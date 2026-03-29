@@ -1,0 +1,199 @@
+{
+  "_metadata": {
+    "standard_id": "CL-IS-ART06-v0.1",
+    "title": "ComplianceLint Interim Standard for EU AI Act Article 6: Classification Rules for High-Risk AI Systems",
+    "version": "0.1.0",
+    "date": "2026-03-17",
+    "status": "draft",
+    "disclaimer": "This is an interim standard developed by ComplianceLint based on available guidance and the official EU AI Act text. It is NOT an official standard. It will be superseded when CEN-CENELEC publishes the harmonized standard for Article 6 (expected Q4 2026).",
+    "basis": [
+      "EU AI Act Article 6 (official text)",
+      "EU AI Act Annex I (Union harmonisation legislation)",
+      "EU AI Act Annex III (High-risk AI systems)",
+      "EU AI Act Recitals 46-56 (classification intent)",
+      "EU AI Act Article 6(3) exception criteria",
+      "European Commission guidelines on high-risk classification (2025)"
+    ],
+    "awaiting_standard": "CEN-CENELEC harmonized standard for Art. 6 classification (expected Q4 2026)"
+  },
+
+  "classification_decision_tree": {
+    "step_1": {
+      "question": "Is the AI system a safety component of a product covered by EU harmonisation legislation listed in Annex I, OR is it itself such a product?",
+      "if_yes": "HIGH-RISK via Art. 6(1) — subject to third-party conformity assessment under Annex I legislation",
+      "if_no": "Proceed to Step 2"
+    },
+    "step_2": {
+      "question": "Does the AI system fall under one of the use-case categories listed in Annex III?",
+      "if_yes": "Proceed to Step 3",
+      "if_no": "NOT HIGH-RISK under Art. 6 — may still be subject to other AI Act provisions (e.g., Art. 52 transparency obligations for certain AI)"
+    },
+    "step_3": {
+      "question": "Does the Art. 6(3) exception apply? The system is NOT high-risk if it does NOT pose a significant risk of harm to health, safety, or fundamental rights AND it meets at least one of: (a) performs a narrow procedural task, (b) improves the result of a previously completed human activity, (c) detects decision-making patterns without replacing human assessment, (d) performs a preparatory task for an assessment listed in Annex III.",
+      "if_yes": "NOT HIGH-RISK (Art. 6(3) exception) — provider must document this reasoning",
+      "if_no": "HIGH-RISK via Art. 6(2) — subject to Chapter 2 requirements (Arts. 8-15)"
+    }
+  },
+
+  "annex_i_product_categories": [
+    "Machinery and machinery products (Regulation (EU) 2023/1230)",
+    "Toys (Directive 2009/48/EC)",
+    "Recreational craft and personal watercraft (Directive 2013/53/EU)",
+    "Lifts (Directive 2014/33/EU)",
+    "Equipment for potentially explosive atmospheres (Directive 2014/34/EU)",
+    "Radio equipment (Directive 2014/53/EU)",
+    "Pressure equipment (Directive 2014/68/EU)",
+    "Cableway installations (Regulation (EU) 2016/424)",
+    "Personal protective equipment (Regulation (EU) 2016/425)",
+    "Appliances burning gaseous fuels (Regulation (EU) 2016/426)",
+    "Medical devices (Regulation (EU) 2017/745)",
+    "In vitro diagnostic medical devices (Regulation (EU) 2017/746)",
+    "Civil aviation (Regulation (EU) 2018/1139)",
+    "Motor vehicles type-approval (Regulation (EU) 2019/2144)",
+    "Marine equipment (Directive 2014/90/EU)"
+  ],
+
+  "annex_iii_categories": [
+    {
+      "id": "ANNEX-III-1",
+      "category": "Biometrics",
+      "description": "AI systems intended for biometric identification, categorisation, or emotion recognition",
+      "subcategories": [
+        "Remote biometric identification (real-time and post, in publicly accessible spaces)",
+        "Biometric categorisation by sensitive attributes (race, political opinions, trade union membership, religious beliefs, sex life/orientation)",
+        "Emotion recognition in workplace and education"
+      ],
+      "keywords": ["face recognition", "facial detection", "biometric", "fingerprint", "iris scan", "voice identification", "gait recognition", "emotion detection", "sentiment analysis face", "categorisation"],
+      "libraries": ["deepface", "face_recognition", "dlib", "insightface", "arcface", "opencv face", "mediapipe face", "amazon rekognition", "azure face api"]
+    },
+    {
+      "id": "ANNEX-III-2",
+      "category": "Critical infrastructure",
+      "description": "AI systems intended as safety components in the management and operation of critical infrastructure",
+      "subcategories": [
+        "Road traffic management",
+        "Water supply",
+        "Gas supply",
+        "Heating supply",
+        "Electricity supply",
+        "Digital infrastructure"
+      ],
+      "keywords": ["traffic control", "water treatment", "power grid", "electricity grid", "gas pipeline", "smart grid", "scada", "industrial control", "energy management", "water supply", "heating system", "digital infrastructure", "network management critical"],
+      "libraries": ["pymodbus", "opcua", "scapy scada", "mininet"]
+    },
+    {
+      "id": "ANNEX-III-3",
+      "category": "Education and vocational training",
+      "description": "AI systems that determine access to or affect progression in education and vocational training",
+      "subcategories": [
+        "Access or admission decisions",
+        "Assignment to institutions or programs",
+        "Assessment of learning outcomes (when used to determine progression)",
+        "Monitoring and detection of prohibited behaviour during exams (cheating detection)"
+      ],
+      "keywords": ["student admission", "enrollment decision", "grade prediction", "exam proctoring", "cheating detection", "plagiarism detection ai", "learning assessment", "student scoring", "academic performance prediction", "dropout prediction"],
+      "libraries": ["proctorio", "examsoft", "turnitin ai"]
+    },
+    {
+      "id": "ANNEX-III-4",
+      "category": "Employment, workers management and access to self-employment",
+      "description": "AI systems used in recruitment, selection, and management of workers",
+      "subcategories": [
+        "Recruitment and selection (CV screening, interview evaluation)",
+        "Decisions on promotion, termination, task allocation",
+        "Monitoring and evaluation of worker performance and behaviour"
+      ],
+      "keywords": ["resume screening", "cv screening", "candidate ranking", "recruitment ai", "hiring algorithm", "employee performance", "worker monitoring", "promotion decision", "termination decision", "workforce management ai", "talent acquisition ai", "applicant tracking"],
+      "libraries": ["pyresparser", "resume-parser", "hiredscore"]
+    },
+    {
+      "id": "ANNEX-III-5",
+      "category": "Access to essential private services and public services and benefits",
+      "description": "AI systems evaluating eligibility for essential services",
+      "subcategories": [
+        "Creditworthiness assessment (credit scoring)",
+        "Risk assessment and pricing for life/health insurance",
+        "Evaluation of eligibility for public assistance benefits",
+        "Dispatching or priority-setting for emergency services",
+        "Risk assessment for emergency response"
+      ],
+      "keywords": ["credit scoring", "credit risk", "loan approval", "insurance risk", "insurance pricing", "underwriting ai", "benefits eligibility", "social scoring", "emergency dispatch", "triage ai", "risk assessment financial", "creditworthiness"],
+      "libraries": ["scorecardpy", "optbinning", "xgboost credit"]
+    },
+    {
+      "id": "ANNEX-III-6",
+      "category": "Law enforcement",
+      "description": "AI systems used by law enforcement authorities",
+      "subcategories": [
+        "Individual risk assessment (recidivism, reoffending)",
+        "Polygraph and similar tools",
+        "Evaluation of reliability of evidence",
+        "Predicting occurrence or reoccurrence of criminal offences (predictive policing)",
+        "Profiling of natural persons in criminal investigations",
+        "Crime analytics on large datasets"
+      ],
+      "keywords": ["recidivism prediction", "predictive policing", "crime prediction", "evidence evaluation", "polygraph ai", "risk assessment criminal", "offender profiling", "crime analytics", "law enforcement ai", "forensic ai"],
+      "libraries": ["compas", "predpol"]
+    },
+    {
+      "id": "ANNEX-III-7",
+      "category": "Migration, asylum and border control management",
+      "description": "AI systems used in migration and border control",
+      "subcategories": [
+        "Risk assessment for security, irregular migration, or health risks",
+        "Examination of applications for asylum, visa, and residence permits",
+        "Document authenticity verification",
+        "Polygraph or similar tools during examination"
+      ],
+      "keywords": ["border control", "immigration risk", "asylum application", "visa assessment", "document verification", "passport verification", "migration risk", "travel document authenticity"],
+      "libraries": []
+    },
+    {
+      "id": "ANNEX-III-8",
+      "category": "Administration of justice and democratic processes",
+      "description": "AI systems assisting judicial authorities or used in democratic processes",
+      "subcategories": [
+        "Research and interpretation of facts and law, application of law to facts",
+        "Alternative dispute resolution",
+        "Influencing the outcome of elections or referendums (excluding organizational tools)"
+      ],
+      "keywords": ["judicial decision", "court decision", "legal prediction", "case outcome prediction", "dispute resolution ai", "sentencing prediction", "election influence", "vote prediction", "legal analytics"],
+      "libraries": []
+    }
+  ],
+
+  "art6_3_exception_criteria": {
+    "description": "An AI system listed in Annex III is NOT high-risk if it does NOT pose a significant risk AND meets at least one of these criteria:",
+    "criteria": [
+      {
+        "id": "EXC-A",
+        "label": "Narrow procedural task",
+        "description": "The system performs a narrow procedural task (e.g., converting unstructured data to structured, document classification for filing)"
+      },
+      {
+        "id": "EXC-B",
+        "label": "Improvement of prior human activity",
+        "description": "The system improves the result of a previously completed human activity (e.g., grammar check on a human-written decision)"
+      },
+      {
+        "id": "EXC-C",
+        "label": "Pattern detection without replacement",
+        "description": "The system detects decision-making patterns or deviations without replacing or influencing the human assessment (e.g., flagging inconsistencies for human review)"
+      },
+      {
+        "id": "EXC-D",
+        "label": "Preparatory task",
+        "description": "The system performs a preparatory task to an assessment relevant to the use cases in Annex III (e.g., data preprocessing before a human makes the actual decision)"
+      }
+    ],
+    "documentation_requirement": "The provider MUST document their reasoning for invoking the Art. 6(3) exception and notify the relevant national authority BEFORE placing the system on the market."
+  },
+
+  "scoring": {
+    "high_risk_art6_1": "System is a safety component or product under Annex I legislation — HIGH-RISK",
+    "high_risk_art6_2": "System falls under Annex III and Art. 6(3) exception does NOT apply — HIGH-RISK",
+    "not_high_risk_exception": "System falls under Annex III but Art. 6(3) exception applies — NOT HIGH-RISK (must document reasoning)",
+    "not_high_risk": "System does not fall under Annex I products or Annex III use cases — NOT HIGH-RISK under Art. 6",
+    "unable_to_determine": "Insufficient information to classify — manual review required"
+  }
+}

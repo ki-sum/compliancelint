@@ -1,0 +1,50 @@
+{
+  "_metadata": {
+    "standard_id": "CL-IS-ART47-v0.1",
+    "title": "ComplianceLint Interim Standard for EU AI Act Article 47: EU Declaration of Conformity",
+    "version": "0.1.0",
+    "date": "2026-04-03",
+    "status": "draft",
+    "disclaimer": "This is an interim standard developed by ComplianceLint. It will be superseded by the CEN-CENELEC harmonized standard.",
+    "basis": [
+      "EU AI Act Article 47 (official text)",
+      "EU AI Act Annex V -- EU Declaration of Conformity content requirements"
+    ],
+    "awaiting_standard": "CEN-CENELEC harmonized standard (expected Q4 2026)"
+  },
+  "requirements": [
+    {
+      "id": "IS-ART47-R01",
+      "obligation_ref": "ART47-OBL-1",
+      "title": "EU Declaration of Conformity Document",
+      "requirement": "The provider MUST draw up a written, machine-readable EU Declaration of Conformity for each high-risk AI system.",
+      "rationale": "Art. 47(1) mandates the DoC document.",
+      "required_content": [
+        "AI system name and identification",
+        "Provider name and address",
+        "Statement that the DoC is issued under the sole responsibility of the provider",
+        "Reference to conformity assessment procedure used",
+        "Reference to harmonised standards or common specifications applied",
+        "Date of issue",
+        "Signature of authorised person"
+      ],
+      "acceptable_formats": [
+        "Machine-readable digital document (JSON, XML, PDF/A with structured data)",
+        "Electronically signed PDF",
+        "Physical signed document with digital copy"
+      ]
+    },
+    {
+      "id": "IS-ART47-R02",
+      "obligation_ref": "ART47-OBL-1",
+      "title": "10-Year Retention",
+      "requirement": "The provider MUST keep the DoC at the disposal of national competent authorities for 10 years.",
+      "rationale": "Art. 47(1) requires 10-year retention after market placement."
+    }
+  ],
+  "scoring": {
+    "compliant": "R01 + R02 met",
+    "partial": "R01 met but incomplete Annex V coverage or no retention plan",
+    "non_compliant": "No DoC document"
+  }
+}

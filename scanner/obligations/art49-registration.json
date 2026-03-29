@@ -1,0 +1,121 @@
+{
+  "_metadata": {
+    "article": 49,
+    "title": "Registration",
+    "prerequisites": [
+      {
+        "type": "risk_classification",
+        "required_level": "high-risk",
+        "source_article": 6,
+        "context_field": "risk_classification",
+        "skip_when": "not high-risk with medium/high confidence"
+      }
+    ],
+    "decomposition_date": "2026-04-03",
+    "primary_official_source": {
+      "name": "EUR-Lex -- Official Journal of the European Union",
+      "eli_uri": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng",
+      "celex": "32024R1689",
+      "oj_citation": "OJ L 2024/1689, 12.7.2024"
+    },
+    "pdf_pages": [81],
+    "related_standards": {
+      "published": [
+        "Annex VIII -- Information to be submitted upon registration of high-risk AI systems"
+      ],
+      "upcoming": []
+    }
+  },
+  "obligations": [
+    {
+      "id": "ART49-OBL-1",
+      "source": "Art. 49(1)",
+      "source_quote": "Before placing on the market or putting into service a high-risk AI system listed in Annex III, with the exception of high-risk AI systems referred to in point 2 of Annex III, the provider or, where applicable, the authorised representative shall register themselves and their system in the EU database referred to in Article 71.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "provider_registered",
+          "description": "Provider must register themselves in EU database",
+          "requirement": "SHALL register themselves in the EU database (Art. 71)"
+        },
+        {
+          "atom": "system_registered",
+          "description": "System must be registered in EU database before market placement",
+          "requirement": "SHALL register the system before placing on market or putting into service"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "low",
+        "detection_method": "Check for EU database registration documentation, registration confirmation",
+        "what_to_scan": ["documentation"],
+        "human_judgment_needed": "Whether registration has been completed in the EU database"
+      }
+    },
+    {
+      "id": "ART49-OBL-2",
+      "source": "Art. 49(2)",
+      "source_quote": "Before placing on the market or putting into service an AI system for which the provider has concluded that it is not high-risk according to Article 6(3), that provider or, where applicable, the authorised representative shall register themselves and that system in the EU database referred to in Article 71.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "scope_limitation": "Only applies to providers claiming Art. 6(3) exception (not high-risk despite Annex III)",
+      "context_skip_field": "claims_art6_3_exception",
+      "context_skip_value": false,
+      "decomposed_atoms": [
+        {
+          "atom": "exception_registered",
+          "description": "Art. 6(3) exception systems must also register",
+          "requirement": "SHALL register even when claiming Art. 6(3) exception"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "Check for Art. 6(3) exception documentation and registration",
+        "what_to_scan": ["documentation"],
+        "human_judgment_needed": "Whether Art. 6(3) exception is validly claimed and system is registered"
+      }
+    },
+    {
+      "id": "ART49-OBL-3",
+      "source": "Art. 49(3)",
+      "source_quote": "Before putting into service or using a high-risk AI system listed in Annex III, with the exception of high-risk AI systems listed in point 2 of Annex III, deployers that are public authorities, Union institutions, bodies, offices or agencies or persons acting on their behalf shall register themselves, select the system and register its use in the EU database referred to in Article 71.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "deployer",
+      "scope_limitation": "Only applies to public authority deployers",
+      "context_skip_field": "is_public_authority",
+      "context_skip_value": false,
+      "decomposed_atoms": [
+        {
+          "atom": "public_authority_registration",
+          "description": "Public authority deployers must register their use",
+          "requirement": "Public authority deployers SHALL register themselves and register system use"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "Not automatable from code — registration is in the EU database",
+        "what_to_scan": [],
+        "human_judgment_needed": "Whether the organization is a public authority and has registered"
+      }
+    }
+  ],
+  "summary": {
+    "total_obligations": 3,
+    "obligation_count": 3,
+    "addressee_breakdown": {
+      "provider": 2,
+      "deployer": 1
+    },
+    "automation_breakdown": {
+      "full": 0,
+      "partial": 1,
+      "manual": 2
+    }
+  }
+}

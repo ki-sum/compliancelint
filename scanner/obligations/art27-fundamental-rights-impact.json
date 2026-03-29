@@ -1,0 +1,176 @@
+{
+  "_metadata": {
+    "article": 27,
+    "title": "Fundamental Rights Impact Assessment",
+    "prerequisites": [
+      {
+        "type": "risk_classification",
+        "required_level": "high-risk",
+        "source_article": 6,
+        "context_field": "risk_classification",
+        "skip_when": "not high-risk with medium/high confidence"
+      }
+    ],
+    "decomposition_date": "2026-04-03",
+    "primary_official_source": {
+      "name": "EUR-Lex -- Official Journal of the European Union",
+      "eli_uri": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng",
+      "celex": "32024R1689",
+      "oj_citation": "OJ L 2024/1689, 12.7.2024"
+    },
+    "pdf_pages": [69, 70],
+    "related_standards": {
+      "published": [
+        "ISO/IEC 42001:2023 -- AI management system",
+        "ISO/IEC 23894:2023 -- AI risk management"
+      ],
+      "upcoming": [
+        "CEN-CENELEC harmonized standard for fundamental rights impact assessment (expected Q4 2026)"
+      ]
+    }
+  },
+  "obligations": [
+    {
+      "id": "ART27-OBL-1",
+      "source": "Art. 27(1)",
+      "source_quote": "Prior to deploying a high-risk AI system referred to in Article 6(2), with the exception of high-risk AI systems intended to be used in the area listed in point 2 of Annex III, deployers that are bodies governed by public law, or are private entities providing public services, and deployers of high-risk AI systems referred to in points 5 (b) and (c) of Annex III, shall perform an assessment of the impact on fundamental rights that the use of such system may produce. For that purpose, deployers shall perform an assessment consisting of: (a) a description of the deployer's processes in which the high-risk AI system will be used in line with its intended purpose; (b) a description of the period of time within which, and the frequency with which, each high-risk AI system is intended to be used; (c) the categories of natural persons and groups likely to be affected by its use in the specific context; (d) the specific risks of harm likely to have an impact on the categories of natural persons or groups of persons identified pursuant to point (c) of this paragraph, taking into account the information given by the provider pursuant to Article 13; (e) a description of the implementation of human oversight measures, according to the instructions for use; (f) the measures to be taken in the case of the materialisation of those risks, including the arrangements for internal governance and complaint mechanisms.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "deployer",
+      "scope_limitation": "Only applies to public law bodies, private entities providing public services, and deployers of Annex III point 5(b) and (c) systems",
+      "context_skip_field": "is_public_law_or_annex_iii_5bc",
+      "context_skip_value": false,
+      "decomposed_atoms": [
+        {
+          "atom": "fria_description_of_processes",
+          "description": "FRIA must include description of deployer's processes using the AI system",
+          "requirement": "SHALL include description of processes in which the AI system will be used"
+        },
+        {
+          "atom": "fria_period_frequency",
+          "description": "FRIA must include period and frequency of use",
+          "requirement": "SHALL include period of time and frequency of intended use"
+        },
+        {
+          "atom": "fria_categories_affected",
+          "description": "FRIA must include categories of persons affected",
+          "requirement": "SHALL include categories of natural persons and groups likely to be affected"
+        },
+        {
+          "atom": "fria_specific_risks",
+          "description": "FRIA must include specific risks of harm",
+          "requirement": "SHALL include specific risks of harm likely to affect identified categories of persons"
+        },
+        {
+          "atom": "fria_human_oversight",
+          "description": "FRIA must include human oversight measures",
+          "requirement": "SHALL include description of human oversight measures"
+        },
+        {
+          "atom": "fria_risk_materialisation",
+          "description": "FRIA must include measures for when risks materialise",
+          "requirement": "SHALL include measures to be taken when risks materialise"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check for FRIA documentation covering all six required elements: processes, period/frequency, affected categories, specific risks, oversight measures, risk materialisation measures",
+        "what_to_scan": ["documentation"],
+        "human_judgment_needed": "Whether the FRIA content is substantively adequate for the specific deployment context"
+      }
+    },
+    {
+      "id": "ART27-OBL-2",
+      "source": "Art. 27(2)",
+      "source_quote": "The obligation laid down in paragraph 1 applies to the first use of the high-risk AI system. The deployer may, in similar cases, rely on previously conducted fundamental rights impact assessments or existing impact assessments carried out by provider. If, during the use of the high-risk AI system, the deployer considers that any of the elements listed in paragraph 1 has changed or is no longer up to date, the deployer shall take the necessary steps to update the information.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "deployer",
+      "scope_limitation": "Only applies to public law bodies, private entities providing public services, and deployers of Annex III point 5(b) and (c) systems",
+      "context_skip_field": "is_public_law_or_annex_iii_5bc",
+      "context_skip_value": false,
+      "decomposed_atoms": [
+        {
+          "atom": "fria_before_first_use",
+          "description": "FRIA must be performed before first use of the AI system",
+          "requirement": "SHALL perform FRIA before first use"
+        },
+        {
+          "atom": "fria_update_on_change",
+          "description": "FRIA must be updated when relevant elements change",
+          "requirement": "SHALL update FRIA when relevant elements have changed"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "low",
+        "detection_method": "Check for FRIA documentation with dates, version history, change log showing updates",
+        "what_to_scan": ["documentation"],
+        "human_judgment_needed": "Whether the FRIA was completed before first use and updated appropriately"
+      }
+    },
+    {
+      "id": "ART27-OBL-3",
+      "source": "Art. 27(3)",
+      "source_quote": "Once the assessment referred to in paragraph 1 of this Article has been performed, the deployer shall notify the market surveillance authority of its results, submitting the filled-out template referred to in paragraph 5 of this Article as part of the notification. In the case referred to in Article 46(1), deployers may be exempt from that obligation to notify.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "deployer",
+      "scope_limitation": "Only applies to public law bodies, private entities providing public services, and deployers of Annex III point 5(b) and (c) systems",
+      "context_skip_field": "is_public_law_or_annex_iii_5bc",
+      "context_skip_value": false,
+      "decomposed_atoms": [
+        {
+          "atom": "fria_notify_authority",
+          "description": "Must notify market surveillance authority of FRIA results",
+          "requirement": "SHALL notify market surveillance authority of results of the assessment"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "Check for evidence of authority notification, submission records, correspondence",
+        "what_to_scan": ["documentation"],
+        "human_judgment_needed": "Whether notification has actually been submitted to the relevant authority"
+      }
+    },
+    {
+      "id": "ART27-OBL-4",
+      "source": "Art. 27(4)",
+      "source_quote": "If any of the obligations laid down in this Article is already met through the data protection impact assessment conducted pursuant to Article 35 of Regulation (EU) 2016/679 or Article 27 of Directive (EU) 2016/680, the fundamental rights impact assessment referred to in paragraph 1 of this Article shall complement that data protection impact assessment.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "deployer",
+      "scope_limitation": "Only applies where a DPIA has already been conducted under GDPR",
+      "context_skip_field": "has_existing_dpia",
+      "context_skip_value": false,
+      "decomposed_atoms": [
+        {
+          "atom": "fria_complement_dpia",
+          "description": "FRIA must complement existing DPIA rather than duplicate it",
+          "requirement": "SHALL complement the existing DPIA when one has been conducted under GDPR"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "Check for FRIA documentation that references and complements existing DPIA",
+        "what_to_scan": ["documentation"],
+        "human_judgment_needed": "Whether the FRIA adequately complements the DPIA"
+      }
+    }
+  ],
+  "summary": {
+    "total_obligations": 4,
+    "obligation_count": 4,
+    "addressee_breakdown": {
+      "deployer": 4
+    },
+    "automation_breakdown": {
+      "full": 0,
+      "partial": 2,
+      "manual": 2
+    }
+  }
+}

@@ -1,0 +1,659 @@
+{
+  "_metadata": {
+    "article": 9,
+    "title": "Risk Management System",
+    "prerequisites": [
+      {
+        "type": "risk_classification",
+        "required_level": "high-risk",
+        "source_article": 6,
+        "context_field": "risk_classification",
+        "skip_when": "not high-risk with medium/high confidence"
+      }
+    ],
+    "decomposition_date": "2026-03-20",
+    "primary_official_source": {
+      "name": "EUR-Lex — Official Journal of the European Union",
+      "eli_uri": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng",
+      "celex": "32024R1689",
+      "oj_citation": "OJ L 2024/1689, 12.7.2024"
+    },
+    "pdf_pages": [
+      56,
+      57
+    ],
+    "related_standards": {
+      "published": [
+        "ISO 14971:2019 — Medical device risk management",
+        "ISO/IEC 23894:2023 — AI risk management guidance",
+        "ISO/IEC 42001:2023 — AI management system",
+        "NIST AI RMF 1.0 — AI Risk Management Framework"
+      ],
+      "upcoming": [
+        "CEN-CENELEC harmonized standard for Art. 9 (expected Q4 2026)"
+      ]
+    }
+  },
+  "obligations": [
+    {
+      "id": "ART09-OBL-1",
+      "source": "Art. 9(1)",
+      "source_quote": "A risk management system shall be established, implemented, documented and maintained in relation to high-risk AI systems.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "addressee_note": "Provider of a high-risk AI system (as defined in Art. 3(3))",
+      "decomposed_atoms": [
+        {
+          "atom": "rms_established",
+          "description": "A risk management system must be established",
+          "requirement": "The provider SHALL establish a risk management system"
+        },
+        {
+          "atom": "rms_implemented",
+          "description": "The RMS must be actively implemented",
+          "requirement": "The RMS SHALL be implemented — not just documented but actively executed"
+        },
+        {
+          "atom": "rms_documented",
+          "description": "The RMS must be documented",
+          "requirement": "The RMS SHALL be documented — creating traceable records"
+        },
+        {
+          "atom": "rms_maintained",
+          "description": "The RMS must be maintained over time",
+          "requirement": "The RMS SHALL be maintained throughout the AI system's lifecycle"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check for risk management documentation files (risk_assessment.md, risk_register.*, FMEA files)",
+        "what_to_scan": [
+          "documentation",
+          "config"
+        ],
+        "human_judgment_needed": "Whether the documented RMS is adequate and truly maintained",
+        "rationale": "Can detect presence of documentation but cannot assess quality or maintenance"
+      }
+    },
+    {
+      "id": "ART09-OBL-2",
+      "source": "Art. 9(2)",
+      "source_quote": "The risk management system shall be understood as a continuous iterative process planned and run throughout the entire lifecycle of a high-risk AI system, requiring regular systematic review and updating.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "rms_continuous_iterative",
+          "description": "RMS must be continuous and iterative",
+          "requirement": "The RMS SHALL be continuous and iterative — not a one-time exercise"
+        },
+        {
+          "atom": "rms_planned",
+          "description": "RMS activities must be planned",
+          "requirement": "RMS activities SHALL be planned with defined schedules and responsibilities"
+        },
+        {
+          "atom": "rms_full_lifecycle",
+          "description": "RMS must cover entire lifecycle",
+          "requirement": "RMS SHALL run throughout the entire lifecycle — design through decommission"
+        },
+        {
+          "atom": "rms_regular_review",
+          "description": "Regular systematic review required",
+          "requirement": "The RMS SHALL undergo regular systematic review and updating"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "low",
+        "detection_method": "Check for version-controlled risk documents with change history, review schedules",
+        "what_to_scan": [
+          "documentation",
+          "config"
+        ],
+        "human_judgment_needed": "Whether the process is truly continuous and iterative",
+        "rationale": "Can check for version history but cannot verify genuine iteration"
+      }
+    },
+    {
+      "id": "ART09-OBL-2a",
+      "source": "Art. 9(2)(a)",
+      "source_quote": "the identification and analysis of the known and the reasonably foreseeable risks that the high-risk AI system can pose to health, safety or fundamental rights when the high-risk AI system is used in accordance with its intended purpose;",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "identify_known_risks",
+          "description": "Known risks must be identified",
+          "requirement": "The provider SHALL identify known risks to health, safety, or fundamental rights"
+        },
+        {
+          "atom": "identify_foreseeable_risks",
+          "description": "Foreseeable risks must be identified",
+          "requirement": "The provider SHALL identify reasonably foreseeable risks"
+        },
+        {
+          "atom": "analyse_risks",
+          "description": "Identified risks must be analysed",
+          "requirement": "The provider SHALL analyse identified risks — assessing nature, severity, and likelihood"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check for risk register with risk categories covering health, safety, fundamental rights",
+        "what_to_scan": [
+          "documentation"
+        ],
+        "human_judgment_needed": "Whether all foreseeable risks have been identified",
+        "rationale": "Can detect presence of risk register but cannot assess completeness"
+      }
+    },
+    {
+      "id": "ART09-OBL-2b",
+      "source": "Art. 9(2)(b)",
+      "source_quote": "the estimation and evaluation of the risks that may emerge when the high-risk AI system is used in accordance with its intended purpose, and under conditions of reasonably foreseeable misuse;",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "evaluate_intended_use_risks",
+          "description": "Risks from intended use must be evaluated",
+          "requirement": "Risk evaluation SHALL consider risks from intended use"
+        },
+        {
+          "atom": "evaluate_misuse_risks",
+          "description": "Risks from foreseeable misuse must be evaluated",
+          "requirement": "Risk evaluation SHALL consider risks from reasonably foreseeable misuse"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "low",
+        "detection_method": "Check for intended use / misuse documentation, model cards",
+        "what_to_scan": [
+          "documentation"
+        ],
+        "human_judgment_needed": "Whether misuse scenarios are realistic and comprehensive",
+        "rationale": "Can detect presence of documentation but cannot assess completeness"
+      }
+    },
+    {
+      "id": "ART09-OBL-2c",
+      "source": "Art. 9(2)(c)",
+      "source_quote": "the evaluation of other risks possibly arising, based on the analysis of data gathered from the post-market monitoring system referred to in Article 72;",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "evaluate_postmarket_risks",
+          "description": "Risks from post-market data must be evaluated",
+          "requirement": "The provider SHALL evaluate risks arising from post-market monitoring data"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "Check for post-market monitoring integration in risk management docs",
+        "what_to_scan": [
+          "documentation"
+        ],
+        "human_judgment_needed": "Whether post-market data is actually feeding into risk management",
+        "rationale": "Post-market monitoring feedback loop cannot be verified from code alone"
+      },
+      "cross_references": [
+        {
+          "article": 72,
+          "context": "Post-market monitoring system"
+        }
+      ]
+    },
+    {
+      "id": "ART09-OBL-2d",
+      "source": "Art. 9(2)(d)",
+      "source_quote": "the adoption of appropriate and targeted risk management measures designed to address the risks identified pursuant to point (a).",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "adopt_risk_measures",
+          "description": "Risk management measures must be adopted",
+          "requirement": "The provider SHALL adopt appropriate and targeted risk management measures"
+        },
+        {
+          "atom": "measures_address_identified_risks",
+          "description": "Measures must address identified risks",
+          "requirement": "Risk measures SHALL be designed to address the specific risks identified in step (a)"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check for guardrails, safety checks, input validation, content filters in code",
+        "what_to_scan": [
+          "code",
+          "config"
+        ],
+        "human_judgment_needed": "Whether measures are appropriate and targeted to specific risks",
+        "rationale": "Can detect risk mitigation code patterns but cannot assess appropriateness"
+      }
+    },
+    {
+      "id": "ART09-OBL-3",
+      "source": "Art. 9(3)",
+      "source_quote": "The risks referred to in this Article shall concern only those which may be reasonably mitigated or eliminated through the development or design of the high-risk AI system, or the provision of adequate technical information.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "note": "Scope-limiting clause: the RMS need only address risks that are reasonably mitigable through design or provision of technical information. Not all conceivable risks fall within scope.",
+      "decomposed_atoms": [
+        {
+          "atom": "rms_scope_limited_to_mitigable_risks",
+          "description": "RMS scope is limited to reasonably mitigable risks",
+          "requirement": "The RMS SHALL concern only risks which may be reasonably mitigated or eliminated through design or provision of adequate technical information"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "N/A — scope-definition clause requiring legal judgment",
+        "what_to_scan": [],
+        "human_judgment_needed": "Whether identified risks fall within scope of what is reasonably mitigable through design or technical information",
+        "rationale": "Scope determination requires domain expertise and legal judgment — cannot be automated"
+      }
+    },
+    {
+      "id": "ART09-OBL-4",
+      "source": "Art. 9(4)",
+      "source_quote": "The risk management measures referred to in paragraph 2, point (d), shall give due consideration to the effects and possible interaction resulting from the combined application of the requirements set out in this Section, with a view to minimising risks more effectively while achieving an appropriate balance in implementing the measures to fulfil those requirements.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "consider_combined_effects",
+          "description": "Combined effects of requirements must be considered",
+          "requirement": "Risk measures SHALL consider effects from combined application of all Section requirements"
+        },
+        {
+          "atom": "balance_measures",
+          "description": "Balance must be achieved",
+          "requirement": "Measures SHALL achieve appropriate balance between risk minimisation and requirement fulfilment"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "N/A — requires human assessment of cross-requirement interactions",
+        "what_to_scan": [],
+        "human_judgment_needed": "Whether combined effects have been adequately considered",
+        "rationale": "Cross-requirement interaction analysis requires domain expertise"
+      }
+    },
+    {
+      "id": "ART09-OBL-5",
+      "source": "Art. 9(5)",
+      "source_quote": "The risk management measures referred to in paragraph 2, point (d), shall be such that the relevant residual risk associated with each hazard, as well as the overall residual risk of the high-risk AI systems is judged to be acceptable.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "residual_risk_per_hazard_acceptable",
+          "description": "Residual risk per hazard must be acceptable",
+          "requirement": "Each hazard's residual risk SHALL be judged acceptable"
+        },
+        {
+          "atom": "overall_residual_risk_acceptable",
+          "description": "Overall residual risk must be acceptable",
+          "requirement": "The overall residual risk SHALL be judged acceptable"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "Check for residual risk documentation, known limitations sections",
+        "what_to_scan": [
+          "documentation"
+        ],
+        "human_judgment_needed": "Whether residual risks are truly acceptable",
+        "rationale": "Acceptability involves value judgments beyond technical assessment"
+      }
+    },
+    {
+      "id": "ART09-OBL-5a",
+      "source": "Art. 9(5)(a)",
+      "source_quote": "elimination or reduction of risks identified and evaluated pursuant to paragraph 2 in as far as technically feasible through adequate design and development of the high-risk AI system;",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "eliminate_risks_by_design",
+          "description": "Risks must be eliminated/reduced through design",
+          "requirement": "The provider SHALL eliminate or reduce risks through adequate design and development"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "low",
+        "detection_method": "Check for safety-by-design patterns (guardrails, input validation, output filters)",
+        "what_to_scan": [
+          "code"
+        ],
+        "human_judgment_needed": "Whether design choices adequately address identified risks",
+        "rationale": "Can detect safety patterns but cannot assess adequacy"
+      }
+    },
+    {
+      "id": "ART09-OBL-5b",
+      "source": "Art. 9(5)(b)",
+      "source_quote": "where appropriate, implementation of adequate mitigation and control measures addressing risks that cannot be eliminated;",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "implement_mitigations",
+          "description": "Mitigation measures for non-eliminable risks",
+          "requirement": "The provider SHALL implement adequate mitigation and control measures for risks that cannot be eliminated by design"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "low",
+        "detection_method": "Check for monitoring, alerting, fallback mechanisms, circuit breakers",
+        "what_to_scan": [
+          "code",
+          "config"
+        ],
+        "human_judgment_needed": "Whether mitigations are adequate and proportionate",
+        "rationale": "Can detect mitigation patterns but cannot assess proportionality"
+      }
+    },
+    {
+      "id": "ART09-OBL-5c",
+      "source": "Art. 9(5)(c)",
+      "source_quote": "provision of information required pursuant to Article 13 and, where appropriate, training to deployers.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "provide_info_per_art13",
+          "description": "Information per Art. 13 must be provided",
+          "requirement": "The provider SHALL provide information required by Art. 13"
+        },
+        {
+          "atom": "provide_deployer_training",
+          "description": "Training for deployers where appropriate",
+          "requirement": "The provider SHALL provide training to deployers where appropriate"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "Check for deployer documentation and training materials",
+        "what_to_scan": [
+          "documentation"
+        ],
+        "human_judgment_needed": "Whether information and training are sufficient",
+        "rationale": "Training adequacy requires human assessment"
+      },
+      "cross_references": [
+        {
+          "article": 13,
+          "context": "Transparency and provision of information to deployers"
+        }
+      ]
+    },
+    {
+      "id": "ART09-OBL-5d",
+      "source": "Art. 9(5)",
+      "source_quote": "With a view to eliminating or reducing risks related to the use of the high-risk AI system, due consideration shall be given to the technical knowledge, experience, education, the training to be expected by the deployer, and the presumable context in which the system is intended to be used.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "consider_deployer_knowledge",
+          "description": "Deployer's technical knowledge must be considered",
+          "requirement": "Due consideration SHALL be given to the deployer's technical knowledge and experience"
+        },
+        {
+          "atom": "consider_usage_context",
+          "description": "Intended usage context must be considered",
+          "requirement": "Due consideration SHALL be given to the presumable context of use"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "Check for target user documentation, deployment context description",
+        "what_to_scan": [
+          "documentation"
+        ],
+        "human_judgment_needed": "Whether deployer context has been adequately considered",
+        "rationale": "Deployer context assessment requires domain knowledge"
+      }
+    },
+    {
+      "id": "ART09-OBL-6",
+      "source": "Art. 9(6)",
+      "source_quote": "High-risk AI systems shall be tested for the purpose of identifying the most appropriate and targeted risk management measures. Testing shall ensure that high-risk AI systems perform consistently for their intended purpose and that they are in compliance with the requirements set out in this Section.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "testing_for_risk_measures",
+          "description": "Testing to identify appropriate risk measures",
+          "requirement": "Systems SHALL be tested to identify the most appropriate risk management measures"
+        },
+        {
+          "atom": "testing_consistent_performance",
+          "description": "Testing must verify consistent performance",
+          "requirement": "Testing SHALL ensure consistent performance for intended purpose"
+        },
+        {
+          "atom": "testing_section_compliance",
+          "description": "Testing must verify Section compliance",
+          "requirement": "Testing SHALL ensure compliance with all requirements in this Section (Art. 8-15)"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check for test files, evaluation scripts, benchmark files",
+        "what_to_scan": [
+          "code",
+          "config"
+        ],
+        "human_judgment_needed": "Whether tests adequately cover identified risks",
+        "rationale": "Can detect testing infrastructure but cannot assess test adequacy"
+      }
+    },
+    {
+      "id": "ART09-OBL-8a",
+      "source": "Art. 9(8)",
+      "source_quote": "The testing of high-risk AI systems shall be performed, as appropriate, at any time throughout the development process, and, in any event, prior to their being placed on the market or put into service.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "testing_throughout_development",
+          "description": "Testing throughout development",
+          "requirement": "Testing SHALL be performed at any time throughout development"
+        },
+        {
+          "atom": "testing_prior_to_market",
+          "description": "Testing before market placement",
+          "requirement": "Testing SHALL be performed prior to being placed on market or put into service"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check for CI/CD test integration, pre-deployment test gates",
+        "what_to_scan": [
+          "config",
+          "code"
+        ],
+        "human_judgment_needed": "Whether testing was performed at appropriate times",
+        "rationale": "Can detect CI/CD integration but cannot verify timing of all tests"
+      }
+    },
+    {
+      "id": "ART09-OBL-8b",
+      "source": "Art. 9(8)",
+      "source_quote": "Testing shall be carried out against prior defined metrics and probabilistic thresholds that are appropriate to the intended purpose of the high-risk AI system.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "prior_defined_metrics",
+          "description": "Metrics must be defined before testing",
+          "requirement": "Testing SHALL use prior defined metrics — not post-hoc cherry-picked"
+        },
+        {
+          "atom": "probabilistic_thresholds",
+          "description": "Probabilistic thresholds required",
+          "requirement": "Testing SHALL use probabilistic thresholds — not binary pass/fail"
+        },
+        {
+          "atom": "metrics_appropriate_to_purpose",
+          "description": "Metrics appropriate to purpose",
+          "requirement": "Metrics and thresholds SHALL be appropriate to the system's intended purpose"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check for metric definitions (accuracy, precision, recall, F1, AUC), threshold values in config",
+        "what_to_scan": [
+          "code",
+          "config"
+        ],
+        "human_judgment_needed": "Whether metrics are appropriate for the specific system",
+        "rationale": "Can detect metric usage but cannot assess appropriateness"
+      }
+    },
+    {
+      "id": "ART09-OBL-9",
+      "source": "Art. 9(9)",
+      "source_quote": "When implementing the risk management system as provided for in paragraphs 1 to 7, providers shall give consideration to whether in view of its intended purpose the high-risk AI system is likely to have an adverse impact on persons under the age of 18 and, as appropriate, other vulnerable groups.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "scope_limitation": "Only applies when the AI system is intended to be used by or may affect children or vulnerable groups",
+      "context_skip_field": "affects_children",
+      "context_skip_value": false,
+      "decomposed_atoms": [
+        {
+          "atom": "consider_child_impact",
+          "description": "Impact on children must be considered",
+          "requirement": "Providers SHALL consider whether the system is likely to adversely impact persons under 18"
+        },
+        {
+          "atom": "consider_vulnerable_groups",
+          "description": "Impact on vulnerable groups must be considered",
+          "requirement": "Providers SHALL consider impact on other vulnerable groups as appropriate"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "low",
+        "detection_method": "Check for references to children, minors, age verification, child safety in code and docs",
+        "what_to_scan": [
+          "code",
+          "documentation"
+        ],
+        "human_judgment_needed": "Whether the system actually affects children and whether protections are adequate",
+        "rationale": "Can detect references but cannot determine actual impact on children"
+      }
+    },
+    {
+      "id": "ART09-PERM-7",
+      "source": "Art. 9(7)",
+      "source_quote": "Testing procedures may include testing in real-world conditions in accordance with Article 60.",
+      "deontic_type": "permission",
+      "note": "Permission to test in real-world conditions, subject to Art. 60 safeguards. Not an obligation.",
+      "modality": "may",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "real_world_testing_permitted",
+          "description": "Real-world testing is permitted",
+          "requirement": "Providers MAY include real-world testing subject to Art. 60 requirements"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "N/A — permission, not obligation",
+        "what_to_scan": [],
+        "human_judgment_needed": "Whether real-world testing is appropriate",
+        "rationale": "Permission (may), not obligation (shall)"
+      },
+      "cross_references": [
+        {
+          "article": 60,
+          "context": "Testing in real-world conditions"
+        }
+      ]
+    },
+    {
+      "id": "ART09-PERM-10",
+      "source": "Art. 9(10)",
+      "source_quote": "For providers of high-risk AI systems that are subject to requirements regarding internal risk management processes under other relevant provisions of Union law, the aspects provided in paragraphs 1 to 9 may be part of, or combined with, the risk management procedures established pursuant to that law.",
+      "deontic_type": "permission",
+      "note": "Permission to integrate Art. 9 RMS with other Union law risk management. Not an obligation.",
+      "modality": "may",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "rms_may_integrate_with_other_law",
+          "description": "RMS may integrate with other legal requirements",
+          "requirement": "The RMS MAY be part of or combined with risk management under other Union law"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "N/A — permission, not obligation",
+        "what_to_scan": [],
+        "human_judgment_needed": "Whether integration with other risk management is appropriate",
+        "rationale": "Permission (may), not obligation (shall)"
+      }
+    }
+  ],
+  "summary": {
+    "total_obligations": 19,
+    "obligation_count": 17,
+    "permission_count": 2,
+    "addressee_breakdown": {
+      "provider": 18,
+      "deployer": 0,
+      "commission": 0
+    },
+    "automation_breakdown": {
+      "full": 0,
+      "partial": 11,
+      "manual": 7
+    },
+    "scope_notes": {
+      "general_obligations": "ART09-OBL-1 through ART09-OBL-8b — apply to ALL high-risk AI systems",
+      "conditional": "ART09-OBL-9 — applies only when system may affect children or vulnerable groups",
+      "permissions": "ART09-PERM-7, ART09-PERM-10 — permissions (may), not obligations (shall)"
+    }
+  }
+}

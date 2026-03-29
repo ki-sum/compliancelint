@@ -1,0 +1,158 @@
+{
+  "_metadata": {
+    "article": 72,
+    "title": "Post-Market Monitoring by Providers",
+    "prerequisites": [
+      {
+        "type": "risk_classification",
+        "required_level": "high-risk",
+        "source_article": 6,
+        "context_field": "risk_classification",
+        "skip_when": "not high-risk with medium/high confidence"
+      }
+    ],
+    "decomposition_date": "2026-04-03",
+    "primary_official_source": {
+      "name": "EUR-Lex -- Official Journal of the European Union",
+      "eli_uri": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng",
+      "celex": "32024R1689",
+      "oj_citation": "OJ L 2024/1689, 12.7.2024"
+    },
+    "pdf_pages": [99, 100],
+    "related_standards": {
+      "published": [
+        "ISO/IEC 42001:2023 -- AI management system",
+        "ISO 9001:2015 -- Quality management systems (post-delivery activities)"
+      ],
+      "upcoming": [
+        "CEN-CENELEC harmonized standard for post-market monitoring of AI systems (expected Q4 2026)"
+      ]
+    }
+  },
+  "obligations": [
+    {
+      "id": "ART72-OBL-1",
+      "source": "Art. 72(1)",
+      "source_quote": "Providers shall establish and document a post-market monitoring system in a manner that is proportionate to the nature of the AI technologies and the risks of the high-risk AI system.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "pmm_system_established",
+          "description": "Must establish a post-market monitoring system",
+          "requirement": "SHALL establish a post-market monitoring system"
+        },
+        {
+          "atom": "pmm_system_documented",
+          "description": "Post-market monitoring system must be documented",
+          "requirement": "SHALL document the post-market monitoring system"
+        },
+        {
+          "atom": "pmm_proportionate",
+          "description": "System must be proportionate to the nature and risks of the AI system",
+          "requirement": "SHALL be proportionate to the nature of the AI technology and the risks of the high-risk AI system"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check for post-market monitoring documentation, monitoring system configuration, risk-proportionate design evidence",
+        "what_to_scan": ["documentation", "config"],
+        "human_judgment_needed": "Whether the monitoring system is truly proportionate to the specific risks"
+      }
+    },
+    {
+      "id": "ART72-OBL-2",
+      "source": "Art. 72(2)",
+      "source_quote": "The post-market monitoring system shall actively and systematically collect, document and analyse relevant data which may be provided by deployers or which may be collected through other sources on the performance of high-risk AI systems throughout their lifetime, and which allow the provider to evaluate the continuous compliance of AI systems with the requirements set out in Chapter III, Section 2. Where relevant, post-market monitoring shall include an analysis of the interaction with other AI systems. This obligation shall not cover sensitive operational data of deployers which are law-enforcement authorities.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "pmm_active_collection",
+          "description": "Must actively collect relevant data throughout the system's lifetime",
+          "requirement": "SHALL actively and systematically collect, document and analyse relevant data"
+        },
+        {
+          "atom": "pmm_continuous_compliance",
+          "description": "Must evaluate continuous compliance with requirements",
+          "requirement": "SHALL evaluate the continuous compliance of AI systems with the requirements set out in this Regulation"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check for data collection pipelines, analytics dashboards, compliance evaluation procedures, performance tracking systems",
+        "what_to_scan": ["code", "config", "documentation"],
+        "human_judgment_needed": "Whether data collection is sufficiently comprehensive and analysis is meaningful"
+      }
+    },
+    {
+      "id": "ART72-OBL-3",
+      "source": "Art. 72(3)",
+      "source_quote": "The post-market monitoring system shall be based on a post-market monitoring plan. The post-market monitoring plan shall be part of the technical documentation referred to in Annex IV. The Commission shall adopt an implementing act laying down detailed provisions establishing a template for the post-market monitoring plan and the list of elements to be included in the plan by 2 February 2026. That implementing act shall be adopted in accordance with the examination procedure referred to in Article 98(2).",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "pmm_plan_exists",
+          "description": "Must have a post-market monitoring plan",
+          "requirement": "SHALL be based on a post-market monitoring plan"
+        },
+        {
+          "atom": "pmm_plan_in_technical_docs",
+          "description": "Plan must be part of Annex IV technical documentation",
+          "requirement": "SHALL include the post-market monitoring plan as part of the technical documentation referred to in Annex IV"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check for post-market monitoring plan document, integration with technical documentation per Annex IV",
+        "what_to_scan": ["documentation"],
+        "human_judgment_needed": "Whether the plan is sufficiently detailed and properly integrated into technical documentation"
+      }
+    },
+    {
+      "id": "ART72-PER-1",
+      "source": "Art. 72(4)",
+      "source_quote": "For high-risk AI systems covered by the Union harmonisation legislation listed in Section A of Annex I, where a post-market monitoring system and plan are already established under that legislation, in order to ensure consistency, avoid duplications and minimise additional burdens, providers shall have a choice of integrating, as appropriate, the necessary elements described in paragraphs 1, 2 and 3 using the template referred in paragraph 3 into systems and plans already existing under that legislation, provided that it achieves an equivalent level of protection.",
+      "deontic_type": "permission",
+      "modality": "may",
+      "addressee": "provider",
+      "scope_limitation": "Only applies to products covered by Annex I Union harmonisation legislation",
+      "context_skip_field": "is_annex_i_product",
+      "context_skip_value": false,
+      "decomposed_atoms": [
+        {
+          "atom": "pmm_integrate_existing",
+          "description": "May integrate AI post-market monitoring into existing product monitoring",
+          "requirement": "MAY be integrated into existing post-market monitoring systems for Annex I products"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "Check for documentation of integrated monitoring systems for Annex I products",
+        "what_to_scan": ["documentation"],
+        "human_judgment_needed": "Whether integration with existing monitoring is appropriate and complete"
+      }
+    }
+  ],
+  "summary": {
+    "total_obligations": 4,
+    "obligation_count": 3,
+    "permission_count": 1,
+    "addressee_breakdown": {
+      "provider": 4
+    },
+    "automation_breakdown": {
+      "full": 0,
+      "partial": 3,
+      "manual": 1
+    }
+  }
+}

@@ -1,0 +1,107 @@
+{
+  "_metadata": {
+    "article": 80,
+    "title": "Procedure for dealing with AI systems classified by the provider as non-high-risk in application of Annex III",
+    "prerequisites": [],
+    "primary_official_source": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689#art_80",
+    "pdf_pages": "107",
+    "decomposition_date": "2026-04-04",
+    "related_standards": {
+      "draft": [],
+      "published": [],
+      "upcoming": []
+    }
+  },
+  "obligations": [
+    {
+      "id": "ART80-OBL-4",
+      "source": "Art. 80(4)",
+      "source_quote": "The provider shall ensure that all necessary action is taken to bring the AI system into compliance with the requirements and obligations laid down in this Regulation. Where the provider of an AI system concerned does not bring the AI system into compliance with those requirements and obligations within the period referred to in paragraph 2 of this Article, the provider shall be subject to fines in accordance with Article 99.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "addressee_note": "Provider whose AI system was found to be wrongly classified as non-high-risk",
+      "decomposed_atoms": [
+        {
+          "atom": "bring_system_into_compliance",
+          "description": "Provider must take all necessary action to bring the system into compliance",
+          "requirement": "The provider SHALL ensure that all necessary action is taken to bring the AI system into compliance with the requirements and obligations of this Regulation"
+        },
+        {
+          "atom": "compliance_within_prescribed_period",
+          "description": "Compliance must be achieved within the period set by the market surveillance authority",
+          "requirement": "The provider SHALL bring the system into compliance within the period referred to in paragraph 2, or be subject to fines per Art. 99"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "low",
+        "detection_method": "documentation_search",
+        "what_to_scan": "Risk classification documentation, compliance remediation plans, authority correspondence",
+        "human_judgment_needed": true
+      },
+      "cross_references": ["Art. 99"]
+    },
+    {
+      "id": "ART80-OBL-5",
+      "source": "Art. 80(5)",
+      "source_quote": "The provider shall ensure that all appropriate corrective action is taken in respect of all the AI systems concerned that it has made available on the Union market.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "addressee_note": "Provider whose AI system was wrongly classified as non-high-risk",
+      "decomposed_atoms": [
+        {
+          "atom": "corrective_action_all_affected_systems",
+          "description": "Corrective action must cover all affected AI systems on the Union market, not just the one investigated",
+          "requirement": "The provider SHALL ensure corrective action is taken in respect of ALL AI systems concerned that it has made available on the Union market"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "low",
+        "detection_method": "documentation_search",
+        "what_to_scan": "Product inventory, deployed system records, corrective action scope documentation",
+        "human_judgment_needed": true
+      }
+    },
+    {
+      "id": "ART80-OBL-7",
+      "source": "Art. 80(7)",
+      "source_quote": "Where, in the course of the evaluation pursuant to paragraph 1 of this Article, the market surveillance authority establishes that the AI system was misclassified by the provider as non-high-risk in order to circumvent the application of requirements in Chapter III, Section 2, the provider shall be subject to fines in accordance with Article 99.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "addressee_note": "Provider that deliberately misclassified system to circumvent requirements",
+      "decomposed_atoms": [
+        {
+          "atom": "fines_for_deliberate_misclassification",
+          "description": "Provider faces fines for deliberate misclassification to circumvent requirements",
+          "requirement": "The provider SHALL be subject to fines per Art. 99 if the system was deliberately misclassified to circumvent Chapter III Section 2 requirements"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "context_analysis",
+        "what_to_scan": "Risk classification methodology documentation, classification rationale, Art. 6(3) criteria assessment",
+        "human_judgment_needed": true
+      },
+      "cross_references": ["Art. 6(3)", "Art. 99"]
+    }
+  ],
+  "summary": {
+    "total_obligations": 3,
+    "obligation_count": 3,
+    "prohibition_count": 0,
+    "permission_count": 0,
+    "addressee_breakdown": {
+      "provider": 3
+    },
+    "automation_breakdown": {
+      "full": 0,
+      "partial": 3,
+      "manual": 0
+    }
+  }
+}

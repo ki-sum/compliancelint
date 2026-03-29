@@ -1,0 +1,90 @@
+{
+  "_metadata": {
+    "article": 71,
+    "title": "EU database for high-risk AI systems listed in Annex III",
+    "prerequisites": [
+      {
+        "type": "risk_classification",
+        "required_level": "high-risk",
+        "source_article": 6,
+        "context_field": "risk_classification",
+        "skip_when": "not high-risk with medium/high confidence"
+      }
+    ],
+    "primary_official_source": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689#art_71",
+    "pdf_pages": "99-100",
+    "decomposition_date": "2026-04-04",
+    "related_standards": {
+      "draft": [],
+      "published": [],
+      "upcoming": []
+    }
+  },
+  "obligations": [
+    {
+      "id": "ART71-OBL-2",
+      "source": "Art. 71(2)",
+      "source_quote": "The data listed in Sections A and B of Annex VIII shall be entered into the EU database by the provider or, where applicable, by the authorised representative.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "addressee_note": "Provider (or authorised representative) of a high-risk AI system listed in Annex III",
+      "decomposed_atoms": [
+        {
+          "atom": "provider_data_entered_in_eu_database",
+          "description": "Provider must enter Annex VIII Sections A and B data into the EU database",
+          "requirement": "The data listed in Sections A and B of Annex VIII SHALL be entered into the EU database by the provider or authorised representative"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "documentation_search",
+        "what_to_scan": "EU database registration records, Annex VIII data preparation, registration confirmation",
+        "human_judgment_needed": true
+      },
+      "cross_references": ["Annex VIII Sections A and B", "Art. 49"]
+    },
+    {
+      "id": "ART71-OBL-3",
+      "source": "Art. 71(3)",
+      "source_quote": "The data listed in Section C of Annex VIII shall be entered into the EU database by the deployer who is, or who acts on behalf of, a public authority, agency or body, in accordance with Article 49(3) and (4).",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "deployer",
+      "addressee_note": "Deployer who is, or acts on behalf of, a public authority, agency, or body",
+      "decomposed_atoms": [
+        {
+          "atom": "deployer_data_entered_in_eu_database",
+          "description": "Public-authority deployers must enter Annex VIII Section C data into the EU database",
+          "requirement": "Deployers who are public authorities SHALL enter Section C data into the EU database per Art. 49(3) and (4)"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "low",
+        "detection_method": "documentation_search",
+        "what_to_scan": "Deployer registration records, public authority classification, Annex VIII Section C data",
+        "human_judgment_needed": true
+      },
+      "scope_limitation": "Only applies to deployers who are, or act on behalf of, public authorities",
+      "context_skip_field": "is_public_authority_deployer",
+      "cross_references": ["Annex VIII Section C", "Art. 49(3)", "Art. 49(4)"]
+    }
+  ],
+  "summary": {
+    "total_obligations": 2,
+    "obligation_count": 2,
+    "prohibition_count": 0,
+    "permission_count": 0,
+    "addressee_breakdown": {
+      "provider": 1,
+      "deployer": 1
+    },
+    "automation_breakdown": {
+      "full": 0,
+      "partial": 2,
+      "manual": 0
+    }
+  }
+}

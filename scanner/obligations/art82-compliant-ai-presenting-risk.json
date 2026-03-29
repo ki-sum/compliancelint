@@ -1,0 +1,68 @@
+{
+  "_metadata": {
+    "article": 82,
+    "title": "Compliant AI systems which present a risk",
+    "prerequisites": [
+      {
+        "type": "risk_classification",
+        "required_level": "high-risk",
+        "source_article": 6,
+        "context_field": "risk_classification",
+        "skip_when": "not high-risk with medium/high confidence"
+      }
+    ],
+    "primary_official_source": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689#art_82",
+    "pdf_pages": "108",
+    "decomposition_date": "2026-04-04",
+    "related_standards": {
+      "draft": [],
+      "published": [],
+      "upcoming": []
+    }
+  },
+  "obligations": [
+    {
+      "id": "ART82-OBL-2",
+      "source": "Art. 82(2)",
+      "source_quote": "The provider or other relevant operator shall ensure that corrective action is taken in respect of all the AI systems concerned that it has made available on the Union market within the timeline prescribed by the market surveillance authority of the Member State referred to in paragraph 1.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "addressee_note": "Provider or other relevant operator of a compliant AI system that nevertheless presents a risk",
+      "decomposed_atoms": [
+        {
+          "atom": "corrective_action_all_affected_systems",
+          "description": "Corrective action must cover all affected systems on the Union market",
+          "requirement": "The provider SHALL ensure corrective action is taken in respect of ALL AI systems concerned made available on the Union market"
+        },
+        {
+          "atom": "corrective_action_within_timeline",
+          "description": "Corrective action must be completed within the timeline prescribed by the authority",
+          "requirement": "Corrective action SHALL be taken within the timeline prescribed by the market surveillance authority"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "low",
+        "detection_method": "documentation_search",
+        "what_to_scan": "Corrective action plans, authority correspondence, system inventory, compliance remediation records",
+        "human_judgment_needed": true
+      },
+      "cross_references": ["Art. 79"]
+    }
+  ],
+  "summary": {
+    "total_obligations": 1,
+    "obligation_count": 1,
+    "prohibition_count": 0,
+    "permission_count": 0,
+    "addressee_breakdown": {
+      "provider": 1
+    },
+    "automation_breakdown": {
+      "full": 0,
+      "partial": 1,
+      "manual": 0
+    }
+  }
+}

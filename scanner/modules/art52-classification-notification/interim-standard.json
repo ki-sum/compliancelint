@@ -1,0 +1,58 @@
+{
+  "_metadata": {
+    "standard_id": "CL-IS-ART52-v0.1",
+    "title": "ComplianceLint Interim Standard for EU AI Act Article 52: Notification of GPAI Models with Systemic Risk",
+    "version": "0.1.0",
+    "date": "2026-04-03",
+    "status": "draft",
+    "disclaimer": "This is an interim standard developed by ComplianceLint. It will be superseded by the CEN-CENELEC harmonized standard.",
+    "basis": [
+      "EU AI Act Article 52 (official text)",
+      "EU AI Office notification procedures"
+    ],
+    "awaiting_standard": "CEN-CENELEC harmonized standard for Art. 52 (expected Q4 2026)"
+  },
+  "requirements": [
+    {
+      "id": "IS-ART52-R01",
+      "obligation_ref": "ART52-OBL-1",
+      "title": "Timely Notification to Commission",
+      "requirement": "The provider MUST notify the Commission without delay and no later than 2 weeks after the GPAI model meets the systemic risk criteria.",
+      "rationale": "Art. 52(1) mandates notification within 2 weeks of meeting classification criteria.",
+      "acceptable_implementations": [
+        "Formal notification letter submitted to EU AI Office within 14 days",
+        "Automated threshold monitoring with notification trigger workflow",
+        "Compliance calendar with notification deadline tracking"
+      ]
+    },
+    {
+      "id": "IS-ART52-R02",
+      "obligation_ref": "ART52-OBL-2",
+      "title": "Notification Content Completeness",
+      "requirement": "The notification MUST include sufficient information to demonstrate that the GPAI model meets the systemic risk criteria.",
+      "rationale": "Art. 52 requires the notification to contain evidence supporting the classification determination.",
+      "acceptable_implementations": [
+        "Notification package with FLOPs calculation and training documentation",
+        "Structured notification form with capability assessment results",
+        "Comprehensive submission with model card and technical specifications"
+      ]
+    },
+    {
+      "id": "IS-ART52-R03",
+      "obligation_ref": "ART52-OBL-3",
+      "title": "Rebuttal Process Readiness",
+      "requirement": "The provider MUST be prepared to present sufficiently substantiated arguments for rebuttal if the provider considers the model does not meet systemic risk criteria despite exceeding the FLOPs threshold.",
+      "rationale": "Art. 52(2) grants providers the right to present arguments that their model should not be classified as systemic risk.",
+      "acceptable_implementations": [
+        "Documented rebuttal case with technical evidence of limited capability scope",
+        "Independent assessment report supporting non-systemic-risk classification",
+        "Structured argumentation framework aligned with Annex XIII criteria"
+      ]
+    }
+  ],
+  "scoring": {
+    "compliant": "R01 + R02 met, R03 if applicable",
+    "partial": "R01 met, R02 incomplete",
+    "non_compliant": "R01 not met"
+  }
+}

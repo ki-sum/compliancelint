@@ -1,0 +1,256 @@
+{
+  "_metadata": {
+    "article": 53,
+    "title": "Obligations for Providers of General-Purpose AI Models",
+    "prerequisites": [],
+    "decomposition_date": "2026-04-03",
+    "primary_official_source": {
+      "name": "EUR-Lex -- Official Journal of the European Union",
+      "eli_uri": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng",
+      "celex": "32024R1689",
+      "oj_citation": "OJ L 2024/1689, 12.7.2024"
+    },
+    "pdf_pages": [83, 84],
+    "related_standards": {
+      "published": [
+        "ISO/IEC 42001:2023 -- AI management system"
+      ],
+      "upcoming": [
+        "EU AI Office Code of Practice for GPAI (published 2025-05-02)",
+        "CEN-CENELEC harmonized standard for GPAI (expected 2027)"
+      ]
+    }
+  },
+  "obligations": [
+    {
+      "id": "ART53-OBL-1a",
+      "source": "Art. 53(1)(a)",
+      "source_quote": "Providers of general-purpose AI models shall: (a) draw up and keep up-to-date the technical documentation of the model, including its training and testing process and the results of its evaluation, which shall contain, at a minimum, the information set out in Annex XI for the purpose of providing it, upon request, to the AI Office and the national competent authorities;",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "technical_documentation_exists",
+          "description": "Technical documentation of the model must exist",
+          "requirement": "SHALL draw up technical documentation of the model"
+        },
+        {
+          "atom": "documentation_kept_up_to_date",
+          "description": "Documentation must be kept up-to-date",
+          "requirement": "SHALL keep technical documentation up-to-date"
+        },
+        {
+          "atom": "includes_training_testing_evaluation",
+          "description": "Must include training process, testing process, and evaluation results",
+          "requirement": "SHALL contain training and testing process and evaluation results"
+        },
+        {
+          "atom": "annex_xi_minimum",
+          "description": "Must contain at minimum the information in Annex XI",
+          "requirement": "SHALL contain at a minimum the information set out in Annex XI"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check for model cards, technical documentation, training documentation, evaluation results, and Annex XI coverage",
+        "what_to_scan": ["documentation", "config"],
+        "human_judgment_needed": "Whether documentation meets Annex XI minimum requirements"
+      }
+    },
+    {
+      "id": "ART53-OBL-1b",
+      "source": "Art. 53(1)(b)",
+      "source_quote": "draw up, keep up-to-date and make available information and documentation to providers of AI systems who intend to integrate the general-purpose AI model into their AI systems.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "downstream_documentation_exists",
+          "description": "Documentation for downstream AI system providers must exist",
+          "requirement": "SHALL draw up and make available documentation to downstream providers"
+        },
+        {
+          "atom": "enables_downstream_understanding",
+          "description": "Documentation must enable downstream providers to understand capabilities and limitations",
+          "requirement": "SHALL enable providers of AI systems to have a good understanding of capabilities and limitations"
+        },
+        {
+          "atom": "annex_xii_minimum",
+          "description": "Must contain at minimum elements set out in Annex XII",
+          "requirement": "SHALL contain at a minimum the elements set out in Annex XII"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check for model cards, API documentation, integration guides, capability/limitation documentation, and Annex XII elements",
+        "what_to_scan": ["documentation"],
+        "human_judgment_needed": "Whether downstream documentation is complete and enables understanding"
+      }
+    },
+    {
+      "id": "ART53-OBL-1c",
+      "source": "Art. 53(1)(c)",
+      "source_quote": "put in place a policy to comply with Union law on copyright and related rights, and in particular to identify and comply with, including through state-of-the-art technologies, a reservation of rights expressed pursuant to Article 4(3) of Directive (EU) 2019/790;",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "copyright_policy_exists",
+          "description": "Must have a copyright compliance policy",
+          "requirement": "SHALL put in place a policy to comply with Union copyright law"
+        },
+        {
+          "atom": "reservation_of_rights_compliance",
+          "description": "Must identify and comply with reservation of rights (opt-out)",
+          "requirement": "SHALL identify and comply with reservation of rights per Directive 2019/790 Art. 4(3)"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "low",
+        "detection_method": "Check for copyright policy documentation, robots.txt compliance, opt-out mechanisms, and training data documentation",
+        "what_to_scan": ["documentation", "config"],
+        "human_judgment_needed": "Whether the copyright policy is adequate and actually implemented"
+      }
+    },
+    {
+      "id": "ART53-OBL-1d",
+      "source": "Art. 53(1)(d)",
+      "source_quote": "draw up and make publicly available a sufficiently detailed summary about the content used for training of the general-purpose AI model, according to a template provided by the AI Office.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "training_data_summary_exists",
+          "description": "A training data summary must exist",
+          "requirement": "SHALL draw up a sufficiently detailed summary about training content"
+        },
+        {
+          "atom": "training_data_summary_public",
+          "description": "Training data summary must be publicly available",
+          "requirement": "SHALL make the summary publicly available"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check for public training data summaries, data cards, or documentation describing training data sources",
+        "what_to_scan": ["documentation"],
+        "human_judgment_needed": "Whether the summary is 'sufficiently detailed'"
+      }
+    },
+    {
+      "id": "ART53-EXC-2",
+      "source": "Art. 53(2)",
+      "source_quote": "The obligations set out in paragraph 1, points (a) and (b), shall not apply to providers of AI models that are released under a free and open-source licence that allows for the access, usage, modification, and distribution of the model, and whose parameters, including the weights, the information on the model architecture, and the information on model usage, are made publicly available. This exception shall not apply to general-purpose AI models with systemic risks.",
+      "deontic_type": "exception",
+      "modality": "shall_not",
+      "addressee": "provider",
+      "scope_limitation": "Only applies to open-source GPAI models without systemic risk",
+      "context_skip_field": "is_open_source_gpai",
+      "context_skip_value": false,
+      "decomposed_atoms": [
+        {
+          "atom": "open_source_exception_53_1a_1b",
+          "description": "Open-source GPAI providers exempt from Art. 53(1)(a) and (b) unless systemic risk",
+          "requirement": "Art. 53(1)(a)(b) SHALL NOT apply to open-source GPAI (unless systemic risk)"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check license type, model weight availability, and systemic risk classification",
+        "what_to_scan": ["documentation", "config"],
+        "human_judgment_needed": "Whether the model truly qualifies for open-source exception"
+      }
+    },
+    {
+      "id": "ART53-OBL-3",
+      "source": "Art. 53(3)",
+      "source_quote": "Providers of general-purpose AI models shall cooperate as necessary with the Commission and the national competent authorities in the exercise of their competences and powers pursuant to this Regulation.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "authority_cooperation",
+          "description": "Must cooperate with Commission and national authorities",
+          "requirement": "SHALL cooperate with Commission and national competent authorities"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "Check for authority liaison procedures",
+        "what_to_scan": ["documentation"],
+        "human_judgment_needed": "Organizational process requirement"
+      }
+    }
+    ,
+    {
+      "id": "ART53-PERM-4",
+      "source": "Art. 53(4)",
+      "source_quote": "Providers of general-purpose AI models may rely on codes of practice within the meaning of Article 56 to demonstrate compliance with the obligations set out in paragraph 1 of this Article, until a harmonised standard is published.",
+      "deontic_type": "permission",
+      "modality": "may",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "codes_of_practice_compliance",
+          "description": "Provider may use codes of practice to demonstrate compliance until harmonised standard exists",
+          "requirement": "MAY rely on codes of practice to demonstrate compliance until a harmonised standard is published"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "Check for adherence to approved codes of practice or harmonised standards",
+        "what_to_scan": ["documentation"],
+        "human_judgment_needed": "Whether the provider follows an approved code of practice"
+      },
+      "cross_references": [{"article": 56, "context": "Codes of practice"}]
+    },
+    {
+      "id": "ART53-OBL-4",
+      "source": "Art. 53(4)",
+      "source_quote": "Providers of general-purpose AI models who do not adhere to an approved code of practice or do not comply with a European harmonised standard shall demonstrate alternative adequate means of compliance for assessment by the Commission.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "scope_limitation": "Only applies to providers who do not follow an approved code of practice or harmonised standard",
+      "decomposed_atoms": [
+        {
+          "atom": "alternative_compliance_demonstration",
+          "description": "Must demonstrate alternative adequate means of compliance if not following codes/standards",
+          "requirement": "SHALL demonstrate alternative adequate means of compliance for assessment by the Commission"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "Check for alternative compliance documentation submitted to Commission",
+        "what_to_scan": ["documentation"],
+        "human_judgment_needed": "Whether alternative means are adequate"
+      }
+    }
+  ],
+  "summary": {
+    "total_obligations": 8,
+    "obligation_count": 6,
+    "permission_count": 2,
+    "addressee_breakdown": {
+      "provider": 8
+    },
+    "automation_breakdown": {
+      "full": 0,
+      "partial": 5,
+      "manual": 3
+    }
+  }
+}

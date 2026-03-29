@@ -1,0 +1,169 @@
+{
+  "_metadata": {
+    "article": 47,
+    "title": "EU Declaration of Conformity",
+    "prerequisites": [
+      {
+        "type": "risk_classification",
+        "required_level": "high-risk",
+        "source_article": 6,
+        "context_field": "risk_classification",
+        "skip_when": "not high-risk with medium/high confidence"
+      }
+    ],
+    "decomposition_date": "2026-04-03",
+    "primary_official_source": {
+      "name": "EUR-Lex -- Official Journal of the European Union",
+      "eli_uri": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng",
+      "celex": "32024R1689",
+      "oj_citation": "OJ L 2024/1689, 12.7.2024"
+    },
+    "pdf_pages": [80],
+    "related_standards": {
+      "published": [
+        "Annex V of EU AI Act -- EU Declaration of Conformity content"
+      ],
+      "upcoming": []
+    }
+  },
+  "obligations": [
+    {
+      "id": "ART47-OBL-1",
+      "source": "Art. 47(1)",
+      "source_quote": "The provider shall draw up a written machine readable, physical or electronically signed EU declaration of conformity for each high-risk AI system, and keep it at the disposal of the national competent authorities for 10 years after the high-risk AI system has been placed on the market or put into service.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "doc_drawn_up",
+          "description": "Must create written DoC for each high-risk AI system",
+          "requirement": "SHALL draw up a written EU declaration of conformity for each high-risk AI system"
+        },
+        {
+          "atom": "doc_machine_readable",
+          "description": "DoC must be machine readable, physical or electronically signed",
+          "requirement": "SHALL be machine readable, physical or electronically signed"
+        },
+        {
+          "atom": "doc_retained_10_years",
+          "description": "Must keep DoC for 10 years after market placement",
+          "requirement": "SHALL keep at disposal of authorities for 10 years"
+        },
+        {
+          "atom": "doc_identifies_system",
+          "description": "DoC must identify the high-risk AI system it covers",
+          "requirement": "SHALL identify the high-risk AI system for which it has been drawn up"
+        },
+        {
+          "atom": "doc_copy_submitted_on_request",
+          "description": "A copy must be submitted to authorities upon request",
+          "requirement": "SHALL submit a copy to the relevant national competent authorities upon request"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check for EU declaration of conformity document, machine-readable format, retention policy",
+        "what_to_scan": ["documentation"],
+        "human_judgment_needed": "Whether the DoC contains all required Annex V elements"
+      }
+    },
+    {
+      "id": "ART47-OBL-2",
+      "source": "Art. 47(2)",
+      "source_quote": "The EU declaration of conformity shall state that the high-risk AI system concerned meets the requirements set out in Section 2. The EU declaration of conformity shall contain the information set out in Annex V, and shall be translated into a language that can be easily understood by the national competent authorities of the Member States in which the high-risk AI system is placed on the market or made available.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "doc_states_compliance",
+          "description": "DoC must state system meets Section 2 requirements",
+          "requirement": "SHALL state that the system meets Section 2 requirements"
+        },
+        {
+          "atom": "annex_v_content",
+          "description": "DoC must contain Annex V information",
+          "requirement": "SHALL contain the information set out in Annex V"
+        },
+        {
+          "atom": "doc_translated",
+          "description": "DoC must be translated into relevant languages",
+          "requirement": "SHALL be translated into language understood by national competent authorities"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "low",
+        "detection_method": "Check for Annex V elements in DoC document, language availability",
+        "what_to_scan": ["documentation"],
+        "human_judgment_needed": "Whether DoC covers all Annex V elements and appropriate languages"
+      }
+    },
+    {
+      "id": "ART47-OBL-3",
+      "source": "Art. 47(3)",
+      "source_quote": "Where high-risk AI systems are subject to other Union harmonisation legislation which also requires an EU declaration of conformity, a single EU declaration of conformity shall be drawn up in respect of all Union law applicable to the high-risk AI system. The declaration shall contain all the information required to identify the Union harmonisation legislation to which the declaration relates.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "scope_limitation": "Only applies where multiple Union harmonisation laws require an EU declaration of conformity",
+      "context_skip_field": "is_multi_harmonisation_product",
+      "context_skip_value": false,
+      "decomposed_atoms": [
+        {
+          "atom": "single_doc_for_all_laws",
+          "description": "A single DoC must cover all applicable Union law",
+          "requirement": "SHALL draw up a single EU declaration of conformity for all applicable Union law"
+        },
+        {
+          "atom": "doc_identifies_applicable_legislation",
+          "description": "DoC must identify all applicable Union harmonisation legislation",
+          "requirement": "SHALL contain all the information required to identify the Union harmonisation legislation"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "Check if product is subject to multiple EU harmonisation laws, verify single consolidated DoC",
+        "what_to_scan": ["documentation"],
+        "human_judgment_needed": "Whether all applicable legislation has been identified and covered"
+      }
+    },
+    {
+      "id": "ART47-OBL-4",
+      "source": "Art. 47(4)",
+      "source_quote": "By drawing up the EU declaration of conformity, the provider shall assume responsibility for compliance with the requirements set out in Section 2. The provider shall keep the EU declaration of conformity up-to-date as appropriate.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "doc_kept_up_to_date",
+          "description": "DoC must be kept up-to-date",
+          "requirement": "SHALL keep the EU declaration of conformity up-to-date"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "Check DoC document date vs last system modification",
+        "what_to_scan": ["documentation"],
+        "human_judgment_needed": "Whether DoC reflects current system state"
+      }
+    }
+  ],
+  "summary": {
+    "total_obligations": 4,
+    "obligation_count": 4,
+    "addressee_breakdown": {
+      "provider": 4
+    },
+    "automation_breakdown": {
+      "full": 0,
+      "partial": 2,
+      "manual": 2
+    }
+  }
+}

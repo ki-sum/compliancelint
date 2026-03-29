@@ -1,0 +1,24 @@
+name: Tests
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'scanner/**'
+  pull_request:
+    branches: [master]
+
+jobs:
+  # ── Scanner (Python) ──────────────────────────────────
+  scanner-tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: scanner
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt
+      - run: python -m pytest -x --tb=short

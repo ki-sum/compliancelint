@@ -1,0 +1,69 @@
+{
+  "_metadata": {
+    "standard_id": "CL-IS-ART72-v0.1",
+    "title": "ComplianceLint Interim Standard for EU AI Act Article 72: Post-Market Monitoring",
+    "version": "0.1.0",
+    "date": "2026-04-03",
+    "status": "draft",
+    "disclaimer": "This is an interim standard developed by ComplianceLint. It will be superseded when CEN-CENELEC publishes the harmonized standard for post-market monitoring of AI systems.",
+    "basis": [
+      "EU AI Act Article 72 (official text)",
+      "EU AI Act Recitals 131-133 (legislative intent on post-market monitoring)",
+      "ISO/IEC 42001:2023 -- AI management system",
+      "ISO 9001:2015 -- Quality management systems (post-delivery activities)",
+      "EU Decision 768/2008/EC -- New Legislative Framework (market surveillance)"
+    ],
+    "awaiting_standard": "CEN-CENELEC harmonized standard for post-market monitoring of AI systems (expected Q4 2026)"
+  },
+
+  "requirements": [
+    {
+      "id": "IS-ART72-R01",
+      "obligation_ref": "ART72-OBL-1",
+      "title": "Post-Market Monitoring System",
+      "requirement": "The provider MUST establish and document a post-market monitoring system that is proportionate to the nature and risks of the AI system.",
+      "rationale": "Art. 72(1) requires a documented, proportionate monitoring system.",
+      "required_content": [
+        "Description of the monitoring system and its scope",
+        "Risk proportionality justification",
+        "Roles and responsibilities for monitoring",
+        "Data sources and collection methods",
+        "Analysis and reporting procedures"
+      ]
+    },
+    {
+      "id": "IS-ART72-R02",
+      "obligation_ref": "ART72-OBL-2",
+      "title": "Active Data Collection and Analysis",
+      "requirement": "The monitoring system MUST actively and systematically collect, document, and analyse relevant data throughout the AI system's lifetime to evaluate continuous compliance.",
+      "rationale": "Art. 72(2) requires active, systematic, and ongoing monitoring throughout the system lifetime.",
+      "acceptable_implementations": [
+        "Automated performance monitoring with dashboards",
+        "Periodic compliance evaluation reports",
+        "Drift detection and model degradation monitoring",
+        "User feedback collection and analysis pipelines",
+        "Incident and near-miss tracking systems"
+      ]
+    },
+    {
+      "id": "IS-ART72-R03",
+      "obligation_ref": "ART72-OBL-3",
+      "title": "Post-Market Monitoring Plan",
+      "requirement": "The monitoring system MUST be based on a post-market monitoring plan that is included as part of the Annex IV technical documentation.",
+      "rationale": "Art. 72(3) requires a formal plan integrated into technical documentation.",
+      "required_content": [
+        "Monitoring objectives and scope",
+        "Data collection methodology and frequency",
+        "Key performance indicators and thresholds",
+        "Escalation criteria and procedures",
+        "Review and update schedule for the plan itself"
+      ]
+    }
+  ],
+
+  "scoring": {
+    "compliant": "R01 + R02 + R03 all met",
+    "partial": "At least R01 met",
+    "non_compliant": "R01 not met"
+  }
+}

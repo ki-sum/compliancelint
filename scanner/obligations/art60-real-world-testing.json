@@ -1,0 +1,211 @@
+{
+  "_metadata": {
+    "article": 60,
+    "title": "Testing of high-risk AI systems in real world conditions outside AI regulatory sandboxes",
+    "prerequisites": [
+      {
+        "type": "risk_classification",
+        "required_level": "high-risk",
+        "source_article": 6,
+        "context_field": "risk_classification",
+        "skip_when": "not high-risk with medium/high confidence"
+      }
+    ],
+    "primary_official_source": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689#art_60",
+    "pdf_pages": "91-93",
+    "decomposition_date": "2026-04-04",
+    "related_standards": {
+      "draft": [],
+      "published": [],
+      "upcoming": []
+    }
+  },
+  "obligations": [
+    {
+      "id": "ART60-OBL-4",
+      "source": "Art. 60(4)",
+      "source_quote": "Providers or prospective providers may conduct the testing in real world conditions only where all of the following conditions are met: (a) the provider or prospective provider has drawn up a real-world testing plan and submitted it to the market surveillance authority in the Member State where the testing in real world conditions is to be conducted;",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "addressee_note": "Provider or prospective provider conducting real-world testing of Annex III high-risk AI systems",
+      "decomposed_atoms": [
+        {
+          "atom": "testing_plan_drawn_up",
+          "description": "A real-world testing plan must be prepared",
+          "requirement": "The provider SHALL draw up a real-world testing plan"
+        },
+        {
+          "atom": "testing_plan_submitted_to_authority",
+          "description": "Testing plan must be submitted to the market surveillance authority",
+          "requirement": "The provider SHALL submit the testing plan to the market surveillance authority in the Member State where testing is to be conducted"
+        },
+        {
+          "atom": "authority_approval_obtained",
+          "description": "Market surveillance authority must approve the testing plan",
+          "requirement": "The market surveillance authority SHALL have approved the testing in real world conditions and the real-world testing plan"
+        },
+        {
+          "atom": "testing_registered",
+          "description": "Testing must be registered in EU database with unique ID",
+          "requirement": "The provider SHALL register the testing in real world conditions with a Union-wide unique single identification number"
+        },
+        {
+          "atom": "provider_established_in_union",
+          "description": "Provider must be established in the Union or have appointed a legal representative",
+          "requirement": "The provider SHALL be established in the Union or have appointed a legal representative who is established in the Union"
+        },
+        {
+          "atom": "data_transfer_safeguards",
+          "description": "Data collected for testing transferred to third countries only with appropriate safeguards",
+          "requirement": "Data SHALL be transferred to third countries only with appropriate and applicable safeguards under Union law"
+        },
+        {
+          "atom": "testing_duration_limited",
+          "description": "Testing must not last longer than necessary, max 6 months (extendable by 6 months with notice)",
+          "requirement": "Testing SHALL not last longer than necessary and in any case not longer than six months, extendable for an additional six months with prior notification"
+        },
+        {
+          "atom": "vulnerable_groups_protected",
+          "description": "Test subjects from vulnerable groups must be appropriately protected",
+          "requirement": "Subjects belonging to vulnerable groups due to age or disability SHALL be appropriately protected"
+        },
+        {
+          "atom": "deployers_informed",
+          "description": "Deployers participating in testing must be informed and given instructions",
+          "requirement": "Deployers or prospective deployers SHALL be informed of all relevant aspects and given relevant instructions for use per Art. 13"
+        },
+        {
+          "atom": "informed_consent_obtained",
+          "description": "Test subjects must give informed consent per Art. 61",
+          "requirement": "Subjects SHALL have given informed consent in accordance with Art. 61"
+        },
+        {
+          "atom": "effective_oversight",
+          "description": "Testing must be effectively overseen by qualified persons",
+          "requirement": "Testing SHALL be effectively overseen by suitably qualified persons with necessary capacity, training, and authority"
+        },
+        {
+          "atom": "decisions_reversible",
+          "description": "AI system predictions/recommendations must be reversible and disregardable",
+          "requirement": "Predictions, recommendations, or decisions of the AI system SHALL be effectively reversible and disregardable"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "documentation_search",
+        "what_to_scan": "Testing plans, authority approval documentation, registration records, consent forms, oversight procedures, data transfer policies",
+        "human_judgment_needed": true
+      },
+      "cross_references": ["Art. 13", "Art. 61", "Art. 71(4)", "Annex IX"],
+      "scope_limitation": "Only applies to testing of Annex III high-risk AI systems in real world conditions outside regulatory sandboxes",
+      "context_skip_field": "conducts_real_world_testing"
+    },
+    {
+      "id": "ART60-OBL-7",
+      "source": "Art. 60(7)",
+      "source_quote": "Any serious incident identified in the course of the testing in real world conditions shall be reported to the national market surveillance authority in accordance with Article 73. The provider or prospective provider shall adopt immediate mitigation measures or, failing that, shall suspend the testing in real world conditions until such mitigation takes place, or otherwise terminate it. The provider or prospective provider shall establish a procedure for the prompt recall of the AI system upon such termination of the testing in real world conditions.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "addressee_note": "Provider or prospective provider conducting real-world testing",
+      "decomposed_atoms": [
+        {
+          "atom": "serious_incident_reported",
+          "description": "Serious incidents during testing must be reported per Art. 73",
+          "requirement": "Any serious incident SHALL be reported to the national market surveillance authority in accordance with Art. 73"
+        },
+        {
+          "atom": "immediate_mitigation_or_suspension",
+          "description": "Provider must immediately mitigate or suspend testing upon serious incident",
+          "requirement": "The provider SHALL adopt immediate mitigation measures or suspend the testing until mitigation takes place, or terminate it"
+        },
+        {
+          "atom": "recall_procedure_established",
+          "description": "A prompt recall procedure must be established for testing termination",
+          "requirement": "The provider SHALL establish a procedure for the prompt recall of the AI system upon termination of testing"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "documentation_search",
+        "what_to_scan": "Incident reporting procedures, mitigation plans, testing suspension protocols, recall procedures",
+        "human_judgment_needed": true
+      },
+      "cross_references": ["Art. 73"],
+      "scope_limitation": "Only applies during real-world testing",
+      "context_skip_field": "conducts_real_world_testing"
+    },
+    {
+      "id": "ART60-OBL-8",
+      "source": "Art. 60(8)",
+      "source_quote": "Providers or prospective providers shall notify the national market surveillance authority in the Member State where the testing in real world conditions is to be conducted of the suspension or termination of the testing in real world conditions and of the final outcomes.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "addressee_note": "Provider or prospective provider conducting real-world testing",
+      "decomposed_atoms": [
+        {
+          "atom": "notify_suspension_or_termination",
+          "description": "Authority must be notified of testing suspension or termination",
+          "requirement": "The provider SHALL notify the market surveillance authority of suspension or termination of testing"
+        },
+        {
+          "atom": "notify_final_outcomes",
+          "description": "Final outcomes of testing must be reported to the authority",
+          "requirement": "The provider SHALL notify the market surveillance authority of the final outcomes of testing"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "low",
+        "detection_method": "documentation_search",
+        "what_to_scan": "Testing notification procedures, authority communication records",
+        "human_judgment_needed": true
+      },
+      "scope_limitation": "Only applies during real-world testing",
+      "context_skip_field": "conducts_real_world_testing"
+    },
+    {
+      "id": "ART60-OBL-9",
+      "source": "Art. 60(9)",
+      "source_quote": "The provider or prospective provider shall be liable under applicable Union and national liability law for any damage caused in the course of their testing in real world conditions.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "addressee_note": "Provider or prospective provider conducting real-world testing",
+      "decomposed_atoms": [
+        {
+          "atom": "liability_for_testing_damage",
+          "description": "Provider is liable for any damage caused during testing",
+          "requirement": "The provider SHALL be liable under applicable Union and national liability law for any damage caused in the course of their testing in real world conditions"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "documentation_search",
+        "what_to_scan": "Insurance policies, liability coverage documentation, indemnification agreements",
+        "human_judgment_needed": true
+      },
+      "scope_limitation": "Only applies during real-world testing",
+      "context_skip_field": "conducts_real_world_testing"
+    }
+  ],
+  "summary": {
+    "total_obligations": 4,
+    "obligation_count": 4,
+    "prohibition_count": 0,
+    "permission_count": 0,
+    "addressee_breakdown": {
+      "provider": 4
+    },
+    "automation_breakdown": {
+      "full": 0,
+      "partial": 3,
+      "manual": 1
+    }
+  }
+}

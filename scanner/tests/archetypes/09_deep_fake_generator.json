@@ -1,0 +1,461 @@
+{
+  "name": "Deep fake video generation tool",
+  "description": "Deep fake video generation tool, NOT open source. is_deep_fake_system=true, no disclosure. Art.50(4) must trigger for missing deep fake disclosure.",
+  "project_context": {
+    "primary_language": "Python",
+    "risk_classification": "not high-risk",
+    "risk_classification_confidence": "medium",
+    "compliance_answers": {
+      "_scope": {
+        "is_ai_system": true,
+        "is_ai_system_reasoning": "GAN-based face swap and video synthesis",
+        "territorial_scope_applies": true,
+        "territorial_scope_reasoning": "Available for download in EU",
+        "is_open_source": false,
+        "open_source_license": null,
+        "user_role": "provider",
+        "user_role_reasoning": "Develops the deep fake generation tool",
+        "is_military_defense": false,
+        "is_research_only": false
+      },
+      "art4": {
+        "has_ai_literacy_measures": null
+      },
+      "art5": {
+        "has_facial_recognition_scraping": false,
+        "has_social_scoring": false,
+        "has_subliminal_manipulation": false,
+        "has_emotion_recognition_workplace": false,
+        "has_exploitation_of_vulnerabilities": false,
+        "has_predictive_policing": false,
+        "has_biometric_categorization": false,
+        "has_real_time_biometric_id": false
+      },
+      "art6": {
+        "annex_iii_categories": [],
+        "annex_i_product_type": null,
+        "is_high_risk": false,
+        "reasoning": "Deep fake generation not in Annex III high-risk categories"
+      },
+      "art9": {
+        "has_risk_docs": false,
+        "risk_doc_paths": [],
+        "has_testing_infrastructure": false,
+        "testing_evidence": [],
+        "has_risk_code_patterns": false,
+        "risk_code_evidence": [],
+        "has_defined_metrics": false,
+        "metrics_evidence": []
+      },
+      "art10": {
+        "has_data_governance_doc": false,
+        "data_doc_paths": [],
+        "has_bias_mitigation": false,
+        "bias_evidence": [],
+        "has_data_lineage": false
+      },
+      "art11": {
+        "has_technical_docs": true,
+        "doc_paths": [
+          "README.md"
+        ],
+        "documented_aspects": [
+          "usage"
+        ]
+      },
+      "art12": {
+        "has_logging": false,
+        "logging_description": "",
+        "logging_evidence": [],
+        "has_retention_config": false,
+        "retention_days": null,
+        "retention_evidence": ""
+      },
+      "art13": {
+        "has_explainability": false,
+        "explainability_evidence": [],
+        "has_transparency_info": false,
+        "transparency_paths": []
+      },
+      "art14": {
+        "has_human_oversight": false,
+        "oversight_evidence": [],
+        "has_override_mechanism": false,
+        "override_evidence": []
+      },
+      "art15": {
+        "has_accuracy_testing": false,
+        "accuracy_evidence": [],
+        "has_robustness_testing": false,
+        "robustness_evidence": [],
+        "has_fallback_behavior": false
+      },
+      "art50": {
+        "is_chatbot_or_interactive_ai": false,
+        "is_generating_synthetic_content": true,
+        "has_ai_disclosure_to_users": false,
+        "disclosure_evidence": [],
+        "has_content_watermarking": false,
+        "is_emotion_recognition_system": false,
+        "is_biometric_categorization_system": false,
+        "has_emotion_biometric_disclosure": false,
+        "emotion_biometric_evidence": [],
+        "is_deep_fake_system": true,
+        "has_deep_fake_disclosure": false,
+        "deep_fake_evidence": [
+          "face_swap.py",
+          "video_synth.py"
+        ]
+      },
+      "art17": {
+        "has_qms_documentation": false,
+        "qms_evidence": [],
+        "has_compliance_strategy": false,
+        "has_design_procedures": false,
+        "has_qa_procedures": false,
+        "has_testing_procedures": false,
+        "has_technical_specifications": false,
+        "has_data_management": false,
+        "has_risk_management_in_qms": false,
+        "has_post_market_monitoring": false,
+        "has_record_keeping": false,
+        "has_accountability_framework": false
+      },
+      "art26": {
+        "has_deployment_documentation": null,
+        "has_human_oversight_assignment": null,
+        "has_operational_monitoring": null,
+        "has_log_retention": null,
+        "retention_days": null,
+        "has_affected_persons_notification": null
+      },
+      "art43": {
+        "has_internal_control_assessment": null,
+        "has_change_management_procedures": null
+      },
+      "art47": {
+        "has_doc_declaration": null,
+        "has_annex_v_content": null
+      },
+      "art49": {
+        "has_eu_database_registration": null
+      },
+      "art51": {
+        "is_gpai_model": false,
+        "has_high_impact_capabilities": null,
+        "training_compute_exceeds_threshold": null,
+        "has_commission_designation": null,
+        "has_systemic_risk_assessment": null
+      },
+      "art53": {
+        "has_technical_documentation": null,
+        "has_downstream_documentation": null,
+        "has_copyright_policy": null,
+        "has_training_data_summary": null,
+        "is_open_source_gpai": null,
+        "has_systemic_risk": null
+      },
+      "art54": {
+        "is_third_country_provider": null,
+        "has_authorised_representative": null,
+        "is_open_source_gpai": null,
+        "has_systemic_risk": null
+      },
+      "art55": {
+        "has_systemic_risk": null,
+        "has_model_evaluation": null,
+        "has_adversarial_testing": null,
+        "evaluation_evidence": [],
+        "has_incident_tracking": null,
+        "incident_evidence": [],
+        "has_cybersecurity_protection": null,
+        "cybersecurity_evidence": []
+      },
+      "art27": {
+        "has_fria_documentation": null,
+        "has_fria_versioning": null
+      },
+      "art72": {
+        "has_pmm_system": null,
+        "has_active_data_collection": null,
+        "has_pmm_plan": null
+      },
+      "art73": {
+        "has_incident_reporting_procedure": null,
+        "has_reporting_timelines": null,
+        "has_expedited_reporting_procedure": null,
+        "has_investigation_procedure": null
+      },
+      "art86": {
+        "has_explanation_mechanism": null,
+        "explanation_evidence": []
+      },
+      "art16": {
+        "has_section_2_compliance": null,
+        "has_provider_identification": null,
+        "has_qms": null,
+        "has_documentation_kept": null,
+        "has_log_retention": null,
+        "has_conformity_assessment": null,
+        "has_eu_declaration": null,
+        "has_ce_marking": null,
+        "has_registration": null,
+        "has_corrective_actions_process": null,
+        "has_conformity_evidence": null,
+        "has_accessibility_compliance": null
+      },
+      "art18": {
+        "has_documentation_retention_policy": null,
+        "retention_policy_evidence": ""
+      },
+      "art19": {
+        "has_log_retention": null,
+        "log_retention_evidence": "",
+        "has_retention_config": null,
+        "retention_days": null,
+        "retention_evidence": ""
+      },
+      "art20": {
+        "has_corrective_action_procedure": null,
+        "has_supply_chain_notification": null,
+        "has_risk_investigation_procedure": null
+      },
+      "art21": {
+        "has_conformity_documentation": null,
+        "has_log_export_capability": null
+      },
+      "art22": {
+        "is_eu_established_provider": null,
+        "has_authorised_representative": null,
+        "has_representative_enablement": null,
+        "has_mandate_authority_contact": null
+      },
+      "art24": {
+        "is_distributor": null,
+        "has_pre_market_verification": null,
+        "has_conformity_review": null,
+        "has_authority_documentation": null
+      },
+      "art25": {
+        "has_rebranding_or_modification": null,
+        "has_provider_cooperation_documentation": null,
+        "is_safety_component_annex_i": null,
+        "has_third_party_written_agreement": null,
+        "has_open_source_exception": null
+      },
+      "art8": {
+        "has_section_2_compliance": null,
+        "section_2_evidence": []
+      },
+      "art23": {
+        "is_importer": null,
+        "has_pre_market_verification": null,
+        "has_conformity_review": null,
+        "has_importer_identification": null,
+        "has_documentation_retention": null,
+        "has_authority_documentation": null
+      },
+      "art41": {
+        "follows_common_specifications": null,
+        "has_alternative_justification": null
+      },
+      "art60": {
+        "conducts_real_world_testing": null,
+        "has_testing_plan": null,
+        "has_incident_reporting_for_testing": null,
+        "has_authority_notification_procedure": null
+      },
+      "art61": {
+        "conducts_real_world_testing": null,
+        "has_informed_consent_procedure": null,
+        "has_consent_documentation": null
+      },
+      "art71": {
+        "has_provider_database_entry": null
+      },
+      "art80": {
+        "has_compliance_remediation_plan": null,
+        "has_corrective_action_for_all_systems": null,
+        "has_classification_rationale": null
+      },
+      "art82": {
+        "has_corrective_action_procedure": null
+      },
+      "art91": {
+        "has_information_supply_readiness": null
+      },
+      "art92": {
+        "has_evaluation_cooperation_readiness": null,
+        "cooperation_evidence": ""
+      },
+      "art111": {
+        "has_transition_plan": null,
+        "transition_evidence": "",
+        "has_significant_change_tracking": null,
+        "change_tracking_evidence": "",
+        "has_gpai_compliance_timeline": null,
+        "gpai_timeline_evidence": ""
+      }
+    }
+  },
+  "expected": {
+    "art4": {
+      "overall": "unable_to_determine",
+      "legal_basis": "Art. 4: has_ai_literacy_measures=null \u2014 cannot determine whether AI literacy measures are in place without evidence"
+    },
+    "art5": {
+      "overall": "compliant",
+      "legal_basis": "Art. 5(1): no prohibited practices detected \u2014 deep fake generation itself is not a prohibited practice under Art. 5, all 4 categories checked with high confidence"
+    },
+    "art6": {
+      "overall": "unable_to_determine",
+      "legal_basis": "Art. 6(1)-(2): deep fake generation not explicitly in Annex III high-risk categories (is_high_risk=false) but risk classification confidence is medium \u2014 cannot fully determine"
+    },
+    "art9": {
+      "overall": "not_applicable",
+      "legal_basis": "Art. 9(1): risk management required only for high-risk AI systems; is_high_risk=false \u2014 Art. 9 does not apply to non-high-risk systems"
+    },
+    "art10": {
+      "overall": "not_applicable",
+      "legal_basis": "Art. 10(1): data governance required only for high-risk AI systems; is_high_risk=false \u2014 Art. 10 does not apply to non-high-risk systems"
+    },
+    "art11": {
+      "overall": "not_applicable",
+      "legal_basis": "Art. 11(1): technical documentation required only for high-risk AI systems; is_high_risk=false \u2014 Art. 11 does not apply to non-high-risk systems"
+    },
+    "art12": {
+      "overall": "not_applicable",
+      "legal_basis": "Art. 12(1): automatic logging required only for high-risk AI systems; is_high_risk=false \u2014 Art. 12 does not apply to non-high-risk systems"
+    },
+    "art13": {
+      "overall": "not_applicable",
+      "legal_basis": "Art. 13(1): transparency required only for high-risk AI systems; is_high_risk=false \u2014 Art. 13 does not apply to non-high-risk systems"
+    },
+    "art14": {
+      "overall": "not_applicable",
+      "legal_basis": "Art. 14(1): human oversight required only for high-risk AI systems; is_high_risk=false \u2014 Art. 14 does not apply to non-high-risk systems"
+    },
+    "art15": {
+      "overall": "not_applicable",
+      "legal_basis": "Art. 15(1): accuracy/robustness required only for high-risk AI systems; is_high_risk=false \u2014 Art. 15 does not apply to non-high-risk systems"
+    },
+    "art50": {
+      "overall": "non_compliant",
+      "legal_basis": "Art. 50(4): deep fake content must be labelled as artificially generated/manipulated; is_deep_fake_system=true but has_deep_fake_disclosure=false \u2014 no disclosure or labelling mechanism found"
+    },
+    "art17": {
+      "overall": "not_applicable",
+      "legal_basis": "Art. 17(1): quality management system required only for high-risk AI systems; is_high_risk=false \u2014 Art. 17 does not apply to non-high-risk systems"
+    },
+    "art26": {
+      "overall": "not_applicable",
+      "legal_basis": "Art. 26: not high-risk \u2014 Art. 26 deployer obligations do not apply"
+    },
+    "art43": {
+      "overall": "not_applicable",
+      "legal_basis": "Art. 43 applies only to high-risk AI systems; risk_classification='not high-risk' with medium confidence"
+    },
+    "art47": {
+      "overall": "not_applicable",
+      "legal_basis": "Art. 47 applies only to high-risk AI systems; risk_classification='not high-risk' with medium confidence"
+    },
+    "art49": {
+      "overall": "not_applicable",
+      "legal_basis": "Art. 49 applies only to high-risk AI systems; risk_classification='not high-risk' with medium confidence"
+    },
+    "art51": {
+      "overall": "unable_to_determine"
+    },
+    "art53": {
+      "overall": "unable_to_determine",
+      "legal_basis": "Art. 53(1): all compliance_answers fields are null \u2014 cannot determine GPAI provider obligation compliance without evidence"
+    },
+    "art54": {
+      "overall": "unable_to_determine"
+    },
+    "art55": {
+      "overall": "unable_to_determine"
+    },
+    "art27": {
+      "overall": "not_applicable"
+    },
+    "art72": {
+      "overall": "not_applicable"
+    },
+    "art73": {
+      "overall": "not_applicable"
+    },
+    "art86": {
+      "overall": "not_applicable"
+    },
+    "art16": {
+      "overall": "not_applicable",
+      "legal_basis": "Art. 16: system classified as not high-risk with medium confidence - provider obligations do not apply"
+    },
+    "art18": {
+      "overall": "not_applicable",
+      "legal_basis": "Art. 18 applies only to providers of high-risk AI systems; this system is not high-risk"
+    },
+    "art19": {
+      "overall": "not_applicable",
+      "legal_basis": "Art. 19 applies only to providers of high-risk AI systems; this system is not high-risk"
+    },
+    "art20": {
+      "overall": "not_applicable",
+      "legal_basis": "Art. 20 applies only to providers of high-risk AI systems; this system is not high-risk"
+    },
+    "art21": {
+      "overall": "not_applicable",
+      "legal_basis": "Art. 21 applies only to providers of high-risk AI systems; this system is not high-risk"
+    },
+    "art22": {
+      "overall": "not_applicable",
+      "legal_basis": "Art. 22 applies only to providers of high-risk AI systems; risk_classification='not high-risk' with medium confidence"
+    },
+    "art24": {
+      "overall": "not_applicable",
+      "legal_basis": "Art. 24 applies only to distributors of high-risk AI systems; deep fake generator classified as not high-risk"
+    },
+    "art25": {
+      "overall": "not_applicable",
+      "legal_basis": "Art. 25 applies only to high-risk AI systems under Art. 6; deep fake generator is not high-risk (is_high_risk=false) \u2014 Art. 25 value chain responsibilities do not apply"
+    },
+    "art8": {
+      "overall": "not_applicable",
+      "legal_basis": "Art. 8: not high-risk system \u2014 Art. 8 Section 2 compliance requirements apply only to high-risk AI systems"
+    },
+    "art23": {
+      "overall": "not_applicable",
+      "legal_basis": "Art. 23 applies only to importers of high-risk AI systems; deep fake generator classified as not high-risk"
+    },
+    "art41": {
+      "overall": "not_applicable"
+    },
+    "art60": {
+      "overall": "not_applicable"
+    },
+    "art61": {
+      "overall": "not_applicable"
+    },
+    "art71": {
+      "overall": "not_applicable"
+    },
+    "art80": {
+      "overall": "unable_to_determine"
+    },
+    "art82": {
+      "overall": "unable_to_determine"
+    },
+    "art91": {
+      "overall": "unable_to_determine"
+    },
+    "art92": {
+      "note": "Evaluation cooperation readiness not determined",
+      "overall": "unable_to_determine"
+    },
+    "art111": {
+      "overall": "unable_to_determine",
+      "note": "No transitional provision context provided"
+    }
+  }
+}

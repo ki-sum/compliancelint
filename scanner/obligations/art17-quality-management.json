@@ -1,0 +1,412 @@
+{
+  "_metadata": {
+    "article": 17,
+    "title": "Quality Management System",
+    "prerequisites": [
+      {
+        "type": "risk_classification",
+        "required_level": "high-risk",
+        "source_article": 6,
+        "context_field": "risk_classification",
+        "skip_when": "not high-risk with medium/high confidence"
+      }
+    ],
+    "decomposition_date": "2026-04-03",
+    "primary_official_source": {
+      "name": "EUR-Lex -- Official Journal of the European Union",
+      "eli_uri": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng",
+      "celex": "32024R1689",
+      "oj_citation": "OJ L 2024/1689, 12.7.2024"
+    },
+    "pdf_pages": [62, 63],
+    "related_standards": {
+      "published": [
+        "ISO 9001:2015 -- Quality management systems",
+        "ISO/IEC 42001:2023 -- AI management system",
+        "ISO 13485:2016 -- Medical devices QMS (for Annex I medical device AI)"
+      ],
+      "upcoming": [
+        "CEN-CENELEC harmonized standard for Art. 17 (expected Q4 2026)"
+      ]
+    }
+  },
+  "obligations": [
+    {
+      "id": "ART17-OBL-1",
+      "source": "Art. 17(1)",
+      "source_quote": "Providers of high-risk AI systems shall put a quality management system in place that ensures compliance with this Regulation. That system shall be documented in a systematic and orderly manner in the form of written policies, procedures and instructions, and shall include at least the following aspects:",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "qms_exists",
+          "description": "A quality management system must be in place",
+          "requirement": "SHALL put a quality management system in place"
+        },
+        {
+          "atom": "qms_ensures_compliance",
+          "description": "QMS must ensure compliance with the Regulation",
+          "requirement": "QMS SHALL ensure compliance with this Regulation"
+        },
+        {
+          "atom": "qms_documented",
+          "description": "QMS must be documented as written policies, procedures, and instructions",
+          "requirement": "SHALL be documented in a systematic and orderly manner in the form of written policies, procedures and instructions"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check for QMS documentation, quality policy, quality manual, procedures documentation",
+        "what_to_scan": ["documentation"],
+        "human_judgment_needed": "Whether the QMS is adequate and actually ensures compliance"
+      }
+    },
+    {
+      "id": "ART17-OBL-1a",
+      "source": "Art. 17(1)(a)",
+      "source_quote": "a strategy for regulatory compliance, including compliance with conformity assessment procedures and procedures for the management of modifications to the high-risk AI system;",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "regulatory_compliance_strategy",
+          "description": "QMS must include a regulatory compliance strategy",
+          "requirement": "SHALL include a strategy for regulatory compliance including conformity assessment and modification management"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "low",
+        "detection_method": "Check for compliance strategy documentation, conformity assessment procedures, change management procedures",
+        "what_to_scan": ["documentation"],
+        "human_judgment_needed": "Whether the strategy is adequate"
+      }
+    },
+    {
+      "id": "ART17-OBL-1b",
+      "source": "Art. 17(1)(b)",
+      "source_quote": "techniques, procedures and systematic actions to be used for the design, design control and design verification of the high-risk AI system;",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "design_procedures",
+          "description": "QMS must include design, design control, and verification procedures",
+          "requirement": "SHALL include techniques, procedures and systematic actions for design, design control and design verification"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check for design documentation, review processes, verification procedures in code/docs",
+        "what_to_scan": ["documentation", "config"],
+        "human_judgment_needed": "Whether procedures are systematic and adequate"
+      }
+    },
+    {
+      "id": "ART17-OBL-1c",
+      "source": "Art. 17(1)(c)",
+      "source_quote": "techniques, procedures and systematic actions to be used for the development, quality control and quality assurance of the high-risk AI system;",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "development_qa_procedures",
+          "description": "QMS must include development QC/QA procedures",
+          "requirement": "SHALL include development, quality control and quality assurance procedures"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check for CI/CD configuration, testing framework, code review processes, QA documentation",
+        "what_to_scan": ["code", "config", "documentation"],
+        "human_judgment_needed": "Whether QA procedures are adequate for high-risk AI"
+      }
+    },
+    {
+      "id": "ART17-OBL-1d",
+      "source": "Art. 17(1)(d)",
+      "source_quote": "examination, test and validation procedures to be carried out before, during and after the development of the high-risk AI system, and the frequency with which they have to be carried out;",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "testing_validation_procedures",
+          "description": "QMS must include testing and validation procedures with defined frequency",
+          "requirement": "SHALL include examination, test and validation procedures before, during and after development"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check for test suites, validation scripts, test schedules, CI/CD pipelines with testing stages",
+        "what_to_scan": ["code", "config"],
+        "human_judgment_needed": "Whether testing frequency and coverage are adequate"
+      }
+    },
+    {
+      "id": "ART17-OBL-1e",
+      "source": "Art. 17(1)(e)",
+      "source_quote": "technical specifications, including standards, to be applied and, where the relevant harmonised standards are not applied in full or do not cover all of the relevant requirements set out in Section 2, the means to be used to ensure that the high-risk AI system complies with those requirements;",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "technical_specifications_documented",
+          "description": "QMS must include applicable technical specifications and standards",
+          "requirement": "SHALL include technical specifications and standards to be applied"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "low",
+        "detection_method": "Check for standards reference documentation, technical specifications",
+        "what_to_scan": ["documentation"],
+        "human_judgment_needed": "Whether all applicable standards are identified and applied"
+      }
+    },
+    {
+      "id": "ART17-OBL-1f",
+      "source": "Art. 17(1)(f)",
+      "source_quote": "systems and procedures for data management, including data acquisition, data collection, data analysis, data labelling, data storage, data filtration, data mining, data aggregation, data retention and any other operation regarding the data that is performed before and for the purpose of the placing on the market or the putting into service of high-risk AI systems;",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "data_management_procedures",
+          "description": "QMS must include comprehensive data management procedures",
+          "requirement": "SHALL include systems and procedures for data management (acquisition, collection, analysis, labelling, storage, filtration, mining, aggregation, retention)"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check for data management documentation, data pipelines, data governance policies",
+        "what_to_scan": ["code", "documentation", "config"],
+        "human_judgment_needed": "Whether data management covers all listed operations"
+      }
+    },
+    {
+      "id": "ART17-OBL-1g",
+      "source": "Art. 17(1)(g)",
+      "source_quote": "the risk management system referred to in Article 9;",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "risk_management_in_qms",
+          "description": "QMS must include the Art. 9 risk management system",
+          "requirement": "SHALL include the risk management system per Art. 9"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check if Art. 9 risk management documentation exists and is referenced in QMS",
+        "what_to_scan": ["documentation"],
+        "human_judgment_needed": "Whether risk management is integrated into QMS"
+      },
+      "cross_references": [{"article": 9, "context": "Risk management system"}]
+    },
+    {
+      "id": "ART17-OBL-1h",
+      "source": "Art. 17(1)(h)",
+      "source_quote": "the setting-up, implementation and maintenance of a post-market monitoring system, in accordance with Article 72;",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "post_market_monitoring",
+          "description": "QMS must include post-market monitoring system per Art. 72",
+          "requirement": "SHALL include post-market monitoring system per Art. 72"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "low",
+        "detection_method": "Check for post-market monitoring documentation, telemetry systems, feedback collection",
+        "what_to_scan": ["documentation", "config"],
+        "human_judgment_needed": "Whether monitoring system meets Art. 72 requirements"
+      },
+      "cross_references": [{"article": 72, "context": "Post-market monitoring"}]
+    },
+    {
+      "id": "ART17-OBL-1i",
+      "source": "Art. 17(1)(i)",
+      "source_quote": "procedures related to the reporting of a serious incident in accordance with Article 73;",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "incident_reporting_procedures",
+          "description": "QMS must include serious incident reporting procedures per Art. 73",
+          "requirement": "SHALL include serious incident reporting procedures per Art. 73"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "Check for incident response plans, reporting procedures",
+        "what_to_scan": ["documentation"],
+        "human_judgment_needed": "Whether procedures meet Art. 73 requirements"
+      },
+      "cross_references": [{"article": 73, "context": "Serious incident reporting"}]
+    },
+    {
+      "id": "ART17-OBL-1j",
+      "source": "Art. 17(1)(j)",
+      "source_quote": "the handling of communication with national competent authorities, other relevant authorities, including those providing or supporting the access to data, notified bodies, other operators, customers or other interested parties;",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "authority_communication_procedures",
+          "description": "QMS must include procedures for communication with authorities and stakeholders",
+          "requirement": "SHALL include procedures for handling communication with authorities, notified bodies, operators, and customers"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "Check for communication procedures documentation",
+        "what_to_scan": ["documentation"],
+        "human_judgment_needed": "Whether communication procedures are adequate"
+      }
+    },
+    {
+      "id": "ART17-OBL-1k",
+      "source": "Art. 17(1)(k)",
+      "source_quote": "systems and procedures for record-keeping of all relevant documentation and information;",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "record_keeping",
+          "description": "QMS must include record-keeping systems",
+          "requirement": "SHALL include record-keeping systems for all relevant documentation"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check for documentation management systems, version control, document retention policies",
+        "what_to_scan": ["documentation", "config"],
+        "human_judgment_needed": "Whether record-keeping covers all relevant documentation"
+      }
+    },
+    {
+      "id": "ART17-OBL-1l",
+      "source": "Art. 17(1)(l)",
+      "source_quote": "resource management, including security-of-supply related measures;",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "resource_management",
+          "description": "QMS must include resource management",
+          "requirement": "SHALL include resource management including security-of-supply measures"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "Check for resource management documentation, supply chain documentation",
+        "what_to_scan": ["documentation"],
+        "human_judgment_needed": "Whether resource management is adequate"
+      }
+    },
+    {
+      "id": "ART17-OBL-1m",
+      "source": "Art. 17(1)(m)",
+      "source_quote": "an accountability framework setting out the responsibilities of the management and other staff with regard to all the aspects listed in this paragraph.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "accountability_framework",
+          "description": "QMS must include accountability framework with roles and responsibilities",
+          "requirement": "SHALL include accountability framework for management and staff responsibilities"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "low",
+        "detection_method": "Check for RACI matrix, roles documentation, accountability documentation",
+        "what_to_scan": ["documentation"],
+        "human_judgment_needed": "Whether accountability framework covers all QMS aspects"
+      }
+    },
+    {
+      "id": "ART17-OBL-2",
+      "source": "Art. 17(2)",
+      "source_quote": "The implementation of the aspects referred to in paragraph 1 shall be proportionate to the size of the provider's organisation. Providers shall, in any event, respect the degree of rigour and the level of protection required to ensure the compliance of their high-risk AI systems with this Regulation.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "proportionate_implementation",
+          "description": "QMS implementation must be proportionate but always ensure compliance",
+          "requirement": "SHALL be proportionate to size but always ensure compliance"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "Cannot be automated — requires judgment about proportionality",
+        "what_to_scan": [],
+        "human_judgment_needed": "Whether QMS is proportionate yet adequate for the system's risk level"
+      }
+    },
+    {
+      "id": "ART17-PERM-3",
+      "source": "Art. 17(3)",
+      "source_quote": "Providers of high-risk AI systems that are subject to obligations regarding quality management systems or an equivalent function under relevant sectoral Union law may include the aspects listed in paragraph 1 as part of the quality management systems pursuant to that law.",
+      "deontic_type": "permission",
+      "modality": "may",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "sectoral_qms_integration",
+          "description": "May integrate Art. 17 aspects into existing sectoral QMS",
+          "requirement": "MAY include aspects in existing sectoral QMS"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "N/A — permission, not obligation",
+        "what_to_scan": [],
+        "human_judgment_needed": "Whether sectoral QMS covers all Art. 17 aspects"
+      }
+    }
+  ],
+  "summary": {
+    "total_obligations": 16,
+    "obligation_count": 16,
+    "addressee_breakdown": {
+      "provider": 16
+    },
+    "automation_breakdown": {
+      "full": 0,
+      "partial": 10,
+      "manual": 6
+    }
+  }
+}

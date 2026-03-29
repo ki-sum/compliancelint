@@ -1,0 +1,71 @@
+{
+  "_metadata": {
+    "article": 41,
+    "title": "Common specifications",
+    "prerequisites": [
+      {
+        "type": "risk_classification",
+        "required_level": "high-risk",
+        "source_article": 6,
+        "context_field": "risk_classification",
+        "skip_when": "not high-risk with medium/high confidence"
+      }
+    ],
+    "primary_official_source": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689#art_41",
+    "pdf_pages": "76-77",
+    "decomposition_date": "2026-04-04",
+    "related_standards": {
+      "draft": [],
+      "published": [],
+      "upcoming": [
+        "CEN-CENELEC harmonized standards for AI Act (expected 2026)"
+      ]
+    }
+  },
+  "obligations": [
+    {
+      "id": "ART41-OBL-5",
+      "source": "Art. 41(5)",
+      "source_quote": "Where providers of high-risk AI systems or general-purpose AI models do not comply with the common specifications referred to in paragraph 1, they shall duly justify that they have adopted technical solutions that meet the requirements referred to in Section 2 of this Chapter or, as applicable, comply with the obligations set out in Sections 2 and 3 of Chapter V to a level at least equivalent thereto.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "addressee_note": "Provider of a high-risk AI system or general-purpose AI model that does not follow common specifications",
+      "decomposed_atoms": [
+        {
+          "atom": "justify_alternative_technical_solutions",
+          "description": "Provider must justify equivalent technical solutions when not following common specifications",
+          "requirement": "Providers that do not comply with common specifications SHALL duly justify that they have adopted technical solutions that meet the requirements to a level at least equivalent"
+        },
+        {
+          "atom": "equivalent_compliance_level",
+          "description": "Alternative solutions must meet requirements to at least an equivalent level",
+          "requirement": "Technical solutions SHALL meet the requirements to a level at least equivalent to the common specifications"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "documentation_search",
+        "what_to_scan": "Standards compliance documentation, technical justification documents, alternative solution descriptions, equivalence assessments",
+        "human_judgment_needed": true
+      },
+      "scope_limitation": "Only applies when common specifications have been adopted and the provider does not comply with them",
+      "context_skip_field": "follows_common_specifications"
+    }
+  ],
+  "summary": {
+    "total_obligations": 1,
+    "obligation_count": 1,
+    "prohibition_count": 0,
+    "permission_count": 0,
+    "addressee_breakdown": {
+      "provider": 1
+    },
+    "automation_breakdown": {
+      "full": 0,
+      "partial": 1,
+      "manual": 0
+    }
+  }
+}

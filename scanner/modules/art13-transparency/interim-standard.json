@@ -1,0 +1,133 @@
+{
+  "_metadata": {
+    "standard_id": "CL-IS-ART13-v0.1",
+    "title": "ComplianceLint Interim Standard for EU AI Act Article 13: Transparency and Provision of Information to Deployers",
+    "version": "0.1.0",
+    "date": "2026-03-17",
+    "status": "draft",
+    "disclaimer": "This is an interim standard developed by ComplianceLint based on available guidance, industry best practices, and relevant ISO standards. It is NOT an official standard. It will be superseded when CEN-CENELEC publishes the harmonized standard for Article 13 (expected Q4 2026).",
+    "basis": [
+      "EU AI Act Article 13 (official text)",
+      "EU AI Act Recital 72 (legislative intent on transparency)",
+      "ISO/IEC TR 24028:2020 — Overview of trustworthiness in artificial intelligence",
+      "ISO/IEC TS 6254:2024 — Transparency taxonomy of AI systems",
+      "ISO/IEC 42001:2023 — AI management system",
+      "ISO/IEC TR 29119-11:2020 — Testing of AI-based systems",
+      "NIST AI 100-1 (AI Risk Management Framework — Transparency)",
+      "EU High-Level Expert Group on AI — Ethics Guidelines for Trustworthy AI"
+    ],
+    "awaiting_standard": "CEN-CENELEC harmonized standard for Art. 13 (expected Q4 2026)"
+  },
+
+  "requirements": [
+    {
+      "id": "IS-ART13-R01",
+      "obligation_ref": "ART13-OBL-1",
+      "title": "Instructions of Use for Deployers",
+      "requirement": "The provider MUST provide instructions of use in an appropriate digital format accompanying the high-risk AI system.",
+      "rationale": "Art. 13(3) mandates that instructions of use accompany the system. These instructions enable deployers to fulfill their own obligations under Art. 26.",
+      "required_content": [
+        "Provider identity, name, and contact information",
+        "Intended purpose of the AI system",
+        "Level of accuracy, robustness, and cybersecurity metrics",
+        "Known or foreseeable circumstances creating risks",
+        "Performance across different groups of persons (where applicable)",
+        "Specifications for input data",
+        "Human oversight measures (per Art. 14)",
+        "Expected lifetime of the system and maintenance needs",
+        "Computational and hardware resources needed",
+        "Description of logging capabilities (per Art. 12)"
+      ],
+      "acceptable_formats": [
+        "Deployer guide (digital document: MD, PDF, HTML)",
+        "User manual with dedicated AI transparency section",
+        "Interactive documentation portal",
+        "Structured data file (JSON/YAML) alongside human-readable guide"
+      ]
+    },
+    {
+      "id": "IS-ART13-R02",
+      "obligation_ref": "ART13-OBL-2",
+      "title": "Model Interpretability",
+      "requirement": "The provider SHOULD integrate interpretability mechanisms enabling deployers to understand the basis for individual predictions.",
+      "rationale": "Art. 13(1) requires the system to be 'sufficiently transparent to enable deployers to interpret the system's output and use it appropriately.' Interpretability tools are the standard mechanism for achieving this.",
+      "acceptable_implementations": [
+        "SHAP (SHapley Additive exPlanations) — feature importance per prediction",
+        "LIME (Local Interpretable Model-agnostic Explanations)",
+        "Captum (PyTorch attribution library)",
+        "ELI5 (Explain Like I'm 5)",
+        "InterpretML (Microsoft interpretable ML toolkit)",
+        "Alibi (Seldon model explanations)",
+        "Attention visualization (for transformer models)",
+        "Decision tree extraction or rule-based surrogate models"
+      ],
+      "note": "The level of interpretability needed depends on the risk level and domain. Medical/legal AI requires deeper interpretability than recommendation systems."
+    },
+    {
+      "id": "IS-ART13-R03",
+      "obligation_ref": "ART13-OBL-3",
+      "title": "Output Confidence / Uncertainty Scores",
+      "requirement": "The AI system SHOULD expose calibrated confidence or uncertainty scores alongside predictions to enable deployers to appropriately calibrate trust.",
+      "rationale": "Art. 13(3)(b)(ii) requires disclosure of 'the level of accuracy, including its metrics.' Per-prediction confidence scores enable deployers to set human review thresholds and identify cases requiring additional scrutiny.",
+      "acceptable_implementations": [
+        "Calibrated prediction probabilities (e.g., Platt scaling, isotonic regression)",
+        "Softmax scores with documented calibration methodology",
+        "Prediction intervals or confidence intervals",
+        "Ensemble disagreement scores",
+        "Epistemic and aleatoric uncertainty decomposition",
+        "Conformal prediction sets"
+      ]
+    },
+    {
+      "id": "IS-ART13-R04",
+      "obligation_ref": "ART13-OBL-4",
+      "title": "Intended Purpose Documentation",
+      "requirement": "The provider MUST document the intended purpose of the AI system, including use cases and foreseeable misuse.",
+      "rationale": "Art. 13(3)(b)(i) requires instructions to include 'the intended purpose of the AI system.' This is foundational — deployers cannot use a system appropriately if they do not understand its intended purpose.",
+      "required_content": [
+        "Primary use case(s)",
+        "Target user population",
+        "Decision types supported by the system",
+        "Explicitly out-of-scope uses",
+        "Foreseeable misuse scenarios",
+        "Geographic and demographic scope"
+      ]
+    },
+    {
+      "id": "IS-ART13-R05",
+      "obligation_ref": "ART13-OBL-5",
+      "title": "Known Limitations Documentation",
+      "requirement": "The provider MUST document known limitations, foreseeable risks, and circumstances under which the system may underperform.",
+      "rationale": "Art. 13(3)(b)(iv) requires documenting 'the known or foreseeable circumstances, related to the use of the high-risk AI system in accordance with its intended purpose or under conditions of reasonably foreseeable misuse, in which the AI system may create risks to the health, safety or fundamental rights.'",
+      "required_content": [
+        "Known failure modes and edge cases",
+        "Demographic or geographic performance gaps",
+        "Environmental constraints (lighting, noise, data quality)",
+        "Input types that cause degraded performance",
+        "Conditions under which the system should not be used",
+        "Foreseeable risks from reasonably foreseeable misuse"
+      ]
+    },
+    {
+      "id": "IS-ART13-R06",
+      "obligation_ref": "ART13-OBL-6",
+      "title": "Input Data Specifications",
+      "requirement": "The provider MUST document input data specifications, including expected formats, valid ranges, and quality requirements.",
+      "rationale": "Art. 13(3)(b)(iii) requires 'the specifications for the input data, or any other relevant information in terms of the training, validation and testing datasets used.'",
+      "required_content": [
+        "Expected data formats and types",
+        "Valid ranges and constraints",
+        "Required preprocessing steps",
+        "Data quality requirements",
+        "Sample inputs with expected outputs",
+        "Known input types that cause errors"
+      ]
+    }
+  ],
+
+  "scoring": {
+    "compliant": "R01 + R04 + R05 met, and at least 2 of R02, R03, R06 met",
+    "partial": "R01 or R04 met + at least 2 others met",
+    "non_compliant": "Neither R01 nor R04 met"
+  }
+}

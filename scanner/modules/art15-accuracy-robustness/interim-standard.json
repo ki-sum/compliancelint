@@ -1,0 +1,181 @@
+{
+  "_metadata": {
+    "standard_id": "CL-IS-ART15-v0.1",
+    "title": "ComplianceLint Interim Standard for EU AI Act Article 15: Accuracy, Robustness and Cybersecurity",
+    "version": "0.1.0",
+    "date": "2026-03-17",
+    "status": "draft",
+    "disclaimer": "This is an interim standard developed by ComplianceLint based on available guidance, industry best practices, and relevant ISO standards. It is NOT an official standard. It will be superseded when CEN-CENELEC publishes the harmonized standard for Article 15 (expected Q4 2026).",
+    "basis": [
+      "EU AI Act Article 15 (official text)",
+      "EU AI Act Recital 74 (legislative intent on accuracy, robustness, cybersecurity)",
+      "ISO/IEC 42001:2023 — AI management system",
+      "ISO/IEC 27001:2022 — Information security management",
+      "ISO/IEC 27002:2022 — Information security controls",
+      "ISO/IEC 23894:2023 — Guidance on risk management for AI",
+      "ISO/IEC TR 24029-1:2021 — Assessment of the robustness of neural networks — Part 1: Overview",
+      "ISO/IEC TR 24029-2:2023 — Assessment of the robustness of neural networks — Part 2: Methodology",
+      "OWASP Top 10 for LLM Applications (2025)",
+      "NIST AI 100-2 — Adversarial Machine Learning",
+      "MITRE ATLAS — Adversarial Threat Landscape for AI Systems"
+    ],
+    "awaiting_standard": "CEN-CENELEC harmonized standard for Art. 15 (expected Q4 2026)"
+  },
+
+  "requirements": [
+    {
+      "id": "IS-ART15-R01",
+      "obligation_ref": "ART15-OBL-1",
+      "title": "Accuracy Metrics Definition and Tracking",
+      "requirement": "The provider MUST define, track, and declare accuracy metrics appropriate for the system's intended purpose.",
+      "rationale": "Art. 15(1) requires 'an appropriate level of accuracy' and Art. 15(2) requires 'accuracy metrics shall be declared in the accompanying instructions of use.' Without defined metrics, compliance cannot be assessed.",
+      "recommended_metrics": {
+        "classification": ["accuracy", "precision", "recall", "F1-score", "AUC-ROC", "confusion matrix"],
+        "regression": ["MSE", "RMSE", "MAE", "R-squared", "MAPE"],
+        "generation": ["BLEU", "ROUGE", "perplexity", "human evaluation scores"],
+        "detection": ["mAP", "IoU", "precision-recall curve"],
+        "ranking": ["NDCG", "MRR", "MAP"]
+      },
+      "required_documentation": [
+        "Metric values on validation and test sets",
+        "Performance breakdown by demographic groups (where applicable)",
+        "Performance under different operating conditions",
+        "Confidence intervals or statistical significance"
+      ]
+    },
+    {
+      "id": "IS-ART15-R02",
+      "obligation_ref": "ART15-OBL-2",
+      "title": "Testing Infrastructure",
+      "requirement": "The provider MUST implement comprehensive testing including unit tests, integration tests, and model evaluation tests.",
+      "rationale": "Art. 15(3) requires resilience to 'errors, faults or inconsistencies.' Testing is the primary mechanism for demonstrating and maintaining robustness.",
+      "acceptable_implementations": [
+        "Unit tests for individual components (pytest, jest, JUnit)",
+        "Integration tests for system interactions",
+        "Model evaluation tests (performance on test datasets)",
+        "Regression tests for model updates",
+        "End-to-end tests for critical user flows",
+        "Performance/load tests for system resilience"
+      ],
+      "minimum_coverage": "Testing SHOULD cover all critical paths and edge cases. Coverage metrics SHOULD be tracked."
+    },
+    {
+      "id": "IS-ART15-R03",
+      "obligation_ref": "ART15-OBL-3",
+      "title": "Input Validation and Sanitization",
+      "requirement": "The provider MUST implement input validation and sanitization on all system entry points.",
+      "rationale": "Art. 15(3) requires resilience to 'errors, faults or inconsistencies that may occur within the system or the environment in which the system operates.' Input validation is the first line of defense.",
+      "acceptable_implementations": [
+        "Schema validation (pydantic, zod, JSON Schema, Protocol Buffers)",
+        "Type checking and range validation",
+        "Input sanitization against injection attacks",
+        "Image/audio/text format validation for ML inputs",
+        "Anomaly detection on input distributions"
+      ]
+    },
+    {
+      "id": "IS-ART15-R04",
+      "obligation_ref": "ART15-OBL-4",
+      "title": "Error Handling and Graceful Degradation",
+      "requirement": "The provider MUST implement error handling with graceful degradation, including technically redundant solutions (back-up plans, fail-safe plans).",
+      "rationale": "Art. 15(3) explicitly requires 'technically redundant solutions which may include back-up plans and fail-safe plans.'",
+      "acceptable_implementations": [
+        "Structured exception handling (try/except, try/catch)",
+        "Error boundaries in UI components",
+        "Graceful degradation (fallback to simpler model or rule-based system)",
+        "Circuit breaker pattern for external dependencies",
+        "Retry mechanisms with exponential backoff",
+        "Fail-safe defaults (conservative output when uncertain)"
+      ]
+    },
+    {
+      "id": "IS-ART15-R05",
+      "obligation_ref": "ART15-OBL-5",
+      "title": "Rate Limiting and Abuse Prevention",
+      "requirement": "The provider SHOULD implement rate limiting on all public-facing endpoints to prevent abuse and denial-of-service attacks.",
+      "rationale": "Art. 15(5) requires 'cybersecurity measures appropriate to the circumstances and the risks.' Rate limiting is a standard defense against service abuse.",
+      "acceptable_implementations": [
+        "Per-client rate limiting (by IP, API key, or user ID)",
+        "Global rate limiting for system protection",
+        "Adaptive rate limiting based on threat signals",
+        "WAF (Web Application Firewall) rules"
+      ]
+    },
+    {
+      "id": "IS-ART15-R06",
+      "obligation_ref": "ART15-OBL-6",
+      "title": "Authentication and Authorization",
+      "requirement": "The provider MUST implement authentication and authorization controls on all system endpoints and administrative functions.",
+      "rationale": "Art. 15(5) requires protection against 'attempts by unauthorised third parties.' Authentication verifies identity; authorization enforces access control.",
+      "acceptable_implementations": [
+        "JWT (JSON Web Tokens) with proper validation",
+        "OAuth 2.0 / OpenID Connect",
+        "API key authentication with rotation",
+        "Role-based access control (RBAC)",
+        "Attribute-based access control (ABAC)",
+        "Multi-factor authentication for administrative access"
+      ]
+    },
+    {
+      "id": "IS-ART15-R07",
+      "obligation_ref": "ART15-OBL-7",
+      "title": "Dependency Vulnerability Scanning",
+      "requirement": "The provider MUST integrate automated dependency vulnerability scanning into the development pipeline.",
+      "rationale": "Art. 15(5) requires protection against exploitation of 'system vulnerabilities.' Third-party dependencies are a common attack vector.",
+      "acceptable_implementations": [
+        "pip-audit or safety (Python)",
+        "npm audit or snyk (JavaScript/TypeScript)",
+        "OWASP Dependency-Check (Java)",
+        "cargo audit (Rust)",
+        "Dependabot or Renovate for automated updates",
+        "Trivy or Grype for container scanning",
+        "CodeQL or SonarQube for static analysis"
+      ]
+    },
+    {
+      "id": "IS-ART15-R08",
+      "obligation_ref": "ART15-OBL-8",
+      "title": "Adversarial Testing",
+      "requirement": "The provider SHOULD conduct adversarial testing appropriate to the system's risk profile and attack surface.",
+      "rationale": "Art. 15(4) explicitly names adversarial ML attacks: 'data poisoning, model evasion, model inversion, and model inference.' Testing resilience against these is necessary.",
+      "acceptable_implementations": [
+        "Adversarial Robustness Toolbox (ART) — IBM",
+        "CleverHans — adversarial example generation",
+        "Foolbox — adversarial attacks library",
+        "TextAttack — NLP adversarial testing",
+        "Fuzz testing (AFL, libfuzzer, hypothesis)",
+        "Property-based testing",
+        "Red team exercises for AI systems"
+      ],
+      "attack_types_to_test": [
+        "Data poisoning: Can training data be manipulated?",
+        "Model evasion: Can adversarial inputs cause misclassification?",
+        "Model inversion: Can model outputs reveal training data?",
+        "Model inference: Can membership in training set be detected?",
+        "Prompt injection (for LLM-based systems)"
+      ]
+    },
+    {
+      "id": "IS-ART15-R09",
+      "obligation_ref": "ART15-OBL-9",
+      "title": "Redundancy and Failover",
+      "requirement": "The provider SHOULD implement redundancy and failover mechanisms appropriate to the system's criticality.",
+      "rationale": "Art. 15(3) requires 'technically redundant solutions which may include back-up plans and fail-safe plans.' For production systems, this translates to infrastructure redundancy.",
+      "acceptable_implementations": [
+        "Health checks and liveness/readiness probes",
+        "Replica sets with automatic failover",
+        "Load balancing across multiple instances",
+        "Backup and restore procedures",
+        "Disaster recovery plans and testing",
+        "Canary or blue-green deployment strategies",
+        "Multi-region or multi-availability-zone deployment"
+      ]
+    }
+  ],
+
+  "scoring": {
+    "compliant": "R01 + R02 + R06 met, and at least 4 of R03-R05, R07-R09 met",
+    "partial": "R01 or R02 met + at least 4 others met",
+    "non_compliant": "Neither R01 nor R02 met, or fewer than 4 requirements met"
+  }
+}

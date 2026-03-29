@@ -1,0 +1,179 @@
+{
+  "_metadata": {
+    "article": 22,
+    "title": "Authorised representatives of providers of high-risk AI systems",
+    "prerequisites": [
+      {
+        "type": "risk_classification",
+        "required_level": "high-risk",
+        "source_article": 6,
+        "context_field": "risk_classification",
+        "skip_when": "not high-risk with medium/high confidence"
+      }
+    ],
+    "primary_official_source": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689#art_22",
+    "pdf_pages": "64-65",
+    "decomposition_date": "2026-04-04",
+    "related_standards": {
+      "draft": [],
+      "published": [],
+      "upcoming": []
+    }
+  },
+  "obligations": [
+    {
+      "id": "ART22-OBL-1",
+      "source": "Art. 22(1)",
+      "source_quote": "Prior to making their high-risk AI systems available on the Union market, providers established in third countries shall, by written mandate, appoint an authorised representative which is established in the Union.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "addressee_note": "Provider established in a third country (non-EU)",
+      "decomposed_atoms": [
+        {
+          "atom": "authorised_representative_appointed",
+          "description": "Non-EU provider must appoint an EU-based authorised representative by written mandate",
+          "requirement": "Third-country providers SHALL appoint an authorised representative established in the Union by written mandate, prior to making systems available on the Union market"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "documentation_search",
+        "what_to_scan": "Authorised representative documentation, mandate agreements, EU representative contact details",
+        "human_judgment_needed": true
+      },
+      "scope_limitation": "Only applies to providers established in third countries (non-EU)",
+      "context_skip_field": "is_eu_established_provider"
+    },
+    {
+      "id": "ART22-OBL-2",
+      "source": "Art. 22(2)",
+      "source_quote": "The provider shall enable its authorised representative to perform the tasks specified in the mandate received from the provider.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "addressee_note": "Provider that has appointed an authorised representative",
+      "decomposed_atoms": [
+        {
+          "atom": "enable_representative_to_perform_tasks",
+          "description": "Provider must enable the authorised representative to perform mandate tasks",
+          "requirement": "The provider SHALL enable its authorised representative to perform the tasks specified in the mandate"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "low",
+        "detection_method": "documentation_search",
+        "what_to_scan": "Mandate scope documentation, representative access and authority records",
+        "human_judgment_needed": true
+      },
+      "scope_limitation": "Only applies to providers established in third countries",
+      "context_skip_field": "is_eu_established_provider"
+    },
+    {
+      "id": "ART22-OBL-3",
+      "source": "Art. 22(3)",
+      "source_quote": "The authorised representative shall perform the tasks specified in the mandate received from the provider.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "authorised_representative",
+      "addressee_note": "Authorised representative of a third-country provider",
+      "decomposed_atoms": [
+        {
+          "atom": "representative_performs_mandate_tasks",
+          "description": "Authorised representative must perform the tasks in the mandate",
+          "requirement": "The authorised representative SHALL perform the tasks specified in the mandate"
+        },
+        {
+          "atom": "provide_mandate_copy_to_ai_office",
+          "description": "Provide a copy of the mandate to the AI Office upon request",
+          "requirement": "The authorised representative SHALL provide a copy of the mandate to the AI Office upon request, in one of the official languages of the institutions of the Union"
+        },
+        {
+          "atom": "verify_declaration_and_documentation",
+          "description": "Verify EU declaration of conformity and technical documentation exist and conformity assessment was carried out",
+          "requirement": "The authorised representative SHALL verify that the EU declaration of conformity (Art. 47) and technical documentation (Art. 11) have been drawn up and an appropriate conformity assessment procedure has been carried out by the provider"
+        },
+        {
+          "atom": "keep_documents_10_years",
+          "description": "Keep provider contact details, declaration, technical documentation and certificate for 10 years",
+          "requirement": "The authorised representative SHALL keep at the disposal of competent authorities, for 10 years after the system has been placed on the market or put into service: provider contact details, EU declaration of conformity, technical documentation, and if applicable the notified body certificate"
+        },
+        {
+          "atom": "provide_information_on_request",
+          "description": "Provide all information and documentation necessary to demonstrate conformity upon reasoned request",
+          "requirement": "The authorised representative SHALL provide a competent authority, upon a reasoned request, with all information and documentation necessary to demonstrate conformity, including access to automatically generated logs to the extent under the provider's control"
+        },
+        {
+          "atom": "cooperate_with_authorities",
+          "description": "Cooperate with competent authorities on any action related to the high-risk AI system",
+          "requirement": "The authorised representative SHALL cooperate with competent authorities, upon a reasoned request, in any action they take in relation to the high-risk AI system, in particular to reduce and mitigate risks"
+        },
+        {
+          "atom": "comply_with_registration_obligations",
+          "description": "Comply with registration obligations or ensure registration information is correct",
+          "requirement": "The authorised representative SHALL, where applicable, comply with registration obligations (Art. 49(1)), or if registration is carried out by the provider, ensure the information in Annex VIII Section A point 3 is correct"
+        },
+        {
+          "atom": "terminate_mandate_if_provider_non_compliant",
+          "description": "Terminate mandate if provider is acting contrary to its obligations",
+          "requirement": "The authorised representative SHALL terminate the mandate if it considers or has reason to consider the provider to be acting contrary to its obligations pursuant to this Regulation"
+        },
+        {
+          "atom": "inform_authority_of_termination",
+          "description": "Immediately inform market surveillance authority and notified body about termination",
+          "requirement": "The authorised representative SHALL immediately inform the relevant market surveillance authority, and where applicable the relevant notified body, about the termination of the mandate and the reasons therefor"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "documentation_search",
+        "what_to_scan": "Mandate task completion records, document retention systems, authority correspondence, registration records",
+        "human_judgment_needed": true
+      },
+      "cross_references": ["Art. 47", "Art. 11", "Art. 74(10)", "Art. 12(1)", "Art. 49(1)", "Annex VIII Section A point 3"]
+    },
+    {
+      "id": "ART22-OBL-4",
+      "source": "Art. 22(3)",
+      "source_quote": "The mandate shall empower the authorised representative to be addressed, in addition to or instead of the provider, by the competent authorities, on all issues related to ensuring compliance with this Regulation.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "addressee_note": "Provider that drafts the mandate for its authorised representative",
+      "decomposed_atoms": [
+        {
+          "atom": "mandate_empowers_representative_for_authority_contact",
+          "description": "The mandate must empower the representative to be addressed by competent authorities on all compliance issues",
+          "requirement": "The mandate SHALL empower the authorised representative to be addressed, in addition to or instead of the provider, by the competent authorities, on all issues related to ensuring compliance"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "low",
+        "detection_method": "documentation_search",
+        "what_to_scan": "Mandate agreement scope, authorised representative authority clauses",
+        "human_judgment_needed": true
+      },
+      "scope_limitation": "Only applies to providers established in third countries",
+      "context_skip_field": "is_eu_established_provider"
+    }
+  ],
+  "summary": {
+    "total_obligations": 4,
+    "obligation_count": 4,
+    "prohibition_count": 0,
+    "permission_count": 0,
+    "addressee_breakdown": {
+      "provider": 3,
+      "authorised_representative": 1
+    },
+    "automation_breakdown": {
+      "full": 0,
+      "partial": 3,
+      "manual": 1
+    }
+  }
+}

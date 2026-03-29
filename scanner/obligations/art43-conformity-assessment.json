@@ -1,0 +1,140 @@
+{
+  "_metadata": {
+    "article": 43,
+    "title": "Conformity Assessment",
+    "prerequisites": [
+      {
+        "type": "risk_classification",
+        "required_level": "high-risk",
+        "source_article": 6,
+        "context_field": "risk_classification",
+        "skip_when": "not high-risk with medium/high confidence"
+      }
+    ],
+    "decomposition_date": "2026-04-03",
+    "primary_official_source": {
+      "name": "EUR-Lex -- Official Journal of the European Union",
+      "eli_uri": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng",
+      "celex": "32024R1689",
+      "oj_citation": "OJ L 2024/1689, 12.7.2024"
+    },
+    "pdf_pages": [77, 78],
+    "related_standards": {
+      "published": [
+        "ISO/IEC 42001:2023 -- AI management system",
+        "ISO/IEC 17065:2012 -- Conformity assessment"
+      ],
+      "upcoming": [
+        "CEN-CENELEC harmonized standard for Art. 43 (expected Q4 2026)"
+      ]
+    }
+  },
+  "obligations": [
+    {
+      "id": "ART43-OBL-1",
+      "source": "Art. 43(1)",
+      "source_quote": "For high-risk AI systems listed in point 1 of Annex III, where, in demonstrating the compliance of a high-risk AI system with the requirements set out in Section 2, the provider has applied harmonised standards referred to in Article 40, or, where applicable, common specifications referred to in Article 41, the provider shall opt for one of the following conformity assessment procedures based on: (a) the internal control referred to in Annex VI; or (b) the assessment of the quality management system and the assessment of the technical documentation, with the involvement of a notified body, referred to in Annex VII.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "scope_limitation": "Applies to Annex III point 1 (biometric identification) high-risk AI systems",
+      "context_skip_field": "is_annex_iii_point_1",
+      "context_skip_value": false,
+      "decomposed_atoms": [
+        {
+          "atom": "conformity_assessment_performed",
+          "description": "Provider must perform conformity assessment (Annex VI internal control or Annex VII with notified body)",
+          "requirement": "SHALL opt for Annex VI or Annex VII conformity assessment procedure"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "Check for conformity assessment documentation, notified body involvement",
+        "what_to_scan": ["documentation"],
+        "human_judgment_needed": "Which assessment procedure is appropriate and whether it has been completed"
+      }
+    },
+    {
+      "id": "ART43-OBL-2",
+      "source": "Art. 43(2)",
+      "source_quote": "For high-risk AI systems referred to in points 2 to 8 of Annex III, providers shall follow the conformity assessment procedure based on internal control as referred to in Annex VI, which does not provide for the involvement of a notified body.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "internal_control_assessment",
+          "description": "Annex III points 2-8 systems use internal control (Annex VI)",
+          "requirement": "SHALL follow Annex VI internal control conformity assessment"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "low",
+        "detection_method": "Check for self-assessment documentation, internal control procedures",
+        "what_to_scan": ["documentation"],
+        "human_judgment_needed": "Whether internal control assessment has been properly conducted"
+      }
+    },
+    {
+      "id": "ART43-OBL-3",
+      "source": "Art. 43(3)",
+      "source_quote": "For high-risk AI systems covered by the Union harmonisation legislation listed in Section A of Annex I, the provider shall follow the relevant conformity assessment procedure as required under those legal acts.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "scope_limitation": "Only applies to Annex I product systems",
+      "context_skip_field": "is_annex_i_product",
+      "context_skip_value": false,
+      "decomposed_atoms": [
+        {
+          "atom": "sectoral_assessment",
+          "description": "Annex I product systems follow sectoral conformity assessment",
+          "requirement": "SHALL follow relevant sectoral conformity assessment procedure"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "Check for sectoral conformity assessment documentation",
+        "what_to_scan": ["documentation"],
+        "human_judgment_needed": "Which sectoral legislation applies and whether assessment is complete"
+      }
+    },
+    {
+      "id": "ART43-OBL-4",
+      "source": "Art. 43(4)",
+      "source_quote": "High-risk AI systems that have already been subject to a conformity assessment procedure shall undergo a new conformity assessment procedure in the event of a substantial modification, regardless of whether the modified system is intended to be further distributed or continues to be used by the current deployer.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "reassessment_on_modification",
+          "description": "New assessment required on substantial modification",
+          "requirement": "SHALL undergo new conformity assessment on substantial modification"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "low",
+        "detection_method": "Check for change management procedures, substantial modification tracking",
+        "what_to_scan": ["documentation", "config"],
+        "human_judgment_needed": "What constitutes a 'substantial modification'"
+      }
+    }
+  ],
+  "summary": {
+    "total_obligations": 4,
+    "obligation_count": 4,
+    "addressee_breakdown": {
+      "provider": 4
+    },
+    "automation_breakdown": {
+      "full": 0,
+      "partial": 2,
+      "manual": 2
+    }
+  }
+}

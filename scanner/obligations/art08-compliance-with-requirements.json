@@ -1,0 +1,99 @@
+{
+  "_metadata": {
+    "article": 8,
+    "title": "Compliance with the requirements",
+    "prerequisites": [
+      {
+        "type": "risk_classification",
+        "required_level": "high-risk",
+        "source_article": 6,
+        "context_field": "risk_classification",
+        "skip_when": "not high-risk with medium/high confidence"
+      }
+    ],
+    "primary_official_source": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689#art_8",
+    "pdf_pages": "55",
+    "decomposition_date": "2026-04-04",
+    "related_standards": {
+      "draft": [],
+      "published": [],
+      "upcoming": []
+    }
+  },
+  "obligations": [
+    {
+      "id": "ART08-OBL-1",
+      "source": "Art. 8(1)",
+      "source_quote": "High-risk AI systems shall comply with the requirements laid down in this Section, taking into account their intended purpose as well as the generally acknowledged state of the art on AI and AI-related technologies. The risk management system referred to in Article 9 shall be taken into account when ensuring compliance with those requirements.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "addressee_note": "Implicit — provider ensures system compliance (Art. 16(a) assigns this to providers)",
+      "decomposed_atoms": [
+        {
+          "atom": "compliant_with_section_2_requirements",
+          "description": "High-risk AI system meets Section 2 requirements considering intended purpose and state of the art",
+          "requirement": "High-risk AI systems SHALL comply with the requirements in Section 2, taking into account intended purpose and the generally acknowledged state of the art"
+        },
+        {
+          "atom": "risk_management_considered",
+          "description": "Risk management system (Art. 9) is considered when ensuring compliance",
+          "requirement": "The risk management system referred to in Art. 9 SHALL be taken into account when ensuring compliance"
+        }
+      ],
+      "automation_assessment": {
+        "level": "full",
+        "confidence": "high",
+        "detection_method": "cross_reference_check",
+        "what_to_scan": "Aggregate compliance status across Art. 9-15 scan results",
+        "human_judgment_needed": false
+      },
+      "cross_references": ["Art. 9", "Art. 10", "Art. 11", "Art. 12", "Art. 13", "Art. 14", "Art. 15"]
+    },
+    {
+      "id": "ART08-OBL-2",
+      "source": "Art. 8(2)",
+      "source_quote": "Where a product contains an AI system, to which the requirements of this Regulation as well as requirements of the Union harmonisation legislation listed in Section A of Annex I apply, providers shall be responsible for ensuring that their product is fully compliant with all applicable requirements under applicable Union harmonisation legislation. In ensuring the compliance of high-risk AI systems referred to in paragraph 1 with the requirements set out in this Section, and in order to ensure consistency, avoid duplication and minimise additional burdens, providers shall have a choice of integrating, as appropriate, the necessary testing and reporting processes, information and documentation they provide with regard to their product into documentation and procedures that already exist and are required under the Union harmonisation legislation listed in Section A of Annex I.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "addressee_note": "Provider of a product containing an AI system subject to both AI Act and Annex I legislation",
+      "decomposed_atoms": [
+        {
+          "atom": "full_compliance_with_all_applicable_legislation",
+          "description": "Product must be fully compliant with both AI Act and applicable Union harmonisation legislation",
+          "requirement": "Providers SHALL be responsible for ensuring their product is fully compliant with all applicable requirements under applicable Union harmonisation legislation"
+        },
+        {
+          "atom": "integration_choice_for_documentation",
+          "description": "Providers may integrate AI Act testing/documentation into existing sectoral documentation",
+          "requirement": "Providers SHALL have a choice of integrating AI Act testing, reporting, information, and documentation into existing documentation required under Annex I legislation"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "documentation_search",
+        "what_to_scan": "Product compliance documentation, sectoral legislation references, integrated testing/reporting procedures",
+        "human_judgment_needed": true
+      },
+      "scope_limitation": "Only applies where a product contains an AI system subject to both AI Act and Annex I Union harmonisation legislation",
+      "context_skip_field": "is_annex_i_product",
+      "cross_references": ["Annex I Section A"]
+    }
+  ],
+  "summary": {
+    "total_obligations": 2,
+    "obligation_count": 2,
+    "prohibition_count": 0,
+    "permission_count": 0,
+    "addressee_breakdown": {
+      "provider": 2
+    },
+    "automation_breakdown": {
+      "full": 1,
+      "partial": 1,
+      "manual": 0
+    }
+  }
+}

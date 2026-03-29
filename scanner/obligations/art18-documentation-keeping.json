@@ -1,0 +1,110 @@
+{
+  "_metadata": {
+    "article": 18,
+    "title": "Documentation keeping",
+    "prerequisites": [
+      {
+        "type": "risk_classification",
+        "required_level": "high-risk",
+        "source_article": 6,
+        "context_field": "risk_classification",
+        "skip_when": "not high-risk with medium/high confidence"
+      }
+    ],
+    "primary_official_source": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689#art_18",
+    "pdf_pages": "63",
+    "decomposition_date": "2026-04-04",
+    "related_standards": {
+      "draft": [],
+      "published": [
+        "ISO/IEC 42001:2023 — AI management system (documentation controls)"
+      ],
+      "upcoming": []
+    }
+  },
+  "obligations": [
+    {
+      "id": "ART18-OBL-1",
+      "source": "Art. 18(1)",
+      "source_quote": "The provider shall, for a period ending 10 years after the high-risk AI system has been placed on the market or put into service, keep at the disposal of the national competent authorities: (a) the technical documentation referred to in Article 11; (b) the documentation concerning the quality management system referred to in Article 17; (c) the documentation concerning the changes approved by notified bodies, where applicable; (d) the decisions and other documents issued by the notified bodies, where applicable; (e) the EU declaration of conformity referred to in Article 47.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "addressee_note": "Provider of a high-risk AI system (as defined in Art. 3(3))",
+      "decomposed_atoms": [
+        {
+          "atom": "documentation_retained_10_years",
+          "description": "All documentation kept for 10 years after market placement or service start",
+          "requirement": "The provider SHALL keep documentation for a period ending 10 years after the high-risk AI system has been placed on the market or put into service"
+        },
+        {
+          "atom": "documentation_available_to_authorities",
+          "description": "Documentation kept at the disposal of national competent authorities",
+          "requirement": "Documentation SHALL be kept at the disposal of the national competent authorities"
+        },
+        {
+          "atom": "technical_documentation_retained",
+          "description": "Technical documentation per Art. 11 is retained",
+          "requirement": "The provider SHALL keep the technical documentation referred to in Art. 11"
+        },
+        {
+          "atom": "qms_documentation_retained",
+          "description": "Quality management system documentation per Art. 17 is retained",
+          "requirement": "The provider SHALL keep the documentation concerning the quality management system referred to in Art. 17"
+        },
+        {
+          "atom": "eu_declaration_retained",
+          "description": "EU declaration of conformity per Art. 47 is retained",
+          "requirement": "The provider SHALL keep the EU declaration of conformity referred to in Art. 47"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "documentation_search",
+        "what_to_scan": "Document retention policies, compliance documentation directories, archival configuration",
+        "human_judgment_needed": true
+      },
+      "cross_references": ["Art. 11", "Art. 17", "Art. 47"]
+    },
+    {
+      "id": "ART18-OBL-3",
+      "source": "Art. 18(3)",
+      "source_quote": "Providers that are financial institutions subject to requirements regarding their internal governance, arrangements or processes under Union financial services law shall maintain the technical documentation as part of the documentation kept under the relevant Union financial services law.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "addressee_note": "Provider that is a financial institution subject to Union financial services law",
+      "decomposed_atoms": [
+        {
+          "atom": "financial_institution_docs_integrated",
+          "description": "Financial institution providers integrate AI technical docs into financial services documentation",
+          "requirement": "Financial institution providers SHALL maintain AI technical documentation as part of the documentation kept under relevant Union financial services law"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "low",
+        "detection_method": "documentation_search",
+        "what_to_scan": "Financial services compliance documentation, regulatory filing structures",
+        "human_judgment_needed": true
+      },
+      "scope_limitation": "Only applies to providers that are financial institutions subject to Union financial services law",
+      "context_skip_field": "is_financial_institution"
+    }
+  ],
+  "summary": {
+    "total_obligations": 2,
+    "obligation_count": 2,
+    "prohibition_count": 0,
+    "permission_count": 0,
+    "addressee_breakdown": {
+      "provider": 2
+    },
+    "automation_breakdown": {
+      "full": 0,
+      "partial": 2,
+      "manual": 0
+    }
+  }
+}

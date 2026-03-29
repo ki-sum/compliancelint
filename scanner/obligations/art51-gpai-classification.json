@@ -1,0 +1,102 @@
+{
+  "_metadata": {
+    "article": 51,
+    "title": "Classification of General-Purpose AI Models with Systemic Risk",
+    "prerequisites": [],
+    "decomposition_date": "2026-04-03",
+    "primary_official_source": {
+      "name": "EUR-Lex -- Official Journal of the European Union",
+      "eli_uri": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng",
+      "celex": "32024R1689",
+      "oj_citation": "OJ L 2024/1689, 12.7.2024"
+    },
+    "pdf_pages": [82],
+    "related_standards": {
+      "published": [],
+      "upcoming": [
+        "CEN-CENELEC harmonized standard for GPAI classification (expected 2027)"
+      ]
+    }
+  },
+  "obligations": [
+    {
+      "id": "ART51-CLS-1",
+      "source": "Art. 51(1)",
+      "source_quote": "A general-purpose AI model shall be classified as a general-purpose AI model with systemic risk if it meets any of the following conditions: (a) it has high impact capabilities evaluated on the basis of appropriate technical tools and methodologies, including indicators and benchmarks; (b) based on a decision of the Commission, ex officio or following a qualified alert from the scientific panel, it has capabilities or an impact equivalent to those set out in point (a) having regard to the criteria set out in Annex XIII.",
+      "deontic_type": "classification_rule",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "systemic_risk_classification",
+          "description": "Classification as systemic risk GPAI based on high impact capabilities or Commission decision",
+          "requirement": "SHALL be classified as systemic risk if high impact capabilities OR Commission designation"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "low",
+        "detection_method": "Check if AI answers indicate the model has high impact capabilities, training compute > 10^25 FLOPs, or Commission designation",
+        "what_to_scan": ["documentation", "config"],
+        "human_judgment_needed": "Whether the model truly has 'high impact capabilities' requires expert evaluation of benchmarks and capabilities"
+      }
+    },
+    {
+      "id": "ART51-CLS-2",
+      "source": "Art. 51(2)",
+      "source_quote": "A general-purpose AI model shall be presumed to have high impact capabilities pursuant to paragraph 1, point (a), when the cumulative amount of computation used for its training measured in floating point operations is greater than 10^25.",
+      "deontic_type": "classification_rule",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "compute_threshold_presumption",
+          "description": "Models trained with > 10^25 FLOPs are presumed systemic risk",
+          "requirement": "SHALL be presumed high impact when training compute > 10^25 FLOPs"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check documentation for training compute figures (FLOPs)",
+        "what_to_scan": ["documentation"],
+        "human_judgment_needed": "Verification of compute figures"
+      }
+    },
+    {
+      "id": "ART51-EMP-3",
+      "source": "Art. 51(3)",
+      "source_quote": "The Commission shall adopt delegated acts in accordance with Article 97 to amend the thresholds listed in paragraphs 1 and 2 of this Article, as well as to supplement benchmarks and indicators in light of evolving technological developments, such as algorithmic improvements or increased hardware efficiency, when necessary, for these thresholds to reflect the state of the art.",
+      "deontic_type": "empowerment",
+      "modality": "shall",
+      "addressee": "commission",
+      "decomposed_atoms": [
+        {
+          "atom": "commission_threshold_update_power",
+          "description": "Commission empowered to update the 10^25 FLOPs threshold via delegated acts",
+          "requirement": "Commission SHALL adopt delegated acts to amend thresholds as technology evolves"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "N/A -- Commission empowerment, not provider obligation",
+        "what_to_scan": [],
+        "human_judgment_needed": "Monitor Commission delegated acts for threshold changes"
+      }
+    }
+  ],
+  "summary": {
+    "total_obligations": 3,
+    "obligation_count": 3,
+    "addressee_breakdown": {
+      "provider": 2,
+      "commission": 1
+    },
+    "automation_breakdown": {
+      "full": 0,
+      "partial": 2,
+      "manual": 1
+    }
+  }
+}

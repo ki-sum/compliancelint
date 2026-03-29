@@ -1,0 +1,79 @@
+{
+  "_metadata": {
+    "standard_id": "CL-IS-ART27-v0.1",
+    "title": "ComplianceLint Interim Standard for EU AI Act Article 27: Fundamental Rights Impact Assessment",
+    "version": "0.1.0",
+    "date": "2026-04-03",
+    "status": "draft",
+    "disclaimer": "This is an interim standard developed by ComplianceLint. It will be superseded when CEN-CENELEC publishes the harmonized standard for fundamental rights impact assessment.",
+    "basis": [
+      "EU AI Act Article 27 (official text)",
+      "EU AI Act Recitals 94-96 (legislative intent on fundamental rights impact assessment)",
+      "ISO/IEC 42001:2023 -- AI management system",
+      "ISO/IEC 23894:2023 -- AI risk management",
+      "GDPR Article 35 -- Data protection impact assessment"
+    ],
+    "awaiting_standard": "CEN-CENELEC harmonized standard for fundamental rights impact assessment (expected Q4 2026)"
+  },
+
+  "requirements": [
+    {
+      "id": "IS-ART27-R01",
+      "obligation_ref": "ART27-OBL-1",
+      "title": "FRIA Documentation",
+      "requirement": "The deployer MUST perform and document a fundamental rights impact assessment covering all six required elements: (a) description of processes, (b) period/frequency, (c) categories of persons affected, (d) specific risks, (e) human oversight measures, (f) risk materialisation measures.",
+      "rationale": "Art. 27(1) mandates a comprehensive FRIA covering six specific elements for qualifying deployers.",
+      "required_content": [
+        "Description of deployer processes using the AI system",
+        "Period of time and frequency of intended use",
+        "Categories of natural persons and groups likely affected",
+        "Specific risks of harm to identified categories",
+        "Description of human oversight measures implemented",
+        "Measures to be taken when identified risks materialise"
+      ]
+    },
+    {
+      "id": "IS-ART27-R02",
+      "obligation_ref": "ART27-OBL-2",
+      "title": "FRIA Timing and Updates",
+      "requirement": "The deployer MUST complete the FRIA before first use and MUST update it when relevant elements change.",
+      "rationale": "Art. 27(2) requires the assessment before first use and ongoing updates.",
+      "acceptable_implementations": [
+        "FRIA document with completion date prior to deployment date",
+        "Version-controlled FRIA with change log",
+        "Periodic review schedule with trigger conditions for updates",
+        "Change management process linked to FRIA review"
+      ]
+    },
+    {
+      "id": "IS-ART27-R03",
+      "obligation_ref": "ART27-OBL-3",
+      "title": "Authority Notification",
+      "requirement": "The deployer MUST notify the relevant market surveillance authority of the FRIA results.",
+      "rationale": "Art. 27(3) requires notification of assessment results to the authority.",
+      "acceptable_implementations": [
+        "Formal submission to national market surveillance authority",
+        "Documented notification with receipt confirmation",
+        "Registered communication channel with the authority"
+      ]
+    },
+    {
+      "id": "IS-ART27-R04",
+      "obligation_ref": "ART27-OBL-4",
+      "title": "DPIA Complementarity",
+      "requirement": "Where a DPIA has been conducted under GDPR, the FRIA MUST complement it rather than duplicate it.",
+      "rationale": "Art. 27(4) requires the FRIA to build upon existing GDPR DPIA where applicable.",
+      "acceptable_implementations": [
+        "FRIA document referencing existing DPIA and extending it with AI-specific elements",
+        "Integrated assessment document covering both GDPR and AI Act requirements",
+        "Cross-reference table mapping DPIA findings to FRIA elements"
+      ]
+    }
+  ],
+
+  "scoring": {
+    "compliant": "R01 + R02 + R03 all met",
+    "partial": "At least R01 met",
+    "non_compliant": "R01 not met"
+  }
+}

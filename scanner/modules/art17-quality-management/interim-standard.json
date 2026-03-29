@@ -1,0 +1,82 @@
+{
+  "_metadata": {
+    "standard_id": "CL-IS-ART17-v0.1",
+    "title": "ComplianceLint Interim Standard for EU AI Act Article 17: Quality Management System",
+    "version": "0.1.0",
+    "date": "2026-04-03",
+    "status": "draft",
+    "disclaimer": "This is an interim standard developed by ComplianceLint. It will be superseded by the CEN-CENELEC harmonized standard.",
+    "basis": [
+      "EU AI Act Article 17 (official text)",
+      "ISO 9001:2015 -- Quality management systems",
+      "ISO/IEC 42001:2023 -- AI management system",
+      "ISO 13485:2016 -- Medical devices QMS",
+      "ISO/IEC 23894:2023 -- AI risk management"
+    ],
+    "awaiting_standard": "CEN-CENELEC harmonized standard for Art. 17 (expected Q4 2026)"
+  },
+
+  "requirements": [
+    {
+      "id": "IS-ART17-R01",
+      "obligation_ref": "ART17-OBL-1",
+      "title": "Documented Quality Management System",
+      "requirement": "The provider MUST establish and maintain a documented QMS covering all 13 aspects of Art. 17(1).",
+      "rationale": "Art. 17(1) mandates a systematic, documented QMS.",
+      "required_content": [
+        "Quality policy statement",
+        "Quality manual or equivalent",
+        "Procedure documents for each applicable aspect",
+        "Work instructions for operational staff",
+        "Records demonstrating QMS implementation"
+      ]
+    },
+    {
+      "id": "IS-ART17-R02",
+      "obligation_ref": "ART17-OBL-1c,ART17-OBL-1d",
+      "title": "Development QA and Testing",
+      "requirement": "The QMS MUST include development quality assurance and testing procedures.",
+      "rationale": "Art. 17(1)(c)(d) requires QC/QA and testing procedures.",
+      "acceptable_implementations": [
+        "CI/CD pipeline with automated testing stages",
+        "Code review processes with documented standards",
+        "Unit, integration, and system testing frameworks",
+        "Test plans with defined pass/fail criteria",
+        "Validation protocols with frequency schedules"
+      ]
+    },
+    {
+      "id": "IS-ART17-R03",
+      "obligation_ref": "ART17-OBL-1f",
+      "title": "Data Management Procedures",
+      "requirement": "The QMS MUST include comprehensive data management procedures.",
+      "rationale": "Art. 17(1)(f) requires data management covering the full data lifecycle.",
+      "required_content": [
+        "Data acquisition and collection procedures",
+        "Data labelling quality controls",
+        "Data storage and retention policies",
+        "Data filtering and quality criteria",
+        "Data versioning and provenance tracking"
+      ]
+    },
+    {
+      "id": "IS-ART17-R04",
+      "obligation_ref": "ART17-OBL-1m",
+      "title": "Accountability Framework",
+      "requirement": "The QMS MUST include an accountability framework defining roles and responsibilities.",
+      "rationale": "Art. 17(1)(m) requires clear accountability for all QMS aspects.",
+      "acceptable_implementations": [
+        "RACI matrix covering all 13 QMS aspects",
+        "Organizational chart with QMS responsibilities",
+        "Role descriptions including QMS duties",
+        "Management review procedures"
+      ]
+    }
+  ],
+
+  "scoring": {
+    "compliant": "R01 + R02 + R03 + R04 all met",
+    "partial": "R01 met + at least one of R02-R04 met",
+    "non_compliant": "R01 not met (no documented QMS)"
+  }
+}

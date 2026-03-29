@@ -1,0 +1,58 @@
+{
+  "_metadata": {
+    "standard_id": "CL-IS-ART54-v0.1",
+    "title": "ComplianceLint Interim Standard for EU AI Act Article 54: Authorised Representatives of Providers of GPAI Models",
+    "version": "0.1.0",
+    "date": "2026-04-03",
+    "status": "draft",
+    "disclaimer": "This is an interim standard developed by ComplianceLint. It will be superseded by the CEN-CENELEC harmonized standard.",
+    "basis": [
+      "EU AI Act Article 54 (official text)",
+      "EU AI Office guidance on third-country provider obligations"
+    ],
+    "awaiting_standard": "CEN-CENELEC harmonized standard for Art. 54 (expected Q4 2026)"
+  },
+  "requirements": [
+    {
+      "id": "IS-ART54-R01",
+      "obligation_ref": "ART54-OBL-1",
+      "title": "Authorised Representative Appointment",
+      "requirement": "A provider of a GPAI model established in a third country MUST appoint an authorised representative established in the Union before making the model available on the Union market.",
+      "rationale": "Art. 54(1) mandates third-country providers appoint an EU-based authorised representative.",
+      "acceptable_implementations": [
+        "Written mandate agreement with EU-established legal entity",
+        "Authorised representative contract specifying scope and duration",
+        "Formal appointment letter filed with relevant EU authorities"
+      ]
+    },
+    {
+      "id": "IS-ART54-R02",
+      "obligation_ref": "ART54-OBL-2",
+      "title": "Written Mandate Scope",
+      "requirement": "The authorised representative MUST have a written mandate specifying the tasks to be performed, including maintaining technical documentation and cooperating with competent authorities.",
+      "rationale": "Art. 54(2) requires a written mandate defining the representative's responsibilities.",
+      "acceptable_implementations": [
+        "Written mandate covering documentation maintenance and authority cooperation",
+        "Detailed mandate agreement with enumerated regulatory tasks",
+        "Legal instrument specifying representative powers aligned with Art. 54(2)"
+      ]
+    },
+    {
+      "id": "IS-ART54-R03",
+      "obligation_ref": "ART54-OBL-3",
+      "title": "Documentation Retention",
+      "requirement": "The provider MUST ensure that technical documentation is kept available for at least 10 years after the GPAI model has been placed on the market.",
+      "rationale": "Art. 54 requires long-term documentation retention to enable regulatory oversight.",
+      "acceptable_implementations": [
+        "10-year document retention policy with secure archival storage",
+        "Version-controlled documentation repository with retention schedule",
+        "Third-party document management service with guaranteed retention period"
+      ]
+    }
+  ],
+  "scoring": {
+    "compliant": "R01 + R02 + R03 met",
+    "partial": "R01 met, R02 or R03 incomplete",
+    "non_compliant": "R01 not met"
+  }
+}

@@ -1,0 +1,162 @@
+{
+  "_metadata": {
+    "article": 52,
+    "title": "Procedure for Classification and Notification of Systemic Risk",
+    "prerequisites": [],
+    "decomposition_date": "2026-04-03",
+    "primary_official_source": {
+      "name": "EUR-Lex -- Official Journal of the European Union",
+      "eli_uri": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng",
+      "celex": "32024R1689",
+      "oj_citation": "OJ L 2024/1689, 12.7.2024"
+    },
+    "pdf_pages": [83],
+    "related_standards": {
+      "published": [],
+      "upcoming": []
+    }
+  },
+  "obligations": [
+    {
+      "id": "ART52-OBL-1",
+      "source": "Art. 52(1)",
+      "source_quote": "Where a general-purpose AI model meets the condition referred to in Article 51(1), point (a), the relevant provider shall notify the Commission without delay and in any event within two weeks after that requirement is met or it becomes known that it will be met.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "scope_limitation": "Only applies to providers of GPAI models meeting systemic risk threshold",
+      "context_skip_field": "is_gpai_with_systemic_risk",
+      "context_skip_value": false,
+      "decomposed_atoms": [
+        {
+          "atom": "commission_notification",
+          "description": "Must notify Commission within 2 weeks of meeting systemic risk threshold",
+          "requirement": "SHALL notify the Commission without delay and within two weeks"
+        },
+        {
+          "atom": "notification_includes_evidence",
+          "description": "Notification must include information demonstrating the requirement has been met",
+          "requirement": "SHALL include the information necessary to demonstrate that the relevant requirement has been met"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "Check for evidence of Commission notification documentation",
+        "what_to_scan": ["documentation"],
+        "human_judgment_needed": "Whether the model meets the threshold and whether notification has been made is an organizational/legal matter"
+      }
+    },
+    {
+      "id": "ART52-PERM-2",
+      "source": "Art. 52(2)",
+      "source_quote": "The provider of a general-purpose AI model that meets the condition referred to in Article 51(1), point (a), may present, with its notification, sufficiently substantiated arguments to demonstrate that, exceptionally, although it meets that requirement, the general-purpose AI model does not present, due to its specific characteristics, systemic risks and therefore should not be classified as a general-purpose AI model with systemic risk.",
+      "deontic_type": "permission",
+      "modality": "may",
+      "addressee": "provider",
+      "scope_limitation": "Only applies to providers who have notified under Art. 52(1)",
+      "context_skip_field": "is_gpai_with_systemic_risk",
+      "context_skip_value": false,
+      "decomposed_atoms": [
+        {
+          "atom": "rebuttal_right",
+          "description": "Provider may present arguments that model does not present systemic risks despite meeting threshold",
+          "requirement": "MAY present substantiated arguments against systemic risk classification"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "N/A -- permission, not obligation",
+        "what_to_scan": [],
+        "human_judgment_needed": "Whether to exercise this right is a strategic/legal decision"
+      }
+    },
+    {
+      "id": "ART52-OBL-5",
+      "source": "Art. 52(5)",
+      "source_quote": "Such a request shall contain objective, detailed and new reasons that have arisen since the designation decision.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "scope_limitation": "Only applies to providers requesting reassessment of systemic risk designation",
+      "context_skip_field": "is_gpai_with_systemic_risk",
+      "context_skip_value": false,
+      "decomposed_atoms": [
+        {
+          "atom": "reassessment_request_content",
+          "description": "Reassessment request must contain objective, detailed and new reasons",
+          "requirement": "SHALL contain objective, detailed and new reasons that have arisen since the designation decision"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "Check for reassessment request documentation with substantive new reasons",
+        "what_to_scan": ["documentation"],
+        "human_judgment_needed": "Whether the reasons are sufficiently objective, detailed and new"
+      }
+    },
+    {
+      "id": "ART52-PERM-5",
+      "source": "Art. 52(5)",
+      "source_quote": "Providers may request reassessment at the earliest six months after the designation decision. Where the Commission, following its reassessment, decides to maintain the designation as a general-purpose AI model with systemic risk, providers may request reassessment at the earliest six months after that decision.",
+      "deontic_type": "permission",
+      "modality": "may",
+      "addressee": "provider",
+      "scope_limitation": "Only applies to providers designated under Art. 52(4)",
+      "context_skip_field": "is_gpai_with_systemic_risk",
+      "context_skip_value": false,
+      "decomposed_atoms": [
+        {
+          "atom": "reassessment_request_right",
+          "description": "Provider may request reassessment at earliest 6 months after designation",
+          "requirement": "MAY request reassessment at the earliest six months after the designation decision"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "N/A -- permission, not obligation",
+        "what_to_scan": [],
+        "human_judgment_needed": "Whether to exercise this right is a strategic decision"
+      }
+    },
+    {
+      "id": "ART52-OBL-6",
+      "source": "Art. 52(6)",
+      "source_quote": "The Commission shall ensure that a list of general-purpose AI models with systemic risk is published and shall keep that list up to date, without prejudice to the need to observe and protect intellectual property rights and confidential business information or trade secrets in accordance with Union and national law.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "commission",
+      "decomposed_atoms": [
+        {
+          "atom": "systemic_risk_list_published",
+          "description": "Commission must publish and maintain list of systemic risk GPAI",
+          "requirement": "Commission SHALL publish and keep up-to-date a list of systemic risk GPAI models"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "N/A -- Commission obligation",
+        "what_to_scan": [],
+        "human_judgment_needed": "N/A"
+      }
+    }
+  ],
+  "summary": {
+    "total_obligations": 5,
+    "obligation_count": 3,
+    "permission_count": 2,
+    "addressee_breakdown": {
+      "provider": 4,
+      "commission": 1
+    },
+    "automation_breakdown": {
+      "full": 0,
+      "partial": 0,
+      "manual": 5
+    }
+  }
+}

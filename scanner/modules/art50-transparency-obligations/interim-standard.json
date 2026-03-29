@@ -1,0 +1,158 @@
+{
+  "_metadata": {
+    "standard_id": "CL-IS-ART50-v0.1",
+    "title": "ComplianceLint Interim Standard for EU AI Act Article 50: Transparency Obligations for Certain AI Systems",
+    "version": "0.1.0",
+    "date": "2026-03-17",
+    "status": "draft",
+    "disclaimer": "This is an interim standard developed by ComplianceLint based on available guidance, industry best practices, and existing provenance standards. It is NOT an official standard. It will be superseded when CEN-CENELEC publishes the harmonized standard for Article 50 (expected Q4 2026).",
+    "basis": [
+      "EU AI Act Article 50 (official text)",
+      "EU AI Act Recitals 132-134 (legislative intent for transparency)",
+      "C2PA (Coalition for Content Provenance and Authenticity) v2.1",
+      "IPTC Photo Metadata Standard 2024.1",
+      "EU AI Office Guidelines on AI system transparency (2025)",
+      "ISO/IEC 12792:2024 — Transparency taxonomy of AI systems",
+      "NIST AI 100-4 — Reducing Risks Posed by Synthetic Content"
+    ],
+    "awaiting_standard": "CEN-CENELEC harmonized standard for Art. 50 (expected Q4 2026)"
+  },
+
+  "scope_note": "Art. 50 applies to ALMOST ALL AI systems, not just high-risk. This is the broadest transparency obligation in the EU AI Act. Any AI system that interacts with persons, generates synthetic content, or performs emotion recognition/biometric categorization falls under Art. 50.",
+
+  "requirements": [
+    {
+      "id": "IS-ART50-R01",
+      "obligation_ref": "ART50-OBL-1",
+      "title": "Human Interaction Disclosure",
+      "paragraph": "Art. 50(1)",
+      "requirement": "AI systems designed to interact directly with natural persons MUST inform those persons that they are interacting with an AI system, unless this is obvious from the circumstances and context of use.",
+      "rationale": "Art. 50(1) requires that natural persons are informed they are interacting with an AI. This applies to chatbots, virtual assistants, AI customer service, AI-powered phone systems, and any conversational AI.",
+      "scope": ["chatbots", "virtual assistants", "AI customer service", "conversational AI", "AI-powered phone/voice systems"],
+      "acceptable_implementations": [
+        "Persistent banner or label: 'You are interacting with an AI system'",
+        "Initial disclosure message at conversation start",
+        "Visual indicator (icon, badge) consistently displayed",
+        "Audio disclosure for voice-based systems",
+        "API response header: X-AI-Generated: true"
+      ],
+      "not_acceptable": [
+        "Disclosure buried in terms of service only",
+        "One-time disclosure that disappears",
+        "No disclosure because system 'seems obvious'",
+        "Disclosure only available on request"
+      ],
+      "exception": "Disclosure is not required when it is 'obvious from the circumstances and context of use' that the person is interacting with AI (e.g., a clearly labeled AI game character). The burden of proving 'obviousness' rests on the deployer."
+    },
+    {
+      "id": "IS-ART50-R02",
+      "obligation_ref": "ART50-OBL-2",
+      "title": "Synthetic Content Marking",
+      "paragraph": "Art. 50(2)",
+      "requirement": "AI systems that generate synthetic audio, image, video, or text content MUST mark output as artificially generated or manipulated, in a machine-readable format. The marking MUST be interoperable, robust, and reliable.",
+      "rationale": "Art. 50(2) requires that AI-generated content is marked in a way that can be detected by other systems. This enables downstream verification and prevents deceptive use of AI-generated content.",
+      "scope": ["image generation", "video generation", "audio generation/TTS", "text generation", "deepfake creation", "content manipulation"],
+      "recommended_standard": "C2PA (Coalition for Content Provenance and Authenticity)",
+      "c2pa_details": {
+        "specification": "C2PA Technical Specification v2.1",
+        "website": "https://c2pa.org",
+        "description": "C2PA provides a technical standard for certifying the source and provenance of media content. It embeds cryptographically signed metadata (manifests) into content files.",
+        "supported_formats": ["JPEG", "PNG", "WebP", "AVIF", "HEIF", "GIF", "TIFF", "SVG", "MP4", "MOV", "PDF"],
+        "key_features": [
+          "Cryptographically signed provenance chain",
+          "Tamper-evident metadata embedding",
+          "Hardware-binding capability (aligns with ComplianceLint hardware verification approach)",
+          "Open standard with broad industry adoption"
+        ],
+        "eu_alignment": "The European Commission has referenced C2PA as a suitable technical standard for Art. 50(2) compliance in its AI Office guidance documents."
+      },
+      "acceptable_implementations": [
+        "C2PA manifest embedding in generated media files",
+        "IPTC metadata fields indicating AI generation (DigitalSourceType: trainedAlgorithmicMedia)",
+        "SynthID or similar robust watermarking for images",
+        "Steganographic watermarking for audio content",
+        "Structured metadata header for AI-generated text (e.g., X-AI-Generated: true, AI-Content-Declaration header)",
+        "EXIF/XMP metadata with AI generation flag"
+      ],
+      "not_acceptable": [
+        "No marking of any kind",
+        "Only human-readable watermark (must be machine-readable)",
+        "Marking that is easily stripped or removed",
+        "Marking only in filename or folder structure"
+      ]
+    },
+    {
+      "id": "IS-ART50-R03",
+      "obligation_ref": "ART50-OBL-3",
+      "title": "Emotion Recognition / Biometric Categorization Disclosure",
+      "paragraph": "Art. 50(3)",
+      "requirement": "Deployers of emotion recognition systems or biometric categorization systems MUST inform natural persons exposed to such systems. The information MUST include: the operation of the system and the processing of personal data in accordance with GDPR/LED.",
+      "rationale": "Art. 50(3) requires disclosure when AI is used for emotion detection or biometric categorization. This is a deployer obligation (not provider), reflecting the sensitivity of these applications.",
+      "scope": ["emotion recognition", "sentiment analysis from biometrics", "facial expression analysis", "voice emotion detection", "biometric categorization", "age estimation", "gender classification"],
+      "acceptable_implementations": [
+        "Clear signage in physical spaces where system operates",
+        "In-app notification before emotion/biometric processing begins",
+        "Consent flow that explains what biometric data is processed",
+        "Privacy notice specifically mentioning emotion recognition"
+      ],
+      "gdpr_intersection": "Art. 50(3) explicitly requires compliance with Regulation (EU) 2016/679 (GDPR) Art. 13 and Art. 14, and Directive (EU) 2016/680 (LED) Art. 13."
+    },
+    {
+      "id": "IS-ART50-R04",
+      "obligation_ref": "ART50-OBL-4",
+      "title": "Deep Fake Disclosure",
+      "paragraph": "Art. 50(4)",
+      "requirement": "Deployers of AI systems that generate or manipulate image, audio, or video content constituting a deep fake MUST disclose that the content has been artificially generated or manipulated.",
+      "rationale": "Art. 50(4) specifically targets deep fakes — content depicting real persons or events in a misleading way. This is a deployer-level obligation with exceptions for legitimate uses.",
+      "scope": ["face swapping", "voice cloning", "lip syncing", "body puppeteering", "AI-generated video of real persons", "AI-manipulated news/event footage"],
+      "acceptable_implementations": [
+        "Clear label on content: 'This content was generated/manipulated by AI'",
+        "C2PA manifest indicating manipulation",
+        "Watermark visible to viewers",
+        "Metadata disclosure in content distribution"
+      ],
+      "exceptions": [
+        "Content used for manifestly artistic, creative, satirical, or fictional purposes (analogous to existing exceptions for parody/satire)",
+        "Content where disclosure would undermine the exercise of a fundamental right (e.g., freedom of expression)",
+        "However: even excepted content should indicate AI generation 'in an appropriate manner that does not hamper the display or enjoyment of the work'"
+      ]
+    }
+  ],
+
+  "detection_patterns": {
+    "chatbot_indicators": [
+      "chat endpoint patterns (e.g., /chat, /conversation, /message)",
+      "WebSocket connections for real-time chat",
+      "Conversational UI components (chat bubbles, message input)",
+      "Integration with LLM APIs (OpenAI, Anthropic, etc.)",
+      "Bot framework usage (Rasa, Botpress, Dialogflow)"
+    ],
+    "content_generation_indicators": [
+      "Image generation APIs (DALL-E, Stable Diffusion, Midjourney)",
+      "Text generation/completion APIs",
+      "TTS (text-to-speech) libraries",
+      "Video generation or manipulation libraries",
+      "Diffusion model imports"
+    ],
+    "disclosure_indicators": [
+      "AI disclosure text in templates/UI",
+      "X-AI-Generated headers",
+      "C2PA library imports",
+      "Watermarking library imports",
+      "IPTC/EXIF metadata writing"
+    ],
+    "emotion_recognition_indicators": [
+      "Emotion detection library imports (e.g., fer, deepface emotion)",
+      "Facial expression analysis",
+      "Voice emotion/sentiment libraries",
+      "Biometric categorization (age, gender estimation)"
+    ]
+  },
+
+  "scoring": {
+    "compliant": "All applicable R01-R04 requirements met for the system's scope",
+    "partial": "Some transparency measures in place but incomplete (e.g., disclosure exists but no machine-readable marking)",
+    "non_compliant": "No transparency measures detected for an AI system that clearly falls under Art. 50",
+    "not_applicable": "System does not interact with persons, generate content, or process biometrics"
+  }
+}

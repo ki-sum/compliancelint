@@ -1,0 +1,48 @@
+{
+  "_metadata": {
+    "standard_id": "CL-IS-ART43-v0.1",
+    "title": "ComplianceLint Interim Standard for EU AI Act Article 43: Conformity Assessment",
+    "version": "0.1.0",
+    "date": "2026-04-03",
+    "status": "draft",
+    "disclaimer": "This is an interim standard developed by ComplianceLint. It will be superseded by the CEN-CENELEC harmonized standard.",
+    "basis": [
+      "EU AI Act Article 43 (official text)",
+      "EU AI Act Annexes VI and VII",
+      "ISO/IEC 17065:2012 -- Conformity assessment",
+      "ISO/IEC 42001:2023 -- AI management system"
+    ],
+    "awaiting_standard": "CEN-CENELEC harmonized standard for Art. 43 (expected Q4 2026)"
+  },
+  "requirements": [
+    {
+      "id": "IS-ART43-R01",
+      "obligation_ref": "ART43-OBL-2",
+      "title": "Conformity Assessment Completion",
+      "requirement": "The provider MUST complete a conformity assessment per the applicable procedure (Annex VI or VII) before market placement.",
+      "rationale": "Art. 43(1)-(2) mandates conformity assessment before placing on market.",
+      "acceptable_implementations": [
+        "Annex VI internal control self-assessment with documentation",
+        "Annex VII assessment with notified body involvement",
+        "Sectoral conformity assessment per Annex I legislation"
+      ]
+    },
+    {
+      "id": "IS-ART43-R02",
+      "obligation_ref": "ART43-OBL-4",
+      "title": "Substantial Modification Tracking",
+      "requirement": "The provider MUST have a process to identify substantial modifications and trigger re-assessment.",
+      "rationale": "Art. 43(4) requires new assessment on substantial modification.",
+      "acceptable_implementations": [
+        "Change management process with classification criteria",
+        "Version control with modification impact assessment",
+        "Change review board for AI system modifications"
+      ]
+    }
+  ],
+  "scoring": {
+    "compliant": "R01 + R02 met",
+    "partial": "R01 met only",
+    "non_compliant": "R01 not met"
+  }
+}

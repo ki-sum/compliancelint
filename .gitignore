@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.egg
+venv/
+.venv/
+.pytest_cache/
+
+# IDE / OS
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+
+# Private — never public
+private/
+scanner/tools/
+CLAUDE.md
+CLAUDE.local.md
+.compliancelintrc
+
+# Claude Code (local dev config)
+.claude/
+
+# Test results
+test-results/
+
+# Runtime
+.compliancelint/
+*.log
+*.db-shm
+*.db-wal
+
+# Legal source documents (copyrighted, not distributable)
+docs/sources/*.pdf
+docs/sources/*.html
+docs/sources/*.zip

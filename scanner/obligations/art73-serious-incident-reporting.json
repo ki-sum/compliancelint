@@ -1,0 +1,194 @@
+{
+  "_metadata": {
+    "article": 73,
+    "title": "Reporting of Serious Incidents",
+    "prerequisites": [
+      {
+        "type": "risk_classification",
+        "required_level": "high-risk",
+        "source_article": 6,
+        "context_field": "risk_classification",
+        "skip_when": "not high-risk with medium/high confidence"
+      }
+    ],
+    "decomposition_date": "2026-04-03",
+    "primary_official_source": {
+      "name": "EUR-Lex -- Official Journal of the European Union",
+      "eli_uri": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng",
+      "celex": "32024R1689",
+      "oj_citation": "OJ L 2024/1689, 12.7.2024"
+    },
+    "pdf_pages": [100, 101],
+    "related_standards": {
+      "published": [
+        "ISO/IEC 42001:2023 -- AI management system",
+        "ISO 9001:2015 -- Quality management systems (nonconformity and corrective action)"
+      ],
+      "upcoming": [
+        "CEN-CENELEC harmonized standard for AI incident reporting (expected Q4 2026)"
+      ]
+    }
+  },
+  "obligations": [
+    {
+      "id": "ART73-OBL-1",
+      "source": "Art. 73(1)",
+      "source_quote": "Providers of high-risk AI systems placed on the Union market shall report any serious incident to the market surveillance authorities of the Member States where that incident occurred.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "report_serious_incidents",
+          "description": "Must report any serious incident to market surveillance authorities",
+          "requirement": "SHALL report any serious incident to the market surveillance authorities of the Member States where that incident occurred"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check for incident reporting procedures, incident detection systems, authority contact information, reporting templates",
+        "what_to_scan": ["documentation", "code", "config"],
+        "human_judgment_needed": "Whether incidents are correctly classified as serious and reported to the right authority"
+      }
+    },
+    {
+      "id": "ART73-OBL-2",
+      "source": "Art. 73(2)",
+      "source_quote": "The report referred to in paragraph 1 shall be made immediately after the provider has established a causal link between the AI system and the serious incident or the reasonable likelihood of such a link, and, in any event, not later than 15 days after the provider or, where applicable, the deployer, becomes aware of the serious incident.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "report_within_15_days",
+          "description": "Report must be made immediately and not later than 15 days after becoming aware",
+          "requirement": "SHALL report immediately after becoming aware, and not later than 15 days"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check for incident response timeline documentation, SLA definitions, escalation procedures with time bounds",
+        "what_to_scan": ["documentation", "config"],
+        "human_judgment_needed": "Whether the 15-day deadline is being met in practice"
+      }
+    },
+    {
+      "id": "ART73-OBL-3",
+      "source": "Art. 73(3)",
+      "source_quote": "Notwithstanding paragraph 2 of this Article, in the event of a widespread infringement or a serious incident as defined in Article 3, point (49)(b), the report referred to in paragraph 1 of this Article shall be provided immediately, and not later than two days after the provider or, where applicable, the deployer becomes aware of that incident.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "report_widespread_within_2_days",
+          "description": "Widespread infringement must be reported within 2 days",
+          "requirement": "SHALL report widespread infringement immediately, not later than 2 days after becoming aware"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "low",
+        "detection_method": "Check for escalation procedures distinguishing widespread infringement from other incidents, expedited reporting procedures",
+        "what_to_scan": ["documentation"],
+        "human_judgment_needed": "Whether an incident constitutes a widespread infringement requiring expedited reporting"
+      }
+    },
+    {
+      "id": "ART73-OBL-4",
+      "source": "Art. 73(4)",
+      "source_quote": "Notwithstanding paragraph 2, in the event of the death of a person, the report shall be provided immediately after the provider or the deployer has established, or as soon as it suspects, a causal relationship between the high-risk AI system and the serious incident, but not later than 10 days after the date on which the provider or, where applicable, the deployer becomes aware of the serious incident.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "report_death_within_10_days",
+          "description": "Incidents involving death must be reported within 10 days",
+          "requirement": "SHALL report incidents involving death immediately, not later than 10 days after becoming aware"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "low",
+        "detection_method": "Check for escalation procedures for fatal incidents, expedited reporting procedures for death cases",
+        "what_to_scan": ["documentation"],
+        "human_judgment_needed": "Whether the causal link between AI system and death is correctly established"
+      }
+    },
+    {
+      "id": "ART73-PER-1",
+      "source": "Art. 73(5)",
+      "source_quote": "Where necessary to ensure timely reporting, the provider or, where applicable, the deployer, may submit an initial report that is incomplete, followed by a complete report.",
+      "deontic_type": "permission",
+      "modality": "may",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "initial_incomplete_report_allowed",
+          "description": "Provider may submit an initial incomplete report followed by a complete report",
+          "requirement": "MAY submit an initial incomplete report followed by a complete report"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "Check for two-stage reporting procedures in incident response documentation",
+        "what_to_scan": ["documentation"],
+        "human_judgment_needed": "Whether initial report contains sufficient information"
+      }
+    },
+    {
+      "id": "ART73-OBL-5",
+      "source": "Art. 73(6)",
+      "source_quote": "Following the reporting of a serious incident pursuant to paragraph 1, the provider shall, without delay, perform the necessary investigations in relation to the serious incident and the AI system concerned. This shall include a risk assessment of the incident, and corrective action.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "investigate_without_delay",
+          "description": "Must perform necessary investigations without delay after a serious incident",
+          "requirement": "SHALL perform necessary investigations in relation to the serious incident without delay"
+        },
+        {
+          "atom": "risk_assessment_and_corrective_action",
+          "description": "Investigations must include risk assessment and corrective action",
+          "requirement": "SHALL include risk assessment of the incident and corrective action"
+        },
+        {
+          "atom": "cooperate_with_authorities",
+          "description": "Must cooperate with competent authorities and notified body during investigations",
+          "requirement": "SHALL cooperate with the competent authorities, and where relevant with the notified body concerned, during the investigations"
+        },
+        {
+          "atom": "no_alteration_without_notice",
+          "description": "Must not alter the AI system in ways affecting cause evaluation without informing authorities",
+          "requirement": "SHALL NOT perform any investigation which involves altering the AI system in a way which may affect any subsequent evaluation of the causes of the incident, prior to informing the competent authorities"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check for incident investigation procedures, root cause analysis templates, corrective action tracking, risk assessment methodology",
+        "what_to_scan": ["documentation", "code"],
+        "human_judgment_needed": "Whether investigations are sufficiently thorough and corrective actions adequate"
+      }
+    }
+  ],
+  "summary": {
+    "total_obligations": 6,
+    "obligation_count": 5,
+    "permission_count": 1,
+    "addressee_breakdown": {
+      "provider": 6
+    },
+    "automation_breakdown": {
+      "full": 0,
+      "partial": 5,
+      "manual": 1
+    }
+  }
+}

@@ -1,0 +1,117 @@
+{
+  "_metadata": {
+    "standard_id": "CL-IS-ART12-v0.1",
+    "title": "ComplianceLint Interim Standard for EU AI Act Article 12: Record-keeping",
+    "version": "0.1.0",
+    "date": "2026-03-16",
+    "status": "draft",
+    "disclaimer": "This is an interim standard developed by ComplianceLint based on available guidance, industry best practices, and the draft ISO/IEC DIS 24970:2025. It is NOT an official standard. It will be superseded when CEN-CENELEC publishes the harmonized standard for Article 12 (expected Q4 2026).",
+    "basis": [
+      "EU AI Act Article 12 (official text)",
+      "EU AI Act Recital 71 (legislative intent)",
+      "EU AI Act Article 19 (log retention)",
+      "ISO/IEC DIS 24970:2025 — AI system logging (draft)",
+      "ISO/IEC 42001:2023 — AI management system",
+      "ISO 27001 Annex A.12.4 — Logging and monitoring",
+      "OWASP Logging Cheat Sheet",
+      "practical-ai-act.eu implementation guide",
+      "isms.online Article 12 analysis"
+    ],
+    "awaiting_standard": "CEN-CENELEC harmonized standard for Art. 12 (expected Q4 2026)"
+  },
+
+  "requirements": [
+    {
+      "id": "IS-ART12-R01",
+      "obligation_ref": "ART12-OBL-1",
+      "title": "Logging Framework Required",
+      "requirement": "The AI system MUST use a structured logging framework capable of automatic event recording.",
+      "rationale": "Art. 12(1) requires 'automatic recording of events' — ad-hoc print statements or manual logging do not satisfy this requirement.",
+      "acceptable_implementations": [
+        "Python: structlog, loguru, stdlib logging with JSON formatter",
+        "JavaScript/TypeScript: winston, pino, bunyan",
+        "Java: SLF4J + Logback, Log4j2",
+        "Go: slog (stdlib), zap, zerolog",
+        "Rust: tracing, log + env_logger"
+      ],
+      "not_acceptable": [
+        "print() / console.log() without structured formatting",
+        "Manual log file writing without framework",
+        "No logging at all"
+      ]
+    },
+    {
+      "id": "IS-ART12-R02",
+      "obligation_ref": "ART12-OBL-1",
+      "title": "Logging Coverage",
+      "requirement": "At least 90% of API endpoints / entry points MUST have structured logging.",
+      "rationale": "Art. 12(1) says 'over the duration of the lifetime' — gaps in logging coverage mean some events are not recorded.",
+      "note": "90% threshold is ComplianceLint interim standard. Official threshold TBD by CEN-CENELEC."
+    },
+    {
+      "id": "IS-ART12-R03",
+      "obligation_ref": "ART12-OBL-2a",
+      "title": "Structured Log Fields",
+      "requirement": "Each log entry MUST include at minimum: timestamp, event_type, and a correlation identifier (session_id, trace_id, or request_id).",
+      "recommended_fields": [
+        "timestamp (ISO 8601 with timezone)",
+        "event_type / action",
+        "user_id / actor (when applicable)",
+        "session_id / trace_id / request_id",
+        "severity / log_level",
+        "input_hash (hash of input data, not raw data)",
+        "output_summary (classification result, score, etc.)",
+        "model_version",
+        "duration_ms"
+      ],
+      "rationale": "Art. 12(2)(a) requires identifying risk situations — this requires structured fields that enable querying and anomaly detection, not just text messages."
+    },
+    {
+      "id": "IS-ART12-R04",
+      "obligation_ref": "ART19-OBL-1",
+      "title": "Log Retention",
+      "requirement": "Logs MUST be retained for a minimum of 6 months. Systems in healthcare, law enforcement, or critical infrastructure SHOULD retain for 12+ months.",
+      "rationale": "Art. 19(1) explicitly states 'at least six months.' Longer retention for high-impact domains is industry best practice.",
+      "implementation_guidance": [
+        "Configure log rotation with minimum 180-day retention",
+        "Use append-only log storage (S3 with object lock, WORM storage)",
+        "Ensure retention policy is documented and auditable",
+        "Consider GDPR data minimization: anonymize personal data in logs after active use period"
+      ]
+    },
+    {
+      "id": "IS-ART12-R05",
+      "obligation_ref": "ART12-OBL-1",
+      "title": "Log Integrity / Tamper Protection",
+      "requirement": "Logs SHOULD be protected against tampering. For high-risk biometric systems (Annex III, 1(a)), logs MUST be tamper-protected.",
+      "rationale": "Multiple expert sources interpret Art. 12's 'automatic recording' requirement as implying forensic-grade logs. If logs can be modified after the fact, they cannot serve their purpose of enabling traceability (Recital 71).",
+      "acceptable_implementations": [
+        "HMAC-signed log entries",
+        "Hash chain (each log entry includes hash of previous entry)",
+        "Append-only storage (S3 Object Lock, Azure Immutable Blob)",
+        "Write-once-read-many (WORM) storage",
+        "Blockchain-anchored log hashes (for critical applications)"
+      ],
+      "note": "This is elevated from SHOULD to MUST for biometric systems based on the heightened requirements in Art. 12(4)."
+    },
+    {
+      "id": "IS-ART12-R06",
+      "obligation_ref": "ART12-OBL-2c",
+      "title": "Log Accessibility for Deployers",
+      "requirement": "The provider MUST offer deployers a mechanism to access operational logs or log summaries relevant to monitoring.",
+      "rationale": "Art. 12(2)(c) requires logging that enables deployer monitoring per Art. 26(5). If deployers cannot access logs, this obligation cannot be fulfilled.",
+      "acceptable_implementations": [
+        "Log export API",
+        "Deployer-facing monitoring dashboard",
+        "Automated log summary reports",
+        "Log forwarding to deployer's SIEM/logging system"
+      ]
+    }
+  ],
+
+  "scoring": {
+    "compliant": "All R01-R06 requirements met",
+    "partial": "R01 met + at least 3 of R02-R06 met",
+    "non_compliant": "R01 not met, or fewer than 3 of R02-R06 met"
+  }
+}

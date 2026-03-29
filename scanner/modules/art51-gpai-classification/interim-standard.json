@@ -1,0 +1,59 @@
+{
+  "_metadata": {
+    "standard_id": "CL-IS-ART51-v0.1",
+    "title": "ComplianceLint Interim Standard for EU AI Act Article 51: Classification of GPAI Models with Systemic Risk",
+    "version": "0.1.0",
+    "date": "2026-04-03",
+    "status": "draft",
+    "disclaimer": "This is an interim standard developed by ComplianceLint. It will be superseded by the CEN-CENELEC harmonized standard.",
+    "basis": [
+      "EU AI Act Article 51 (official text)",
+      "EU AI Act Annex XIII",
+      "EU AI Office classification guidance"
+    ],
+    "awaiting_standard": "CEN-CENELEC harmonized standard for Art. 51 (expected Q4 2026)"
+  },
+  "requirements": [
+    {
+      "id": "IS-ART51-R01",
+      "obligation_ref": "ART51-OBL-1",
+      "title": "Cumulative FLOPs Threshold Assessment",
+      "requirement": "The provider MUST assess whether the cumulative amount of computation used for training the GPAI model exceeds 10^25 FLOPs.",
+      "rationale": "Art. 51(2) sets 10^25 FLOPs as the presumptive threshold for systemic risk classification.",
+      "acceptable_implementations": [
+        "Documented computation log tracking total training FLOPs",
+        "Training infrastructure records with FLOPs estimation methodology",
+        "Third-party audit of training compute expenditure"
+      ]
+    },
+    {
+      "id": "IS-ART51-R02",
+      "obligation_ref": "ART51-OBL-2",
+      "title": "High-Impact Capabilities Evaluation",
+      "requirement": "The provider MUST evaluate whether the GPAI model has high-impact capabilities based on Annex XIII criteria, independent of the FLOPs threshold.",
+      "rationale": "Art. 51(1)(b) allows Commission designation based on high-impact capabilities per Annex XIII criteria.",
+      "acceptable_implementations": [
+        "Structured capability evaluation against Annex XIII criteria",
+        "Benchmark suite covering high-impact capability domains",
+        "Red-team evaluation report assessing systemic risk potential"
+      ]
+    },
+    {
+      "id": "IS-ART51-R03",
+      "obligation_ref": "ART51-OBL-3",
+      "title": "Classification Record Maintenance",
+      "requirement": "The provider MUST maintain records documenting the classification outcome and supporting evidence.",
+      "rationale": "Art. 51 requires providers to know and document their classification status for regulatory compliance.",
+      "acceptable_implementations": [
+        "Classification decision document with FLOPs calculation and capability assessment",
+        "Internal classification register with periodic review schedule",
+        "Auditable classification trail with version history"
+      ]
+    }
+  ],
+  "scoring": {
+    "compliant": "R01 + R02 + R03 met",
+    "partial": "R01 met, R02 or R03 incomplete",
+    "non_compliant": "R01 not met"
+  }
+}

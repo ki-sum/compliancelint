@@ -1,0 +1,510 @@
+{
+  "_metadata": {
+    "article": 50,
+    "title": "Transparency Obligations for Certain AI Systems",
+    "prerequisites": [],
+    "decomposition_date": "2026-03-17",
+    "related_standards": {
+      "published": [
+        "C2PA Technical Specification v2.1 — Content provenance and authenticity",
+        "IPTC Photo Metadata Standard 2024.1 — DigitalSourceType for AI-generated media",
+        "ISO/IEC 12792:2024 — Transparency taxonomy of AI systems",
+        "NIST AI 100-4 — Reducing Risks Posed by Synthetic Content"
+      ],
+      "upcoming": [
+        "CEN-CENELEC harmonized standard for Art. 50 (expected Q4 2026)"
+      ]
+    },
+    "primary_official_source": {
+      "name": "EUR-Lex — Official Journal of the European Union",
+      "eli_uri": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng",
+      "celex": "32024R1689",
+      "oj_citation": "OJ L 2024/1689, 12.7.2024",
+      "eli_note": "ELI (European Legislation Identifier) is designed for permanent persistence. Preferred over CELEX-based URLs."
+    }
+  },
+  "obligations": [
+    {
+      "id": "ART50-OBL-1",
+      "source": "Art. 50(1)",
+      "source_quote": "Providers shall ensure that AI systems intended to interact directly with natural persons are designed and developed in such a way that the natural persons concerned are informed that they are interacting with an AI system, unless this is obvious from the point of view of a natural person who is reasonably well-informed, observant and circumspect, taking into account the circumstances and the context of use.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "addressee_note": "Provider of an AI system intended to interact directly with natural persons (e.g., chatbots, virtual assistants, AI customer service). NOT limited to high-risk systems.",
+      "decomposed_atoms": [
+        {
+          "atom": "system_informs_of_ai_nature",
+          "description": "The AI system must inform natural persons that they are interacting with an AI system",
+          "requirement": "The AI system SHALL inform natural persons that they are interacting with an AI system — the disclosure must be proactive, not requiring the user to discover this fact"
+        },
+        {
+          "atom": "designed_for_transparency",
+          "description": "The system must be designed and developed with transparency as a built-in feature",
+          "requirement": "The system SHALL be designed and developed in such a way that the AI disclosure is part of the system's architecture — not an afterthought or optional feature"
+        },
+        {
+          "atom": "disclosure_clear_and_distinguishable",
+          "description": "The disclosure must be clear and distinguishable to the natural person",
+          "requirement": "The AI interaction disclosure SHALL be presented clearly and in a distinguishable manner — not buried in terms of service, not in fine print, not easily missed"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Detect chatbot/conversational AI patterns (LLM API calls, chat endpoints, conversational UI components) AND check for AI disclosure text in code/templates",
+        "what_to_scan": [
+          "code",
+          "templates",
+          "config"
+        ],
+        "human_judgment_needed": "Whether the disclosure is shown at the point of interaction (not just in documentation), and whether the 'obvious from circumstances' exception applies",
+        "rationale": "Can detect both chatbot presence and disclosure text in code, but cannot verify disclosure is actually displayed to users at the right moment"
+      },
+      "exceptions": [
+        {
+          "condition": "obvious_from_circumstances",
+          "description": "Disclosure is not required when it is 'obvious from the circumstances and context of use' that the person is interacting with an AI system",
+          "burden_of_proof": "The deployer bears the burden of demonstrating that AI interaction is obvious from context",
+          "note": "This exception should be interpreted narrowly — most conversational AI interactions are NOT obviously AI-driven"
+        }
+      ],
+      "cross_references": [
+        {
+          "article": 50,
+          "paragraph": 5,
+          "context": "Information under Art. 50(1) must be provided in a clear, distinguishable manner by the time of first interaction"
+        }
+      ]
+    },
+    {
+      "id": "ART50-OBL-2",
+      "source": "Art. 50(2)",
+      "source_quote": "Providers of AI systems, including general-purpose AI systems, generating synthetic audio, image, video or text content, shall ensure that the outputs of the AI system are marked in a machine-readable format and detectable as artificially generated or manipulated.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "addressee_note": "Provider of any AI system (including GPAI) that generates synthetic content. Covers image generators, TTS, video generators, and text generation systems.",
+      "decomposed_atoms": [
+        {
+          "atom": "output_marked_machine_readable",
+          "description": "AI-generated content must be marked in a machine-readable format",
+          "requirement": "The outputs of the AI system SHALL be marked in a machine-readable format — human-visible watermarks alone are NOT sufficient; the marking must be detectable by automated systems"
+        },
+        {
+          "atom": "output_detectable_as_artificial",
+          "description": "The marking must make the content detectable as artificially generated or manipulated",
+          "requirement": "The marking SHALL make the content detectable as artificially generated or manipulated — enabling downstream systems and users to verify the origin of content"
+        },
+        {
+          "atom": "marking_covers_all_modalities",
+          "description": "Marking must apply to all content modalities the system generates",
+          "requirement": "Marking SHALL cover ALL output modalities: synthetic audio, image, video, AND text — if the system generates multiple types, each must be marked"
+        },
+        {
+          "atom": "marking_interoperable_robust_reliable",
+          "description": "Technical marking must be interoperable, robust against manipulation, and reliable",
+          "requirement": "The marking technique SHALL be interoperable (works across platforms), robust (resistant to removal or alteration), and reliable (consistently applied and detectable)"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Detect content generation patterns (diffusion models, LLM APIs, TTS libraries, video generation) AND check for content marking patterns (C2PA, IPTC metadata, watermarking, SynthID, X-AI-Generated headers)",
+        "what_to_scan": [
+          "code",
+          "config",
+          "dependencies"
+        ],
+        "human_judgment_needed": "Whether marking covers ALL generated output (not just some paths), whether marking is robust enough to survive common transformations (compression, cropping, format conversion)",
+        "rationale": "Can detect both content generation and marking code patterns, but cannot verify marking is applied to every output or that it is robust against removal"
+      },
+      "recommended_standards": [
+        {
+          "standard": "C2PA v2.1",
+          "description": "Coalition for Content Provenance and Authenticity — cryptographically signed content credentials embedded in media files",
+          "eu_alignment": "Referenced by EU AI Office guidelines as suitable technical standard for Art. 50(2)"
+        },
+        {
+          "standard": "IPTC Photo Metadata Standard 2024.1",
+          "description": "DigitalSourceType: trainedAlgorithmicMedia — standardized metadata field for AI-generated images",
+          "eu_alignment": "Widely adopted in media industry; interoperable with C2PA"
+        },
+        {
+          "standard": "SynthID",
+          "description": "Google DeepMind imperceptible watermarking for AI-generated images and text",
+          "eu_alignment": "Cited in NIST AI 100-4 as an example of robust content marking"
+        }
+      ],
+      "cross_references": [
+        {
+          "article": 50,
+          "paragraph": 4,
+          "context": "Deep fake disclosure obligation (Art. 50(4)) extends marking requirement for manipulated content depicting real persons"
+        },
+        {
+          "article": 50,
+          "paragraph": 5,
+          "context": "Information must be provided in a clear, distinguishable manner"
+        }
+      ]
+    },
+    {
+      "id": "ART50-OBL-3",
+      "source": "Art. 50(3)",
+      "source_quote": "Deployers of an emotion recognition system or a biometric categorisation system shall inform the natural persons exposed thereto of the operation of the system, and shall process the personal data in accordance with Regulations (EU) 2016/679 and (EU) 2018/1725 and Directive (EU) 2016/680, as applicable.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "deployer",
+      "addressee_note": "DEPLOYER (not provider) of emotion recognition or biometric categorization systems. This is a deployment-time obligation, reflecting that the deployer controls where and how the system is used.",
+      "decomposed_atoms": [
+        {
+          "atom": "inform_exposed_persons",
+          "description": "Natural persons exposed to the system must be informed of its operation",
+          "requirement": "The deployer SHALL inform all natural persons exposed to the emotion recognition or biometric categorization system of its operation — this includes persons in physical spaces (signage) and digital users (in-app notification)"
+        },
+        {
+          "atom": "inform_of_system_operation",
+          "description": "The information must describe the operation of the system",
+          "requirement": "The deployer SHALL explain what the system does — e.g., that it detects emotions from facial expressions, or categorizes persons by age/gender from biometric data"
+        },
+        {
+          "atom": "gdpr_compliant_processing",
+          "description": "Personal data must be processed in accordance with GDPR/LED",
+          "requirement": "The deployer SHALL process personal data in accordance with GDPR (Regulation 2016/679), Regulation 2018/1725 (EU institutions), or the Law Enforcement Directive (2016/680) as applicable"
+        },
+        {
+          "atom": "gdpr_information_rights",
+          "description": "GDPR information obligations (Art. 13/14) must be fulfilled",
+          "requirement": "The deployer SHALL provide information required under GDPR Art. 13 (data collected from data subject) or Art. 14 (data obtained indirectly) — including purpose, legal basis, retention period, and data subject rights"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Detect emotion recognition patterns (FER, deepface, facial expression analysis, voice emotion detection) and biometric categorization patterns (age/gender estimation, demographic classification) in code",
+        "what_to_scan": [
+          "code",
+          "dependencies"
+        ],
+        "human_judgment_needed": "Whether disclosure reaches ALL exposed persons (especially in physical spaces), whether GDPR compliance is adequate, and whether a DPIA is required",
+        "rationale": "Can detect presence of emotion/biometric code but cannot verify deployment-time disclosure or GDPR compliance"
+      },
+      "cross_references": [
+        {
+          "regulation": "GDPR",
+          "articles": [
+            "Art. 13",
+            "Art. 14",
+            "Art. 35"
+          ],
+          "context": "Data subject information rights and DPIA requirements for high-risk processing"
+        },
+        {
+          "regulation": "LED (Directive 2016/680)",
+          "articles": [
+            "Art. 13"
+          ],
+          "context": "Information rights under the Law Enforcement Directive"
+        }
+      ]
+    },
+    {
+      "id": "ART50-OBL-4",
+      "source": "Art. 50(4)",
+      "source_quote": "Deployers of an AI system that generates or manipulates image, audio or video content constituting a deep fake, shall disclose that the content has been artificially generated or manipulated.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "deployer",
+      "addressee_note": "DEPLOYER (not provider) of AI systems that generate or manipulate deep fake content. Includes face swapping, voice cloning, lip syncing, and neural rendering of real persons.",
+      "decomposed_atoms": [
+        {
+          "atom": "disclose_artificial_generation",
+          "description": "The deployer must disclose that the content has been artificially generated or manipulated",
+          "requirement": "The deployer SHALL disclose that the content has been artificially generated or manipulated — this is a mandatory disclosure, not optional"
+        },
+        {
+          "atom": "disclosure_accompanies_content",
+          "description": "Disclosure must accompany the content when published or distributed",
+          "requirement": "The disclosure SHALL accompany the deep fake content in its distribution — it must travel with the content, not be available only at the point of creation"
+        },
+        {
+          "atom": "disclosure_clear_to_audience",
+          "description": "Disclosure must be understandable to the intended audience",
+          "requirement": "The disclosure SHALL be presented in a manner that is clear and understandable to the audience encountering the content"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Detect deep fake generation patterns (face swap, voice cloning, lip sync, neural face rendering, body puppeteering) and check for disclosure mechanisms (C2PA manifests, watermarks, labels)",
+        "what_to_scan": [
+          "code",
+          "config"
+        ],
+        "human_judgment_needed": "Whether content qualifies as a 'deep fake' under the Act's definition, whether the artistic/satirical exception applies, and whether disclosure is adequate",
+        "rationale": "Can detect deep fake code patterns but cannot assess whether specific outputs constitute deep fakes or qualify for exceptions"
+      },
+      "exceptions": [
+        {
+          "condition": "artistic_satirical_fictional",
+          "description": "Content used for manifestly artistic, creative, satirical, or fictional analogous purposes",
+          "note": "Even excepted content should indicate AI generation 'in an appropriate manner that does not hamper the display or enjoyment of the work'"
+        },
+        {
+          "condition": "law_enforcement",
+          "description": "Content used for law enforcement purposes where disclosure would undermine the purpose",
+          "note": "Subject to Art. 50(6) exemptions and appropriate safeguards"
+        }
+      ],
+      "cross_references": [
+        {
+          "article": 4,
+          "paragraph": 60,
+          "context": "Definition of 'deep fake' — AI-generated or manipulated image, audio, or video content that resembles existing persons, objects, places, or events and would falsely appear to be authentic"
+        },
+        {
+          "article": 50,
+          "paragraph": 2,
+          "context": "Art. 50(2) machine-readable marking requirement applies in addition to Art. 50(4) disclosure"
+        }
+      ]
+    },
+    {
+      "id": "ART50-OBL-4b",
+      "source": "Art. 50(4)",
+      "source_quote": "Deployers of an AI system that generates or manipulates text which is published with the purpose of informing the public on matters of public interest shall disclose that the text has been artificially generated or manipulated.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "deployer",
+      "addressee_note": "DEPLOYER (not provider) of AI systems that generate or manipulate text published for public interest purposes. Distinct from OBL-4 which covers image/audio/video deep fakes.",
+      "note": "Distinct from OBL-4: OBL-4 covers image/audio/video deep fake disclosure. This obligation covers AI-generated or manipulated TEXT published with the purpose of informing the public on matters of public interest (e.g., news, political commentary, public reports).",
+      "decomposed_atoms": [
+        {
+          "atom": "text_disclosure_to_audience",
+          "description": "Disclosure that text was artificially generated or manipulated",
+          "requirement": "The deployer SHALL disclose that the text has been artificially generated or manipulated"
+        },
+        {
+          "atom": "applies_to_public_interest_text",
+          "description": "Applies when text is published for informing the public on matters of public interest",
+          "requirement": "The disclosure obligation SHALL apply where text is published with the purpose of informing the public on matters of public interest"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Detect AI text generation patterns (LLM APIs, content generation pipelines) AND check for disclosure mechanisms in text publishing workflows",
+        "what_to_scan": [
+          "code",
+          "config"
+        ],
+        "human_judgment_needed": "Whether published text constitutes 'informing the public on matters of public interest' and whether disclosure is adequately presented",
+        "rationale": "Can detect text generation patterns but cannot assess whether content qualifies as public interest information"
+      },
+      "exceptions": [
+        {
+          "condition": "artistic_satirical_fictional",
+          "description": "Content used for manifestly artistic, creative, satirical, or fictional analogous purposes",
+          "note": "Even excepted content should indicate AI generation in an appropriate manner"
+        }
+      ]
+    },
+    {
+      "id": "ART50-OBL-5",
+      "source": "Art. 50(5)",
+      "source_quote": "The information referred to in paragraphs 1 to 4 shall be provided to the natural persons concerned in a clear and distinguishable manner at the latest at the time of the first interaction or exposure.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider_and_deployer",
+      "addressee_note": "Applies to both providers (Art. 50(1)-(2)) and deployers (Art. 50(3)-(4)) — whoever is responsible for the respective paragraph obligation.",
+      "decomposed_atoms": [
+        {
+          "atom": "information_clear",
+          "description": "Information must be presented clearly",
+          "requirement": "All transparency information under Art. 50(1)-(4) SHALL be provided clearly — using plain language, appropriate to the audience, avoiding technical jargon"
+        },
+        {
+          "atom": "information_distinguishable",
+          "description": "Information must be distinguishable from other content",
+          "requirement": "Transparency information SHALL be distinguishable — visually or audibly distinct from surrounding content, not blended in or hidden"
+        },
+        {
+          "atom": "timing_first_interaction",
+          "description": "Information must be provided by the time of first interaction at the latest",
+          "requirement": "Transparency information SHALL be provided at the latest at the time of the first interaction or exposure — not after the fact, not upon request, but proactively before or at the moment of engagement"
+        },
+        {
+          "atom": "accessibility_consideration",
+          "description": "Information must conform to applicable accessibility requirements",
+          "requirement": "Transparency information SHALL conform to applicable accessibility requirements — ensuring persons with disabilities can also receive the disclosure"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "low",
+        "detection_method": "Check for disclosure placement in UI initialization, conversation start handlers, first-render components, and onboarding flows",
+        "what_to_scan": [
+          "code",
+          "templates"
+        ],
+        "human_judgment_needed": "Whether the disclosure is truly provided at the point of first interaction, whether it is visually distinguishable, and whether accessibility requirements are met",
+        "rationale": "Can check code structure for early-stage disclosure but cannot verify the actual user experience meets the 'clear and distinguishable' standard"
+      },
+      "cross_references": [
+        {
+          "article": 50,
+          "paragraphs": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "context": "Art. 50(5) sets the presentation and timing standard for ALL transparency obligations in Art. 50"
+        }
+      ]
+    },
+    {
+      "id": "ART50-OBL-6",
+      "source": "Art. 50(6)",
+      "source_quote": "Paragraphs 1 to 4 shall not affect the requirements and obligations set out in Chapter III, and shall be without prejudice to other transparency obligations laid down in Union or national law for deployers of AI systems.",
+      "deontic_type": "savings_clause",
+      "modality": "shall not",
+      "addressee": "provider_and_deployer",
+      "addressee_note": "Applies to all addressees of Art. 50. Ensures Art. 50 obligations do not diminish or replace other transparency obligations.",
+      "decomposed_atoms": [
+        {
+          "atom": "title_iii_obligations_preserved",
+          "description": "High-risk AI system obligations (Title III) are not affected by Art. 50",
+          "requirement": "Art. 50 transparency obligations SHALL NOT diminish or replace the requirements and obligations for high-risk AI systems under Title III — both sets of obligations apply cumulatively where applicable"
+        },
+        {
+          "atom": "other_transparency_obligations_preserved",
+          "description": "Other transparency obligations in EU or national law remain in force",
+          "requirement": "Art. 50 SHALL be without prejudice to other transparency obligations under Union or national law — including GDPR transparency requirements, consumer protection law, and sector-specific obligations"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "N/A — this is a legal scope provision, not a technical requirement",
+        "what_to_scan": [],
+        "human_judgment_needed": "Legal analysis of which other transparency obligations apply to the specific system and whether cumulative compliance is achieved",
+        "rationale": "This obligation requires legal analysis of applicable law beyond the AI Act — cannot be automated"
+      },
+      "cross_references": [
+        {
+          "title": "Title III",
+          "context": "High-risk AI system requirements (Art. 6-51) — apply in addition to Art. 50 where system is also high-risk"
+        }
+      ]
+    },
+    {
+      "id": "ART50-OBL-7",
+      "source": "Art. 50(7)",
+      "source_quote": "The AI Office shall encourage and facilitate the drawing up of codes of practice at Union level to facilitate the effective implementation of the obligations regarding the detection and labelling of artificially generated or manipulated content.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "ai_office",
+      "addressee_note": "The AI Office (not providers or deployers). The AI Office is tasked with encouraging and facilitating industry codes of practice for detection and labelling of AI-generated content.",
+      "decomposed_atoms": [
+        {
+          "atom": "ai_office_encourages_codes_of_practice",
+          "description": "AI Office must encourage development of codes of practice at Union level",
+          "requirement": "The AI Office SHALL encourage and facilitate the drawing up of codes of practice at Union level"
+        },
+        {
+          "atom": "codes_target_detection_and_labelling",
+          "description": "Codes of practice must target detection and labelling of artificially generated/manipulated content",
+          "requirement": "Codes of practice SHALL facilitate effective implementation of obligations regarding detection and labelling of artificially generated or manipulated content"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "N/A — AI Office obligation, not provider or deployer",
+        "what_to_scan": [],
+        "human_judgment_needed": "Monitor for AI Office publication of codes of practice — providers should align with published codes once available",
+        "rationale": "AI Office obligation — cannot be assessed from provider or deployer code"
+      },
+      "cross_references": [
+        {
+          "article": 50,
+          "paragraph": 2,
+          "context": "AI Office codes of practice target effective implementation of the Art. 50(2) marking obligation"
+        }
+      ]
+    },
+    {
+      "id": "ART50-EMP-7a",
+      "source": "Art. 50(7)",
+      "source_quote": "The Commission may adopt implementing acts to establish the technical specifications for the machine-readable format referred to in paragraph 2 of this Article.",
+      "deontic_type": "empowerment",
+      "modality": "may",
+      "addressee": "commission",
+      "note": "Commission empowerment to specify the technical format for machine-readable content marking (Art. 50(2)). Providers should monitor for implementing acts that may specify required formats.",
+      "decomposed_atoms": [
+        {
+          "atom": "commission_may_specify_marking_format",
+          "description": "Commission may adopt implementing acts for machine-readable format specifications",
+          "requirement": "The Commission MAY adopt implementing acts to establish technical specifications for the machine-readable format"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "N/A — Commission empowerment",
+        "what_to_scan": [],
+        "human_judgment_needed": "Monitor for Commission implementing acts specifying required machine-readable marking formats",
+        "rationale": "Commission empowerment — cannot be assessed from provider or deployer code"
+      }
+    },
+    {
+      "id": "ART50-EMP-7b",
+      "source": "Art. 50(7)",
+      "source_quote": "The Commission may adopt implementing acts to specify and update the list of specific categories of AI systems referred to in paragraph 4 of this Article.",
+      "deontic_type": "empowerment",
+      "modality": "may",
+      "addressee": "commission",
+      "note": "Commission empowerment to specify and update the list of AI system categories subject to Art. 50(4) deep fake disclosure. Providers should monitor for implementing acts that may expand the scope.",
+      "decomposed_atoms": [
+        {
+          "atom": "commission_may_specify_system_categories",
+          "description": "Commission may specify AI system categories for Art. 50(4) disclosure",
+          "requirement": "The Commission MAY adopt implementing acts to specify and update the list of AI system categories for Art. 50(4)"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "N/A — Commission empowerment",
+        "what_to_scan": [],
+        "human_judgment_needed": "Monitor for Commission implementing acts specifying or expanding system categories subject to Art. 50(4)",
+        "rationale": "Commission empowerment — cannot be assessed from provider or deployer code"
+      }
+    }
+  ],
+  "summary": {
+    "total_obligations": 10,
+    "addressee_breakdown": {
+      "provider": 2,
+      "deployer": 4,
+      "provider_and_deployer": 2,
+      "ai_office": 1,
+      "commission": 2
+    },
+    "automation_breakdown": {
+      "full": 0,
+      "partial": 6,
+      "manual": 4
+    },
+    "scope_notes": {
+      "broad_scope": "Art. 50 applies to ALMOST ALL AI systems — not limited to high-risk. This is the broadest transparency obligation in the EU AI Act.",
+      "provider_obligations": "ART50-OBL-1 (human interaction disclosure), ART50-OBL-2 (synthetic content marking) — provider must build transparency into the system",
+      "deployer_obligations": "ART50-OBL-3 (emotion/biometric disclosure), ART50-OBL-4 (deep fake image/audio/video), ART50-OBL-4b (deep fake text for public interest) — deployer must inform persons at deployment time",
+      "cross_cutting": "ART50-OBL-5 (presentation and timing), ART50-OBL-6 (cumulative obligations) — apply to all Art. 50 obligations",
+      "ai_office": "ART50-OBL-7 — AI Office SHALL facilitate codes of practice for detection and labelling",
+      "commission_empowerments": "ART50-EMP-7a (machine-readable format specs), ART50-EMP-7b (system category list) — Commission MAY adopt implementing acts"
+    }
+  }
+}

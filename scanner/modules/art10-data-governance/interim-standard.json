@@ -1,0 +1,144 @@
+{
+  "_metadata": {
+    "standard_id": "CL-IS-ART10-v0.1",
+    "title": "ComplianceLint Interim Standard for EU AI Act Article 10: Data and Data Governance",
+    "version": "0.1.0",
+    "date": "2026-03-17",
+    "status": "draft",
+    "disclaimer": "This is an interim standard developed by ComplianceLint based on available guidance, industry best practices, and relevant ISO standards. It is NOT an official standard. It will be superseded when CEN-CENELEC publishes the harmonized standard for Article 10 (expected Q4 2026).",
+    "basis": [
+      "EU AI Act Article 10 (official text)",
+      "EU AI Act Recital 67 (legislative intent on data quality)",
+      "ISO/IEC 5259-1:2024 — Data quality for analytics and ML — Part 1: Overview",
+      "ISO/IEC 5259-2:2024 — Data quality for analytics and ML — Part 2: Data quality measures",
+      "ISO/IEC 5259-3:2024 — Data quality for analytics and ML — Part 3: Data quality management",
+      "ISO/IEC 5259-4:2024 — Data quality for analytics and ML — Part 4: Data quality process framework",
+      "ISO/IEC TR 24027:2021 — Bias in AI systems and AI aided decision making",
+      "ISO/IEC 42001:2023 — AI management system",
+      "Google Model Cards / Microsoft Datasheets for Datasets",
+      "NIST AI 100-1 (AI Risk Management Framework)"
+    ],
+    "awaiting_standard": "CEN-CENELEC harmonized standard for Art. 10 (expected Q4 2026)"
+  },
+
+  "requirements": [
+    {
+      "id": "IS-ART10-R01",
+      "obligation_ref": "ART10-OBL-1",
+      "title": "Dataset Documentation",
+      "requirement": "All training, validation, and testing datasets MUST have accompanying documentation (data card, datasheet, or equivalent).",
+      "rationale": "Art. 10(2) requires documented data governance practices. Without dataset documentation, it is impossible to demonstrate compliance with data quality and governance requirements.",
+      "required_content": [
+        "Data source(s) and collection methodology",
+        "Labeling process and quality assurance",
+        "Data cleaning and preprocessing steps",
+        "Known limitations and gaps",
+        "Demographic and representativeness statistics",
+        "Data freshness and update frequency",
+        "Licensing and legal basis for data use"
+      ],
+      "acceptable_formats": [
+        "data_card.md or data_card.json (Google Data Cards format)",
+        "datasheet.md or datasheet.yaml (Microsoft Datasheets for Datasets)",
+        "data_governance.md or data_governance.yaml",
+        "Equivalent structured documentation in project wiki"
+      ],
+      "not_acceptable": [
+        "No dataset documentation at all",
+        "Undocumented data sources",
+        "Data used without provenance tracking"
+      ]
+    },
+    {
+      "id": "IS-ART10-R02",
+      "obligation_ref": "ART10-OBL-2",
+      "title": "Data Pipeline Documentation",
+      "requirement": "Data preparation and processing operations MUST be implemented in documented, reproducible code.",
+      "rationale": "Art. 10(2)(b) requires documented 'data preparation and processing operations such as annotation, labelling, cleaning, updating, enrichment and aggregation.'",
+      "acceptable_implementations": [
+        "Dedicated preprocessing scripts with inline documentation",
+        "Data pipeline frameworks (Apache Beam, Prefect, Airflow)",
+        "Jupyter notebooks with clear markdown documentation",
+        "ETL scripts with configuration files"
+      ],
+      "not_acceptable": [
+        "Manual, undocumented data preparation",
+        "Ad-hoc scripts without version control",
+        "Data transformations embedded in model training code without separation"
+      ]
+    },
+    {
+      "id": "IS-ART10-R03",
+      "obligation_ref": "ART10-OBL-3",
+      "title": "Bias Detection and Mitigation",
+      "requirement": "The provider MUST conduct and document bias examination of training data, using appropriate statistical methods or fairness toolkits.",
+      "rationale": "Art. 10(2)(f) requires 'examination in view of possible biases that are likely to affect the health and safety of persons, have a negative impact on fundamental rights, or lead to discrimination.' This cannot be satisfied without systematic bias analysis.",
+      "acceptable_implementations": [
+        "fairlearn (Microsoft): demographic parity, equalized odds metrics",
+        "aif360 (IBM): comprehensive bias detection and mitigation",
+        "aequitas: group fairness audit toolkit",
+        "Google What-If Tool: visual bias exploration",
+        "Custom bias analysis with documented methodology"
+      ],
+      "minimum_bias_checks": [
+        "Representation analysis across protected attributes (where available)",
+        "Label distribution analysis by demographic group",
+        "Feature correlation analysis with protected attributes",
+        "Intersectional analysis (combinations of protected attributes)"
+      ]
+    },
+    {
+      "id": "IS-ART10-R04",
+      "obligation_ref": "ART10-OBL-4",
+      "title": "Data Versioning and Traceability",
+      "requirement": "Datasets SHOULD be versioned alongside code to ensure traceability of data origin and reproducibility of model training.",
+      "rationale": "Art. 10(2)(a) requires documented 'design choices' and 'data collection processes' including 'the origin of data.' Without data versioning, it is difficult to trace which data was used for which model version.",
+      "acceptable_implementations": [
+        "DVC (Data Version Control) with remote storage",
+        "LakeFS for data lake versioning",
+        "Pachyderm for data pipeline versioning",
+        "Delta Lake for versioned data tables",
+        "Git LFS for smaller datasets"
+      ]
+    },
+    {
+      "id": "IS-ART10-R05",
+      "obligation_ref": "ART10-OBL-5",
+      "title": "Training/Validation/Testing Dataset Separation",
+      "requirement": "The provider MUST implement and document separate training, validation, and testing datasets with explicit split ratios.",
+      "rationale": "Art. 10(3) requires 'relevant, sufficiently representative, and to the best extent possible, free of errors and complete' datasets for training, validation, and testing. Proper separation is fundamental to meaningful evaluation.",
+      "acceptable_implementations": [
+        "Explicit train/validation/test split with documented ratios",
+        "Stratified splitting by target variable and key features",
+        "Cross-validation with documented fold strategy",
+        "Separate data collection for test set (gold standard)"
+      ],
+      "minimum_requirements": [
+        "Documented split ratios (e.g., 70/15/15 or 80/10/10)",
+        "Stratification strategy documented",
+        "No data leakage between splits",
+        "Test set held out from any model selection process"
+      ]
+    },
+    {
+      "id": "IS-ART10-R06",
+      "obligation_ref": "ART10-OBL-6",
+      "title": "Continuous Learning Safeguards",
+      "requirement": "For AI systems that continue to learn after deployment, the provider MUST implement safeguards against biased outputs used as input for future operations (feedback loops).",
+      "rationale": "Art. 10(6) explicitly requires 'appropriate measures' to prevent feedback loop biases in systems that continue learning after deployment.",
+      "acceptable_implementations": [
+        "Drift detection monitoring (data drift, concept drift, prediction drift)",
+        "Periodic revalidation against held-out test sets",
+        "Human review of model updates before deployment",
+        "Feedback loop analysis and documentation",
+        "Automated rollback mechanisms when performance degrades"
+      ]
+    }
+  ],
+
+  "scoring": {
+    "compliant": "R01 + R03 + R05 met, and at least 2 of R02, R04, R06 met",
+    "partial": "R01 or R03 met + at least 2 others met",
+    "non_compliant": "Neither R01 nor R03 met"
+  }
+}

@@ -1,0 +1,276 @@
+{
+  "_metadata": {
+    "article": 6,
+    "title": "Classification Rules for High-Risk AI Systems",
+    "prerequisites": [],
+    "decomposition_date": "2026-03-20",
+    "primary_official_source": {
+      "name": "EUR-Lex -- Official Journal of the European Union",
+      "eli_uri": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng",
+      "celex": "32024R1689"
+    },
+    "pdf_pages": [
+      53,
+      54
+    ]
+  },
+  "obligations": [
+    {
+      "id": "ART06-CLS-1",
+      "source": "Art. 6(1)",
+      "source_quote": "Irrespective of whether an AI system is placed on the market or put into service independently of the products referred to in points (a) and (b), that AI system shall be considered to be high-risk where both of the following conditions are fulfilled:",
+      "deontic_type": "classification_rule",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "safety_component_or_product",
+          "description": "Art.6(1)(a): AI is safety component of product or is product itself, covered by Annex I",
+          "requirement": "System SHALL be considered high-risk if it is a safety component or product under Annex I harmonisation legislation"
+        },
+        {
+          "atom": "requires_third_party_assessment",
+          "description": "Art.6(1)(b): Product requires third-party conformity assessment",
+          "requirement": "System SHALL be considered high-risk if the product requires third-party conformity assessment under Annex I"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Keyword and pattern scanning for Annex I product indicators in source code, documentation, package metadata, and configuration files (e.g., 'medical device', 'machinery safety', 'civil aviation', 'motor vehicle')",
+        "what_to_scan": [
+          "code",
+          "config",
+          "dependencies",
+          "documentation"
+        ],
+        "human_judgment_needed": "Whether the system is genuinely a safety component or product under Annex I legislation",
+        "rationale": "Can detect product-type keywords but cannot determine legal classification"
+      }
+    },
+    {
+      "id": "ART06-CLS-2",
+      "source": "Art. 6(2)",
+      "source_quote": "In addition to the high-risk AI systems referred to in paragraph 1, AI systems referred to in Annex III shall be considered to be high-risk.",
+      "deontic_type": "classification_rule",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "annex_iii_classification",
+          "description": "Annex III AI systems are high-risk",
+          "requirement": "AI systems in Annex III categories SHALL be considered high-risk"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Library import detection (e.g., deepface, face_recognition, scorecardpy) and domain keyword scanning (e.g., 'credit scoring', 'resume screening', 'biometric identification') across source code, documentation, and configuration",
+        "what_to_scan": [
+          "code",
+          "config",
+          "dependencies",
+          "documentation"
+        ],
+        "human_judgment_needed": "Whether the system falls under a specific Annex III category",
+        "rationale": "Can detect domain-specific libraries and keywords but cannot determine legal scope"
+      }
+    },
+    {
+      "id": "ART06-EXC-3",
+      "source": "Art. 6(3)",
+      "source_quote": "By derogation from paragraph 2, an AI system referred to in Annex III shall not be considered to be high-risk where it does not pose a significant risk of harm to the health, safety or fundamental rights of natural persons, including by not materially influencing the outcome of decision making.",
+      "deontic_type": "exception",
+      "modality": "shall not",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "no_significant_risk",
+          "description": "System does not pose significant risk",
+          "requirement": "System SHALL NOT be considered high-risk if it does not pose significant risk of harm"
+        },
+        {
+          "atom": "narrow_procedural_task",
+          "description": "Art.6(3)(a): intended for narrow procedural task",
+          "requirement": "Exception applies if system is intended to perform a narrow procedural task"
+        },
+        {
+          "atom": "improves_human_activity",
+          "description": "Art.6(3)(b): intended to improve prior human activity",
+          "requirement": "Exception applies if system improves result of previously completed human activity"
+        },
+        {
+          "atom": "detects_patterns_no_replace",
+          "description": "Art.6(3)(c): detects patterns without replacing human assessment",
+          "requirement": "Exception applies if system detects decision-making patterns without replacing human assessment"
+        },
+        {
+          "atom": "preparatory_task",
+          "description": "Art.6(3)(d): performs preparatory task",
+          "requirement": "Exception applies if system performs a preparatory task to an assessment"
+        },
+        {
+          "atom": "profiling_always_high_risk",
+          "description": "Profiling exception: always high-risk",
+          "requirement": "System SHALL always be high-risk if it performs profiling of natural persons (no exception)"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "low",
+        "detection_method": "Analyze code complexity, output space, and task specification -- systems with narrow output types (boolean, enum, fixed categories) may indicate procedural tasks. Check for intended use documentation describing the task scope.",
+        "what_to_scan": [
+          "code",
+          "documentation"
+        ],
+        "human_judgment_needed": "Whether the system truly poses no significant risk and qualifies for exception",
+        "rationale": "Exception determination requires understanding deployment context"
+      }
+    },
+    {
+      "id": "ART06-OBL-4",
+      "source": "Art. 6(4)",
+      "source_quote": "A provider who considers that an AI system referred to in Annex III is not high-risk shall document its assessment before that system is placed on the market or put into service.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "document_non_high_risk_assessment",
+          "description": "Provider must document non-high-risk assessment",
+          "requirement": "Provider SHALL document the assessment that the system is not high-risk BEFORE placing on market"
+        },
+        {
+          "atom": "register_per_art49",
+          "description": "Provider must register per Art. 49(2)",
+          "requirement": "Provider SHALL be subject to registration obligation in Art. 49(2)"
+        },
+        {
+          "atom": "provide_documentation_on_request",
+          "description": "Documentation available to authorities on request",
+          "requirement": "Provider SHALL provide documentation of assessment upon request of national competent authorities"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check for risk classification documentation, non-high-risk assessment documents, intended use documentation with risk rationale",
+        "what_to_scan": [
+          "documentation"
+        ],
+        "human_judgment_needed": "Whether the assessment is adequate and the non-high-risk determination is correct",
+        "rationale": "Can detect documentation presence but cannot assess legal correctness of the determination"
+      }
+    },
+    {
+      "id": "ART06-COM-5",
+      "source": "Art. 6(5)",
+      "source_quote": "The Commission shall, after consulting the European Artificial Intelligence Board (the 'Board'), and no later than 2 February 2026, provide guidelines specifying the practical implementation of this Article in line with Article 96 together with a comprehensive list of practical examples of use cases of AI systems that are high-risk and not high-risk.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "commission",
+      "note": "Commission obligation to provide guidelines by 2 February 2026. Not a provider obligation.",
+      "decomposed_atoms": [
+        {
+          "atom": "commission_provides_guidelines",
+          "description": "Commission must provide implementation guidelines",
+          "requirement": "Commission SHALL provide guidelines with practical examples by 2 February 2026"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "N/A -- Commission obligation",
+        "what_to_scan": [],
+        "rationale": "Commission obligation, not provider"
+      }
+    },
+    {
+      "id": "ART06-EMP-6",
+      "source": "Art. 6(6)",
+      "source_quote": "The Commission is empowered to adopt delegated acts in accordance with Article 97 in order to amend paragraph 3, second subparagraph, of this Article by adding new conditions to those laid down therein, or by modifying them, where there is concrete and reliable evidence of the existence of AI systems that fall under the scope of Annex III, but do not pose a significant risk of harm to the health, safety or fundamental rights of natural persons.",
+      "deontic_type": "empowerment",
+      "modality": "is empowered",
+      "addressee": "commission",
+      "note": "Commission empowerment to add exception conditions. Not a provider obligation.",
+      "decomposed_atoms": [
+        {
+          "atom": "commission_may_add_exceptions",
+          "description": "Commission can add new exception conditions to Art.6(3)",
+          "requirement": "Commission is empowered to add or modify exception conditions in Art.6(3)"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "N/A -- empowerment",
+        "what_to_scan": [],
+        "rationale": "Empowerment, not provider obligation"
+      }
+    },
+    {
+      "id": "ART06-COM-7",
+      "source": "Art. 6(7)",
+      "source_quote": "The Commission shall adopt delegated acts in accordance with Article 97 in order to amend paragraph 3, second subparagraph, of this Article by deleting any of the conditions laid down therein, where there is concrete and reliable evidence that this is necessary to maintain the level of protection of health, safety and fundamental rights provided for by this Regulation.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "commission",
+      "note": "Commission obligation to remove exception conditions when necessary. Not a provider obligation.",
+      "decomposed_atoms": [
+        {
+          "atom": "commission_removes_exceptions",
+          "description": "Commission must remove conditions if evidence warrants",
+          "requirement": "Commission SHALL remove exception conditions when necessary to maintain protection level"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "N/A -- Commission obligation",
+        "what_to_scan": [],
+        "rationale": "Commission obligation, not provider"
+      }
+    },
+    {
+      "id": "ART06-CON-8",
+      "source": "Art. 6(8)",
+      "source_quote": "Any amendment to the conditions laid down in paragraph 3, second subparagraph, adopted in accordance with paragraphs 6 and 7 of this Article shall not decrease the overall level of protection of health, safety and fundamental rights provided for by this Regulation and shall ensure consistency with the delegated acts adopted pursuant to Article 7(1), and take account of market and technological developments.",
+      "deontic_type": "constraint",
+      "modality": "shall not",
+      "addressee": "commission",
+      "note": "Constraint on Commission delegated acts. Not a provider obligation.",
+      "decomposed_atoms": [
+        {
+          "atom": "no_decrease_protection",
+          "description": "Amendments must not decrease protection level",
+          "requirement": "Amendments SHALL NOT decrease overall protection of health, safety, and fundamental rights"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "N/A -- constraint on Commission",
+        "what_to_scan": [],
+        "rationale": "Constraint on Commission, not provider obligation"
+      }
+    }
+  ],
+  "summary": {
+    "total_obligations": 8,
+    "classification_rules": 2,
+    "exceptions": 1,
+    "provider_obligations": 1,
+    "commission_obligations": 2,
+    "empowerments": 1,
+    "constraints": 1,
+    "addressee_breakdown": {
+      "provider": 4,
+      "commission": 4
+    },
+    "automation_breakdown": {
+      "full": 0,
+      "partial": 4,
+      "manual": 4
+    }
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "_metadata": {
+    "article": 91,
+    "title": "Power to request documentation and information",
+    "prerequisites": [],
+    "primary_official_source": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689#art_91",
+    "pdf_pages": "111",
+    "decomposition_date": "2026-04-04",
+    "related_standards": {
+      "draft": [],
+      "published": [],
+      "upcoming": []
+    }
+  },
+  "obligations": [
+    {
+      "id": "ART91-OBL-5",
+      "source": "Art. 91(5)",
+      "source_quote": "The provider of the general-purpose AI model concerned, or its representative shall supply the information requested.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "addressee_note": "Provider of a general-purpose AI model (or its representative) when requested by the Commission",
+      "decomposed_atoms": [
+        {
+          "atom": "supply_requested_information",
+          "description": "Provider must supply information requested by the Commission during investigations",
+          "requirement": "The provider SHALL supply the information requested by the Commission"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "low",
+        "detection_method": "documentation_search",
+        "what_to_scan": "GPAI model documentation readiness, Art. 53/55 documentation completeness, information request response procedures",
+        "human_judgment_needed": true
+      },
+      "scope_limitation": "Only applies to providers of general-purpose AI models when requested by the Commission",
+      "context_skip_field": "is_gpai_provider",
+      "cross_references": ["Art. 53", "Art. 55", "Art. 101"]
+    }
+  ],
+  "summary": {
+    "total_obligations": 1,
+    "obligation_count": 1,
+    "prohibition_count": 0,
+    "permission_count": 0,
+    "addressee_breakdown": {
+      "provider": 1
+    },
+    "automation_breakdown": {
+      "full": 0,
+      "partial": 1,
+      "manual": 0
+    }
+  }
+}

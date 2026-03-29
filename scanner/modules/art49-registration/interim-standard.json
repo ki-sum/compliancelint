@@ -1,0 +1,39 @@
+{
+  "_metadata": {
+    "standard_id": "CL-IS-ART49-v0.1",
+    "title": "ComplianceLint Interim Standard for EU AI Act Article 49: Registration",
+    "version": "0.1.0",
+    "date": "2026-04-03",
+    "status": "draft",
+    "disclaimer": "This is an interim standard developed by ComplianceLint. It will be superseded by the CEN-CENELEC harmonized standard.",
+    "basis": [
+      "EU AI Act Article 49 (official text)",
+      "EU AI Act Annex VIII -- Information to be submitted upon registration",
+      "EU AI Act Article 71 -- EU database for high-risk AI systems"
+    ],
+    "awaiting_standard": "EU AI database (Art. 71) operational guidelines"
+  },
+  "requirements": [
+    {
+      "id": "IS-ART49-R01",
+      "obligation_ref": "ART49-OBL-1",
+      "title": "EU Database Registration",
+      "requirement": "The provider MUST register themselves and their high-risk AI system in the EU database before market placement.",
+      "rationale": "Art. 49(1) requires pre-market registration for Annex III systems.",
+      "required_information": [
+        "Provider identity and contact details",
+        "System name and description",
+        "Intended purpose",
+        "Status of the system (on market, withdrawn, recalled)",
+        "Conformity assessment procedure used",
+        "Member States where placed on market",
+        "URL to instructions for use"
+      ]
+    }
+  ],
+  "scoring": {
+    "compliant": "R01 met (registration completed with Annex VIII information)",
+    "partial": "Registration initiated but incomplete",
+    "non_compliant": "No registration"
+  }
+}

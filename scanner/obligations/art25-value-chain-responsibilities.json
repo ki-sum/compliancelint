@@ -1,0 +1,225 @@
+{
+  "_metadata": {
+    "article": 25,
+    "title": "Responsibilities along the AI value chain",
+    "prerequisites": [],
+    "primary_official_source": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689#art_25",
+    "pdf_pages": "66-67",
+    "decomposition_date": "2026-04-04",
+    "related_standards": {
+      "draft": [],
+      "published": [],
+      "upcoming": []
+    }
+  },
+  "obligations": [
+    {
+      "id": "ART25-CLS-1",
+      "source": "Art. 25(1)",
+      "source_quote": "Any distributor, importer, deployer or other third-party shall be considered to be a provider of a high-risk AI system for the purposes of this Regulation and shall be subject to the obligations of the provider under Article 16, in any of the following circumstances: (a) they put their name or trademark on a high-risk AI system already placed on the market or put into service, without prejudice to contractual arrangements stipulating that the obligations are otherwise allocated; (b) they make a substantial modification to a high-risk AI system that has already been placed on the market or has already been put into service in such a way that it remains a high-risk AI system pursuant to Article 6; (c) they modify the intended purpose of an AI system, including a general-purpose AI system, which has not been classified as high-risk and has already been placed on the market or put into service in such a way that the AI system concerned becomes a high-risk AI system in accordance with Article 6.",
+      "deontic_type": "classification_rule",
+      "modality": "shall",
+      "addressee": "both",
+      "addressee_note": "Any distributor, importer, deployer, or other third-party who modifies or rebrands an AI system",
+      "decomposed_atoms": [
+        {
+          "atom": "rebranding_triggers_provider_status",
+          "description": "Putting name/trademark on existing high-risk AI system makes the party a provider",
+          "requirement": "Any party that puts their name or trademark on a high-risk AI system SHALL be considered a provider and subject to Art. 16 obligations"
+        },
+        {
+          "atom": "substantial_modification_triggers_provider_status",
+          "description": "Making a substantial modification to a high-risk AI system makes the modifier a provider",
+          "requirement": "Any party that makes a substantial modification to a high-risk AI system (remaining high-risk per Art. 6) SHALL be considered a provider"
+        },
+        {
+          "atom": "purpose_change_triggers_provider_status",
+          "description": "Modifying intended purpose to make system high-risk makes the modifier a provider",
+          "requirement": "Any party that modifies the intended purpose of an AI system causing it to become high-risk per Art. 6 SHALL be considered a provider"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "context_analysis",
+        "what_to_scan": "Project metadata for rebranding indicators, modification history, intended purpose documentation, upstream AI system integration details",
+        "human_judgment_needed": true
+      },
+      "cross_references": ["Art. 6", "Art. 16"]
+    },
+    {
+      "id": "ART25-OBL-2",
+      "source": "Art. 25(2)",
+      "source_quote": "That initial provider shall closely cooperate with new providers and shall make available the necessary information and provide the reasonably expected technical access and other assistance that are required for the fulfilment of the obligations set out in this Regulation, in particular regarding the compliance with the conformity assessment of high-risk AI systems.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "addressee_note": "Initial provider that originally placed the AI system on the market",
+      "decomposed_atoms": [
+        {
+          "atom": "initial_provider_cooperates",
+          "description": "Initial provider must closely cooperate with new providers",
+          "requirement": "The initial provider SHALL closely cooperate with new providers"
+        },
+        {
+          "atom": "initial_provider_shares_information",
+          "description": "Initial provider must make available necessary information and technical access",
+          "requirement": "The initial provider SHALL make available the necessary information and provide reasonably expected technical access and other assistance required for compliance"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "low",
+        "detection_method": "documentation_search",
+        "what_to_scan": "Upstream provider agreements, technical documentation transfer records, cooperation documentation",
+        "human_judgment_needed": true
+      }
+    },
+    {
+      "id": "ART25-EXC-2",
+      "source": "Art. 25(2)",
+      "source_quote": "This paragraph shall not apply in cases where the initial provider has clearly specified that its AI system is not to be changed into a high-risk AI system and therefore does not fall under the obligation to hand over the documentation.",
+      "deontic_type": "exception",
+      "modality": "shall not",
+      "addressee": "provider",
+      "addressee_note": "Initial provider that specified system should not be changed into high-risk",
+      "decomposed_atoms": [
+        {
+          "atom": "opt_out_clearly_specified",
+          "description": "Initial provider can opt out of cooperation obligation by clearly specifying system is not to be made high-risk",
+          "requirement": "The cooperation obligation does NOT apply if the initial provider has clearly specified that the AI system is not to be changed into a high-risk AI system"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "low",
+        "detection_method": "documentation_search",
+        "what_to_scan": "License terms, usage restrictions, upstream provider documentation for opt-out clauses",
+        "human_judgment_needed": true
+      }
+    },
+    {
+      "id": "ART25-CLS-3",
+      "source": "Art. 25(3)",
+      "source_quote": "In the case of high-risk AI systems that are safety components of products covered by the Union harmonisation legislation listed in Section A of Annex I, the product manufacturer shall be considered to be the provider of the high-risk AI system, and shall be subject to the obligations under Article 16 under either of the following circumstances: (a) the high-risk AI system is placed on the market together with the product under the name or trademark of the product manufacturer; (b) the high-risk AI system is put into service under the name or trademark of the product manufacturer after the product has been placed on the market.",
+      "deontic_type": "classification_rule",
+      "modality": "shall",
+      "addressee": "provider",
+      "addressee_note": "Product manufacturer of products covered by Annex I Union harmonisation legislation",
+      "decomposed_atoms": [
+        {
+          "atom": "product_manufacturer_is_provider_when_cobranded",
+          "description": "Product manufacturer becomes the AI provider when AI is placed on market under their name",
+          "requirement": "Product manufacturer SHALL be considered provider when the high-risk AI system is placed on the market together with the product under their name or trademark"
+        },
+        {
+          "atom": "product_manufacturer_is_provider_when_postmarket_branded",
+          "description": "Product manufacturer becomes provider when AI is put into service under their name after product is on market",
+          "requirement": "Product manufacturer SHALL be considered provider when the high-risk AI system is put into service under their name after the product has been placed on the market"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "low",
+        "detection_method": "context_analysis",
+        "what_to_scan": "Product packaging metadata, brand/trademark usage, Annex I product classification",
+        "human_judgment_needed": true
+      },
+      "cross_references": ["Art. 16", "Annex I Section A"],
+      "scope_limitation": "Only applies to high-risk AI systems that are safety components of products covered by Annex I",
+      "context_skip_field": "is_safety_component_annex_i"
+    },
+    {
+      "id": "ART25-OBL-4",
+      "source": "Art. 25(4)",
+      "source_quote": "The provider of a high-risk AI system and the third party that supplies an AI system, tools, services, components, or processes that are used or integrated in a high-risk AI system shall, by written agreement, specify the necessary information, capabilities, technical access and other assistance based on the generally acknowledged state of the art, in order to enable the provider of the high-risk AI system to fully comply with the obligations set out in this Regulation.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "addressee_note": "Provider of a high-risk AI system AND the third party supplying AI components",
+      "decomposed_atoms": [
+        {
+          "atom": "written_agreement_with_third_party",
+          "description": "Written agreement must exist between provider and third-party suppliers",
+          "requirement": "The provider and third-party supplier SHALL specify in a written agreement the necessary information, capabilities, technical access, and other assistance"
+        },
+        {
+          "atom": "agreement_enables_full_compliance",
+          "description": "Agreement must enable the provider to fully comply with the Regulation",
+          "requirement": "The written agreement SHALL be based on the generally acknowledged state of the art and enable the provider to fully comply with the obligations set out in this Regulation"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "documentation_search",
+        "what_to_scan": "Third-party supplier agreements, vendor contracts, component supply documentation, open-source license files",
+        "human_judgment_needed": true
+      }
+    },
+    {
+      "id": "ART25-EXC-4",
+      "source": "Art. 25(4)",
+      "source_quote": "This paragraph shall not apply to third parties making accessible to the public tools, services, processes, or components, other than general-purpose AI models, under a free and open-source licence.",
+      "deontic_type": "exception",
+      "modality": "shall not",
+      "addressee": "provider",
+      "addressee_note": "Third parties providing open-source tools/services (except GPAI models)",
+      "decomposed_atoms": [
+        {
+          "atom": "open_source_exception",
+          "description": "Written agreement requirement does not apply to open-source third-party components (except GPAI models)",
+          "requirement": "The written agreement obligation does NOT apply to third parties providing tools, services, processes, or components under a free and open-source licence (except general-purpose AI models)"
+        }
+      ],
+      "automation_assessment": {
+        "level": "full",
+        "confidence": "high",
+        "detection_method": "code_pattern_search",
+        "what_to_scan": "License files, dependency manifests, open-source declarations for third-party AI components",
+        "human_judgment_needed": false
+      }
+    },
+    {
+      "id": "ART25-SAV-5",
+      "source": "Art. 25(5)",
+      "source_quote": "Paragraphs 2 and 3 are without prejudice to the need to observe and protect intellectual property rights, confidential business information and trade secrets in accordance with Union and national law.",
+      "deontic_type": "savings_clause",
+      "modality": "shall not",
+      "addressee": "both",
+      "addressee_note": "Provider and third parties — IP and trade secret protection boundary",
+      "decomposed_atoms": [
+        {
+          "atom": "ip_protection_preserved",
+          "description": "Cooperation and information-sharing obligations do not override IP/trade secret protections",
+          "requirement": "The obligations in paragraphs 2 and 3 are without prejudice to the need to observe and protect intellectual property rights, confidential business information, and trade secrets"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "documentation_search",
+        "what_to_scan": "IP protection clauses in agreements, NDA documentation, trade secret policies",
+        "human_judgment_needed": true
+      }
+    }
+  ],
+  "summary": {
+    "total_obligations": 7,
+    "obligation_count": 2,
+    "prohibition_count": 0,
+    "permission_count": 0,
+    "classification_rule_count": 2,
+    "exception_count": 2,
+    "savings_clause_count": 1,
+    "addressee_breakdown": {
+      "provider": 5,
+      "both": 2
+    },
+    "automation_breakdown": {
+      "full": 1,
+      "partial": 5,
+      "manual": 1
+    }
+  }
+}

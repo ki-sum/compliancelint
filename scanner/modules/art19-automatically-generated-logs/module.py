@@ -1,0 +1,416 @@
+"""
+Article 19: Automatically generated logs — Module implementation using unified protocol.
+
+Art. 19 requires providers of high-risk AI systems to keep automatically generated
+logs from Art. 12(1) for at least six months. Financial institutions must integrate
+these logs into their financial services documentation.
+
+This module reads AI-provided compliance_answers["art19"] and maps each answer
+to a Finding. Falls back to art12 retention fields if art19 answers not provided.
+No regex, keyword, or detector.py scanning is performed — detection is entirely
+the AI's responsibility.
+
+Obligation mapping:
+  ART19-OBL-1   → has_log_retention (provider keeps Art. 12(1) logs)
+  ART19-OBL-1b  → has_retention_config + retention_days (>= 180 day minimum)
+  ART19-OBL-2   → context_skip_field: is_financial_institution (gap_findings handles this)
+"""
+
+import os
+import sys
+from datetime import datetime, timezone
+
+# Add core to path
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
+
+from core.protocol import (
+    BaseArticleModule, ScanResult, Explanation, ActionPlan, ActionItem,
+    Finding, ComplianceLevel, Confidence, GapType,
+)
+from core.obligation_engine import ObligationEngine
+
+RETENTION_MINIMUM_DAYS = 180
+
+
+class Art19Module(BaseArticleModule):
+    """Article 19: Automatically generated logs compliance module."""
+
+    def __init__(self):
+        super().__init__(
+            module_dir=os.path.dirname(os.path.abspath(__file__)),
+            article_number=19,
+            article_title="Automatically generated logs",
+        )
+
+    def scan(self, project_path: str) -> ScanResult:
+        """Scan for log retention compliance using AI-provided answers.
+
+        Reads compliance_answers["art19"] from the AI context. Falls back
+        to compliance_answers["art12"] for retention fields if art19 not provided.
+
+        Args:
+            project_path: Absolute path to the project directory to scan.
+
+        Returns:
+            ScanResult with findings for each log retention obligation.
+        """
+        project_path = os.path.abspath(project_path)
+        ctx = self._effective_ctx(project_path)
+        na = self._scope_gate(ctx, project_path)
+        if na:
+            return na
+
+        # Art. 19 applies only to high-risk AI systems.
+        risk = (ctx.risk_classification or "").lower().strip()
+        conf = (ctx.risk_classification_confidence or "").lower().strip()
+        if risk in self._NOT_HIGH_RISK_VALUES and conf in ("high", "medium"):
+            return self._not_applicable_result(
+                project_path,
+                ctx.primary_language or "unknown",
+                "ART19",
+                legal_basis="Art. 6",
+                reason=(
+                    "Art. 19 obligations apply only to providers of high-risk AI systems "
+                    "(as classified under Art. 6). This system has been classified as "
+                    f"'{ctx.risk_classification}' with {conf} confidence."
+                ),
+            )
+
+        index = self._build_index(project_path)
+        language = self._detect_language(project_path)
+        file_count = index.source_file_count
+        findings: list[Finding] = self._ctx_warnings(ctx)
+
+        answers = ctx.get_article_answers("art19")
+
+        # Fall back to art12 retention fields if art19 answers not provided
+        if not answers:
+            art12 = ctx.get_article_answers("art12")
+            answers = {
+                "has_log_retention": art12.get("has_retention_config"),
+                "has_retention_config": art12.get("has_retention_config"),
+                "retention_days": art12.get("retention_days"),
+                "retention_evidence": art12.get("retention_evidence", ""),
+            }
+
+        has_log_retention = answers.get("has_log_retention")
+        if has_log_retention is None:
+            has_log_retention = answers.get("has_retention_config")
+
+        has_retention_config = answers.get("has_retention_config")
+        if has_retention_config is None:
+            has_retention_config = answers.get("has_retention_policy")  # alias
+        retention_days = answers.get("retention_days")
+        retention_evidence = answers.get("retention_evidence", "")
+
+        # ── ART19-OBL-1: Provider keeps Art. 12(1) logs ──
+        findings.append(self._finding_from_answer(
+            obligation_id="ART19-OBL-1",
+            answer=has_log_retention,
+            true_description=(
+                "Log retention mechanism detected. Provider keeps automatically "
+                "generated logs from Art. 12(1)."
+                + (f" Evidence: {retention_evidence}" if retention_evidence else "")
+            ),
+            false_description=(
+                "No log retention mechanism detected. Art. 19(1) requires providers "
+                "to keep logs referred to in Art. 12(1), automatically generated by "
+                "their high-risk AI systems."
+            ),
+            none_description=(
+                "AI could not determine whether the provider keeps Art. 12(1) logs. "
+                "Manual review of log storage and retention infrastructure required."
+            ),
+            gap_type=GapType.CODE,
+        ))
+
+        # ── ART19-OBL-1b: Minimum 6-month retention period ──
+        # Multi-value comparison (retention_days >= 180) requires custom logic
+        # per boundary case rules in methodology.
+        findings.append(self._make_retention_finding(
+            has_retention_config=has_retention_config,
+            retention_days=retention_days,
+            retention_evidence=retention_evidence,
+        ))
+
+        # ART19-OBL-2 (financial institution) is handled by the obligation engine's
+        # gap_findings via context_skip_field "is_financial_institution".
+        # When is_financial_institution=false -> NOT_APPLICABLE.
+        # When is_financial_institution=true -> gap finding (manual verification needed).
+        # When not provided -> CONDITIONAL (ask user).
+
+        # Build details dict
+        details = {
+            "has_log_retention": has_log_retention,
+            "has_retention_config": has_retention_config,
+            "retention_days": retention_days,
+            "retention_minimum_days": RETENTION_MINIMUM_DAYS,
+        }
+
+        # ── Obligation Engine: enrich findings + identify gaps ──
+        obligations = self._load_obligations()
+        if obligations:
+            engine = ObligationEngine(obligations)
+            findings = [engine.enrich_finding(f) for f in findings]
+            gap_findings = engine.gap_findings(findings, ctx.compliance_answers if ctx else None)
+            findings.extend(gap_findings)
+            details["obligation_coverage"] = {
+                "total_obligations": len(engine.obligations),
+                "covered_by_scan": len(engine.obligations) - len(gap_findings),
+                "coverage_gaps": len([g for g in gap_findings if g.level != ComplianceLevel.NOT_APPLICABLE]),
+                "gap_obligation_ids": [f.obligation_id for f in gap_findings],
+            }
+
+        findings = self._cap_findings(findings)
+
+        return ScanResult(
+            article_number=19,
+            article_title="Automatically generated logs",
+            project_path=project_path,
+            scan_date=datetime.now(timezone.utc).isoformat(),
+            files_scanned=file_count,
+            language_detected=language,
+            overall_level=self._compute_overall_level(findings),
+            overall_confidence=Confidence.MEDIUM,
+            findings=findings,
+            details=details,
+        )
+
+    # ── Private helpers ──
+
+    def _make_retention_finding(
+        self,
+        has_retention_config,
+        retention_days,
+        retention_evidence: str,
+    ) -> Finding:
+        """Build the ART19-OBL-1b retention finding from AI answers.
+
+        Rules:
+          - has_retention_config=True, retention_days >= 180  -> PARTIAL (compliant threshold)
+          - has_retention_config=True, retention_days < 180   -> NON_COMPLIANT
+          - has_retention_config=True, retention_days=None    -> PARTIAL (period unknown)
+          - has_retention_config=False                        -> NON_COMPLIANT
+          - has_retention_config=None                         -> UNABLE_TO_DETERMINE
+        """
+        if has_retention_config is None:
+            return Finding(
+                obligation_id="ART19-OBL-1b",
+                file_path="project-wide",
+                line_number=None,
+                level=ComplianceLevel.UNABLE_TO_DETERMINE,
+                confidence=Confidence.LOW,
+                description=(
+                    "AI could not determine whether a log retention period is configured. "
+                    f"Art. 19(1) requires a minimum of {RETENTION_MINIMUM_DAYS} days (6 months)."
+                    + (f" Evidence: {retention_evidence}" if retention_evidence else "")
+                ),
+                gap_type=GapType.CODE,
+            )
+
+        if has_retention_config is False:
+            return Finding(
+                obligation_id="ART19-OBL-1b",
+                file_path="project-wide",
+                line_number=None,
+                level=ComplianceLevel.NON_COMPLIANT,
+                confidence=Confidence.MEDIUM,
+                description=(
+                    f"No retention period configured. "
+                    f"Art. 19(1) requires a minimum of {RETENTION_MINIMUM_DAYS} days (6 months)."
+                ),
+                remediation=(
+                    f"Configure log retention for at least {RETENTION_MINIMUM_DAYS} days. "
+                    "Options: logrotate (rotate 180), Docker json-file max-file:180, "
+                    "AWS CloudWatch retention_in_days:180, or equivalent."
+                ),
+                gap_type=GapType.CODE,
+            )
+
+        # has_retention_config is True
+        if retention_days is None:
+            return Finding(
+                obligation_id="ART19-OBL-1b",
+                file_path="project-wide",
+                line_number=None,
+                level=ComplianceLevel.PARTIAL,
+                confidence=Confidence.LOW,
+                description=(
+                    "Retention configuration found but period could not be determined. "
+                    f"Art. 19(1) requires a minimum of {RETENTION_MINIMUM_DAYS} days (6 months)."
+                    + (f" Evidence: {retention_evidence}" if retention_evidence else "")
+                ),
+                remediation=(
+                    f"Verify the configured retention period meets the {RETENTION_MINIMUM_DAYS}-day minimum."
+                ),
+                gap_type=GapType.CODE,
+            )
+
+        if retention_days >= RETENTION_MINIMUM_DAYS:
+            return Finding(
+                obligation_id="ART19-OBL-1b",
+                file_path="project-wide",
+                line_number=None,
+                level=ComplianceLevel.PARTIAL,
+                confidence=Confidence.MEDIUM,
+                description=(
+                    f"Retention configured: {retention_days} days "
+                    f"(>= {RETENTION_MINIMUM_DAYS}-day minimum per Art. 19(1))."
+                    + (f" Evidence: {retention_evidence}" if retention_evidence else "")
+                ),
+                gap_type=GapType.CODE,
+            )
+        else:
+            return Finding(
+                obligation_id="ART19-OBL-1b",
+                file_path="project-wide",
+                line_number=None,
+                level=ComplianceLevel.NON_COMPLIANT,
+                confidence=Confidence.MEDIUM,
+                description=(
+                    f"Retention of {retention_days} days is below the "
+                    f"{RETENTION_MINIMUM_DAYS}-day minimum required by Art. 19(1)."
+                    + (f" Evidence: {retention_evidence}" if retention_evidence else "")
+                ),
+                remediation=(
+                    f"Increase log retention to at least {RETENTION_MINIMUM_DAYS} days "
+                    f"(currently {retention_days} days)."
+                ),
+                gap_type=GapType.CODE,
+            )
+
+    def explain(self) -> Explanation:
+        return Explanation(
+            article_number=19,
+            article_title="Automatically generated logs",
+            one_sentence="Providers of high-risk AI systems must keep automatically generated logs for at least six months.",
+            official_summary=(
+                "Art. 19 requires providers to keep the automatically generated logs "
+                "referred to in Art. 12(1), to the extent such logs are under their control. "
+                "Logs must be kept for at least six months, unless otherwise provided by "
+                "applicable Union or national law. Financial institutions must maintain these "
+                "logs as part of their financial services law documentation."
+            ),
+            related_articles={
+                "Art. 12(1)": "Defines the logging requirements that Art. 19 retention applies to",
+                "Art. 26(6)": "Deployer log retention obligations (parallel to provider)",
+                "Art. 72": "Post-market monitoring (logs support this)",
+            },
+            recital=(
+                "Recital 71: Logging is required to 'enable traceability, verify compliance, "
+                "and facilitate post-market monitoring.' Art. 19 ensures these logs are retained."
+            ),
+            automation_summary={
+                "fully_automatable": [
+                    "Log retention configuration detection",
+                    "Retention period threshold verification (>= 180 days)",
+                    "Log storage mechanism detection",
+                ],
+                "partially_automatable": [
+                    "Retention period appropriateness to intended purpose",
+                    "Log coverage completeness (all Art. 12(1) logs retained)",
+                ],
+                "requires_human_judgment": [
+                    "Financial institution log integration assessment",
+                    "National law override of 6-month minimum",
+                ],
+            },
+            compliance_checklist_summary=(
+                "ComplianceLint Compliance Checklist v0.1 requires: (1) log storage mechanism "
+                "for Art. 12(1) logs, (2) minimum 180-day (6-month) retention period, "
+                "(3) financial institutions must integrate into financial services documentation. "
+                "Based on: ISO/IEC DIS 24970:2025, ISO/IEC 42001:2023."
+            ),
+            enforcement_date="2026-08-02",
+            waiting_for="CEN-CENELEC harmonized standard (expected Q4 2026)",
+        )
+
+    def action_plan(self, scan_result: ScanResult) -> ActionPlan:
+        actions = []
+        details = scan_result.details
+
+        if details.get("has_log_retention") is False:
+            actions.append(ActionItem(
+                priority="CRITICAL",
+                article="Art. 19(1)",
+                action="Implement log retention for Art. 12(1) logs",
+                details=(
+                    "Art. 19(1) requires providers to keep automatically generated logs "
+                    "from Art. 12(1). Implement persistent log storage that retains system "
+                    "event logs beyond the current session.\n"
+                    "\n"
+                    "Options:\n"
+                    "  - File-based: logrotate with daily rotation\n"
+                    "  - Cloud: CloudWatch Logs, Stackdriver, Azure Monitor\n"
+                    "  - Self-hosted: ELK Stack, Loki + Grafana"
+                ),
+                effort="2-4 hours",
+            ))
+
+        if details.get("has_retention_config") is False:
+            actions.append(ActionItem(
+                priority="HIGH",
+                article="Art. 19(1)",
+                action=f"Configure log retention period (>= {RETENTION_MINIMUM_DAYS} days / 6 months)",
+                details=(
+                    f"Art. 19(1) requires a minimum {RETENTION_MINIMUM_DAYS}-day log retention.\n"
+                    "\n"
+                    "  Option A: logrotate (Linux)\n"
+                    "    /var/log/ai-system/*.log {\n"
+                    "        daily\n"
+                    f"        rotate {RETENTION_MINIMUM_DAYS}\n"
+                    "        compress\n"
+                    "    }\n"
+                    "\n"
+                    "  Option B: Docker Compose\n"
+                    "    logging:\n"
+                    "      options:\n"
+                    f"        max-file: \"{RETENTION_MINIMUM_DAYS}\"\n"
+                    "\n"
+                    "  Option C: Cloud (AWS)\n"
+                    f"    retention_in_days: {RETENTION_MINIMUM_DAYS}"
+                ),
+                effort="1 hour",
+            ))
+        elif (
+            details.get("has_retention_config") is True
+            and details.get("retention_days") is not None
+            and details["retention_days"] < RETENTION_MINIMUM_DAYS
+        ):
+            current_days = details["retention_days"]
+            actions.append(ActionItem(
+                priority="HIGH",
+                article="Art. 19(1)",
+                action=f"Increase log retention from {current_days} to >= {RETENTION_MINIMUM_DAYS} days",
+                details=(
+                    f"Current retention of {current_days} days is below the "
+                    f"{RETENTION_MINIMUM_DAYS}-day minimum required by Art. 19(1)."
+                ),
+                effort="30 minutes",
+            ))
+
+        actions.append(ActionItem(
+            priority="LOW",
+            article="Art. 19(2)",
+            action="Check if financial services log integration applies",
+            details=(
+                "If the provider is a financial institution subject to Union financial "
+                "services law, Art. 19(2) requires maintaining AI system logs as part of "
+                "the documentation kept under relevant financial services law."
+            ),
+            effort="1 hour",
+            action_type="human_judgment_required",
+        ))
+
+        return ActionPlan(
+            article_number=19,
+            article_title="Automatically generated logs",
+            project_path=scan_result.project_path,
+            actions=actions,
+            disclaimer="Based on ComplianceLint compliance checklist. Official CEN-CENELEC standards (expected Q4 2026) may modify these requirements.",
+        )
+
+
+# Module entry point — used by auto-discovery
+def create_module() -> Art19Module:
+    return Art19Module()

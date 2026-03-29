@@ -1,0 +1,68 @@
+{
+  "_metadata": {
+    "standard_id": "CL-IS-ART73-v0.1",
+    "title": "ComplianceLint Interim Standard for EU AI Act Article 73: Reporting of Serious Incidents",
+    "version": "0.1.0",
+    "date": "2026-04-03",
+    "status": "draft",
+    "disclaimer": "This is an interim standard developed by ComplianceLint. It will be superseded when CEN-CENELEC publishes the harmonized standard for AI incident reporting.",
+    "basis": [
+      "EU AI Act Article 73 (official text)",
+      "EU AI Act Recitals 134-136 (legislative intent on incident reporting)",
+      "ISO/IEC 42001:2023 -- AI management system",
+      "ISO 9001:2015 -- Quality management systems (nonconformity and corrective action)",
+      "EU Decision 768/2008/EC -- New Legislative Framework (market surveillance)"
+    ],
+    "awaiting_standard": "CEN-CENELEC harmonized standard for AI incident reporting (expected Q4 2026)"
+  },
+
+  "requirements": [
+    {
+      "id": "IS-ART73-R01",
+      "obligation_ref": "ART73-OBL-1",
+      "title": "Serious Incident Reporting Procedure",
+      "requirement": "The provider MUST have a documented procedure for reporting serious incidents to the market surveillance authorities of the Member States where the incident occurred.",
+      "rationale": "Art. 73(1) requires reporting of all serious incidents to the relevant authority.",
+      "required_content": [
+        "Definition of serious incident per the AI Act",
+        "Incident detection and classification procedures",
+        "Authority contact information per Member State",
+        "Reporting templates and required information",
+        "Escalation chain and responsible persons"
+      ]
+    },
+    {
+      "id": "IS-ART73-R02",
+      "obligation_ref": ["ART73-OBL-2", "ART73-OBL-3", "ART73-OBL-4"],
+      "title": "Reporting Timelines",
+      "requirement": "The provider MUST ensure reporting within the legally mandated timelines: 15 days for general serious incidents, 2 days for widespread infringement, 10 days for incidents involving death.",
+      "rationale": "Art. 73(2)-(4) specify differentiated reporting deadlines based on incident severity.",
+      "acceptable_implementations": [
+        "Incident response runbook with timeline-based escalation tiers",
+        "Automated alerting system with deadline tracking",
+        "Incident management system with SLA enforcement",
+        "On-call rotation with authority for expedited reporting"
+      ]
+    },
+    {
+      "id": "IS-ART73-R03",
+      "obligation_ref": "ART73-OBL-5",
+      "title": "Incident Investigation and Corrective Action",
+      "requirement": "The provider MUST perform necessary investigations without delay after a serious incident, including risk assessment and corrective action.",
+      "rationale": "Art. 73(6) requires immediate investigation with risk assessment and corrective measures.",
+      "required_content": [
+        "Investigation methodology and root cause analysis",
+        "Risk assessment of the incident and its potential recurrence",
+        "Corrective action plan with timelines",
+        "Verification that corrective actions are effective",
+        "Documentation and lessons learned"
+      ]
+    }
+  ],
+
+  "scoring": {
+    "compliant": "R01 + R02 + R03 all met",
+    "partial": "At least R01 met",
+    "non_compliant": "R01 not met"
+  }
+}

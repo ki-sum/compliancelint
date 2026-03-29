@@ -1,0 +1,78 @@
+{
+  "_metadata": {
+    "standard_id": "CL-IS-ART04-v0.1",
+    "title": "ComplianceLint Interim Standard for EU AI Act Article 4: AI Literacy",
+    "version": "0.1.0",
+    "date": "2026-04-03",
+    "status": "draft",
+    "disclaimer": "This is an interim standard developed by ComplianceLint based on available guidance, industry best practices, and relevant ISO standards. It is NOT an official standard. It will be superseded when CEN-CENELEC publishes guidance for Article 4.",
+    "basis": [
+      "EU AI Act Article 4 (official text)",
+      "EU AI Act Recital 91 (legislative intent on AI literacy)",
+      "ISO/IEC 42001:2023 -- AI management system (Clause 7.2 Competence, 7.3 Awareness)",
+      "ISO/IEC TR 24368:2022 -- Overview of ethical and societal concerns",
+      "OECD AI Principles -- Human-centred values and fairness",
+      "UNESCO Recommendation on the Ethics of AI (2021)"
+    ],
+    "awaiting_standard": "AI Office guidance on Art. 4 implementation (no formal harmonized standard expected)"
+  },
+
+  "requirements": [
+    {
+      "id": "IS-ART04-R01",
+      "obligation_ref": "ART04-OBL-1",
+      "title": "AI Literacy Training Program",
+      "requirement": "The organization MUST establish and maintain an AI literacy program for all persons dealing with the operation and use of AI systems.",
+      "rationale": "Art. 4 requires 'measures to ensure a sufficient level of AI literacy.' A structured training program is the primary mechanism for achieving this.",
+      "required_content": [
+        "Overview of AI capabilities and limitations relevant to the organization",
+        "Risks and potential biases of AI systems in use",
+        "Responsibilities when operating or relying on AI outputs",
+        "Affected persons and groups — how to consider their rights",
+        "Escalation procedures for uncertain or high-risk AI decisions",
+        "Regulatory context (EU AI Act basics relevant to role)"
+      ],
+      "acceptable_formats": [
+        "Internal training materials (slides, videos, e-learning)",
+        "Competency framework with AI-specific competencies",
+        "Onboarding documentation covering AI tools",
+        "Workshop or seminar records with attendance",
+        "External certification programs (AI ethics, responsible AI)"
+      ]
+    },
+    {
+      "id": "IS-ART04-R02",
+      "obligation_ref": "ART04-OBL-1",
+      "title": "AI Usage Policy",
+      "requirement": "The organization SHOULD maintain an AI usage policy documenting how AI systems are to be operated and used by staff.",
+      "rationale": "An AI usage policy demonstrates that the organization has considered the context of use and affected persons, as required by Art. 4.",
+      "required_content": [
+        "List of AI systems in use and their intended purposes",
+        "Approved use cases and explicitly prohibited uses",
+        "Data handling requirements when using AI systems",
+        "Human oversight and review requirements",
+        "Incident reporting procedures for AI-related issues",
+        "Review and update schedule"
+      ]
+    },
+    {
+      "id": "IS-ART04-R03",
+      "obligation_ref": "ART04-OBL-1",
+      "title": "Role-Specific Training Differentiation",
+      "requirement": "AI literacy training SHOULD be differentiated based on roles, taking into account technical knowledge, experience, and training of staff.",
+      "rationale": "Art. 4 explicitly requires 'taking into account their technical knowledge, experience, education and training.' One-size-fits-all training does not meet this requirement.",
+      "acceptable_implementations": [
+        "Developer track: AI/ML fundamentals, bias detection, testing",
+        "Operator track: system monitoring, escalation, override procedures",
+        "Decision-maker track: AI limitations, accountability, affected persons",
+        "Executive track: regulatory obligations, organizational responsibility"
+      ]
+    }
+  ],
+
+  "scoring": {
+    "compliant": "R01 met + at least one of R02, R03 met",
+    "partial": "R01 partially met (some training exists) or only R02 met",
+    "non_compliant": "No training program and no AI usage policy"
+  }
+}

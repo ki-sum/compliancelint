@@ -1,0 +1,91 @@
+{
+  "_metadata": {
+    "article": 21,
+    "title": "Cooperation with competent authorities",
+    "prerequisites": [
+      {
+        "type": "risk_classification",
+        "required_level": "high-risk",
+        "source_article": 6,
+        "context_field": "risk_classification",
+        "skip_when": "not high-risk with medium/high confidence"
+      }
+    ],
+    "primary_official_source": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689#art_21",
+    "pdf_pages": "64",
+    "decomposition_date": "2026-04-04",
+    "related_standards": {
+      "draft": [],
+      "published": [],
+      "upcoming": []
+    }
+  },
+  "obligations": [
+    {
+      "id": "ART21-OBL-1",
+      "source": "Art. 21(1)",
+      "source_quote": "Providers of high-risk AI systems shall, upon a reasoned request by a competent authority, provide that authority all the information and documentation necessary to demonstrate the conformity of the high-risk AI system with the requirements set out in Section 2, in a language which can be easily understood by the authority in one of the official languages of the institutions of the Union as indicated by the Member State concerned.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "addressee_note": "Provider of a high-risk AI system (as defined in Art. 3(3))",
+      "decomposed_atoms": [
+        {
+          "atom": "provide_conformity_information",
+          "description": "Provider must provide all information and documentation to demonstrate conformity upon authority request",
+          "requirement": "The provider SHALL provide all information and documentation necessary to demonstrate conformity with Section 2 requirements upon a reasoned request by a competent authority"
+        },
+        {
+          "atom": "information_in_official_language",
+          "description": "Information must be in an official EU language easily understood by the authority",
+          "requirement": "Information SHALL be provided in a language which can be easily understood by the authority in one of the official languages of the EU institutions"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "documentation_search",
+        "what_to_scan": "Compliance documentation availability, language support for documentation, authority request response procedures",
+        "human_judgment_needed": true
+      }
+    },
+    {
+      "id": "ART21-OBL-2",
+      "source": "Art. 21(2)",
+      "source_quote": "Upon a reasoned request by a competent authority, providers shall also give the requesting competent authority, as applicable, access to the automatically generated logs of the high-risk AI system referred to in Article 12(1), to the extent such logs are under their control.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "addressee_note": "Provider of a high-risk AI system",
+      "decomposed_atoms": [
+        {
+          "atom": "provide_log_access_to_authority",
+          "description": "Provider must give authority access to auto-generated logs when requested",
+          "requirement": "The provider SHALL give the competent authority access to the automatically generated logs referred to in Art. 12(1), to the extent such logs are under their control"
+        }
+      ],
+      "automation_assessment": {
+        "level": "full",
+        "confidence": "high",
+        "detection_method": "code_pattern_search",
+        "what_to_scan": "Log export mechanisms, log access APIs, log retrieval procedures, log storage accessibility",
+        "human_judgment_needed": false
+      },
+      "cross_references": ["Art. 12(1)"]
+    }
+  ],
+  "summary": {
+    "total_obligations": 2,
+    "obligation_count": 2,
+    "prohibition_count": 0,
+    "permission_count": 0,
+    "addressee_breakdown": {
+      "provider": 2
+    },
+    "automation_breakdown": {
+      "full": 1,
+      "partial": 1,
+      "manual": 0
+    }
+  }
+}

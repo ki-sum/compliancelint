@@ -1,0 +1,79 @@
+{
+  "_metadata": {
+    "article": 4,
+    "title": "AI Literacy",
+    "prerequisites": [],
+    "decomposition_date": "2026-04-03",
+    "primary_official_source": {
+      "name": "EUR-Lex -- Official Journal of the European Union",
+      "eli_uri": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng",
+      "celex": "32024R1689",
+      "oj_citation": "OJ L 2024/1689, 12.7.2024"
+    },
+    "pdf_pages": [51],
+    "related_standards": {
+      "published": [
+        "ISO/IEC 42001:2023 -- AI management system (Clause 7.2 Competence, 7.3 Awareness)",
+        "ISO/IEC TR 24368:2022 -- Overview of ethical and societal concerns"
+      ],
+      "upcoming": [
+        "CEN-CENELEC harmonized standard for AI literacy (expected Q4 2026)"
+      ]
+    }
+  },
+  "obligations": [
+    {
+      "id": "ART04-OBL-1",
+      "source": "Art. 4",
+      "source_quote": "Providers and deployers of AI systems shall take measures to ensure, to their best extent, a sufficient level of AI literacy of their staff and other persons dealing with the operation and use of AI systems on their behalf, taking into account their technical knowledge, experience, education and training and the context the AI systems are to be used in, and considering the persons or groups of persons on whom the AI systems are to be used.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider_and_deployer",
+      "decomposed_atoms": [
+        {
+          "atom": "measures_taken_for_ai_literacy",
+          "description": "Provider/deployer must take measures to ensure AI literacy",
+          "requirement": "SHALL take measures to ensure a sufficient level of AI literacy"
+        },
+        {
+          "atom": "staff_literacy_covered",
+          "description": "AI literacy must cover staff dealing with operation and use",
+          "requirement": "Literacy SHALL cover staff and other persons dealing with operation and use of AI systems on their behalf"
+        },
+        {
+          "atom": "context_considered",
+          "description": "Must consider technical knowledge, experience, education, training, and context",
+          "requirement": "SHALL take into account technical knowledge, experience, education and training and the context the AI systems are to be used in"
+        },
+        {
+          "atom": "affected_persons_considered",
+          "description": "Must consider persons on whom the AI systems are to be used",
+          "requirement": "SHALL consider the persons or groups of persons on whom the AI systems are to be used"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check for AI training documentation, AI usage policies, competency frameworks, staff onboarding materials mentioning AI, and internal AI guidelines",
+        "what_to_scan": [
+          "documentation",
+          "config"
+        ],
+        "human_judgment_needed": "Whether the measures taken are sufficient and proportionate to the context. AI literacy is an organizational obligation — code scanning can detect documentation artifacts but cannot assess training quality or organizational compliance.",
+        "rationale": "Can detect documentation artifacts (AI policy, training docs) but cannot verify that staff have actually been trained or that the training is adequate"
+      }
+    }
+  ],
+  "summary": {
+    "total_obligations": 1,
+    "obligation_count": 1,
+    "addressee_breakdown": {
+      "provider_and_deployer": 1
+    },
+    "automation_breakdown": {
+      "full": 0,
+      "partial": 1,
+      "manual": 0
+    }
+  }
+}

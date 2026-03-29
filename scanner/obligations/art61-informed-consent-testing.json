@@ -1,0 +1,110 @@
+{
+  "_metadata": {
+    "article": 61,
+    "title": "Informed consent to participate in testing in real world conditions outside AI regulatory sandboxes",
+    "prerequisites": [
+      {
+        "type": "risk_classification",
+        "required_level": "high-risk",
+        "source_article": 6,
+        "context_field": "risk_classification",
+        "skip_when": "not high-risk with medium/high confidence"
+      }
+    ],
+    "primary_official_source": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689#art_61",
+    "pdf_pages": "93",
+    "decomposition_date": "2026-04-04",
+    "related_standards": {
+      "draft": [],
+      "published": [],
+      "upcoming": []
+    }
+  },
+  "obligations": [
+    {
+      "id": "ART61-OBL-1",
+      "source": "Art. 61(1)",
+      "source_quote": "For the purpose of testing in real world conditions under Article 60, freely-given informed consent shall be obtained from the subjects of testing prior to their participation in such testing and after their having been duly informed with concise, clear, relevant, and understandable information regarding: (a) the nature and objectives of the testing in real world conditions and the possible inconvenience that may be linked to their participation; (b) the conditions under which the testing in real world conditions is to be conducted, including the expected duration of the subject or subjects\u2019 participation; (c) their rights, and the guarantees regarding their participation, in particular their right to refuse to participate in, and the right to withdraw from, testing in real world conditions at any time without any resulting detriment and without having to provide any justification; (d) the arrangements for requesting the reversal or the disregarding of the predictions, recommendations or decisions of the AI system; (e) the Union-wide unique single identification number of the testing in real world conditions in accordance with Article 60(4) point (c), and the contact details of the provider or its legal representative from whom further information can be obtained.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "addressee_note": "Provider or prospective provider conducting real-world testing under Art. 60",
+      "decomposed_atoms": [
+        {
+          "atom": "freely_given_informed_consent",
+          "description": "Consent must be freely given and informed",
+          "requirement": "Freely-given informed consent SHALL be obtained from test subjects prior to participation"
+        },
+        {
+          "atom": "consent_prior_to_participation",
+          "description": "Consent must be obtained before participation begins",
+          "requirement": "Consent SHALL be obtained prior to participation in testing"
+        },
+        {
+          "atom": "information_concise_clear_relevant",
+          "description": "Information provided must be concise, clear, relevant, and understandable",
+          "requirement": "Subjects SHALL be duly informed with concise, clear, relevant, and understandable information"
+        },
+        {
+          "atom": "information_covers_all_required_elements",
+          "description": "Information must cover nature/objectives, conditions/duration, rights, reversal arrangements, and ID/contact details",
+          "requirement": "Information SHALL cover: (a) nature and objectives, (b) conditions and duration, (c) rights including withdrawal, (d) reversal arrangements, (e) testing ID and contact details"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "documentation_search",
+        "what_to_scan": "Consent form templates, testing information sheets, participant rights documentation, testing registration IDs",
+        "human_judgment_needed": true
+      },
+      "cross_references": ["Art. 60(4)(c)"],
+      "scope_limitation": "Only applies when conducting real-world testing under Art. 60",
+      "context_skip_field": "conducts_real_world_testing"
+    },
+    {
+      "id": "ART61-OBL-2",
+      "source": "Art. 61(2)",
+      "source_quote": "The informed consent shall be dated and documented and a copy shall be given to the subjects of testing or their legal representative.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "addressee_note": "Provider or prospective provider conducting real-world testing",
+      "decomposed_atoms": [
+        {
+          "atom": "consent_dated_and_documented",
+          "description": "Consent must be dated and documented",
+          "requirement": "The informed consent SHALL be dated and documented"
+        },
+        {
+          "atom": "consent_copy_given_to_subject",
+          "description": "A copy of the consent must be given to the test subject or their legal representative",
+          "requirement": "A copy SHALL be given to the subjects of testing or their legal representative"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "documentation_search",
+        "what_to_scan": "Consent documentation procedures, consent storage systems, copy distribution records",
+        "human_judgment_needed": true
+      },
+      "scope_limitation": "Only applies when conducting real-world testing under Art. 60",
+      "context_skip_field": "conducts_real_world_testing"
+    }
+  ],
+  "summary": {
+    "total_obligations": 2,
+    "obligation_count": 2,
+    "prohibition_count": 0,
+    "permission_count": 0,
+    "addressee_breakdown": {
+      "provider": 2
+    },
+    "automation_breakdown": {
+      "full": 0,
+      "partial": 2,
+      "manual": 0
+    }
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "_metadata": {
+    "standard_id": "CL-IS-ART26-v0.1",
+    "title": "ComplianceLint Interim Standard for EU AI Act Article 26: Obligations of Deployers",
+    "version": "0.1.0",
+    "date": "2026-04-03",
+    "status": "draft",
+    "disclaimer": "This is an interim standard developed by ComplianceLint. It will be superseded when CEN-CENELEC publishes the harmonized standard for deployer obligations.",
+    "basis": [
+      "EU AI Act Article 26 (official text)",
+      "EU AI Act Recitals 91-93 (legislative intent on deployer obligations)",
+      "ISO/IEC 42001:2023 -- AI management system",
+      "ISO/IEC 23894:2023 -- AI risk management",
+      "GDPR Articles 35, 36 -- Data protection impact assessment"
+    ],
+    "awaiting_standard": "CEN-CENELEC harmonized standard for deployer obligations (expected Q4 2026)"
+  },
+
+  "requirements": [
+    {
+      "id": "IS-ART26-R01",
+      "obligation_ref": "ART26-OBL-1",
+      "title": "Deployment Documentation",
+      "requirement": "The deployer MUST maintain documentation demonstrating that the high-risk AI system is used in accordance with the provider's instructions for use.",
+      "rationale": "Art. 26(1) requires use per instructions. Documentation provides evidence of compliance.",
+      "required_content": [
+        "Reference to provider's instructions for use",
+        "Deployment configuration and parameters",
+        "Operational procedures for staff",
+        "Escalation procedures for anomalies or risks",
+        "Regular review schedule"
+      ]
+    },
+    {
+      "id": "IS-ART26-R02",
+      "obligation_ref": "ART26-OBL-2",
+      "title": "Human Oversight Assignment",
+      "requirement": "The deployer MUST assign human oversight to identified natural persons with documented competence, training, authority, and support.",
+      "rationale": "Art. 26(2) requires oversight by competent persons. Assignment must be documented.",
+      "required_content": [
+        "Named oversight person(s) or role(s)",
+        "Competency requirements and evidence of training",
+        "Authority scope (what they can override or stop)",
+        "Support resources available to them",
+        "Backup/deputy arrangements"
+      ]
+    },
+    {
+      "id": "IS-ART26-R03",
+      "obligation_ref": "ART26-OBL-5",
+      "title": "Operational Monitoring",
+      "requirement": "The deployer MUST monitor the operation of the high-risk AI system and have procedures to inform the provider of identified risks.",
+      "rationale": "Art. 26(5) requires monitoring per instructions and risk communication to providers.",
+      "acceptable_implementations": [
+        "Monitoring dashboards with AI system health metrics",
+        "Automated alerting for anomalous behavior",
+        "Regular performance reviews against provider specifications",
+        "Provider communication channel for risk reporting",
+        "Incident response procedures"
+      ]
+    },
+    {
+      "id": "IS-ART26-R04",
+      "obligation_ref": "ART26-OBL-6",
+      "title": "Log Retention",
+      "requirement": "The deployer MUST retain automatically generated AI system logs for at least six months.",
+      "rationale": "Art. 26(6) mandates minimum 6-month log retention for deployers.",
+      "acceptable_implementations": [
+        "Log storage with configured retention >= 180 days",
+        "Cloud logging service with retention policy",
+        "Log archive system with documented retention period",
+        "SIEM integration with appropriate retention"
+      ]
+    },
+    {
+      "id": "IS-ART26-R05",
+      "obligation_ref": "ART26-OBL-11",
+      "title": "Affected Person Notification",
+      "requirement": "The deployer MUST inform natural persons that they are subject to a high-risk AI system when it makes or assists in decisions about them.",
+      "rationale": "Art. 26(11) requires transparency to affected persons.",
+      "acceptable_implementations": [
+        "Clear AI disclosure in user-facing interfaces",
+        "Notification at point of interaction",
+        "Terms of service with AI usage disclosure",
+        "Physical signage for in-person AI systems"
+      ]
+    }
+  ],
+
+  "scoring": {
+    "compliant": "R01 + R02 + R03 + R04 + R05 all met",
+    "partial": "At least R01 + R02 met",
+    "non_compliant": "Neither R01 nor R02 met"
+  }
+}

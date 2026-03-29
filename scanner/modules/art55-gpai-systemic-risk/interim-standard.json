@@ -1,0 +1,71 @@
+{
+  "_metadata": {
+    "standard_id": "CL-IS-ART55-v0.1",
+    "title": "ComplianceLint Interim Standard for EU AI Act Article 55: Obligations for Providers of GPAI Models with Systemic Risk",
+    "version": "0.1.0",
+    "date": "2026-04-03",
+    "status": "draft",
+    "disclaimer": "This is an interim standard developed by ComplianceLint. It will be superseded by the CEN-CENELEC harmonized standard.",
+    "basis": [
+      "EU AI Act Article 55 (official text)",
+      "NIST AI 600-1 (AI Risk Management Framework: GPAI)",
+      "EU AI Office Code of Practice for systemic risk GPAI"
+    ],
+    "awaiting_standard": "CEN-CENELEC harmonized standard for Art. 55 (expected Q4 2026)"
+  },
+  "requirements": [
+    {
+      "id": "IS-ART55-R01",
+      "obligation_ref": "ART55-OBL-1",
+      "title": "Model Evaluation and Adversarial Testing",
+      "requirement": "The provider MUST perform model evaluation including adversarial testing to identify and mitigate systemic risks.",
+      "rationale": "Art. 55(1)(a) mandates state-of-the-art evaluations and adversarial testing for systemic risk models.",
+      "acceptable_implementations": [
+        "Red-team evaluation programme with documented methodology and findings",
+        "Automated adversarial testing suite covering known attack vectors",
+        "Third-party model evaluation against NIST AI 600-1 risk categories"
+      ]
+    },
+    {
+      "id": "IS-ART55-R02",
+      "obligation_ref": "ART55-OBL-2",
+      "title": "Systemic Risk Assessment and Mitigation",
+      "requirement": "The provider MUST assess and mitigate possible systemic risks at Union level, including their sources.",
+      "rationale": "Art. 55(1)(b) requires identification and mitigation of systemic risks that may arise at Union level.",
+      "acceptable_implementations": [
+        "Systemic risk assessment report with identified risks and mitigation measures",
+        "Risk register covering dual-use, misuse, and cascading failure scenarios",
+        "Periodic risk review process with documented mitigation actions"
+      ]
+    },
+    {
+      "id": "IS-ART55-R03",
+      "obligation_ref": "ART55-OBL-3",
+      "title": "Serious Incident Reporting",
+      "requirement": "The provider MUST track, document, and report serious incidents and possible corrective measures to the AI Office and national competent authorities without undue delay.",
+      "rationale": "Art. 55(1)(c) mandates incident tracking and reporting for systemic risk models.",
+      "acceptable_implementations": [
+        "Incident response plan with reporting workflow to AI Office",
+        "Incident tracking system with severity classification and escalation procedures",
+        "Automated incident detection with regulatory notification pipeline"
+      ]
+    },
+    {
+      "id": "IS-ART55-R04",
+      "obligation_ref": "ART55-OBL-4",
+      "title": "Cybersecurity Protections",
+      "requirement": "The provider MUST ensure an adequate level of cybersecurity protection for the GPAI model with systemic risk and the physical infrastructure of the model.",
+      "rationale": "Art. 55(1)(d) requires cybersecurity measures for both the model and its infrastructure.",
+      "acceptable_implementations": [
+        "Cybersecurity framework implementation aligned with ISO 27001 or NIST CSF",
+        "Model security measures including access controls, weight protection, and API security",
+        "Infrastructure security programme covering physical and logical protections"
+      ]
+    }
+  ],
+  "scoring": {
+    "compliant": "R01 + R02 + R03 + R04 met",
+    "partial": "R01 + R02 met, R03 or R04 incomplete",
+    "non_compliant": "R01 or R02 not met"
+  }
+}

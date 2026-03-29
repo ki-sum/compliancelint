@@ -1,0 +1,110 @@
+{
+  "_metadata": {
+    "article": 111,
+    "title": "AI systems already placed on the market or put into service and general-purpose AI models already placed on the market",
+    "prerequisites": [],
+    "primary_official_source": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689#art_111",
+    "pdf_pages": "121",
+    "decomposition_date": "2026-04-04",
+    "related_standards": {
+      "draft": [],
+      "published": [],
+      "upcoming": []
+    }
+  },
+  "obligations": [
+    {
+      "id": "ART111-OBL-1",
+      "source": "Art. 111(1)",
+      "source_quote": "Without prejudice to the application of Article 5 as referred to in Article 113(3), point (a), AI systems which are components of the large-scale IT systems established by the legal acts listed in Annex X that have been placed on the market or put into service before 2 August 2027 shall be brought into compliance with this Regulation by 31 December 2030.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "addressee_note": "Operators of AI systems that are components of Annex X large-scale IT systems",
+      "decomposed_atoms": [
+        {
+          "atom": "annex_x_systems_compliant_by_2030",
+          "description": "Annex X large-scale IT system AI components placed on market before 2 Aug 2027 must be compliant by 31 Dec 2030",
+          "requirement": "AI systems that are components of Annex X large-scale IT systems placed on the market before 2 August 2027 SHALL be brought into compliance by 31 December 2030"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "context_analysis",
+        "what_to_scan": "System deployment date, Annex X classification, compliance timeline tracking",
+        "human_judgment_needed": true
+      },
+      "scope_limitation": "Only applies to AI systems that are components of Annex X large-scale IT systems placed on market before 2 August 2027",
+      "context_skip_field": "is_annex_x_legacy_system",
+      "cross_references": ["Annex X", "Art. 5", "Art. 113(3)"]
+    },
+    {
+      "id": "ART111-OBL-2",
+      "source": "Art. 111(2)",
+      "source_quote": "Without prejudice to the application of Article 5 as referred to in Article 113(3), point (a), this Regulation shall apply to operators of high-risk AI systems, other than the systems referred to in paragraph 1 of this Article, that have been placed on the market or put into service before 2 August 2026, only if, as from that date, those systems are subject to significant changes in their designs. In any case, the providers and deployers of high-risk AI systems intended to be used by public authorities shall take the necessary steps to comply with the requirements and obligations of this Regulation by 2 August 2030.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "both",
+      "addressee_note": "Providers and deployers of high-risk AI systems used by public authorities",
+      "decomposed_atoms": [
+        {
+          "atom": "significant_change_triggers_compliance",
+          "description": "Pre-existing high-risk systems only need to comply if significantly changed after 2 Aug 2026",
+          "requirement": "This Regulation SHALL apply to pre-existing high-risk AI systems only if, from 2 August 2026, they are subject to significant changes in their designs"
+        },
+        {
+          "atom": "public_authority_systems_compliant_by_2030",
+          "description": "Public authority high-risk AI systems must comply by 2 August 2030",
+          "requirement": "Providers and deployers of high-risk AI systems intended for public authority use SHALL comply by 2 August 2030"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "context_analysis",
+        "what_to_scan": "System deployment date, modification history, public authority classification, compliance timeline",
+        "human_judgment_needed": true
+      },
+      "cross_references": ["Art. 5", "Art. 113(3)"]
+    },
+    {
+      "id": "ART111-OBL-3",
+      "source": "Art. 111(3)",
+      "source_quote": "Providers of general-purpose AI models that have been placed on the market before 2 August 2025 shall take the necessary steps in order to comply with the obligations laid down in this Regulation by 2 August 2027.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "addressee_note": "Providers of general-purpose AI models placed on the market before 2 August 2025",
+      "decomposed_atoms": [
+        {
+          "atom": "gpai_models_compliant_by_2027",
+          "description": "GPAI models placed on market before 2 Aug 2025 must comply by 2 Aug 2027",
+          "requirement": "Providers of general-purpose AI models placed on the market before 2 August 2025 SHALL comply by 2 August 2027"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "context_analysis",
+        "what_to_scan": "GPAI model deployment date, compliance status, Chapter V obligation compliance",
+        "human_judgment_needed": true
+      }
+    }
+  ],
+  "summary": {
+    "total_obligations": 3,
+    "obligation_count": 3,
+    "prohibition_count": 0,
+    "permission_count": 0,
+    "addressee_breakdown": {
+      "provider": 2,
+      "both": 1
+    },
+    "automation_breakdown": {
+      "full": 0,
+      "partial": 3,
+      "manual": 0
+    }
+  }
+}

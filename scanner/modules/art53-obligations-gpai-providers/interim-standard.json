@@ -1,0 +1,72 @@
+{
+  "_metadata": {
+    "standard_id": "CL-IS-ART53-v0.1",
+    "title": "ComplianceLint Interim Standard for EU AI Act Article 53: Obligations for Providers of GPAI Models",
+    "version": "0.1.0",
+    "date": "2026-04-03",
+    "status": "draft",
+    "disclaimer": "This is an interim standard developed by ComplianceLint. It will be superseded by the CEN-CENELEC harmonized standard.",
+    "basis": [
+      "EU AI Act Article 53 (official text)",
+      "EU AI Act Annex XI (Technical Documentation for GPAI models)",
+      "EU AI Act Annex XII (Information for downstream providers)",
+      "EU AI Office Code of Practice for GPAI providers"
+    ],
+    "awaiting_standard": "CEN-CENELEC harmonized standard for Art. 53 (expected Q4 2026)"
+  },
+  "requirements": [
+    {
+      "id": "IS-ART53-R01",
+      "obligation_ref": "ART53-OBL-1",
+      "title": "Technical Documentation (Annex XI)",
+      "requirement": "The provider MUST draw up and keep up-to-date technical documentation of the GPAI model in accordance with Annex XI.",
+      "rationale": "Art. 53(1)(a) mandates Annex XI technical documentation for all GPAI providers.",
+      "acceptable_implementations": [
+        "Comprehensive model card covering all Annex XI elements",
+        "Technical documentation repository with version control",
+        "Structured documentation system aligned with Annex XI checklist"
+      ]
+    },
+    {
+      "id": "IS-ART53-R02",
+      "obligation_ref": "ART53-OBL-2",
+      "title": "Downstream Provider Documentation (Annex XII)",
+      "requirement": "The provider MUST draw up and keep up-to-date information and documentation for downstream providers integrating the GPAI model, in accordance with Annex XII.",
+      "rationale": "Art. 53(1)(b) requires sufficient documentation for downstream providers to comply with their own obligations.",
+      "acceptable_implementations": [
+        "Downstream integration guide covering all Annex XII elements",
+        "API documentation with capability descriptions and limitations",
+        "Structured information package for downstream compliance"
+      ]
+    },
+    {
+      "id": "IS-ART53-R03",
+      "obligation_ref": "ART53-OBL-3",
+      "title": "Copyright Policy and Compliance",
+      "requirement": "The provider MUST put in place a policy to comply with Union copyright law, including identification and compliance with text and data mining opt-out reservations.",
+      "rationale": "Art. 53(1)(c) mandates a copyright compliance policy, particularly regarding TDM opt-outs under the DSM Directive.",
+      "acceptable_implementations": [
+        "Published copyright policy with TDM opt-out compliance process",
+        "Automated robots.txt and opt-out reservation crawler",
+        "Copyright compliance framework with training data provenance tracking"
+      ]
+    },
+    {
+      "id": "IS-ART53-R04",
+      "obligation_ref": "ART53-OBL-4",
+      "title": "Training Data Summary",
+      "requirement": "The provider MUST draw up and make publicly available a sufficiently detailed summary of the content used for training the GPAI model.",
+      "rationale": "Art. 53(1)(d) requires a public training data summary to enable copyright holders to exercise their rights.",
+      "acceptable_implementations": [
+        "Published training data summary following the EU AI Office template",
+        "Public data card with dataset descriptions and sources",
+        "Transparency report covering training data composition and provenance"
+      ]
+    }
+  ],
+  "scoring": {
+    "compliant": "R01 + R02 + R03 + R04 met",
+    "partial": "R01 + R02 met, R03 or R04 incomplete",
+    "non_compliant": "R01 or R02 not met"
+  }
+}

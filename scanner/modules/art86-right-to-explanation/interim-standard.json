@@ -1,0 +1,67 @@
+{
+  "_metadata": {
+    "standard_id": "CL-IS-ART86-v0.1",
+    "title": "ComplianceLint Interim Standard for EU AI Act Article 86: Right to Explanation",
+    "version": "0.1.0",
+    "date": "2026-04-03",
+    "status": "draft",
+    "disclaimer": "This is an interim standard developed by ComplianceLint. It will be superseded when CEN-CENELEC publishes the harmonized standard for AI transparency and explainability.",
+    "basis": [
+      "EU AI Act Article 86 (official text)",
+      "EU AI Act Recitals 171-173 (legislative intent on right to explanation)",
+      "ISO/IEC 42001:2023 -- AI management system",
+      "ISO/IEC TR 24028:2020 -- AI trustworthiness (explainability)",
+      "GDPR Article 22 -- Automated individual decision-making"
+    ],
+    "awaiting_standard": "CEN-CENELEC harmonized standard for AI transparency and explainability (expected Q4 2026)"
+  },
+
+  "requirements": [
+    {
+      "id": "IS-ART86-R01",
+      "obligation_ref": "ART86-OBL-1",
+      "title": "Explanation Capability",
+      "requirement": "The deployer MUST be able to provide clear and meaningful explanations of the role of the AI system in the decision-making procedure and the main elements of the decision taken, upon request by affected persons.",
+      "rationale": "Art. 86(1) grants affected persons the right to obtain explanations of AI-assisted decisions.",
+      "required_content": [
+        "Explanation of what role the AI system played in the decision",
+        "Main elements and factors that influenced the decision",
+        "How the AI output was used by the deployer",
+        "Whether and how human review was applied",
+        "How to contest or seek review of the decision"
+      ]
+    },
+    {
+      "id": "IS-ART86-R02",
+      "obligation_ref": "ART86-OBL-1",
+      "title": "Explanation Delivery Mechanism",
+      "requirement": "The deployer MUST have a mechanism for affected persons to request and receive explanations in a clear and meaningful manner.",
+      "rationale": "Art. 86(1) requires explanations to be obtainable, implying a functional delivery mechanism.",
+      "acceptable_implementations": [
+        "User-facing explainability interface or dashboard",
+        "Request process with defined response timeline",
+        "Automated explanation generation (SHAP, LIME, feature importance)",
+        "Human-readable decision audit trail",
+        "Contact point or form for explanation requests"
+      ]
+    },
+    {
+      "id": "IS-ART86-R03",
+      "obligation_ref": ["ART86-EXC-1", "ART86-EXC-2"],
+      "title": "Exception Analysis",
+      "requirement": "Where the deployer claims an exception under Art. 86(2) or (3), the deployer MUST document the legal basis for the exception.",
+      "rationale": "Art. 86(2)-(3) provide exceptions, but the deployer must justify their applicability.",
+      "acceptable_implementations": [
+        "Legal analysis documenting applicable Union or national law exceptions",
+        "Written opinion from legal counsel on exception applicability",
+        "Cross-reference to other Union law providing equivalent right to explanation"
+      ]
+    }
+  ],
+
+  "scoring": {
+    "compliant": "R01 + R02 both met",
+    "partial": "At least R01 met",
+    "non_compliant": "R01 not met"
+  }
+}

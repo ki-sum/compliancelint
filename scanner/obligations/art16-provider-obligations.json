@@ -1,0 +1,331 @@
+{
+  "_metadata": {
+    "article": 16,
+    "title": "Obligations of providers of high-risk AI systems",
+    "prerequisites": [
+      {
+        "type": "risk_classification",
+        "required_level": "high-risk",
+        "source_article": 6,
+        "context_field": "risk_classification",
+        "skip_when": "not high-risk with medium/high confidence"
+      }
+    ],
+    "primary_official_source": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689#art_16",
+    "pdf_pages": "62-63",
+    "decomposition_date": "2026-04-04",
+    "related_standards": {
+      "draft": [],
+      "published": [
+        "ISO/IEC 42001:2023 — AI management system (provider obligations framework)"
+      ],
+      "upcoming": [
+        "CEN-CENELEC harmonized standard for Art. 16 (expected 2026)"
+      ]
+    }
+  },
+  "obligations": [
+    {
+      "id": "ART16-OBL-1a",
+      "source": "Art. 16(a)",
+      "source_quote": "Providers of high-risk AI systems shall: (a) ensure that their high-risk AI systems are compliant with the requirements set out in Section 2;",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "addressee_note": "Provider of a high-risk AI system (as defined in Art. 3(3))",
+      "decomposed_atoms": [
+        {
+          "atom": "compliant_with_section_2",
+          "description": "High-risk AI system meets all requirements in Chapter III Section 2 (Art. 8-15)",
+          "requirement": "The provider SHALL ensure compliance with Art. 8-15 requirements (risk management, data governance, technical documentation, record-keeping, transparency, human oversight, accuracy/robustness)"
+        }
+      ],
+      "automation_assessment": {
+        "level": "full",
+        "confidence": "high",
+        "detection_method": "cross_reference_check",
+        "what_to_scan": "Aggregate compliance status across Art. 9-15 scan results",
+        "human_judgment_needed": false
+      },
+      "cross_references": ["Art. 8", "Art. 9", "Art. 10", "Art. 11", "Art. 12", "Art. 13", "Art. 14", "Art. 15"]
+    },
+    {
+      "id": "ART16-OBL-1b",
+      "source": "Art. 16(b)",
+      "source_quote": "indicate on the high-risk AI system or, where that is not possible, on its packaging or its accompanying documentation, as applicable, their name, registered trade name or registered trade mark, the address at which they can be contacted;",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "addressee_note": "Provider of a high-risk AI system",
+      "decomposed_atoms": [
+        {
+          "atom": "provider_identification_on_system",
+          "description": "Provider name/trademark and contact address on system, packaging, or documentation",
+          "requirement": "The provider SHALL indicate their name, registered trade name or trade mark, and contact address on the AI system itself or its packaging or accompanying documentation"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "documentation_search",
+        "what_to_scan": "README, package metadata, documentation files for provider identification and contact details",
+        "human_judgment_needed": true
+      }
+    },
+    {
+      "id": "ART16-OBL-1c",
+      "source": "Art. 16(c)",
+      "source_quote": "have a quality management system in place which complies with Article 17;",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "addressee_note": "Provider of a high-risk AI system",
+      "decomposed_atoms": [
+        {
+          "atom": "quality_management_system_exists",
+          "description": "A quality management system compliant with Art. 17 is in place",
+          "requirement": "The provider SHALL have a quality management system that complies with Art. 17"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "documentation_search",
+        "what_to_scan": "Quality management documentation, QMS policies, process documentation",
+        "human_judgment_needed": true
+      },
+      "cross_references": ["Art. 17"]
+    },
+    {
+      "id": "ART16-OBL-1d",
+      "source": "Art. 16(d)",
+      "source_quote": "keep the documentation referred to in Article 18;",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "addressee_note": "Provider of a high-risk AI system",
+      "decomposed_atoms": [
+        {
+          "atom": "documentation_kept",
+          "description": "Documentation as specified in Art. 18 is maintained",
+          "requirement": "The provider SHALL keep the documentation referred to in Art. 18"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "documentation_search",
+        "what_to_scan": "Technical documentation, quality system docs, conformity declarations",
+        "human_judgment_needed": true
+      },
+      "cross_references": ["Art. 18"]
+    },
+    {
+      "id": "ART16-OBL-1e",
+      "source": "Art. 16(e)",
+      "source_quote": "when under their control, keep the logs automatically generated by their high-risk AI systems as referred to in Article 19;",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "addressee_note": "Provider of a high-risk AI system",
+      "decomposed_atoms": [
+        {
+          "atom": "logs_kept_when_under_control",
+          "description": "Automatically generated logs are retained when under provider's control",
+          "requirement": "The provider SHALL keep automatically generated logs as referred to in Art. 19, when the logs are under their control"
+        }
+      ],
+      "automation_assessment": {
+        "level": "full",
+        "confidence": "high",
+        "detection_method": "code_pattern_search",
+        "what_to_scan": "Log retention configuration, log storage policies, log archival mechanisms",
+        "human_judgment_needed": false
+      },
+      "cross_references": ["Art. 12", "Art. 19"],
+      "scope_limitation": "when under their control",
+      "context_skip_field": null
+    },
+    {
+      "id": "ART16-OBL-1f",
+      "source": "Art. 16(f)",
+      "source_quote": "ensure that the high-risk AI system undergoes the relevant conformity assessment procedure as referred to in Article 43, prior to its being placed on the market or put into service;",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "addressee_note": "Provider of a high-risk AI system",
+      "decomposed_atoms": [
+        {
+          "atom": "conformity_assessment_completed",
+          "description": "Conformity assessment per Art. 43 is done before market placement",
+          "requirement": "The provider SHALL ensure the high-risk AI system undergoes the relevant conformity assessment procedure prior to placement on the market or putting into service"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "documentation_search",
+        "what_to_scan": "Conformity assessment records, notified body certificates, self-assessment documentation",
+        "human_judgment_needed": true
+      },
+      "cross_references": ["Art. 43"]
+    },
+    {
+      "id": "ART16-OBL-1g",
+      "source": "Art. 16(g)",
+      "source_quote": "draw up an EU declaration of conformity in accordance with Article 47;",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "addressee_note": "Provider of a high-risk AI system",
+      "decomposed_atoms": [
+        {
+          "atom": "eu_declaration_drawn_up",
+          "description": "EU declaration of conformity per Art. 47 is prepared",
+          "requirement": "The provider SHALL draw up an EU declaration of conformity in accordance with Art. 47"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "documentation_search",
+        "what_to_scan": "EU declaration of conformity document, compliance documentation directory",
+        "human_judgment_needed": true
+      },
+      "cross_references": ["Art. 47"]
+    },
+    {
+      "id": "ART16-OBL-1h",
+      "source": "Art. 16(h)",
+      "source_quote": "affix the CE marking to the high-risk AI system or, where that is not possible, on its packaging or its accompanying documentation, to indicate conformity with this Regulation, in accordance with Article 48;",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "addressee_note": "Provider of a high-risk AI system",
+      "decomposed_atoms": [
+        {
+          "atom": "ce_marking_affixed",
+          "description": "CE marking applied to system, packaging, or documentation",
+          "requirement": "The provider SHALL affix the CE marking to the AI system or its packaging or documentation to indicate conformity"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "low",
+        "detection_method": "documentation_search",
+        "what_to_scan": "Product documentation, packaging specifications, release artifacts for CE marking references",
+        "human_judgment_needed": true
+      },
+      "cross_references": ["Art. 48"]
+    },
+    {
+      "id": "ART16-OBL-1i",
+      "source": "Art. 16(i)",
+      "source_quote": "comply with the registration obligations referred to in Article 49(1);",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "addressee_note": "Provider of a high-risk AI system",
+      "decomposed_atoms": [
+        {
+          "atom": "registration_completed",
+          "description": "Registration in EU database per Art. 49(1) is completed",
+          "requirement": "The provider SHALL comply with registration obligations in Art. 49(1)"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "documentation_search",
+        "what_to_scan": "EU database registration records, registration confirmation documentation",
+        "human_judgment_needed": true
+      },
+      "cross_references": ["Art. 49"]
+    },
+    {
+      "id": "ART16-OBL-1j",
+      "source": "Art. 16(j)",
+      "source_quote": "take the necessary corrective actions and provide information as required in Article 20;",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "addressee_note": "Provider of a high-risk AI system",
+      "decomposed_atoms": [
+        {
+          "atom": "corrective_actions_process",
+          "description": "Process for corrective actions and information provision per Art. 20",
+          "requirement": "The provider SHALL take necessary corrective actions and provide information as required in Art. 20"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "documentation_search",
+        "what_to_scan": "Corrective action procedures, incident response documentation, withdrawal/recall plans",
+        "human_judgment_needed": true
+      },
+      "cross_references": ["Art. 20"]
+    },
+    {
+      "id": "ART16-OBL-1k",
+      "source": "Art. 16(k)",
+      "source_quote": "upon a reasoned request of a national competent authority, demonstrate the conformity of the high-risk AI system with the requirements set out in Section 2;",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "addressee_note": "Provider of a high-risk AI system",
+      "decomposed_atoms": [
+        {
+          "atom": "conformity_demonstrable_on_request",
+          "description": "Provider can demonstrate Section 2 conformity when requested by authority",
+          "requirement": "The provider SHALL be able to demonstrate conformity with Section 2 requirements upon a reasoned request of a national competent authority"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "documentation_search",
+        "what_to_scan": "Compliance evidence documentation, audit-ready materials, conformity assessment records",
+        "human_judgment_needed": true
+      }
+    },
+    {
+      "id": "ART16-OBL-1l",
+      "source": "Art. 16(l)",
+      "source_quote": "ensure that the high-risk AI system complies with accessibility requirements in accordance with Directives (EU) 2016/2102 and (EU) 2019/882.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "addressee_note": "Provider of a high-risk AI system",
+      "decomposed_atoms": [
+        {
+          "atom": "accessibility_requirements_met",
+          "description": "System meets accessibility requirements per EU accessibility directives",
+          "requirement": "The provider SHALL ensure the high-risk AI system complies with accessibility requirements in Directives (EU) 2016/2102 and (EU) 2019/882"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "code_and_documentation_search",
+        "what_to_scan": "Accessibility features, WCAG compliance, accessibility testing, accessibility documentation",
+        "human_judgment_needed": true
+      },
+      "cross_references": ["Directive (EU) 2016/2102", "Directive (EU) 2019/882"]
+    }
+  ],
+  "summary": {
+    "total_obligations": 12,
+    "obligation_count": 12,
+    "prohibition_count": 0,
+    "permission_count": 0,
+    "addressee_breakdown": {
+      "provider": 12
+    },
+    "automation_breakdown": {
+      "full": 2,
+      "partial": 10,
+      "manual": 0
+    }
+  }
+}

@@ -1,0 +1,328 @@
+{
+  "_metadata": {
+    "article": 15,
+    "title": "Accuracy, Robustness and Cybersecurity",
+    "prerequisites": [
+      {
+        "type": "risk_classification",
+        "required_level": "high-risk",
+        "source_article": 6,
+        "context_field": "risk_classification",
+        "skip_when": "not high-risk with medium/high confidence"
+      }
+    ],
+    "decomposition_date": "2026-03-20",
+    "primary_official_source": {
+      "name": "EUR-Lex -- Official Journal of the European Union",
+      "eli_uri": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng",
+      "celex": "32024R1689"
+    },
+    "pdf_pages": [
+      61
+    ]
+  },
+  "obligations": [
+    {
+      "id": "ART15-OBL-1",
+      "source": "Art. 15(1)",
+      "source_quote": "High-risk AI systems shall be designed and developed in such a way that they achieve an appropriate level of accuracy, robustness, and cybersecurity, and that they perform consistently in those respects throughout their lifecycle.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "appropriate_accuracy",
+          "description": "System must achieve appropriate accuracy",
+          "requirement": "System SHALL achieve an appropriate level of accuracy"
+        },
+        {
+          "atom": "appropriate_robustness",
+          "description": "System must achieve appropriate robustness",
+          "requirement": "System SHALL achieve an appropriate level of robustness"
+        },
+        {
+          "atom": "appropriate_cybersecurity",
+          "description": "System must achieve appropriate cybersecurity",
+          "requirement": "System SHALL achieve an appropriate level of cybersecurity"
+        },
+        {
+          "atom": "consistent_performance",
+          "description": "Consistent performance throughout lifecycle",
+          "requirement": "System SHALL perform consistently throughout its lifecycle"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check for accuracy metric definitions, evaluation scripts, performance benchmarks, and monitoring infrastructure that tracks metrics over time",
+        "what_to_scan": [
+          "code",
+          "config",
+          "documentation"
+        ],
+        "human_judgment_needed": "Whether accuracy/robustness/cybersecurity levels are 'appropriate' for the specific use case",
+        "rationale": "Can detect testing infrastructure but cannot assess appropriateness"
+      }
+    },
+    {
+      "id": "ART15-EMP-2",
+      "source": "Art. 15(2)",
+      "source_quote": "To address the technical aspects of how to measure the appropriate levels of accuracy and robustness set out in paragraph 1 and any other relevant performance metrics, the Commission shall, in cooperation with relevant stakeholders and organisations such as metrology and benchmarking authorities, encourage, as appropriate, the development of benchmarks and measurement methodologies.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "commission",
+      "note": "Commission obligation to encourage benchmarks. Uses 'shall' not 'is empowered' — correctly classified as obligation. NOT a provider obligation.",
+      "decomposed_atoms": [
+        {
+          "atom": "commission_encourages_benchmarks",
+          "description": "Commission to encourage benchmark development",
+          "requirement": "The Commission SHALL encourage development of benchmarks and measurement methodologies"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "N/A -- Commission obligation",
+        "what_to_scan": [],
+        "rationale": "Commission obligation, not provider"
+      }
+    },
+    {
+      "id": "ART15-OBL-3",
+      "source": "Art. 15(3)",
+      "source_quote": "The levels of accuracy and the relevant accuracy metrics of high-risk AI systems shall be declared in the accompanying instructions of use.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "accuracy_levels_declared",
+          "description": "Accuracy levels must be declared",
+          "requirement": "Accuracy levels SHALL be declared in instructions of use"
+        },
+        {
+          "atom": "accuracy_metrics_declared",
+          "description": "Accuracy metrics must be declared",
+          "requirement": "Relevant accuracy metrics SHALL be declared in instructions of use"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check for model cards, instructions of use documents, or README files that contain accuracy metric values and metric type definitions",
+        "what_to_scan": [
+          "documentation"
+        ],
+        "human_judgment_needed": "Whether declared metrics are complete and appropriate",
+        "rationale": "Can detect metric declarations in documentation but cannot assess completeness"
+      }
+    },
+    {
+      "id": "ART15-OBL-4",
+      "source": "Art. 15(4)",
+      "source_quote": "High-risk AI systems shall be as resilient as possible regarding errors, faults or inconsistencies that may occur within the system or the environment in which the system operates, in particular due to their interaction with natural persons or other systems. Technical and organisational measures shall be taken in this regard.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "resilient_to_errors",
+          "description": "System must be resilient to errors/faults/inconsistencies",
+          "requirement": "System SHALL be as resilient as possible regarding errors, faults or inconsistencies"
+        },
+        {
+          "atom": "technical_measures_taken",
+          "description": "Technical measures for resilience",
+          "requirement": "Technical measures SHALL be taken for resilience"
+        },
+        {
+          "atom": "organisational_measures_taken",
+          "description": "Organisational measures for resilience",
+          "requirement": "Organisational measures SHALL be taken for resilience"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check for input validation frameworks, error handling patterns (try/except, error boundaries), graceful degradation logic, and integration test coverage",
+        "what_to_scan": [
+          "code",
+          "config"
+        ],
+        "human_judgment_needed": "Whether resilience measures are adequate for the specific deployment context",
+        "rationale": "Can detect error handling and fallback patterns but cannot assess adequacy"
+      }
+    },
+    {
+      "id": "ART15-OBL-4b",
+      "source": "Art. 15(4)",
+      "source_quote": "High-risk AI systems that continue to learn after being placed on the market or put into service shall be developed in such a way as to eliminate or reduce as far as possible the risk of possibly biased outputs influencing input for future operations (feedback loops), and as to ensure that any such feedback loops are duly addressed with appropriate mitigation measures.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "scope_limitation": "Only applies to systems that continue to learn after deployment (online learning / continual learning)",
+      "context_skip_field": "continues_learning_after_deployment",
+      "context_skip_value": false,
+      "decomposed_atoms": [
+        {
+          "atom": "feedback_loop_risk_reduced",
+          "description": "Feedback loop bias risk must be reduced",
+          "requirement": "SHALL eliminate or reduce risk of biased outputs influencing future inputs"
+        },
+        {
+          "atom": "feedback_loops_mitigated",
+          "description": "Feedback loops must be mitigated",
+          "requirement": "SHALL ensure feedback loops are duly addressed with appropriate mitigation measures"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check for online learning patterns, model retraining pipelines, feedback loop detection, drift monitoring, data pipeline from outputs to inputs",
+        "what_to_scan": [
+          "code",
+          "config"
+        ],
+        "human_judgment_needed": "Whether feedback loop mitigation is adequate",
+        "rationale": "Can detect online learning patterns but cannot assess mitigation adequacy"
+      }
+    },
+    {
+      "id": "ART15-PERM-4c",
+      "source": "Art. 15(4)",
+      "source_quote": "The robustness of high-risk AI systems may be achieved through technical redundancy solutions, which may include backup or fail-safe plans.",
+      "deontic_type": "permission",
+      "modality": "may",
+      "addressee": "provider",
+      "note": "Flexibility permission: robustness may be achieved through technical redundancy solutions. This is one permitted approach, not the only approach. Not an obligation.",
+      "decomposed_atoms": [
+        {
+          "atom": "redundancy_solutions_permitted",
+          "description": "Technical redundancy is a permitted approach to robustness",
+          "requirement": "Robustness MAY be achieved through technical redundancy solutions"
+        },
+        {
+          "atom": "backup_failsafe_permitted",
+          "description": "Backup or fail-safe plans are a permitted redundancy approach",
+          "requirement": "Technical redundancy solutions MAY include backup or fail-safe plans"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check for backup systems, fail-safe patterns, redundancy configurations, fallback logic, circuit breakers",
+        "what_to_scan": [
+          "code",
+          "config"
+        ],
+        "human_judgment_needed": "Whether redundancy solutions are adequate for the specific robustness requirements",
+        "rationale": "Can detect redundancy patterns but cannot assess whether they achieve required robustness level"
+      }
+    },
+    {
+      "id": "ART15-OBL-5",
+      "source": "Art. 15(5)",
+      "source_quote": "High-risk AI systems shall be resilient against attempts by unauthorised third parties to alter their use, outputs or performance by exploiting system vulnerabilities.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "resilient_against_attacks",
+          "description": "System must resist unauthorized alteration",
+          "requirement": "System SHALL be resilient against unauthorized third-party attempts to alter use, outputs, or performance"
+        },
+        {
+          "atom": "cybersecurity_appropriate",
+          "description": "Technical solutions appropriate to circumstances",
+          "requirement": "Cybersecurity technical solutions SHALL be appropriate to relevant circumstances and risks"
+        },
+        {
+          "atom": "ai_specific_vulnerabilities",
+          "description": "AI-specific attack vectors addressed",
+          "requirement": "Technical solutions SHALL address AI-specific vulnerabilities: data poisoning, model poisoning, adversarial examples, model evasion, confidentiality attacks, model flaws"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check for rate limiting, authentication/authorization, vulnerability scanning tools, security headers, and access control patterns",
+        "what_to_scan": [
+          "code",
+          "config",
+          "dependencies"
+        ],
+        "human_judgment_needed": "Whether cybersecurity measures address AI-specific attack vectors",
+        "rationale": "Can detect security patterns but cannot assess AI-specific vulnerability coverage"
+      }
+    },
+    {
+      "id": "ART15-OBL-5b",
+      "source": "Art. 15(5)",
+      "source_quote": "The technical solutions to address AI specific vulnerabilities shall include, where appropriate, measures to prevent, detect, respond to, resolve and control for attacks trying to manipulate the training data set (data poisoning), or pre-trained components used in training (model poisoning), inputs designed to cause the AI model to make a mistake (adversarial examples or model evasion), confidentiality attacks or model flaws.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "prevent_data_poisoning",
+          "description": "Prevent training data manipulation",
+          "requirement": "SHALL include measures to prevent data poisoning attacks"
+        },
+        {
+          "atom": "prevent_model_poisoning",
+          "description": "Prevent model component manipulation",
+          "requirement": "SHALL include measures to prevent model poisoning"
+        },
+        {
+          "atom": "prevent_adversarial_examples",
+          "description": "Prevent adversarial input attacks",
+          "requirement": "SHALL include measures to prevent adversarial examples / model evasion"
+        },
+        {
+          "atom": "prevent_confidentiality_attacks",
+          "description": "Prevent confidentiality breaches",
+          "requirement": "SHALL include measures to prevent confidentiality attacks"
+        },
+        {
+          "atom": "prevent_model_flaws",
+          "description": "Control for model flaws",
+          "requirement": "SHALL include measures to control for model flaws"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "low",
+        "detection_method": "Check for adversarial training, input sanitization, model integrity verification, access control on training data, differential privacy, model watermarking",
+        "what_to_scan": [
+          "code",
+          "config",
+          "dependencies"
+        ],
+        "human_judgment_needed": "Whether AI-specific security measures are comprehensive",
+        "rationale": "Can detect some security patterns but AI-specific attack mitigation is highly specialized"
+      }
+    }
+  ],
+  "summary": {
+    "total_obligations": 8,
+    "obligation_count": 6,
+    "permission_count": 1,
+    "commission_obligation_count": 1,
+    "addressee_breakdown": {
+      "provider": 6,
+      "deployer": 0,
+      "commission": 1
+    },
+    "automation_breakdown": {
+      "full": 0,
+      "partial": 7,
+      "manual": 1
+    },
+    "scope_notes": {
+      "general": "ART15-OBL-1, OBL-3, OBL-4, OBL-5, OBL-5b -- apply to ALL high-risk AI systems",
+      "conditional": "ART15-OBL-4b -- only systems that continue learning after deployment",
+      "empowerment": "ART15-EMP-2 -- Commission obligation, not provider"
+    }
+  }
+}

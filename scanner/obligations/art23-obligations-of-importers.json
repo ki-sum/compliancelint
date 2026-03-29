@@ -1,0 +1,262 @@
+{
+  "_metadata": {
+    "article": 23,
+    "title": "Obligations of importers",
+    "prerequisites": [
+      {
+        "type": "risk_classification",
+        "required_level": "high-risk",
+        "source_article": 6,
+        "context_field": "risk_classification",
+        "skip_when": "not high-risk with medium/high confidence"
+      }
+    ],
+    "primary_official_source": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689#art_23",
+    "pdf_pages": "65-66",
+    "decomposition_date": "2026-04-04",
+    "related_standards": {
+      "draft": [],
+      "published": [],
+      "upcoming": []
+    }
+  },
+  "obligations": [
+    {
+      "id": "ART23-OBL-1",
+      "source": "Art. 23(1)",
+      "source_quote": "Before placing a high-risk AI system on the market, importers shall ensure that the system is in conformity with this Regulation by verifying that: (a) the relevant conformity assessment procedure referred to in Article 43 has been carried out by the provider of the high-risk AI system; (b) the provider has drawn up the technical documentation in accordance with Article 11 and Annex IV; (c) the system bears the required CE marking and is accompanied by the EU declaration of conformity referred to in Article 47 and instructions for use; (d) the provider has appointed an authorised representative in accordance with Article 22(1).",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "importer",
+      "addressee_note": "Importer placing a high-risk AI system on the EU market",
+      "decomposed_atoms": [
+        {
+          "atom": "verify_conformity_assessment",
+          "description": "Importer must verify that conformity assessment per Art. 43 has been carried out",
+          "requirement": "Importers SHALL verify that the relevant conformity assessment procedure has been carried out by the provider"
+        },
+        {
+          "atom": "verify_technical_documentation",
+          "description": "Importer must verify that technical documentation per Art. 11 and Annex IV exists",
+          "requirement": "Importers SHALL verify that the provider has drawn up technical documentation per Art. 11 and Annex IV"
+        },
+        {
+          "atom": "verify_ce_marking_and_declaration",
+          "description": "Importer must verify CE marking, EU declaration, and instructions for use",
+          "requirement": "Importers SHALL verify that the system bears CE marking and is accompanied by EU declaration of conformity and instructions for use"
+        },
+        {
+          "atom": "verify_authorised_representative",
+          "description": "Importer must verify that the provider has appointed an authorised representative",
+          "requirement": "Importers SHALL verify that the provider has appointed an authorised representative per Art. 22(1)"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "documentation_search",
+        "what_to_scan": "Import compliance records, conformity certificates, CE marking verification, authorised representative documentation",
+        "human_judgment_needed": true
+      },
+      "scope_limitation": "Only applies to importers of high-risk AI systems",
+      "context_skip_field": "is_importer",
+      "cross_references": ["Art. 43", "Art. 11", "Annex IV", "Art. 47", "Art. 22(1)"]
+    },
+    {
+      "id": "ART23-OBL-2",
+      "source": "Art. 23(2)",
+      "source_quote": "Where an importer has sufficient reason to consider that a high-risk AI system is not in conformity with this Regulation, or is falsified, or accompanied by falsified documentation, it shall not place the system on the market until it has been brought into conformity.",
+      "deontic_type": "prohibition",
+      "modality": "shall not",
+      "addressee": "importer",
+      "addressee_note": "Importer with reason to believe the system is non-conforming or falsified",
+      "decomposed_atoms": [
+        {
+          "atom": "no_placement_if_non_conforming",
+          "description": "Non-conforming or falsified systems must not be placed on market",
+          "requirement": "Importers SHALL NOT place a system on the market if they have sufficient reason to consider it non-conforming, falsified, or accompanied by falsified documentation"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "low",
+        "detection_method": "documentation_search",
+        "what_to_scan": "Import compliance review records, non-conformity flags, market placement approval records",
+        "human_judgment_needed": true
+      },
+      "scope_limitation": "Only applies to importers",
+      "context_skip_field": "is_importer"
+    },
+    {
+      "id": "ART23-OBL-3",
+      "source": "Art. 23(3)",
+      "source_quote": "Importers shall indicate their name, registered trade name or registered trade mark, and the address at which they can be contacted on the high-risk AI system and on its packaging or its accompanying documentation, where applicable.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "importer",
+      "addressee_note": "Importer of a high-risk AI system",
+      "decomposed_atoms": [
+        {
+          "atom": "importer_identification_on_system",
+          "description": "Importer name/trademark and contact address on system, packaging, or documentation",
+          "requirement": "Importers SHALL indicate their name, registered trade name or trade mark, and contact address on the system, packaging, or documentation"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "documentation_search",
+        "what_to_scan": "Package metadata, documentation headers, product labeling for importer identification",
+        "human_judgment_needed": true
+      },
+      "scope_limitation": "Only applies to importers",
+      "context_skip_field": "is_importer"
+    },
+    {
+      "id": "ART23-OBL-4",
+      "source": "Art. 23(4)",
+      "source_quote": "Importers shall ensure that, while a high-risk AI system is under their responsibility, storage or transport conditions, where applicable, do not jeopardise its compliance with the requirements set out in Section 2.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "importer",
+      "addressee_note": "Importer responsible for a high-risk AI system",
+      "decomposed_atoms": [
+        {
+          "atom": "storage_transport_conditions_maintained",
+          "description": "Storage and transport must not jeopardise compliance",
+          "requirement": "Importers SHALL ensure storage or transport conditions do not jeopardise compliance with Section 2 requirements"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "documentation_search",
+        "what_to_scan": "Storage and transport procedures, handling documentation",
+        "human_judgment_needed": true
+      },
+      "scope_limitation": "Only applies to importers",
+      "context_skip_field": "is_importer"
+    },
+    {
+      "id": "ART23-OBL-2b",
+      "source": "Art. 23(2)",
+      "source_quote": "Where the high-risk AI system presents a risk within the meaning of Article 79(1), the importer shall inform the provider of the system, the authorised representative and the market surveillance authorities to that effect.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "importer",
+      "addressee_note": "Importer who identifies a risk in the high-risk AI system",
+      "decomposed_atoms": [
+        {
+          "atom": "inform_provider_and_authorities_of_risk",
+          "description": "Importer must inform provider, authorised representative, and market surveillance authorities of risk",
+          "requirement": "Where the system presents a risk per Art. 79(1), the importer SHALL inform the provider, authorised representative, and market surveillance authorities"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "documentation_search",
+        "what_to_scan": "Risk notification records, provider correspondence, authority notification logs",
+        "human_judgment_needed": true
+      },
+      "scope_limitation": "Only applies to importers",
+      "context_skip_field": "is_importer",
+      "cross_references": ["Art. 79(1)"]
+    },
+    {
+      "id": "ART23-OBL-5",
+      "source": "Art. 23(5)",
+      "source_quote": "Importers shall keep, for a period of 10 years after the high-risk AI system has been placed on the market or put into service, a copy of the certificate issued by the notified body, where applicable, of the instructions for use, and of the EU declaration of conformity referred to in Article 47.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "importer",
+      "addressee_note": "Importer of a high-risk AI system",
+      "decomposed_atoms": [
+        {
+          "atom": "keep_documents_10_years",
+          "description": "Keep certificate, instructions for use, and EU declaration for 10 years",
+          "requirement": "Importers SHALL keep, for 10 years after placing on market or putting into service: notified body certificate (where applicable), instructions for use, and EU declaration of conformity"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "documentation_search",
+        "what_to_scan": "Document retention records, certificate archives, declaration storage",
+        "human_judgment_needed": true
+      },
+      "scope_limitation": "Only applies to importers",
+      "context_skip_field": "is_importer",
+      "cross_references": ["Art. 47"]
+    },
+    {
+      "id": "ART23-OBL-6",
+      "source": "Art. 23(6)",
+      "source_quote": "Importers shall provide the relevant competent authorities, upon a reasoned request, with all the necessary information and documentation, including that referred to in paragraph 5, to demonstrate the conformity of a high-risk AI system with the requirements set out in Section 2 in a language which can be easily understood by them. For this purpose, they shall also ensure that the technical documentation can be made available to those authorities.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "importer",
+      "addressee_note": "Importer of a high-risk AI system",
+      "decomposed_atoms": [
+        {
+          "atom": "provide_information_on_request",
+          "description": "Provide all necessary information and documentation to demonstrate conformity upon reasoned request",
+          "requirement": "Importers SHALL provide competent authorities, upon a reasoned request, with all necessary information and documentation to demonstrate conformity with Section 2, in an easily understood language"
+        },
+        {
+          "atom": "ensure_technical_documentation_available",
+          "description": "Ensure technical documentation can be made available to authorities",
+          "requirement": "Importers SHALL ensure that the technical documentation can be made available to competent authorities"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "documentation_search",
+        "what_to_scan": "Authority correspondence records, documentation accessibility, language compliance",
+        "human_judgment_needed": true
+      },
+      "scope_limitation": "Only applies to importers",
+      "context_skip_field": "is_importer"
+    },
+    {
+      "id": "ART23-OBL-7",
+      "source": "Art. 23(7)",
+      "source_quote": "Importers shall cooperate with the relevant competent authorities in any action those authorities take in relation to a high-risk AI system placed on the market by the importers, in particular to reduce and mitigate the risks posed by it.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "importer",
+      "addressee_note": "Importer of a high-risk AI system",
+      "decomposed_atoms": [
+        {
+          "atom": "cooperate_with_authorities",
+          "description": "Cooperate with competent authorities in any action related to the system",
+          "requirement": "Importers SHALL cooperate with competent authorities in any action taken in relation to the high-risk AI system, in particular to reduce and mitigate risks"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "documentation_search",
+        "what_to_scan": "Authority cooperation records, risk mitigation actions",
+        "human_judgment_needed": true
+      },
+      "scope_limitation": "Only applies to importers",
+      "context_skip_field": "is_importer"
+    }
+  ],
+  "summary": {
+    "total_obligations": 8,
+    "obligation_count": 7,
+    "prohibition_count": 1,
+    "permission_count": 0,
+    "addressee_breakdown": {
+      "importer": 9
+    },
+    "automation_breakdown": {
+      "full": 0,
+      "partial": 5,
+      "manual": 3
+    }
+  }
+}

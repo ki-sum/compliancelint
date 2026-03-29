@@ -1,0 +1,308 @@
+{
+  "_metadata": {
+    "article": 26,
+    "title": "Obligations of Deployers of High-Risk AI Systems",
+    "prerequisites": [
+      {
+        "type": "risk_classification",
+        "required_level": "high-risk",
+        "source_article": 6,
+        "context_field": "risk_classification",
+        "skip_when": "not high-risk with medium/high confidence"
+      }
+    ],
+    "decomposition_date": "2026-04-03",
+    "primary_official_source": {
+      "name": "EUR-Lex -- Official Journal of the European Union",
+      "eli_uri": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng",
+      "celex": "32024R1689",
+      "oj_citation": "OJ L 2024/1689, 12.7.2024"
+    },
+    "pdf_pages": [67, 68, 69],
+    "related_standards": {
+      "published": [
+        "ISO/IEC 42001:2023 -- AI management system",
+        "ISO/IEC 23894:2023 -- AI risk management"
+      ],
+      "upcoming": [
+        "CEN-CENELEC harmonized standard for deployer obligations (expected Q4 2026)"
+      ]
+    }
+  },
+  "obligations": [
+    {
+      "id": "ART26-OBL-1",
+      "source": "Art. 26(1)",
+      "source_quote": "Deployers of high-risk AI systems shall take appropriate technical and organisational measures to ensure they use such systems in accordance with the instructions for use accompanying the systems, pursuant to paragraphs 3 and 6.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "deployer",
+      "decomposed_atoms": [
+        {
+          "atom": "use_per_instructions",
+          "description": "Must use system according to instructions for use",
+          "requirement": "SHALL take measures to ensure use in accordance with instructions for use"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check for deployment documentation referencing provider instructions, configuration following provider guidelines",
+        "what_to_scan": ["documentation", "config"],
+        "human_judgment_needed": "Whether the system is actually being used per instructions"
+      }
+    },
+    {
+      "id": "ART26-OBL-2",
+      "source": "Art. 26(2)",
+      "source_quote": "Deployers shall assign human oversight to natural persons who have the necessary competence, training and authority, as well as the necessary support.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "deployer",
+      "decomposed_atoms": [
+        {
+          "atom": "human_oversight_assigned",
+          "description": "Human oversight must be assigned to competent persons",
+          "requirement": "SHALL assign human oversight to natural persons with necessary competence, training and authority"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "low",
+        "detection_method": "Check for human oversight role documentation, oversight assignment records, competency requirements",
+        "what_to_scan": ["documentation"],
+        "human_judgment_needed": "Whether assigned persons truly have necessary competence, training and authority"
+      }
+    },
+    {
+      "id": "ART26-OBL-4",
+      "source": "Art. 26(4)",
+      "source_quote": "Without prejudice to paragraphs 1 and 2, to the extent the deployer exercises control over the input data, that deployer shall ensure that input data is relevant and sufficiently representative in view of the intended purpose of the high-risk AI system.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "deployer",
+      "scope_limitation": "Only applies to the extent the deployer exercises control over input data",
+      "context_skip_field": "deployer_controls_input_data",
+      "context_skip_value": false,
+      "decomposed_atoms": [
+        {
+          "atom": "input_data_relevant",
+          "description": "Input data must be relevant to intended purpose",
+          "requirement": "SHALL ensure input data is relevant and sufficiently representative"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "low",
+        "detection_method": "Check for input data validation, data quality checks, representativeness documentation",
+        "what_to_scan": ["code", "documentation"],
+        "human_judgment_needed": "Whether input data is truly representative for the intended purpose"
+      }
+    },
+    {
+      "id": "ART26-OBL-5",
+      "source": "Art. 26(5)",
+      "source_quote": "Deployers shall monitor the operation of the high-risk AI system on the basis of the instructions for use and, where relevant, inform providers in accordance with Article 72.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "deployer",
+      "decomposed_atoms": [
+        {
+          "atom": "operational_monitoring",
+          "description": "Must monitor system operation per instructions",
+          "requirement": "SHALL monitor operation on the basis of instructions for use"
+        },
+        {
+          "atom": "inform_provider_of_risks",
+          "description": "Must inform provider if system presents risk",
+          "requirement": "SHALL inform provider and suspend use if system may present a risk per Art. 79(1)"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check for monitoring dashboards, alerting systems, health checks, provider communication procedures",
+        "what_to_scan": ["code", "config", "documentation"],
+        "human_judgment_needed": "Whether monitoring is adequate for the specific system"
+      }
+    },
+    {
+      "id": "ART26-OBL-6",
+      "source": "Art. 26(6)",
+      "source_quote": "Deployers of high-risk AI systems shall keep the logs automatically generated by that high-risk AI system to the extent such logs are under their control, for a period appropriate to the intended purpose of the high-risk AI system, of at least six months, unless provided otherwise in applicable Union or national law, in particular in Union law on the protection of personal data.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "deployer",
+      "decomposed_atoms": [
+        {
+          "atom": "log_retention",
+          "description": "Must keep auto-generated logs for at least 6 months",
+          "requirement": "SHALL keep logs for at least six months"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check for log retention configuration, log storage systems, retention policy documentation",
+        "what_to_scan": ["config", "documentation"],
+        "human_judgment_needed": "Whether logs are actually retained for the required period"
+      }
+    },
+    {
+      "id": "ART26-OBL-7",
+      "source": "Art. 26(7)",
+      "source_quote": "Before putting into service or using a high-risk AI system at the workplace, deployers who are employers shall inform workers' representatives and the affected workers that they will be subject to the use of the high-risk AI system.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "deployer",
+      "scope_limitation": "Only applies to deployers who are employers using AI in workplace",
+      "context_skip_field": "is_workplace_deployment",
+      "context_skip_value": false,
+      "decomposed_atoms": [
+        {
+          "atom": "worker_notification",
+          "description": "Must inform workers and representatives before deployment",
+          "requirement": "SHALL inform workers' representatives and affected workers before deployment"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "Check for worker notification documentation, communication templates",
+        "what_to_scan": ["documentation"],
+        "human_judgment_needed": "Whether workers have actually been informed per applicable labor law"
+      }
+    },
+    {
+      "id": "ART26-OBL-8",
+      "source": "Art. 26(8)",
+      "source_quote": "Deployers of high-risk AI systems that are public authorities, or Union institutions, bodies, offices or agencies shall comply with the registration obligations referred to in Article 49.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "deployer",
+      "scope_limitation": "Only applies to public authority deployers",
+      "context_skip_field": "is_public_authority",
+      "context_skip_value": false,
+      "decomposed_atoms": [
+        {
+          "atom": "eu_database_registration",
+          "description": "Public authority deployers must register in EU database",
+          "requirement": "SHALL comply with registration obligations in Art. 49"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "Check for EU database registration evidence",
+        "what_to_scan": ["documentation"],
+        "human_judgment_needed": "Whether registration has been completed"
+      }
+    },
+    {
+      "id": "ART26-OBL-9",
+      "source": "Art. 26(9)",
+      "source_quote": "Where applicable, deployers of high-risk AI systems shall use the information provided under Article 13 of this Regulation to comply with their obligation to carry out a data protection impact assessment under Article 35 of Regulation (EU) 2016/679 or Article 27 of Directive (EU) 2016/680.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "deployer",
+      "scope_limitation": "Only applies where DPIA is required under GDPR/LED",
+      "context_skip_field": "requires_dpia",
+      "context_skip_value": false,
+      "decomposed_atoms": [
+        {
+          "atom": "dpia_using_art13_info",
+          "description": "Must use Art. 13 information for DPIA",
+          "requirement": "SHALL use Art. 13 information for data protection impact assessment"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "Check for DPIA documentation",
+        "what_to_scan": ["documentation"],
+        "human_judgment_needed": "Whether DPIA has been conducted and uses Art. 13 information"
+      }
+    },
+    {
+      "id": "ART26-OBL-10",
+      "source": "Art. 26(10)",
+      "source_quote": "Without prejudice to Directive (EU) 2016/680, in the framework of an investigation for the targeted search of a person suspected or convicted of having committed a criminal offence, the deployer of a high-risk AI system for post-remote biometric identification shall request an authorisation, ex ante, or without undue delay and no later than 48 hours, by a judicial authority or an administrative authority whose decision is binding and subject to judicial review, for the use of that system, except when it is used for the initial identification of a potential suspect based on objective and verifiable facts directly linked to the offence.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "deployer",
+      "scope_limitation": "Only applies to post-remote biometric identification for law enforcement",
+      "context_skip_field": "is_post_remote_biometric_id",
+      "context_skip_value": false,
+      "decomposed_atoms": [
+        {
+          "atom": "judicial_authorisation",
+          "description": "Must obtain judicial/administrative authorisation for post-remote biometric ID",
+          "requirement": "SHALL request authorisation ex ante or within 48 hours for post-remote biometric identification"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "Not automatable — organizational/legal process",
+        "what_to_scan": [],
+        "human_judgment_needed": "This is a law enforcement operational requirement that cannot be assessed from code"
+      }
+    },
+    {
+      "id": "ART26-OBL-11",
+      "source": "Art. 26(11)",
+      "source_quote": "Without prejudice to Article 50 of this Regulation, deployers of high-risk AI systems referred to in Annex III that make decisions or assist in making decisions related to natural persons shall inform the natural persons that they are subject to the use of the high-risk AI system.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "deployer",
+      "decomposed_atoms": [
+        {
+          "atom": "inform_affected_persons",
+          "description": "Must inform natural persons they are subject to the AI system",
+          "requirement": "SHALL inform natural persons that they are subject to the use of the high-risk AI system"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check for user-facing AI disclosure notices, consent forms, notification mechanisms",
+        "what_to_scan": ["code", "documentation"],
+        "human_judgment_needed": "Whether notification actually reaches affected persons"
+      }
+    },
+    {
+      "id": "ART26-OBL-12",
+      "source": "Art. 26(12)",
+      "source_quote": "Deployers shall cooperate with the relevant competent authorities in any action those authorities take in relation to the high-risk AI system in order to implement this Regulation.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "deployer",
+      "decomposed_atoms": [
+        {
+          "atom": "authority_cooperation",
+          "description": "Must cooperate with competent authorities",
+          "requirement": "SHALL cooperate with competent authorities"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "Check for authority liaison documentation, cooperation procedures",
+        "what_to_scan": ["documentation"],
+        "human_judgment_needed": "Organizational process requirement"
+      }
+    }
+  ],
+  "summary": {
+    "total_obligations": 11,
+    "obligation_count": 11,
+    "addressee_breakdown": {
+      "deployer": 11
+    },
+    "automation_breakdown": {
+      "full": 0,
+      "partial": 6,
+      "manual": 5
+    }
+  }
+}
