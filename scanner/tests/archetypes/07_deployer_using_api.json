@@ -1,0 +1,148 @@
+{
+  "name": "Deployer using third-party AI API",
+  "description": "Company deploying a third-party AI API, user_role=deployer, NOT open source, not high risk. Art.9-15 should be NOT_APPLICABLE (not high risk). Art.50 depends on answers.",
+  "project_context": {
+    "primary_language": "Python",
+    "risk_classification": "not high-risk",
+    "risk_classification_confidence": "high",
+    "compliance_answers": {
+      "_scope": {
+        "is_ai_system": true,
+        "is_ai_system_reasoning": "Integrates OpenAI API for customer support",
+        "territorial_scope_applies": true,
+        "territorial_scope_reasoning": "EU-based company serving EU customers",
+        "is_open_source": false,
+        "open_source_license": null,
+        "user_role": "deployer",
+        "user_role_reasoning": "Uses third-party AI API, does not develop the model",
+        "is_military_defense": false,
+        "is_research_only": false
+      },
+      "art5": {
+        "has_facial_recognition_scraping": false,
+        "has_social_scoring": false,
+        "has_subliminal_manipulation": false,
+        "has_emotion_recognition_workplace": false,
+        "has_exploitation_of_vulnerabilities": false,
+        "has_predictive_policing": false,
+        "has_biometric_categorization": false,
+        "has_real_time_biometric_id": false
+      },
+      "art6": {
+        "annex_iii_categories": [],
+        "annex_i_product_type": null,
+        "is_high_risk": false,
+        "reasoning": "Customer support chatbot, not in Annex III categories"
+      },
+      "art9": {
+        "has_risk_docs": false,
+        "risk_doc_paths": [],
+        "has_testing_infrastructure": false,
+        "testing_evidence": [],
+        "has_risk_code_patterns": false,
+        "risk_code_evidence": [],
+        "has_defined_metrics": false,
+        "metrics_evidence": []
+      },
+      "art10": {
+        "has_data_governance_doc": false,
+        "data_doc_paths": [],
+        "has_bias_mitigation": false,
+        "bias_evidence": [],
+        "has_data_lineage": false
+      },
+      "art11": {
+        "has_technical_docs": false,
+        "doc_paths": [],
+        "documented_aspects": []
+      },
+      "art12": {
+        "has_logging": true,
+        "logging_description": "API call logging",
+        "logging_evidence": [
+          "api_client.py"
+        ],
+        "has_retention_config": false,
+        "retention_days": null,
+        "retention_evidence": ""
+      },
+      "art13": {
+        "has_explainability": false,
+        "explainability_evidence": [],
+        "has_transparency_info": false,
+        "transparency_paths": []
+      },
+      "art14": {
+        "has_human_oversight": false,
+        "oversight_evidence": [],
+        "has_override_mechanism": false,
+        "override_evidence": []
+      },
+      "art15": {
+        "has_accuracy_testing": false,
+        "accuracy_evidence": [],
+        "has_robustness_testing": false,
+        "robustness_evidence": [],
+        "has_fallback_behavior": false
+      },
+      "art50": {
+        "is_chatbot_or_interactive_ai": true,
+        "is_generating_synthetic_content": true,
+        "has_ai_disclosure_to_users": true,
+        "disclosure_evidence": [
+          "templates/chat.html"
+        ],
+        "has_content_watermarking": false,
+        "is_emotion_recognition_system": false,
+        "is_biometric_categorization_system": false,
+        "has_emotion_biometric_disclosure": false,
+        "emotion_biometric_evidence": [],
+        "is_deep_fake_system": false,
+        "has_deep_fake_disclosure": false,
+        "deep_fake_evidence": []
+      }
+    }
+  },
+  "expected": {
+    "art5": {
+      "overall": "compliant",
+      "legal_basis": "Art. 5(1): no prohibited practices detected — all 4 categories checked with high confidence; Art. 5 applies to deployers per Art. 5(1)"
+    },
+    "art6": {
+      "overall": "unable_to_determine",
+      "legal_basis": "Art. 6(1)-(2): system is not high-risk (is_high_risk=false) but deployer role means provider's classification governs — unable to fully determine without provider's conformity assessment"
+    },
+    "art9": {
+      "overall": "not_applicable",
+      "legal_basis": "Art. 9(1): risk management system is provider obligation; deployer using not-high-risk third-party API — Art. 9 requirements do not apply to deployers of non-high-risk systems"
+    },
+    "art10": {
+      "overall": "not_applicable",
+      "legal_basis": "Art. 10(1): data governance is provider obligation; deployer of non-high-risk system — Art. 10 does not apply"
+    },
+    "art11": {
+      "overall": "not_applicable",
+      "legal_basis": "Art. 11(1): technical documentation is provider obligation; deployer of non-high-risk system — Art. 11 does not apply"
+    },
+    "art12": {
+      "overall": "not_applicable",
+      "legal_basis": "Art. 12(1): automatic logging is provider obligation; deployer of non-high-risk system — Art. 12 does not apply"
+    },
+    "art13": {
+      "overall": "not_applicable",
+      "legal_basis": "Art. 13(1): transparency/instructions for use is provider obligation; deployer of non-high-risk system — Art. 13 does not apply"
+    },
+    "art14": {
+      "overall": "not_applicable",
+      "legal_basis": "Art. 14(1): human oversight design is provider obligation; deployer of non-high-risk system — Art. 14 does not apply"
+    },
+    "art15": {
+      "overall": "not_applicable",
+      "legal_basis": "Art. 15(1): accuracy/robustness is provider obligation; deployer of non-high-risk system — Art. 15 does not apply"
+    },
+    "art50": {
+      "overall": "non_compliant",
+      "legal_basis": "Art. 50(1): deployer of chatbot must ensure users are informed of AI interaction; is_chatbot_or_interactive_ai=true, has_ai_disclosure_to_users=true but has_content_watermarking=false for synthetic content per Art. 50(2)"
+    }
+  }
+}

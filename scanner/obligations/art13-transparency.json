@@ -1,0 +1,258 @@
+{
+  "_metadata": {
+    "article": 13,
+    "title": "Transparency and Provision of Information to Deployers",
+    "prerequisites": [
+      {
+        "type": "risk_classification",
+        "required_level": "high-risk",
+        "source_article": 6,
+        "context_field": "risk_classification",
+        "skip_when": "not high-risk with medium/high confidence"
+      }
+    ],
+    "decomposition_date": "2026-03-20",
+    "primary_official_source": {
+      "name": "EUR-Lex -- Official Journal of the European Union",
+      "eli_uri": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng",
+      "celex": "32024R1689",
+      "oj_citation": "OJ L 2024/1689, 12.7.2024"
+    },
+    "pdf_pages": [
+      59,
+      60
+    ],
+    "related_standards": {
+      "published": [
+        "ISO/IEC 42001:2023 -- AI management system"
+      ],
+      "upcoming": [
+        "CEN-CENELEC harmonized standard for Art. 13 (expected Q4 2026)"
+      ]
+    }
+  },
+  "obligations": [
+    {
+      "id": "ART13-OBL-1",
+      "source": "Art. 13(1)",
+      "source_quote": "High-risk AI systems shall be designed and developed in such a way as to ensure that their operation is sufficiently transparent to enable deployers to interpret a system's output and use it appropriately.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "operation_sufficiently_transparent",
+          "description": "System operation must be transparent enough for deployers",
+          "requirement": "Operation SHALL be sufficiently transparent to enable deployers to interpret outputs"
+        },
+        {
+          "atom": "enables_output_interpretation",
+          "description": "Deployers must be able to interpret system output",
+          "requirement": "Transparency SHALL enable deployers to interpret the system's output and use it appropriately"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check for interpretability tooling (SHAP, LIME, Captum, ELI5), explanation APIs, feature importance outputs, attention visualizations, and deployer-facing documentation",
+        "what_to_scan": [
+          "code",
+          "dependencies",
+          "documentation"
+        ],
+        "human_judgment_needed": "Whether the level of transparency is 'sufficient' for the specific use case",
+        "rationale": "Can detect explainability tooling but cannot assess if transparency is sufficient"
+      }
+    },
+    {
+      "id": "ART13-OBL-1b",
+      "source": "Art. 13(1)",
+      "source_quote": "An appropriate type and degree of transparency shall be ensured with a view to achieving compliance with the relevant obligations of the provider and deployer set out in Section 3.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "note": "Distinct from OBL-1: OBL-1 covers the design requirement (system must be designed for transparency). This obligation covers the outcome requirement — appropriate type and degree of transparency must actually be ensured, measured against Section 3 compliance.",
+      "decomposed_atoms": [
+        {
+          "atom": "transparency_type_appropriate",
+          "description": "The type of transparency must be appropriate",
+          "requirement": "Transparency SHALL be of an appropriate type for the system and context"
+        },
+        {
+          "atom": "transparency_degree_appropriate",
+          "description": "The degree of transparency must be appropriate",
+          "requirement": "The degree of transparency SHALL be sufficient to enable compliance with Section 3 obligations"
+        },
+        {
+          "atom": "transparency_enables_compliance",
+          "description": "Transparency must achieve Section 3 compliance",
+          "requirement": "Transparency SHALL be ensured with a view to achieving compliance with provider and deployer obligations in Section 3"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "Assess whether the level of transparency provided enables compliance with Art. 9-15 and deployer obligations in Section 3",
+        "what_to_scan": [
+          "documentation"
+        ],
+        "human_judgment_needed": "Whether transparency type and degree are appropriate for the specific system and context, measured against Section 3 obligations",
+        "rationale": "Outcome-based requirement — appropriateness assessment requires legal and domain expertise"
+      }
+    },
+    {
+      "id": "ART13-OBL-2",
+      "source": "Art. 13(2)",
+      "source_quote": "High-risk AI systems shall be accompanied by instructions for use in an appropriate digital format or otherwise that include concise, complete, correct and clear information that is relevant, accessible and comprehensible to deployers.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "instructions_for_use_exist",
+          "description": "Instructions for use must exist",
+          "requirement": "System SHALL be accompanied by instructions for use"
+        },
+        {
+          "atom": "instructions_digital_format",
+          "description": "Instructions in appropriate digital format",
+          "requirement": "Instructions SHALL be in an appropriate digital format"
+        },
+        {
+          "atom": "instructions_concise_complete_correct_clear",
+          "description": "Information must be concise, complete, correct and clear",
+          "requirement": "Instructions SHALL include concise, complete, correct and clear information"
+        },
+        {
+          "atom": "instructions_relevant_accessible_comprehensible",
+          "description": "Information must be relevant, accessible and comprehensible",
+          "requirement": "Information SHALL be relevant, accessible and comprehensible to deployers"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check for existence of deployer-facing documentation (user guide, deployer guide, instructions of use), digital format availability (MD, PDF, HTML), and completeness against Art. 13(3) checklist",
+        "what_to_scan": [
+          "documentation",
+          "config"
+        ],
+        "human_judgment_needed": "Whether instructions are truly concise, complete, correct, clear, relevant, accessible and comprehensible",
+        "rationale": "Can detect documentation existence but cannot assess quality attributes"
+      }
+    },
+    {
+      "id": "ART13-OBL-3",
+      "source": "Art. 13(3)",
+      "source_quote": "The instructions for use shall contain at least the following information:",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "contains_provider_identity",
+          "description": "Art.13(3)(a): provider identity and contact details",
+          "requirement": "SHALL contain identity and contact details of the provider"
+        },
+        {
+          "atom": "contains_intended_purpose",
+          "description": "Art.13(3)(b)(i): intended purpose",
+          "requirement": "SHALL contain the intended purpose of the system"
+        },
+        {
+          "atom": "contains_accuracy_metrics",
+          "description": "Art.13(3)(b)(ii): accuracy, robustness, cybersecurity levels",
+          "requirement": "SHALL contain the level of accuracy, robustness and cybersecurity metrics"
+        },
+        {
+          "atom": "contains_known_risks",
+          "description": "Art.13(3)(b)(iii): known risks to health/safety/rights",
+          "requirement": "SHALL contain known or foreseeable circumstances that may lead to risks"
+        },
+        {
+          "atom": "contains_explainability_info",
+          "description": "Art.13(3)(b)(iv): explainability capabilities",
+          "requirement": "SHALL contain technical capabilities to explain output (where applicable)"
+        },
+        {
+          "atom": "contains_group_performance",
+          "description": "Art.13(3)(b)(v): performance for specific persons/groups",
+          "requirement": "SHALL contain performance regarding specific persons or groups (when appropriate)"
+        },
+        {
+          "atom": "contains_input_specs",
+          "description": "Art.13(3)(b)(vi): input data specifications",
+          "requirement": "SHALL contain specifications for input data (when appropriate)"
+        },
+        {
+          "atom": "contains_output_interpretation",
+          "description": "Art.13(3)(b)(vii): output interpretation guidance",
+          "requirement": "SHALL contain information to enable deployers to interpret output (where applicable)"
+        },
+        {
+          "atom": "contains_changes",
+          "description": "Art.13(3)(c): pre-determined changes",
+          "requirement": "SHALL contain changes pre-determined at initial conformity assessment"
+        },
+        {
+          "atom": "contains_oversight_measures",
+          "description": "Art.13(3)(d): human oversight measures per Art. 14",
+          "requirement": "SHALL contain human oversight measures including technical measures for output interpretation"
+        },
+        {
+          "atom": "contains_resources_lifetime",
+          "description": "Art.13(3)(e): resources and maintenance",
+          "requirement": "SHALL contain computational/hardware resources needed, expected lifetime, maintenance measures"
+        },
+        {
+          "atom": "contains_log_mechanisms",
+          "description": "Art.13(3)(f): log collection mechanisms per Art. 12",
+          "requirement": "SHALL contain description of mechanisms for deployers to collect/store/interpret logs"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "low",
+        "detection_method": "Check deployer documentation for provider name, trade name, contact address, or contact information sections",
+        "what_to_scan": [
+          "documentation"
+        ],
+        "human_judgment_needed": "Whether all 12 required elements (a-f with sub-items) are adequately covered",
+        "rationale": "Can detect some documentation sections but cannot verify completeness of all 12 elements"
+      },
+      "cross_references": [
+        {
+          "article": 14,
+          "context": "Human oversight measures (referenced in 3(d))"
+        },
+        {
+          "article": 12,
+          "context": "Log mechanisms (referenced in 3(f))"
+        },
+        {
+          "article": 15,
+          "context": "Accuracy and robustness metrics (referenced in 3(b)(ii))"
+        },
+        {
+          "article": 9,
+          "paragraph": 2,
+          "context": "Health/safety/rights risks (referenced in 3(b)(iii))"
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "total_obligations": 4,
+    "obligation_count": 4,
+    "addressee_breakdown": {
+      "provider": 3,
+      "deployer": 0,
+      "commission": 0
+    },
+    "automation_breakdown": {
+      "full": 0,
+      "partial": 3,
+      "manual": 0
+    }
+  }
+}

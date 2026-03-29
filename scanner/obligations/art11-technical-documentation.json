@@ -1,0 +1,333 @@
+{
+  "_metadata": {
+    "article": 11,
+    "title": "Technical Documentation",
+    "prerequisites": [
+      {
+        "type": "risk_classification",
+        "required_level": "high-risk",
+        "source_article": 6,
+        "context_field": "risk_classification",
+        "skip_when": "not high-risk with medium/high confidence"
+      }
+    ],
+    "decomposition_date": "2026-03-20",
+    "primary_official_source": {
+      "name": "EUR-Lex — Official Journal of the European Union",
+      "eli_uri": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng",
+      "celex": "32024R1689",
+      "oj_citation": "OJ L 2024/1689, 12.7.2024"
+    },
+    "pdf_pages": [
+      58,
+      59
+    ],
+    "related_standards": {
+      "published": [
+        "ISO/IEC 42001:2023 — AI management system (documentation requirements)"
+      ],
+      "upcoming": [
+        "CEN-CENELEC harmonized standard for Art. 11 (expected Q4 2026)"
+      ]
+    }
+  },
+  "obligations": [
+    {
+      "id": "ART11-OBL-1",
+      "source": "Art. 11(1)",
+      "source_quote": "The technical documentation of a high-risk AI system shall be drawn up before that system is placed on the market or put into service and shall be kept up-to date.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "tech_doc_exists",
+          "description": "Technical documentation must exist",
+          "requirement": "Technical documentation SHALL be drawn up"
+        },
+        {
+          "atom": "tech_doc_before_market",
+          "description": "Documentation before market placement",
+          "requirement": "Documentation SHALL be drawn up BEFORE placing on market or putting into service"
+        },
+        {
+          "atom": "tech_doc_kept_up_to_date",
+          "description": "Documentation must be maintained",
+          "requirement": "Documentation SHALL be kept up-to-date"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check for presence of README with substantive content (>500 chars), check file modification dates against deployment indicators, check for version tracking (CHANGELOG)",
+        "what_to_scan": [
+          "documentation",
+          "config"
+        ],
+        "human_judgment_needed": "Whether documentation is truly comprehensive and up-to-date",
+        "rationale": "Can detect documentation artifacts but cannot assess completeness or currency"
+      }
+    },
+    {
+      "id": "ART11-OBL-1b",
+      "source": "Art. 11(1)",
+      "source_quote": "The technical documentation shall be drawn up in such a way as to demonstrate that the high-risk AI system complies with the requirements set out in this Section and to provide national competent authorities and notified bodies with the necessary information in a clear and comprehensive form to assess the compliance of the AI system with those requirements.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "demonstrates_compliance",
+          "description": "Documentation must demonstrate compliance",
+          "requirement": "Documentation SHALL demonstrate compliance with Section requirements"
+        },
+        {
+          "atom": "clear_and_comprehensive",
+          "description": "Documentation must be clear and comprehensive",
+          "requirement": "Documentation SHALL provide information in a clear and comprehensive form"
+        },
+        {
+          "atom": "enables_authority_assessment",
+          "description": "Documentation must enable authority assessment",
+          "requirement": "Documentation SHALL enable national authorities and notified bodies to assess compliance"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "low",
+        "detection_method": "Check for architecture documentation describing system elements, design decisions, and development process. Cross-reference with other article requirements (Art. 9 risk management docs, Art. 10 data governance docs, Art. 12 logging docs)",
+        "what_to_scan": [
+          "documentation",
+          "code"
+        ],
+        "human_judgment_needed": "Whether documentation is truly clear, comprehensive, and sufficient for authority assessment",
+        "rationale": "Can detect documentation presence but cannot assess clarity or comprehensiveness"
+      }
+    },
+    {
+      "id": "ART11-OBL-1c",
+      "source": "Art. 11(1)",
+      "source_quote": "It shall contain, at a minimum, the elements set out in Annex IV.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "contains_annex_iv_elements",
+          "description": "Documentation must contain Annex IV elements",
+          "requirement": "Documentation SHALL contain at minimum all elements set out in Annex IV"
+        },
+        {
+          "atom": "annex_iv_general_description",
+          "description": "Annex IV(1): General description",
+          "requirement": "SHALL include intended purpose, developer identity, system version"
+        },
+        {
+          "atom": "annex_iv_detailed_description",
+          "description": "Annex IV(2): Detailed description + development",
+          "requirement": "SHALL include design specifications, architecture, algorithms, data requirements"
+        },
+        {
+          "atom": "annex_iv_monitoring_testing",
+          "description": "Annex IV(3-4): Monitoring + testing",
+          "requirement": "SHALL include monitoring description, testing procedures and metrics"
+        },
+        {
+          "atom": "annex_iv_risk_and_changes",
+          "description": "Annex IV(5-8): Risk, changes, standards, declaration",
+          "requirement": "SHALL include risk management, modification history, standards applied"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "low",
+        "detection_method": "Check for documentation artifacts covering each Annex IV section: README (section 1), architecture docs (section 2), model card (section 2), API docs (section 2/3), testing docs (section 4), security docs (section 5)",
+        "what_to_scan": [
+          "documentation",
+          "code",
+          "config"
+        ],
+        "human_judgment_needed": "Whether each Annex IV element is adequately covered",
+        "rationale": "Can detect presence of documentation sections but cannot assess Annex IV coverage completeness"
+      }
+    },
+    {
+      "id": "ART11-PERM-1d",
+      "source": "Art. 11(1)",
+      "source_quote": "SMEs, including start-ups, may provide the elements of the technical documentation specified in Annex IV in a simplified manner.",
+      "deontic_type": "permission",
+      "modality": "may",
+      "addressee": "provider",
+      "scope_limitation": "Only applies to SMEs and start-ups",
+      "context_skip_field": "is_sme",
+      "context_skip_value": false,
+      "note": "SME simplification permission — SMEs are not required to use the full Annex IV format. If is_sme=false, this permission is not applicable to the project.",
+      "decomposed_atoms": [
+        {
+          "atom": "sme_may_simplify_documentation",
+          "description": "SMEs may use simplified technical documentation",
+          "requirement": "SMEs and start-ups MAY provide Annex IV technical documentation in a simplified manner"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "Determine if the provider qualifies as an SME or start-up under EU SME definition",
+        "what_to_scan": [],
+        "human_judgment_needed": "Whether the provider qualifies as an SME or start-up",
+        "rationale": "SME status determination requires business information, not code analysis"
+      }
+    },
+    {
+      "id": "ART11-OBL-1e",
+      "source": "Art. 11(1)",
+      "source_quote": "To that end, the Commission shall establish a simplified technical documentation form targeted at the needs of small and microenterprises.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "commission",
+      "note": "Commission obligation to establish an SME-friendly simplified documentation form. NOT a provider obligation — included for completeness so providers know the form should exist.",
+      "decomposed_atoms": [
+        {
+          "atom": "commission_establishes_sme_form",
+          "description": "Commission must create simplified documentation form",
+          "requirement": "The Commission SHALL establish a simplified technical documentation form targeted at small and microenterprises"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "N/A — Commission obligation, not provider",
+        "what_to_scan": [],
+        "human_judgment_needed": "Monitor for Commission publication of the simplified form",
+        "rationale": "Commission obligation — cannot be assessed from provider code"
+      }
+    },
+    {
+      "id": "ART11-OBL-1f",
+      "source": "Art. 11(1)",
+      "source_quote": "Where an SME, including a start-up, opts to provide the information required in Annex IV in a simplified manner, it shall use the form referred to in this paragraph.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "scope_limitation": "Only applies to SMEs and start-ups that opt to use simplified documentation",
+      "context_skip_field": "is_sme",
+      "context_skip_value": false,
+      "decomposed_atoms": [
+        {
+          "atom": "sme_must_use_official_form",
+          "description": "SMEs opting for simplified documentation must use the official Commission form",
+          "requirement": "Where an SME opts for simplified Annex IV documentation, it SHALL use the Commission form"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "N/A — conditional obligation for SMEs using simplified documentation",
+        "what_to_scan": [],
+        "human_judgment_needed": "Whether the SME has opted for simplified documentation and is using the correct Commission form",
+        "rationale": "Form compliance requires review of actual documentation, not code"
+      }
+    },
+    {
+      "id": "ART11-OBL-1g",
+      "source": "Art. 11(1)",
+      "source_quote": "Notified bodies shall accept the form for the purposes of the conformity assessment.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "notified_bodies",
+      "note": "Obligation on notified bodies (not providers) to accept the simplified SME form. Included so providers know: notified bodies cannot lawfully reject a compliant simplified form.",
+      "decomposed_atoms": [
+        {
+          "atom": "notified_bodies_accept_simplified_form",
+          "description": "Notified bodies must accept simplified form",
+          "requirement": "Notified bodies SHALL accept the simplified SME form for conformity assessment purposes"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "N/A — obligation on notified bodies, not providers",
+        "what_to_scan": [],
+        "human_judgment_needed": "If a notified body refuses to accept the simplified form, escalate — this is a legal obligation on the notified body",
+        "rationale": "Notified body obligation — cannot be assessed from provider code"
+      }
+    },
+    {
+      "id": "ART11-OBL-2",
+      "source": "Art. 11(2)",
+      "source_quote": "Where a high-risk AI system related to a product covered by the Union harmonisation legislation listed in Section A of Annex I is placed on the market or put into service, a single set of technical documentation shall be drawn up containing all the information set out in paragraph 1, as well as the information required under those legal acts.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "scope_limitation": "Only applies to products covered by Union harmonisation legislation (Annex I, Section A)",
+      "context_skip_field": "is_annex_i_product",
+      "context_skip_value": false,
+      "decomposed_atoms": [
+        {
+          "atom": "single_documentation_set",
+          "description": "Single combined documentation for Annex I products",
+          "requirement": "A single set of technical documentation SHALL be drawn up combining Art. 11 and applicable Union harmonisation legislation requirements"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "Determine if the system is a product covered by Annex I Section A legislation",
+        "what_to_scan": [
+          "documentation"
+        ],
+        "human_judgment_needed": "Whether the system falls under Annex I legislation",
+        "rationale": "Product classification requires domain expertise"
+      }
+    },
+    {
+      "id": "ART11-EMP-3",
+      "source": "Art. 11(3)",
+      "source_quote": "The Commission is empowered to adopt delegated acts in accordance with Article 97 in order to amend Annex IV, where necessary, to ensure that, in light of technical progress, the technical documentation provides all the information necessary to assess the compliance of the system with the requirements set out in this Section.",
+      "deontic_type": "empowerment",
+      "modality": "is empowered",
+      "addressee": "commission",
+      "note": "Commission empowerment to amend Annex IV. Not a provider obligation.",
+      "decomposed_atoms": [
+        {
+          "atom": "commission_may_amend_annex_iv",
+          "description": "Commission can update Annex IV",
+          "requirement": "The Commission is empowered to adopt delegated acts to amend Annex IV"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "N/A — empowerment, not obligation",
+        "what_to_scan": [],
+        "human_judgment_needed": "Monitor for delegated acts that modify Annex IV",
+        "rationale": "Empowerment, not obligation"
+      }
+    }
+  ],
+  "summary": {
+    "total_obligations": 9,
+    "obligation_count": 6,
+    "permission_count": 1,
+    "empowerment_count": 1,
+    "addressee_breakdown": {
+      "provider": 6,
+      "deployer": 0,
+      "commission": 2,
+      "notified_bodies": 1
+    },
+    "automation_breakdown": {
+      "full": 0,
+      "partial": 3,
+      "manual": 6
+    },
+    "scope_notes": {
+      "general_obligations": "ART11-OBL-1, ART11-OBL-1b, ART11-OBL-1c — apply to ALL high-risk AI systems",
+      "sme_provisions": "ART11-PERM-1d, ART11-OBL-1f — only for SMEs and start-ups (context_skip_field: is_sme)",
+      "commission_obligations": "ART11-OBL-1e — Commission SHALL establish simplified form; ART11-EMP-3 — Commission empowered to amend Annex IV",
+      "notified_body": "ART11-OBL-1g — notified bodies SHALL accept the simplified SME form",
+      "conditional": "ART11-OBL-2 — only for Annex I products",
+      "empowerment": "ART11-EMP-3 — Commission power, not provider obligation"
+    }
+  }
+}

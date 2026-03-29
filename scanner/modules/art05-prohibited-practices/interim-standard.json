@@ -1,0 +1,253 @@
+{
+  "_metadata": {
+    "standard_id": "CL-IS-ART05-v0.1",
+    "title": "ComplianceLint Interim Standard for EU AI Act Article 5: Prohibited AI Practices",
+    "version": "0.1.0",
+    "date": "2026-03-17",
+    "status": "draft",
+    "disclaimer": "This is an interim standard developed by ComplianceLint. Article 5 prohibitions are directly applicable since 2025-02-02 and do not require harmonized standards for interpretation. This document restates the prohibitions with operational detail for compliance checking. It is NOT legal advice.",
+    "basis": [
+      "EU AI Act Article 5 (official text, Regulation (EU) 2024/1689)",
+      "EU AI Act Recitals 29-44 (legislative intent)",
+      "EU AI Act Annex II (list of criminal offences for Art. 5(1)(h) exception)",
+      "EU AI Act Article 99(1) (penalties for Art. 5 violations)",
+      "AI Office guidelines on prohibited practices (when available)",
+      "European Data Protection Board guidelines on biometric data processing",
+      "Fundamental Rights Agency analysis of AI Act prohibitions"
+    ],
+    "enforcement_date": "2025-02-02",
+    "awaiting_standard": "No harmonized standard required — prohibitions are directly applicable. AI Office guidelines may provide interpretive clarity."
+  },
+
+  "prohibited_practices": [
+    {
+      "id": "PP-ART5-01",
+      "article_ref": "Art. 5(1)(a)",
+      "title": "Subliminal / Manipulative / Deceptive Techniques",
+      "prohibition": "AI systems that deploy subliminal techniques beyond a person's consciousness, or purposefully manipulative or deceptive techniques, with the objective or effect of materially distorting the behaviour of a person or group, in a manner that causes or is reasonably likely to cause significant harm.",
+      "scope": [
+        "Subliminal stimuli (visual, auditory, or other sensory signals below conscious perception threshold)",
+        "Deceptive AI-driven interfaces designed to distort decision-making (dark patterns with AI component)",
+        "AI systems that manipulate information presentation to exploit cognitive biases causing significant harm"
+      ],
+      "not_in_scope": [
+        "Standard recommendation algorithms (unless causing significant harm through manipulation)",
+        "AI-generated marketing content (unless using subliminal techniques)",
+        "Persuasive design without subliminal or deceptive component"
+      ],
+      "exceptions": null,
+      "penalty": "Up to EUR 35,000,000 or 7% of total worldwide annual turnover (Art. 99(1))",
+      "heuristic_indicators": [
+        "Code referencing subliminal messaging or stimulus injection",
+        "Dark pattern implementations with AI-driven personalization",
+        "A/B testing frameworks that optimize for behavioural manipulation"
+      ]
+    },
+    {
+      "id": "PP-ART5-02",
+      "article_ref": "Art. 5(1)(b)",
+      "title": "Exploitation of Vulnerabilities of Specific Groups",
+      "prohibition": "AI systems that exploit any of the vulnerabilities of a person or a specific group of persons due to their age, disability, or a specific social or economic situation, with the objective or the effect of materially distorting the behaviour of that person or a member of that group in a manner that causes or is reasonably likely to cause significant harm.",
+      "scope": [
+        "AI targeting children with manipulative content",
+        "AI exploiting elderly persons' reduced digital literacy",
+        "AI exploiting disability-related vulnerabilities (cognitive, physical, sensory)",
+        "AI exploiting social/economic vulnerability (poverty, homelessness, immigration status)"
+      ],
+      "not_in_scope": [
+        "AI accessibility tools designed to help vulnerable groups",
+        "AI systems providing age-appropriate content filtering",
+        "AI systems that account for vulnerability to REDUCE harm"
+      ],
+      "exceptions": null,
+      "penalty": "Up to EUR 35,000,000 or 7% of total worldwide annual turnover (Art. 99(1))",
+      "heuristic_indicators": [
+        "Code that segments users by age/disability and applies different manipulation strategies",
+        "Targeting logic specifically for vulnerable demographics",
+        "Exploitation of inferred vulnerability status for commercial advantage"
+      ]
+    },
+    {
+      "id": "PP-ART5-03",
+      "article_ref": "Art. 5(1)(c)",
+      "title": "Social Scoring",
+      "prohibition": "AI systems for the evaluation or classification of natural persons or groups based on their social behaviour or known, inferred, or predicted personal or personality characteristics, with the social score leading to either or both: (i) detrimental or unfavourable treatment in social contexts unrelated to the contexts where the data was originally generated or collected; (ii) detrimental or unfavourable treatment that is unjustified or disproportionate to their social behaviour or its gravity.",
+      "scope": [
+        "Systems that aggregate social behaviour data into a 'score' affecting access to services",
+        "Systems that use personal characteristics to create trustworthiness ratings with real-world consequences",
+        "Cross-context data aggregation leading to discriminatory treatment (e.g., social media behaviour affecting credit)"
+      ],
+      "not_in_scope": [
+        "Credit scoring based solely on financial behaviour (regulated under separate financial law)",
+        "Reputation systems limited to a single service context (e.g., seller ratings on a marketplace)",
+        "Fraud detection scoring within the same service context"
+      ],
+      "exceptions": null,
+      "penalty": "Up to EUR 35,000,000 or 7% of total worldwide annual turnover (Art. 99(1))",
+      "heuristic_indicators": [
+        "Social scoring variables or functions",
+        "Cross-context person rating/ranking systems",
+        "Trustworthiness score computation from social behaviour data",
+        "Behaviour aggregation across multiple unrelated domains"
+      ]
+    },
+    {
+      "id": "PP-ART5-04",
+      "article_ref": "Art. 5(1)(d)",
+      "title": "Criminal Offence Risk Assessment Based Solely on Profiling",
+      "prohibition": "AI systems that make risk assessments of natural persons in order to assess or predict the risk of a natural person committing a criminal offence, based solely on the profiling of a natural person or on assessing their personality traits and characteristics. This prohibition does not apply to AI systems used to support the human assessment of the involvement of a person in a criminal activity, which is already based on objective, verifiable facts directly linked to a criminal activity.",
+      "scope": [
+        "Predictive policing systems that profile individuals (not locations) for criminal risk",
+        "Recidivism prediction based solely on personality/demographic profiling",
+        "Pre-crime assessment tools based on personal characteristics without factual criminal evidence"
+      ],
+      "not_in_scope": [
+        "AI augmenting human assessment based on objective criminal evidence",
+        "Crime hotspot prediction (location-based, not person-based)",
+        "Fraud detection based on transactional patterns (not personality profiling)"
+      ],
+      "exceptions": "AI supporting human assessment based on objective, verifiable facts directly linked to criminal activity",
+      "penalty": "Up to EUR 35,000,000 or 7% of total worldwide annual turnover (Art. 99(1))",
+      "heuristic_indicators": [
+        "Criminal risk scoring functions",
+        "Recidivism prediction models",
+        "Person-level crime risk profiling (distinct from location-based crime prediction)"
+      ]
+    },
+    {
+      "id": "PP-ART5-05",
+      "article_ref": "Art. 5(1)(e)",
+      "title": "Untargeted Facial Image Scraping",
+      "prohibition": "AI systems that create or expand facial recognition databases through the untargeted scraping of facial images from the internet or CCTV footage.",
+      "scope": [
+        "Scraping facial images from social media, websites, or public internet sources",
+        "Collecting facial images from CCTV systems without targeted, lawful basis",
+        "Building or expanding facial recognition training datasets through bulk untargeted collection"
+      ],
+      "not_in_scope": [
+        "Facial recognition databases built from consented, targeted data collection",
+        "Facial recognition using images from lawful, targeted investigations (law enforcement with proper authorization)",
+        "Research on publicly available facial recognition benchmark datasets (context-dependent)"
+      ],
+      "exceptions": null,
+      "penalty": "Up to EUR 35,000,000 or 7% of total worldwide annual turnover (Art. 99(1))",
+      "heuristic_indicators": [
+        "Web scraping combined with face detection/extraction",
+        "CCTV feed processing with face extraction pipelines",
+        "Bulk image download scripts combined with facial recognition libraries",
+        "Face database building or expansion code"
+      ]
+    },
+    {
+      "id": "PP-ART5-06",
+      "article_ref": "Art. 5(1)(f)",
+      "title": "Emotion Recognition in Workplace and Education",
+      "prohibition": "AI systems to infer emotions of a natural person in the areas of workplace and education institutions, except where the AI system is intended to be put into service or placed on the market for medical or safety reasons.",
+      "scope": [
+        "Employee engagement/mood detection AI in workplace settings",
+        "Student attention/emotion monitoring in educational institutions",
+        "AI-driven interview emotion analysis for hiring decisions",
+        "Workplace productivity monitoring via emotion inference"
+      ],
+      "not_in_scope": [
+        "Emotion recognition for medical/therapeutic purposes (e.g., mental health monitoring with consent)",
+        "Safety-critical emotion/alertness detection (e.g., driver drowsiness, operator fatigue)",
+        "Emotion recognition in entertainment, gaming, or voluntary consumer applications",
+        "Emotion recognition in customer service (outside workplace/education context)"
+      ],
+      "exceptions": "Medical reasons (e.g., therapeutic monitoring, clinical assessment) or safety reasons (e.g., drowsiness detection for vehicle operators, fatigue monitoring in safety-critical operations)",
+      "exception_requirements": [
+        "The medical or safety purpose must be clearly documented",
+        "The emotion recognition must be necessary (not merely convenient) for the stated purpose",
+        "Appropriate data protection measures must be in place",
+        "Informed consent should be obtained where possible"
+      ],
+      "penalty": "Up to EUR 35,000,000 or 7% of total worldwide annual turnover (Art. 99(1))",
+      "heuristic_indicators": [
+        "Emotion/sentiment detection libraries in workplace/education context",
+        "Facial expression analysis in employee/student monitoring systems",
+        "Voice emotion analysis in workplace communication tools",
+        "Engagement/attention scoring in education platforms"
+      ]
+    },
+    {
+      "id": "PP-ART5-07",
+      "article_ref": "Art. 5(1)(g)",
+      "title": "Biometric Categorization Inferring Sensitive Attributes",
+      "prohibition": "Biometric categorization systems that categorize individually natural persons based on their biometric data to deduce or infer their race, political opinions, trade union membership, religious or philosophical beliefs, sex life or sexual orientation. This prohibition does not apply to any labelling or filtering of lawfully acquired biometric datasets, such as images, based on biometric data or categorizing of biometric data in the area of law enforcement.",
+      "scope": [
+        "AI that analyses facial features, voice, gait, or other biometric data to infer race or ethnicity",
+        "AI that infers political opinions from biometric data",
+        "AI that infers religious beliefs from biometric data (e.g., facial hair, clothing detection as proxy)",
+        "AI that infers sexual orientation from biometric data",
+        "AI that infers trade union membership from biometric data"
+      ],
+      "not_in_scope": [
+        "Biometric data processing that does not attempt to infer the listed sensitive attributes",
+        "Lawful labelling/filtering of biometric datasets (e.g., annotating training data with consent)",
+        "Law enforcement categorization of biometric data under applicable legal basis",
+        "Gender detection for accessibility purposes (context-dependent, seek legal advice)"
+      ],
+      "exceptions": "Lawful labelling or filtering of biometric datasets acquired in line with EU or national law; categorization of biometric data in law enforcement",
+      "penalty": "Up to EUR 35,000,000 or 7% of total worldwide annual turnover (Art. 99(1))",
+      "heuristic_indicators": [
+        "Race/ethnicity classification from facial images",
+        "Political opinion inference from biometric data",
+        "Sexual orientation prediction from biometric data",
+        "Religion inference from physical appearance analysis"
+      ]
+    },
+    {
+      "id": "PP-ART5-08",
+      "article_ref": "Art. 5(1)(h)",
+      "title": "Real-Time Remote Biometric Identification in Public Spaces",
+      "prohibition": "The use of 'real-time' remote biometric identification systems in publicly accessible spaces for the purposes of law enforcement, unless and in as far as such use is strictly necessary for one of the listed objectives.",
+      "scope": [
+        "Live facial recognition cameras in public spaces (streets, parks, transport hubs)",
+        "Real-time gait recognition in publicly accessible areas",
+        "Live voice identification in public spaces",
+        "Any real-time biometric matching against watchlists in public areas"
+      ],
+      "not_in_scope": [
+        "Post-facto (non-real-time) biometric identification (regulated under Art. 6 as high-risk)",
+        "Biometric verification (1:1 matching, e.g., unlocking a phone)",
+        "Biometric identification in non-publicly-accessible spaces (e.g., secure facilities with access control)",
+        "Non-law-enforcement real-time biometric identification (regulated under Art. 6 as high-risk but not banned)"
+      ],
+      "exceptions": {
+        "description": "Three strictly limited exceptions for law enforcement, each requiring prior judicial authorization (except in duly justified urgency, where authorization must be sought within 24 hours)",
+        "exception_i": "Targeted search for specific victims of abduction, trafficking, sexual exploitation, or search for missing persons",
+        "exception_ii": "Prevention of a specific, substantial, and imminent threat to the life or physical safety of natural persons, or a genuine and present or foreseeable threat of a terrorist attack",
+        "exception_iii": "Localization or identification of a person suspected of having committed a criminal offence punishable by a custodial sentence of at least 4 years, for offences listed in Annex II",
+        "conditions": [
+          "Must be strictly necessary for the stated objective",
+          "Prior judicial authorization required (or within 24 hours in urgent cases)",
+          "Temporal, geographic, and personal limitations must be defined",
+          "Fundamental rights impact assessment required before deployment",
+          "Must register in the EU database (Art. 49)",
+          "Must notify the relevant market surveillance authority",
+          "National law may further restrict or prohibit these exceptions"
+        ]
+      },
+      "penalty": "Up to EUR 35,000,000 or 7% of total worldwide annual turnover (Art. 99(1))",
+      "heuristic_indicators": [
+        "Real-time facial recognition pipeline with camera/stream input",
+        "Live biometric matching against watchlists or databases",
+        "Surveillance system integration with biometric identification",
+        "Public space deployment configuration for biometric systems"
+      ]
+    }
+  ],
+
+  "compliance_assessment": {
+    "methodology": "For each prohibited practice, determine: (1) Does the AI system fall within the practice's scope? (2) If yes, does any exception apply? (3) If an exception applies, are all conditions met?",
+    "clean_scan_note": "A clean automated scan (no heuristic flags) is NECESSARY but NOT SUFFICIENT for Art. 5 compliance. Automated tools cannot assess deployment context, intent, or real-world effect.",
+    "documentation_requirement": "All Art. 5 compliance assessments should be documented in writing, including the assessment date, assessor, methodology, and conclusions for each prohibited practice."
+  },
+
+  "scoring": {
+    "compliant": "No heuristic indicators found AND documented human review confirms no prohibited practices",
+    "unable_to_determine": "Heuristic indicators found — human review required to determine compliance",
+    "non_compliant": "Human review confirms a prohibited practice is implemented without valid exception"
+  }
+}

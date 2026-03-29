@@ -1,0 +1,256 @@
+{
+  "_metadata": {
+    "article": 14,
+    "title": "Human Oversight",
+    "prerequisites": [
+      {
+        "type": "risk_classification",
+        "required_level": "high-risk",
+        "source_article": 6,
+        "context_field": "risk_classification",
+        "skip_when": "not high-risk with medium/high confidence"
+      }
+    ],
+    "decomposition_date": "2026-03-20",
+    "primary_official_source": {
+      "name": "EUR-Lex -- Official Journal of the European Union",
+      "eli_uri": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng",
+      "celex": "32024R1689"
+    },
+    "pdf_pages": [
+      60,
+      61
+    ]
+  },
+  "obligations": [
+    {
+      "id": "ART14-OBL-1",
+      "source": "Art. 14(1)",
+      "source_quote": "High-risk AI systems shall be designed and developed in such a way, including with appropriate human-machine interface tools, that they can be effectively overseen by natural persons during the period in which they are in use.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "designed_for_oversight",
+          "description": "System must be designed for effective human oversight",
+          "requirement": "Systems SHALL be designed and developed to enable effective oversight by natural persons"
+        },
+        {
+          "atom": "hmi_tools_provided",
+          "description": "Appropriate human-machine interface tools must be included",
+          "requirement": "Systems SHALL include appropriate human-machine interface tools"
+        },
+        {
+          "atom": "oversight_during_use",
+          "description": "Oversight must be possible during use period",
+          "requirement": "Oversight SHALL be possible during the period in which the system is in use"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check for human-in-the-loop patterns: approval flows, review queues, manual review gates, human-machine interface components",
+        "what_to_scan": [
+          "code",
+          "config",
+          "documentation"
+        ],
+        "human_judgment_needed": "Whether oversight mechanisms are truly 'effective'",
+        "rationale": "Can detect oversight patterns but cannot assess effectiveness"
+      }
+    },
+    {
+      "id": "ART14-OBL-2",
+      "source": "Art. 14(2)",
+      "source_quote": "Human oversight shall aim to prevent or minimise the risks to health, safety or fundamental rights that may emerge when a high-risk AI system is used in accordance with its intended purpose or under conditions of reasonably foreseeable misuse, in particular where such risks persist despite the application of other requirements set out in this Section.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "oversight_prevents_risks",
+          "description": "Oversight must aim to prevent/minimise risks",
+          "requirement": "Human oversight SHALL aim to prevent or minimise risks to health, safety, or fundamental rights"
+        },
+        {
+          "atom": "covers_intended_and_misuse",
+          "description": "Must cover intended use and foreseeable misuse",
+          "requirement": "Oversight SHALL address risks from both intended purpose and foreseeable misuse"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "Check for risk mitigation documentation linked to human oversight procedures",
+        "what_to_scan": [
+          "documentation"
+        ],
+        "human_judgment_needed": "Whether oversight measures adequately address identified risks",
+        "rationale": "Risk prevention effectiveness requires domain expertise"
+      }
+    },
+    {
+      "id": "ART14-OBL-3",
+      "source": "Art. 14(3)",
+      "source_quote": "The oversight measures shall be commensurate with the risks, level of autonomy and context of use of the high-risk AI system, and shall be ensured through either one or both of the following types of measures:",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "measures_commensurate",
+          "description": "Oversight must be proportionate to risks",
+          "requirement": "Oversight measures SHALL be commensurate with risks, autonomy level, and context of use"
+        },
+        {
+          "atom": "built_in_measures",
+          "description": "Art.14(3)(a): measures built into the system by provider",
+          "requirement": "Measures SHALL be identified and built into the system when technically feasible"
+        },
+        {
+          "atom": "deployer_measures",
+          "description": "Art.14(3)(b): measures for deployer to implement",
+          "requirement": "Measures SHALL be identified for deployer implementation"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check for override mechanisms (kill switch, manual override, emergency stop), deployer-facing documentation of oversight procedures",
+        "what_to_scan": [
+          "code",
+          "config",
+          "documentation"
+        ],
+        "human_judgment_needed": "Whether measures are proportionate to the specific risks and autonomy level",
+        "rationale": "Can detect override mechanisms but cannot assess proportionality"
+      }
+    },
+    {
+      "id": "ART14-OBL-4",
+      "source": "Art. 14(4)",
+      "source_quote": "For the purpose of implementing paragraphs 1, 2 and 3, the high-risk AI system shall be provided to the deployer in such a way that natural persons to whom human oversight is assigned are enabled, as appropriate and proportionate:",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "understand_capabilities_limitations",
+          "description": "Art.14(4)(a): understand system capabilities and limitations",
+          "requirement": "Oversight persons SHALL be enabled to understand relevant capacities and limitations, monitor operation, detect anomalies"
+        },
+        {
+          "atom": "aware_automation_bias",
+          "description": "Art.14(4)(b): awareness of automation bias",
+          "requirement": "Oversight persons SHALL remain aware of automation bias tendency"
+        },
+        {
+          "atom": "interpret_output",
+          "description": "Art.14(4)(c): correctly interpret output",
+          "requirement": "Oversight persons SHALL be enabled to correctly interpret the system's output"
+        },
+        {
+          "atom": "override_capability",
+          "description": "Art.14(4)(d): ability to override/reverse output",
+          "requirement": "Oversight persons SHALL be enabled to disregard, override or reverse the output"
+        },
+        {
+          "atom": "interrupt_capability",
+          "description": "Art.14(4)(e): ability to interrupt system (stop button)",
+          "requirement": "Oversight persons SHALL be enabled to intervene or interrupt through a stop button or similar"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check for: monitoring dashboards, system documentation describing capabilities/limitations, anomaly detection code, performance monitoring, model cards, override/stop mechanisms, confidence scores, automation bias warnings",
+        "what_to_scan": [
+          "code",
+          "config",
+          "documentation"
+        ],
+        "human_judgment_needed": "Whether all 5 capabilities (a-e) are adequately provided",
+        "rationale": "Can detect oversight UI patterns and override mechanisms but cannot assess adequacy"
+      }
+    },
+    {
+      "id": "ART14-OBL-5",
+      "source": "Art. 14(5)",
+      "source_quote": "For high-risk AI systems referred to in point 1(a) of Annex III, the measures referred to in paragraph 3 of this Article shall be such as to ensure that, in addition, no action or decision is taken by the deployer on the basis of the identification resulting from the system unless that identification has been separately verified and confirmed by at least two natural persons with the necessary competence, training and authority.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "scope_limitation": "Only applies to biometric identification systems (Annex III, point 1(a))",
+      "context_skip_field": "is_biometric_system",
+      "context_skip_value": false,
+      "decomposed_atoms": [
+        {
+          "atom": "dual_person_verification",
+          "description": "Biometric identification must be verified by at least 2 persons",
+          "requirement": "No action SHALL be taken unless identification is separately verified by at least two natural persons"
+        },
+        {
+          "atom": "persons_competent_trained",
+          "description": "Verifiers must have competence, training and authority",
+          "requirement": "The natural persons SHALL have necessary competence, training and authority"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check for dual-approval workflows, multi-person verification gates, role-based access requiring 2+ approvals",
+        "what_to_scan": [
+          "code",
+          "config"
+        ],
+        "human_judgment_needed": "Whether the dual verification is genuinely independent and persons are qualified",
+        "rationale": "Can detect multi-approval patterns but cannot assess person qualifications"
+      }
+    },
+    {
+      "id": "ART14-EXC-5b",
+      "source": "Art. 14(5)",
+      "source_quote": "The requirement for a separate verification by at least two natural persons shall not apply to high-risk AI systems used for the purposes of law enforcement, migration, border control or asylum, where Union or national law considers the application of this requirement to be disproportionate.",
+      "deontic_type": "exception",
+      "modality": "shall not",
+      "addressee": "provider_and_deployer",
+      "scope_limitation": "Only applies to law enforcement, migration, border control or asylum systems where national/Union law deems dual verification disproportionate",
+      "context_skip_field": "is_biometric_system",
+      "context_skip_value": false,
+      "note": "Exemption from ART14-OBL-5 dual verification requirement. Applies when: (1) system is used for law enforcement, migration, border control, or asylum, AND (2) Union or national law considers dual verification disproportionate. NOT a general exemption.",
+      "decomposed_atoms": [
+        {
+          "atom": "dual_verification_not_required_for_qualifying_le_use",
+          "description": "Dual verification exempt for qualifying law enforcement use",
+          "requirement": "Dual verification requirement SHALL NOT apply to law enforcement/migration/border/asylum systems where national/Union law deems it disproportionate"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "N/A — legal exemption requiring case-by-case assessment",
+        "what_to_scan": [],
+        "human_judgment_needed": "Whether system is used for law enforcement/migration/border/asylum AND applicable law deems dual verification disproportionate",
+        "rationale": "Proportionality assessment under applicable Union/national law requires legal expertise"
+      }
+    }
+  ],
+  "summary": {
+    "total_obligations": 6,
+    "addressee_breakdown": {
+      "provider": 5,
+      "deployer": 0,
+      "commission": 0
+    },
+    "automation_breakdown": {
+      "full": 0,
+      "partial": 4,
+      "manual": 1
+    },
+    "scope_notes": {
+      "general": "ART14-OBL-1 through ART14-OBL-4 -- apply to ALL high-risk AI systems",
+      "conditional": "ART14-OBL-5 -- only biometric identification systems (Annex III, point 1(a))"
+    }
+  }
+}

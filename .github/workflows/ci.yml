@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Run tests
+        working-directory: scanner
+        run: python -m pytest tests/ -v --tb=short
+
+      - name: Verify all modules load
+        working-directory: scanner
+        run: |
+          python -c "
+          import importlib.util, os, sys
+          modules_dir = 'modules'
+          loaded = 0
+          for entry in sorted(os.listdir(modules_dir)):
+              mp = os.path.join(modules_dir, entry, 'module.py')
+              if not os.path.isfile(mp): continue
+              spec = importlib.util.spec_from_file_location(f't.{entry}', mp, submodule_search_locations=[os.path.join(modules_dir, entry)])
+              mod = importlib.util.module_from_spec(spec)
+              if os.path.join(modules_dir, entry) not in sys.path:
+                  sys.path.insert(0, os.path.join(modules_dir, entry))
+              spec.loader.exec_module(mod)
+              inst = mod.create_module()
+              loaded += 1
+          assert loaded == 10, f'Expected 10 modules, got {loaded}'
+          print(f'{loaded} modules loaded successfully')
+          "
+
+      - name: Verify obligation count
+        working-directory: scanner
+        run: |
+          python -c "
+          import json, os
+          total = 0
+          for f in os.listdir('obligations'):
+              if f.endswith('.json'):
+                  data = json.load(open(os.path.join('obligations', f)))
+                  total += len(data.get('obligations', []))
+          assert total == 94, f'Expected 94 obligations, got {total}'
+          print(f'{total} obligations verified')
+          "

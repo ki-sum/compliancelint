@@ -1,0 +1,150 @@
+{
+  "name": "Standalone emotion recognition system",
+  "description": "Like FER library: detects emotions from video, NOT open source, high risk. Art.5 non_compliant (emotion recognition). Art.50(3) must trigger for missing emotion disclosure.",
+  "project_context": {
+    "primary_language": "Python",
+    "risk_classification": "high-risk",
+    "risk_classification_confidence": "high",
+    "compliance_answers": {
+      "_scope": {
+        "is_ai_system": true,
+        "is_ai_system_reasoning": "ML-based emotion detection from video feeds",
+        "territorial_scope_applies": true,
+        "territorial_scope_reasoning": "Sold to EU enterprises",
+        "is_open_source": false,
+        "open_source_license": null,
+        "user_role": "provider",
+        "user_role_reasoning": "Develops and sells the emotion recognition system",
+        "is_military_defense": false,
+        "is_research_only": false
+      },
+      "art5": {
+        "has_facial_recognition_scraping": false,
+        "has_social_scoring": false,
+        "has_subliminal_manipulation": false,
+        "has_emotion_recognition_workplace": true,
+        "has_exploitation_of_vulnerabilities": false,
+        "has_predictive_policing": false,
+        "has_biometric_categorization": false,
+        "has_real_time_biometric_id": false
+      },
+      "art6": {
+        "annex_iii_categories": [
+          "emotion_recognition"
+        ],
+        "annex_i_product_type": null,
+        "is_high_risk": true,
+        "reasoning": "Emotion recognition system under Annex III"
+      },
+      "art9": {
+        "has_risk_docs": false,
+        "risk_doc_paths": [],
+        "has_testing_infrastructure": true,
+        "testing_evidence": [
+          "tests/"
+        ],
+        "has_risk_code_patterns": false,
+        "risk_code_evidence": [],
+        "has_defined_metrics": true,
+        "metrics_evidence": ["accuracy=0.95"]
+      },
+      "art10": {
+        "has_data_governance_doc": false,
+        "data_doc_paths": [],
+        "has_bias_mitigation": false,
+        "bias_evidence": [],
+        "has_data_lineage": false
+      },
+      "art11": {
+        "has_technical_docs": false,
+        "doc_paths": [],
+        "documented_aspects": []
+      },
+      "art12": {
+        "has_logging": false,
+        "logging_description": "",
+        "logging_evidence": [],
+        "has_retention_config": false,
+        "retention_days": null,
+        "retention_evidence": ""
+      },
+      "art13": {
+        "has_explainability": false,
+        "explainability_evidence": [],
+        "has_transparency_info": false,
+        "transparency_paths": []
+      },
+      "art14": {
+        "has_human_oversight": false,
+        "oversight_evidence": [],
+        "has_override_mechanism": false,
+        "override_evidence": []
+      },
+      "art15": {
+        "has_accuracy_testing": false,
+        "accuracy_evidence": [],
+        "has_robustness_testing": false,
+        "robustness_evidence": [],
+        "has_fallback_behavior": false
+      },
+      "art50": {
+        "is_chatbot_or_interactive_ai": false,
+        "is_generating_synthetic_content": false,
+        "has_ai_disclosure_to_users": false,
+        "disclosure_evidence": [],
+        "has_content_watermarking": false,
+        "is_emotion_recognition_system": true,
+        "is_biometric_categorization_system": false,
+        "has_emotion_biometric_disclosure": false,
+        "emotion_biometric_evidence": [
+          "emotion_detector.py"
+        ],
+        "is_deep_fake_system": false,
+        "has_deep_fake_disclosure": false,
+        "deep_fake_evidence": []
+      }
+    }
+  },
+  "expected": {
+    "art5": {
+      "overall": "non_compliant",
+      "legal_basis": "Art. 5(1)(f): prohibited emotion recognition detected in workplace/education/law enforcement context — real-time emotion classification from video triggers Art. 5 prohibition"
+    },
+    "art6": {
+      "overall": "non_compliant",
+      "legal_basis": "Art. 6(2): emotion recognition system falls under Annex III high-risk category — is_high_risk=true confirmed, requires conformity assessment obligations"
+    },
+    "art9": {
+      "overall": "non_compliant",
+      "legal_basis": "Art. 9(1)-(9): high-risk AI system requires risk management system; has_risk_docs=false, has_risk_code_patterns=false — no risk management evidence found"
+    },
+    "art10": {
+      "overall": "non_compliant",
+      "legal_basis": "Art. 10(1)-(6): high-risk AI system requires data governance; has_data_governance_doc=false, has_bias_mitigation=false, has_data_lineage=false — no data governance evidence"
+    },
+    "art11": {
+      "overall": "non_compliant",
+      "legal_basis": "Art. 11(1): high-risk AI system requires technical documentation per Annex IV; has_technical_docs=false — no documentation found"
+    },
+    "art12": {
+      "overall": "non_compliant",
+      "legal_basis": "Art. 12(1)-(4): high-risk AI system requires automatic recording of events; has_logging=false — no logging infrastructure found"
+    },
+    "art13": {
+      "overall": "non_compliant",
+      "legal_basis": "Art. 13(1)-(3): high-risk AI system requires transparency and instructions for use; has_explainability=false, has_transparency_info=false — no transparency evidence"
+    },
+    "art14": {
+      "overall": "non_compliant",
+      "legal_basis": "Art. 14(1)-(5): high-risk AI system requires human oversight measures; has_human_oversight=false, has_override_mechanism=false — no oversight evidence"
+    },
+    "art15": {
+      "overall": "non_compliant",
+      "legal_basis": "Art. 15(1)-(5): high-risk AI system requires accuracy, robustness, cybersecurity; has_accuracy_testing=false, has_robustness_testing=false — no testing evidence"
+    },
+    "art50": {
+      "overall": "non_compliant",
+      "legal_basis": "Art. 50(3): emotion recognition system must disclose operation to exposed persons; is_emotion_recognition_system=true but has_emotion_biometric_disclosure=false"
+    }
+  }
+}

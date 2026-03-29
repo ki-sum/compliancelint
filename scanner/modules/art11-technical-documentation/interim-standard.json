@@ -1,0 +1,142 @@
+{
+  "_metadata": {
+    "standard_id": "CL-IS-ART11-v0.1",
+    "title": "ComplianceLint Interim Standard for EU AI Act Article 11: Technical Documentation",
+    "version": "0.1.0",
+    "date": "2026-03-17",
+    "status": "draft",
+    "disclaimer": "This is an interim standard developed by ComplianceLint based on available guidance, industry best practices, and relevant ISO standards. It is NOT an official standard. It will be superseded when CEN-CENELEC publishes the harmonized standard for Article 11 (expected Q4 2026).",
+    "basis": [
+      "EU AI Act Article 11 (official text)",
+      "EU AI Act Annex IV (technical documentation requirements)",
+      "EU AI Act Recital 68 (legislative intent on documentation)",
+      "ISO/IEC 42001:2023 — AI management system",
+      "ISO/IEC TR 24028:2020 — Overview of trustworthiness in AI",
+      "ISO/IEC 23894:2023 — Guidance on risk management for AI",
+      "ISO/IEC TR 24029-1:2021 — Assessment of robustness of neural networks",
+      "Google Model Cards for Model Reporting",
+      "HuggingFace Model Card template",
+      "Microsoft Responsible AI documentation framework"
+    ],
+    "awaiting_standard": "CEN-CENELEC harmonized standard for Art. 11 / Annex IV (expected Q4 2026)"
+  },
+
+  "requirements": [
+    {
+      "id": "IS-ART11-R01",
+      "obligation_ref": "ART11-OBL-1",
+      "title": "System Description (Annex IV, Section 1)",
+      "requirement": "The provider MUST maintain a README or equivalent document providing a general description of the AI system.",
+      "rationale": "Annex IV(1)(a) requires a 'general description of the AI system' including intended purpose, provider identity, version, and how it interacts with hardware and software.",
+      "required_content": [
+        "System name and version",
+        "Provider identity and contact information",
+        "Intended purpose and use cases",
+        "Interaction with hardware/software/other AI systems",
+        "Versions of relevant software or firmware",
+        "Forms of market placement (SaaS, on-premise, embedded)",
+        "System description in plain language for non-technical users"
+      ],
+      "minimum_length": "500 characters of substantive content"
+    },
+    {
+      "id": "IS-ART11-R02",
+      "obligation_ref": "ART11-OBL-2",
+      "title": "Architecture Documentation (Annex IV, Section 2)",
+      "requirement": "The provider MUST maintain architecture documentation describing system elements and the development process.",
+      "rationale": "Annex IV(2)(a) requires 'a description of the elements of the AI system and of the process for its development, including design specifications.'",
+      "required_content": [
+        "System architecture diagram or description",
+        "Component descriptions and interactions",
+        "Data flow diagrams",
+        "Model architecture details",
+        "Development methodology and process",
+        "Key design choices and their rationale"
+      ]
+    },
+    {
+      "id": "IS-ART11-R03",
+      "obligation_ref": "ART11-OBL-3",
+      "title": "API / Interface Documentation (Annex IV, Section 2(e))",
+      "requirement": "The provider SHOULD maintain an API specification (e.g., OpenAPI/Swagger) describing input data, output data, and their specifications.",
+      "rationale": "Annex IV(2)(e) requires a description of 'input data' and 'a description of the output of the system.' An API specification is the industry standard way to document this.",
+      "acceptable_formats": [
+        "OpenAPI 3.x specification (YAML or JSON)",
+        "Swagger 2.0 specification",
+        "GraphQL schema with documentation",
+        "gRPC .proto files with comments",
+        "Equivalent structured API documentation"
+      ]
+    },
+    {
+      "id": "IS-ART11-R04",
+      "obligation_ref": "ART11-OBL-4",
+      "title": "Model Card (Annex IV, Section 2(b-d))",
+      "requirement": "The provider MUST maintain a model card documenting design specifications, model architecture, training methodologies, and key design choices.",
+      "rationale": "Annex IV(2)(b-d) requires documentation of design specifications, computational resources, training methodologies, training data information, and key design choices.",
+      "required_content": [
+        "Model architecture type and description",
+        "Training procedure (algorithm, hyperparameters, training duration)",
+        "Computational resources used for training",
+        "Training data summary (size, source, characteristics)",
+        "Evaluation metrics and performance on benchmarks",
+        "Intended use and known limitations",
+        "Ethical considerations and fairness analysis",
+        "Environmental impact (training compute carbon footprint)"
+      ],
+      "acceptable_formats": [
+        "model_card.md (Google Model Card format)",
+        "model_card.json (structured format)",
+        "HuggingFace Model Card template"
+      ]
+    },
+    {
+      "id": "IS-ART11-R05",
+      "obligation_ref": "ART11-OBL-5",
+      "title": "Testing Documentation (Annex IV, Section 4)",
+      "requirement": "The provider MUST maintain testing documentation describing validation and testing procedures and their outcomes.",
+      "rationale": "Annex IV(4) requires documentation of 'validation and testing procedures used, including information about the validation and testing data used and their main characteristics, metrics used to measure accuracy, robustness and compliance with other relevant requirements, test logs, and all test reports.'",
+      "required_content": [
+        "Testing strategy and methodology",
+        "Test datasets description",
+        "Evaluation metrics and acceptance criteria",
+        "Test results and reports",
+        "Performance across demographic groups (fairness testing)",
+        "Robustness testing results (adversarial, edge cases)"
+      ]
+    },
+    {
+      "id": "IS-ART11-R06",
+      "obligation_ref": "ART11-OBL-6",
+      "title": "Change Log / Version History",
+      "requirement": "The provider MUST maintain a change log documenting all significant modifications to the system.",
+      "rationale": "Art. 11(1) requires documentation to be 'kept up to date.' A change log is the standard mechanism for tracking documentation currency.",
+      "acceptable_formats": [
+        "CHANGELOG.md (Keep a Changelog format)",
+        "CHANGES.md or HISTORY.md",
+        "Release notes in repository",
+        "Equivalent version tracking system"
+      ]
+    },
+    {
+      "id": "IS-ART11-R07",
+      "obligation_ref": "ART11-OBL-7",
+      "title": "Deployment Documentation",
+      "requirement": "The provider SHOULD maintain deployment documentation describing how the system is deployed and operated.",
+      "rationale": "Annex IV(1)(a) requires description of 'forms in which the AI system is placed on the market or put into service.' Deployment documentation ensures this information is available.",
+      "acceptable_implementations": [
+        "Deployment guide (deployment.md or equivalent)",
+        "Dockerfile / docker-compose.yml with documentation",
+        "Kubernetes manifests / Helm charts",
+        "CI/CD pipeline configuration with deployment steps",
+        "Infrastructure-as-code (Terraform, CloudFormation)"
+      ]
+    }
+  ],
+
+  "scoring": {
+    "compliant": "R01 + R02 + R04 + R05 met, and at least 2 of R03, R06, R07 met",
+    "partial": "R01 met + at least 3 others met",
+    "non_compliant": "R01 not met, or fewer than 3 requirements met"
+  }
+}

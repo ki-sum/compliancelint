@@ -1,0 +1,30 @@
+{
+  "name": "compliancelint",
+  "version": "1.0.0",
+  "description": "EU AI Act compliance scanner for your codebase. ESLint for legal compliance.",
+  "bin": {
+    "compliancelint": "bin/init.js"
+  },
+  "keywords": [
+    "eu-ai-act",
+    "compliance",
+    "mcp",
+    "ai-act",
+    "gdpr",
+    "linter",
+    "legal"
+  ],
+  "author": "ki-sum",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ki-sum/compliancelint"
+  },
+  "homepage": "https://github.com/ki-sum/compliancelint",
+  "engines": {
+    "node": ">=16"
+  },
+  "files": [
+    "bin/"
+  ]
+}

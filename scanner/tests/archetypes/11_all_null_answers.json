@@ -1,0 +1,126 @@
+{
+  "name": "AI system with all null answers",
+  "description": "AI system where the AI could not determine anything: all compliance_answers fields are null. No _scope provided. ALL articles should be unable_to_determine.",
+  "project_context": {
+    "primary_language": "Python",
+    "risk_classification": null,
+    "risk_classification_confidence": null,
+    "compliance_answers": {
+      "art5": {
+        "is_realtime_processing": null,
+        "processing_mode_evidence": null
+      },
+      "art6": {
+        "annex_iii_categories": null,
+        "annex_i_product_type": null,
+        "is_high_risk": null,
+        "reasoning": null
+      },
+      "art9": {
+        "has_risk_docs": null,
+        "risk_doc_paths": null,
+        "has_testing_infrastructure": null,
+        "testing_evidence": null,
+        "has_risk_code_patterns": null,
+        "risk_code_evidence": null,
+        "has_defined_metrics": null,
+        "metrics_evidence": null
+      },
+      "art10": {
+        "has_data_governance_doc": null,
+        "data_doc_paths": null,
+        "has_bias_mitigation": null,
+        "bias_evidence": null,
+        "has_data_lineage": null
+      },
+      "art11": {
+        "has_technical_docs": null,
+        "doc_paths": null,
+        "documented_aspects": null
+      },
+      "art12": {
+        "has_logging": null,
+        "logging_description": null,
+        "logging_evidence": null,
+        "has_retention_config": null,
+        "retention_days": null,
+        "retention_evidence": null
+      },
+      "art13": {
+        "has_explainability": null,
+        "explainability_evidence": null,
+        "has_transparency_info": null,
+        "transparency_paths": null
+      },
+      "art14": {
+        "has_human_oversight": null,
+        "oversight_evidence": null,
+        "has_override_mechanism": null,
+        "override_evidence": null
+      },
+      "art15": {
+        "has_accuracy_testing": null,
+        "accuracy_evidence": null,
+        "has_robustness_testing": null,
+        "robustness_evidence": null,
+        "has_fallback_behavior": null
+      },
+      "art50": {
+        "is_chatbot_or_interactive_ai": null,
+        "is_generating_synthetic_content": null,
+        "has_ai_disclosure_to_users": null,
+        "disclosure_evidence": null,
+        "has_content_watermarking": null,
+        "is_emotion_recognition_system": null,
+        "is_biometric_categorization_system": null,
+        "has_emotion_biometric_disclosure": null,
+        "emotion_biometric_evidence": null,
+        "is_deep_fake_system": null,
+        "has_deep_fake_disclosure": null,
+        "deep_fake_evidence": null
+      }
+    }
+  },
+  "expected": {
+    "art5": {
+      "overall": "unable_to_determine",
+      "legal_basis": "Art. 5(1): all compliance_answers fields are null — insufficient evidence to determine prohibited practice status; scanner cannot render verdict without data"
+    },
+    "art6": {
+      "overall": "unable_to_determine",
+      "legal_basis": "Art. 6(1)-(2): all compliance_answers fields are null — cannot determine risk classification without Annex I/III analysis data"
+    },
+    "art9": {
+      "overall": "unable_to_determine",
+      "legal_basis": "Art. 9(1): all compliance_answers fields are null — cannot assess risk management compliance without evidence data"
+    },
+    "art10": {
+      "overall": "unable_to_determine",
+      "legal_basis": "Art. 10(1): all compliance_answers fields are null — cannot assess data governance compliance without evidence data"
+    },
+    "art11": {
+      "overall": "unable_to_determine",
+      "legal_basis": "Art. 11(1): all compliance_answers fields are null — cannot assess technical documentation compliance without evidence data"
+    },
+    "art12": {
+      "overall": "unable_to_determine",
+      "legal_basis": "Art. 12(1): all compliance_answers fields are null — cannot assess record-keeping compliance without evidence data"
+    },
+    "art13": {
+      "overall": "unable_to_determine",
+      "legal_basis": "Art. 13(1): all compliance_answers fields are null — cannot assess transparency compliance without evidence data"
+    },
+    "art14": {
+      "overall": "unable_to_determine",
+      "legal_basis": "Art. 14(1): all compliance_answers fields are null — cannot assess human oversight compliance without evidence data"
+    },
+    "art15": {
+      "overall": "unable_to_determine",
+      "legal_basis": "Art. 15(1): all compliance_answers fields are null — cannot assess accuracy/robustness compliance without evidence data"
+    },
+    "art50": {
+      "overall": "unable_to_determine",
+      "legal_basis": "Art. 50(1)-(4): all compliance_answers fields are null — cannot assess transparency obligation compliance without evidence data"
+    }
+  }
+}

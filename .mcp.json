@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "compliancelint": {
+      "type": "stdio",
+      "command": "python",
+      "args": ["scanner/server.py"],
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      }
+    }
+  }
+}

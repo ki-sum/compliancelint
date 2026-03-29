@@ -1,0 +1,175 @@
+{
+  "name": "High-risk medical AI device",
+  "description": "Medical AI diagnostic system, NOT open source, confirmed high-risk. Has good docs, logging, risk docs, human oversight. Art.15 non_compliant due to no robustness testing.",
+  "project_context": {
+    "primary_language": "Python",
+    "risk_classification": "high-risk",
+    "risk_classification_confidence": "high",
+    "compliance_answers": {
+      "_scope": {
+        "is_ai_system": true,
+        "is_ai_system_reasoning": "ML-based medical diagnostic system",
+        "territorial_scope_applies": true,
+        "territorial_scope_reasoning": "CE-marked medical device in EU",
+        "is_open_source": false,
+        "open_source_license": null,
+        "user_role": "provider",
+        "user_role_reasoning": "Develops and markets the device",
+        "is_military_defense": false,
+        "is_research_only": false
+      },
+      "art5": {
+        "has_facial_recognition_scraping": false,
+        "has_social_scoring": false,
+        "has_subliminal_manipulation": false,
+        "has_emotion_recognition_workplace": false,
+        "has_exploitation_of_vulnerabilities": false,
+        "has_predictive_policing": false,
+        "has_biometric_categorization": false,
+        "has_real_time_biometric_id": false
+      },
+      "art6": {
+        "annex_iii_categories": [],
+        "annex_i_product_type": "medical_device",
+        "is_high_risk": true,
+        "reasoning": "Medical device under Annex I, Regulation (EU) 2017/745"
+      },
+      "art9": {
+        "has_risk_docs": true,
+        "risk_doc_paths": [
+          "docs/risk-assessment.md"
+        ],
+        "has_testing_infrastructure": true,
+        "testing_evidence": [
+          "tests/"
+        ],
+        "has_risk_code_patterns": true,
+        "risk_code_evidence": [
+          "risk_manager.py"
+        ],
+        "has_defined_metrics": true,
+        "metrics_evidence": ["accuracy=0.95"]
+      },
+      "art10": {
+        "has_data_governance_doc": true,
+        "data_doc_paths": [
+          "docs/data-governance.md"
+        ],
+        "has_bias_mitigation": true,
+        "bias_evidence": [
+          "bias_check.py"
+        ],
+        "has_data_lineage": true
+      },
+      "art11": {
+        "has_technical_docs": true,
+        "doc_paths": [
+          "docs/technical-documentation.md",
+          "docs/architecture.md"
+        ],
+        "documented_aspects": [
+          "system_design",
+          "data_pipeline",
+          "model_architecture"
+        ]
+      },
+      "art12": {
+        "has_logging": true,
+        "logging_description": "Structured logging with audit trail",
+        "logging_evidence": [
+          "audit_logger.py",
+          "config/logging.yaml"
+        ],
+        "has_retention_config": false,
+        "retention_days": null,
+        "retention_evidence": ""
+      },
+      "art13": {
+        "has_explainability": true,
+        "explainability_evidence": [
+          "explainer.py"
+        ],
+        "has_transparency_info": false,
+        "transparency_paths": []
+      },
+      "art14": {
+        "has_human_oversight": true,
+        "oversight_evidence": [
+          "human_review.py",
+          "docs/oversight-protocol.md"
+        ],
+        "has_override_mechanism": true,
+        "override_evidence": [
+          "override_handler.py"
+        ]
+      },
+      "art15": {
+        "has_accuracy_testing": true,
+        "accuracy_evidence": [
+          "tests/test_accuracy.py"
+        ],
+        "has_robustness_testing": false,
+        "robustness_evidence": [],
+        "has_fallback_behavior": true
+      },
+      "art50": {
+        "is_chatbot_or_interactive_ai": false,
+        "is_generating_synthetic_content": false,
+        "has_ai_disclosure_to_users": true,
+        "disclosure_evidence": [
+          "docs/user-manual.md"
+        ],
+        "has_content_watermarking": false,
+        "is_emotion_recognition_system": false,
+        "is_biometric_categorization_system": false,
+        "has_emotion_biometric_disclosure": false,
+        "emotion_biometric_evidence": [],
+        "is_deep_fake_system": false,
+        "has_deep_fake_disclosure": false,
+        "deep_fake_evidence": []
+      }
+    }
+  },
+  "expected": {
+    "art5": {
+      "overall": "compliant",
+      "legal_basis": "Art. 5(1): no prohibited practices detected — all 4 categories checked with high confidence"
+    },
+    "art6": {
+      "overall": "non_compliant",
+      "legal_basis": "Art. 6(1): medical device under Annex I (Regulation (EU) 2017/745) confirmed high-risk — requires conformity assessment and CE marking obligations under Art. 6"
+    },
+    "art9": {
+      "overall": "partial",
+      "legal_basis": "Art. 9(1)-(9): risk management system required for high-risk AI; has_risk_docs=true and has_risk_code_patterns=true provide evidence, but needs human verification of completeness (PARTIAL)"
+    },
+    "art10": {
+      "overall": "partial",
+      "legal_basis": "Art. 10(1)-(6): data governance required for high-risk AI; has_data_governance_doc=true, has_bias_mitigation=true, has_data_lineage=true — evidence found but needs human verification (PARTIAL)"
+    },
+    "art11": {
+      "overall": "partial",
+      "legal_basis": "Art. 11(1): technical documentation required for high-risk AI; has_technical_docs=true with multiple docs but only 3 documented_aspects — may not cover all Annex IV requirements (PARTIAL)"
+    },
+    "art12": {
+      "overall": "non_compliant",
+      "legal_basis": "Art. 12(1)-(4): automatic recording of events required for high-risk AI; has_logging=true but has_retention_config=false — retention policy required per Art. 12(3)"
+    },
+    "art13": {
+      "overall": "non_compliant",
+      "legal_basis": "Art. 13(2)-(3): instructions for use required for high-risk AI; has_explainability=true but has_transparency_info=false — no user-facing transparency documentation found"
+    },
+    "art14": {
+      "overall": "partial",
+      "legal_basis": "Art. 14(1)-(5): human oversight required for high-risk AI; has_human_oversight=true and has_override_mechanism=true — evidence found but needs human verification of completeness (PARTIAL)"
+    },
+    "art15": {
+      "overall": "non_compliant",
+      "legal_basis": "Art. 15(1)-(5): accuracy, robustness and cybersecurity required for high-risk AI; has_accuracy_testing=true but has_robustness_testing=false — robustness testing missing"
+    },
+    "art50": {
+      "overall": "not_applicable",
+      "legal_basis": "Art. 50(1)-(4): system is not a chatbot, does not generate synthetic content, no emotion recognition, no deep fakes — no Art. 50 paragraphs apply"
+    }
+  }
+}

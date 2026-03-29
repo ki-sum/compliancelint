@@ -1,0 +1,148 @@
+{
+  "name": "Commercial chatbot (Next.js)",
+  "description": "Like ai-chatbot: Next.js chatbot, NOT open source, risk unclear. is_chatbot=true, generates synthetic text, no AI disclosure, no watermarking. Art.50 should be non_compliant.",
+  "project_context": {
+    "primary_language": "TypeScript",
+    "risk_classification": "unclear",
+    "risk_classification_confidence": "low",
+    "compliance_answers": {
+      "_scope": {
+        "is_ai_system": true,
+        "is_ai_system_reasoning": "LLM-powered chatbot",
+        "territorial_scope_applies": true,
+        "territorial_scope_reasoning": "Deployed in EU market",
+        "is_open_source": false,
+        "open_source_license": null,
+        "user_role": "provider",
+        "user_role_reasoning": "Builds and operates the chatbot",
+        "is_military_defense": false,
+        "is_research_only": false
+      },
+      "art5": {
+        "has_facial_recognition_scraping": false,
+        "has_social_scoring": false,
+        "has_subliminal_manipulation": false,
+        "has_emotion_recognition_workplace": false,
+        "has_exploitation_of_vulnerabilities": false,
+        "has_predictive_policing": false,
+        "has_biometric_categorization": false,
+        "has_real_time_biometric_id": false
+      },
+      "art6": {
+        "annex_iii_categories": [],
+        "annex_i_product_type": null,
+        "is_high_risk": null,
+        "reasoning": "Risk classification unclear"
+      },
+      "art9": {
+        "has_risk_docs": false,
+        "risk_doc_paths": [],
+        "has_testing_infrastructure": false,
+        "testing_evidence": [],
+        "has_risk_code_patterns": false,
+        "risk_code_evidence": [],
+        "has_defined_metrics": false,
+        "metrics_evidence": []
+      },
+      "art10": {
+        "has_data_governance_doc": false,
+        "data_doc_paths": [],
+        "has_bias_mitigation": false,
+        "bias_evidence": [],
+        "has_data_lineage": false
+      },
+      "art11": {
+        "has_technical_docs": false,
+        "doc_paths": [],
+        "documented_aspects": []
+      },
+      "art12": {
+        "has_logging": false,
+        "logging_description": "",
+        "logging_evidence": [],
+        "has_retention_config": false,
+        "retention_days": null,
+        "retention_evidence": ""
+      },
+      "art13": {
+        "has_explainability": false,
+        "explainability_evidence": [],
+        "has_transparency_info": false,
+        "transparency_paths": []
+      },
+      "art14": {
+        "has_human_oversight": false,
+        "oversight_evidence": [],
+        "has_override_mechanism": false,
+        "override_evidence": []
+      },
+      "art15": {
+        "has_accuracy_testing": false,
+        "accuracy_evidence": [],
+        "has_robustness_testing": false,
+        "robustness_evidence": [],
+        "has_fallback_behavior": false
+      },
+      "art50": {
+        "is_chatbot_or_interactive_ai": true,
+        "is_generating_synthetic_content": true,
+        "has_ai_disclosure_to_users": null,
+        "disclosure_evidence": [],
+        "has_content_watermarking": false,
+        "is_emotion_recognition_system": false,
+        "is_biometric_categorization_system": false,
+        "has_emotion_biometric_disclosure": false,
+        "emotion_biometric_evidence": [],
+        "is_deep_fake_system": false,
+        "has_deep_fake_disclosure": false,
+        "deep_fake_evidence": []
+      }
+    }
+  },
+  "expected": {
+    "art5": {
+      "overall": "compliant",
+      "legal_basis": "Art. 5(1): no prohibited practices detected — all 4 categories checked with high confidence"
+    },
+    "art6": {
+      "overall": "unable_to_determine",
+      "legal_basis": "Art. 6(1)-(2): risk classification unclear (is_high_risk=null) — cannot determine if Annex I product or Annex III category applies"
+    },
+    "art9": {
+      "overall": "non_compliant",
+      "legal_basis": "Art. 9(1)-(9): risk management system required for all AI systems placed on EU market; has_risk_docs=false, no risk management evidence found"
+    },
+    "art10": {
+      "overall": "non_compliant",
+      "legal_basis": "Art. 10(1)-(6): data governance measures required; has_data_governance_doc=false, has_bias_mitigation=false, has_data_lineage=false"
+    },
+    "art11": {
+      "overall": "non_compliant",
+      "legal_basis": "Art. 11(1): technical documentation required before placing on market; has_technical_docs=false, no documentation found"
+    },
+    "art12": {
+      "overall": "non_compliant",
+      "legal_basis": "Art. 12(1)-(4): automatic recording of events (logging) required; has_logging=false, no logging infrastructure found"
+    },
+    "art13": {
+      "overall": "non_compliant",
+      "legal_basis": "Art. 13(1)-(3): transparency and instructions for use required; has_explainability=false, has_transparency_info=false"
+    },
+    "art14": {
+      "overall": "non_compliant",
+      "legal_basis": "Art. 14(1)-(5): human oversight measures required; has_human_oversight=false, has_override_mechanism=false"
+    },
+    "art15": {
+      "overall": "non_compliant",
+      "legal_basis": "Art. 15(1)-(5): accuracy, robustness and cybersecurity required; has_accuracy_testing=false, has_robustness_testing=false"
+    },
+    "art50": {
+      "overall": "non_compliant",
+      "must_have_obligations": [
+        "ART50-OBL-1",
+        "ART50-OBL-2"
+      ],
+      "legal_basis": "Art. 50(1): chatbot system must disclose AI interaction to users; is_chatbot_or_interactive_ai=true but has_ai_disclosure_to_users=null, no disclosure evidence. Art. 50(2): generates synthetic content but has_content_watermarking=false"
+    }
+  }
+}

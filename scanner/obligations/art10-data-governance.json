@@ -1,0 +1,441 @@
+{
+  "_metadata": {
+    "article": 10,
+    "title": "Data and Data Governance",
+    "prerequisites": [
+      {
+        "type": "risk_classification",
+        "required_level": "high-risk",
+        "source_article": 6,
+        "context_field": "risk_classification",
+        "skip_when": "not high-risk with medium/high confidence"
+      }
+    ],
+    "decomposition_date": "2026-03-20",
+    "primary_official_source": {
+      "name": "EUR-Lex — Official Journal of the European Union",
+      "eli_uri": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng",
+      "celex": "32024R1689",
+      "oj_citation": "OJ L 2024/1689, 12.7.2024"
+    },
+    "pdf_pages": [
+      57,
+      58
+    ],
+    "related_standards": {
+      "published": [
+        "ISO/IEC 5259-1:2024 — Data quality for analytics and ML",
+        "ISO/IEC TR 24027:2021 — Bias in AI systems",
+        "ISO/IEC 42001:2023 — AI management system"
+      ],
+      "upcoming": [
+        "CEN-CENELEC harmonized standard for Art. 10 (expected Q4 2026)"
+      ]
+    }
+  },
+  "obligations": [
+    {
+      "id": "ART10-OBL-1",
+      "source": "Art. 10(1)",
+      "source_quote": "High-risk AI systems which make use of techniques involving the training of AI models with data shall be developed on the basis of training, validation and testing data sets that meet the quality criteria referred to in paragraphs 2 to 5 whenever such data sets are used.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "uses_quality_datasets",
+          "description": "Training/validation/testing data must meet quality criteria",
+          "requirement": "Systems SHALL be developed on data sets meeting quality criteria of paragraphs 2-5"
+        },
+        {
+          "atom": "all_dataset_types_covered",
+          "description": "Training, validation AND testing sets all subject to requirements",
+          "requirement": "Quality criteria SHALL apply to training, validation, AND testing data sets"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check for dataset documentation files (data_card.md, datasheet.*, data_governance.*, dataset_card.*)",
+        "what_to_scan": [
+          "documentation",
+          "config"
+        ],
+        "human_judgment_needed": "Whether datasets actually meet quality criteria requires domain expertise",
+        "rationale": "Can detect presence of data documentation but cannot assess data quality"
+      }
+    },
+    {
+      "id": "ART10-OBL-2",
+      "source": "Art. 10(2)",
+      "source_quote": "Training, validation and testing data sets shall be subject to data governance and management practices appropriate for the intended purpose of the high-risk AI system.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "data_governance_practices",
+          "description": "Data governance and management practices must exist",
+          "requirement": "Data sets SHALL be subject to appropriate data governance practices"
+        },
+        {
+          "atom": "covers_design_choices",
+          "description": "Art.10(2)(a): relevant design choices documented",
+          "requirement": "Practices SHALL concern relevant design choices"
+        },
+        {
+          "atom": "covers_data_collection",
+          "description": "Art.10(2)(b): data collection processes and origin documented",
+          "requirement": "Practices SHALL concern data collection processes and origin of data"
+        },
+        {
+          "atom": "covers_data_preparation",
+          "description": "Art.10(2)(c): data preparation operations documented",
+          "requirement": "Practices SHALL concern relevant data-preparation processing operations (annotation, labelling, cleaning, updating, enrichment, aggregation)"
+        },
+        {
+          "atom": "covers_assumptions",
+          "description": "Art.10(2)(d): assumptions formulated",
+          "requirement": "Practices SHALL concern the formulation of assumptions about what data are supposed to measure and represent"
+        },
+        {
+          "atom": "covers_availability_assessment",
+          "description": "Art.10(2)(e): data availability/quantity/suitability assessed",
+          "requirement": "Practices SHALL concern an assessment of availability, quantity and suitability of data sets"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check for dedicated data pipeline/preprocessing files (preprocess.*, data_clean.*, data_pipeline.*, etl.*, feature_engineering.*)",
+        "what_to_scan": [
+          "documentation",
+          "code",
+          "config"
+        ],
+        "human_judgment_needed": "Whether all 6 sub-requirements (a-e) are adequately covered",
+        "rationale": "Can detect data pipeline code and documentation but cannot assess completeness of governance practices"
+      }
+    },
+    {
+      "id": "ART10-OBL-2f",
+      "source": "Art. 10(2)(f)",
+      "source_quote": "examination in view of possible biases that are likely to affect the health and safety of persons, have a negative impact on fundamental rights or lead to discrimination prohibited under Union law, especially where data outputs influence inputs for future operations;",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "bias_examination_performed",
+          "description": "Biases must be examined",
+          "requirement": "Provider SHALL examine data for possible biases affecting health, safety, fundamental rights, or causing prohibited discrimination"
+        },
+        {
+          "atom": "feedback_loop_bias_checked",
+          "description": "Feedback loop bias must be checked",
+          "requirement": "Bias examination SHALL especially consider where data outputs influence inputs for future operations (feedback loops)"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check for bias detection framework imports (fairlearn, aif360, aequitas, what_if_tool, responsibleai, fairness_indicators) in source code and dependencies",
+        "what_to_scan": [
+          "code",
+          "dependencies"
+        ],
+        "human_judgment_needed": "Whether bias examination is adequate for the specific domain and protected categories",
+        "rationale": "Can detect bias detection tooling but cannot assess examination thoroughness"
+      }
+    },
+    {
+      "id": "ART10-OBL-2g",
+      "source": "Art. 10(2)(g)",
+      "source_quote": "appropriate measures to detect, prevent and mitigate possible biases identified according to point (f);",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "bias_detection_measures",
+          "description": "Measures to detect biases",
+          "requirement": "Provider SHALL implement measures to detect biases identified in (f)"
+        },
+        {
+          "atom": "bias_prevention_measures",
+          "description": "Measures to prevent biases",
+          "requirement": "Provider SHALL implement measures to prevent biases"
+        },
+        {
+          "atom": "bias_mitigation_measures",
+          "description": "Measures to mitigate biases",
+          "requirement": "Provider SHALL implement measures to mitigate biases that cannot be prevented"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check for bias mitigation code patterns (resampling, reweighting, adversarial debiasing, fairness constraints, demographic parity enforcement)",
+        "what_to_scan": [
+          "code",
+          "config"
+        ],
+        "human_judgment_needed": "Whether mitigation measures are appropriate and effective",
+        "rationale": "Can detect bias mitigation code but cannot assess effectiveness"
+      }
+    },
+    {
+      "id": "ART10-OBL-2h",
+      "source": "Art. 10(2)(h)",
+      "source_quote": "the identification of relevant data gaps or shortcomings that prevent compliance with this Regulation, and how those gaps and shortcomings can be addressed.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "data_gaps_identified",
+          "description": "Data gaps must be identified",
+          "requirement": "Provider SHALL identify relevant data gaps or shortcomings"
+        },
+        {
+          "atom": "gap_remediation_documented",
+          "description": "How to address gaps must be documented",
+          "requirement": "Provider SHALL document how identified gaps and shortcomings can be addressed"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "Check for data gap analysis in documentation, known limitations sections",
+        "what_to_scan": [
+          "documentation"
+        ],
+        "human_judgment_needed": "Whether all relevant data gaps have been identified and remediation plans are adequate",
+        "rationale": "Data gap identification requires domain expertise beyond code analysis"
+      }
+    },
+    {
+      "id": "ART10-OBL-3",
+      "source": "Art. 10(3)",
+      "source_quote": "Training, validation and testing data sets shall be relevant, sufficiently representative, and to the best extent possible, free of errors and complete in view of the intended purpose.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "data_relevant",
+          "description": "Data must be relevant to intended purpose",
+          "requirement": "Data sets SHALL be relevant in view of the intended purpose"
+        },
+        {
+          "atom": "data_representative",
+          "description": "Data must be sufficiently representative",
+          "requirement": "Data sets SHALL be sufficiently representative"
+        },
+        {
+          "atom": "data_error_free",
+          "description": "Data must be free of errors (best effort)",
+          "requirement": "Data sets SHALL be free of errors to the best extent possible"
+        },
+        {
+          "atom": "data_complete",
+          "description": "Data must be complete for intended purpose",
+          "requirement": "Data sets SHALL be complete in view of the intended purpose"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "Check for data quality validation scripts, error checking in data pipeline, completeness assertions",
+        "what_to_scan": [
+          "code",
+          "documentation"
+        ],
+        "human_judgment_needed": "Whether data is truly representative, complete, and error-free requires domain expertise",
+        "rationale": "Data quality is highly context-dependent and cannot be fully assessed from code"
+      }
+    },
+    {
+      "id": "ART10-OBL-3b",
+      "source": "Art. 10(3)",
+      "source_quote": "They shall have the appropriate statistical properties, including, where applicable, as regards the persons or groups of persons in relation to whom the high-risk AI system is intended to be used.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "appropriate_statistical_properties",
+          "description": "Data must have appropriate statistical properties",
+          "requirement": "Data sets SHALL have appropriate statistical properties for the intended use"
+        },
+        {
+          "atom": "demographic_representation",
+          "description": "Data must represent relevant persons/groups",
+          "requirement": "Statistical properties SHALL include representation of persons or groups the system is intended to be used on"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "Check for statistical analysis of dataset distributions, demographic breakdowns, stratification documentation",
+        "what_to_scan": [
+          "documentation",
+          "code"
+        ],
+        "human_judgment_needed": "Whether statistical properties are appropriate for the specific use case",
+        "rationale": "Statistical adequacy is domain-specific"
+      }
+    },
+    {
+      "id": "ART10-PERM-3",
+      "source": "Art. 10(3)",
+      "source_quote": "Those characteristics of the data sets may be met at the level of individual data sets or at the level of a combination thereof.",
+      "deontic_type": "permission",
+      "modality": "may",
+      "addressee": "provider",
+      "note": "Flexibility permission: providers may satisfy representativeness and statistical property requirements either at individual dataset level or across a combination of datasets. Not an obligation.",
+      "decomposed_atoms": [
+        {
+          "atom": "representativeness_at_individual_level",
+          "description": "Requirements may be met at individual dataset level",
+          "requirement": "Data set characteristics MAY be met by each individual data set"
+        },
+        {
+          "atom": "representativeness_at_combination_level",
+          "description": "Requirements may be met at combined dataset level",
+          "requirement": "Data set characteristics MAY be met by a combination of data sets taken together"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "N/A — permission granting implementation flexibility",
+        "what_to_scan": [],
+        "human_judgment_needed": "Whether the combination of datasets together satisfies representativeness requirements",
+        "rationale": "Permission (may), not obligation — dataset combination assessment requires domain expertise"
+      }
+    },
+    {
+      "id": "ART10-OBL-4",
+      "source": "Art. 10(4)",
+      "source_quote": "Data sets shall take into account, to the extent required by the intended purpose, the characteristics or elements that are particular to the specific geographical, contextual, behavioural or functional setting within which the high-risk AI system is intended to be used.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "geographical_context",
+          "description": "Geographic setting considered",
+          "requirement": "Data SHALL account for geographical setting particularities"
+        },
+        {
+          "atom": "contextual_setting",
+          "description": "Contextual setting considered",
+          "requirement": "Data SHALL account for contextual setting particularities"
+        },
+        {
+          "atom": "behavioural_setting",
+          "description": "Behavioural setting considered",
+          "requirement": "Data SHALL account for behavioural setting particularities"
+        },
+        {
+          "atom": "functional_setting",
+          "description": "Functional setting considered",
+          "requirement": "Data SHALL account for functional setting particularities"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "Check for deployment context documentation, geographic coverage analysis, user behavior analysis",
+        "what_to_scan": [
+          "documentation"
+        ],
+        "human_judgment_needed": "Whether deployment context has been adequately considered in data selection",
+        "rationale": "Deployment context adequacy requires understanding of specific use case"
+      }
+    },
+    {
+      "id": "ART10-PERM-5",
+      "source": "Art. 10(5)",
+      "source_quote": "To the extent that it is strictly necessary for the purpose of ensuring bias detection and correction in relation to the high-risk AI systems in accordance with paragraph (2), points (f) and (g) of this Article, the providers of such systems may exceptionally process special categories of personal data, subject to appropriate safeguards for the fundamental rights and freedoms of natural persons.",
+      "deontic_type": "permission",
+      "modality": "may",
+      "addressee": "provider",
+      "note": "Conditional permission with 6 mandatory conditions (a-f). Only applies when processing special category personal data for bias detection.",
+      "scope_limitation": "Only applies when processing special categories of personal data for bias detection/correction",
+      "context_skip_field": "processes_special_category_data",
+      "context_skip_value": false,
+      "decomposed_atoms": [
+        {
+          "atom": "special_data_strictly_necessary",
+          "description": "Processing must be strictly necessary for bias detection",
+          "requirement": "Special category data processing MAY occur only when strictly necessary for bias detection/correction"
+        },
+        {
+          "atom": "appropriate_safeguards",
+          "description": "Appropriate safeguards must be in place",
+          "requirement": "Processing SHALL include appropriate safeguards for fundamental rights"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "Check for special category data processing code, GDPR compliance documentation",
+        "what_to_scan": [
+          "code",
+          "documentation"
+        ],
+        "human_judgment_needed": "Whether processing is strictly necessary and safeguards are adequate",
+        "rationale": "Necessity and safeguard assessment requires legal expertise"
+      }
+    },
+    {
+      "id": "ART10-OBL-6",
+      "source": "Art. 10(6)",
+      "source_quote": "For the development of high-risk AI systems not using techniques involving the training of AI models, paragraphs 2 to 5 apply only to the testing data sets.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "scope_limitation": "Only applies to systems not using training techniques (rule-based, expert systems)",
+      "decomposed_atoms": [
+        {
+          "atom": "non_training_systems_test_data_only",
+          "description": "For non-training systems, requirements apply only to test data",
+          "requirement": "For systems not using training, paragraphs 2-5 SHALL apply only to testing data sets"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "Determine if system uses training techniques or is rule-based/expert system",
+        "what_to_scan": [
+          "code",
+          "documentation"
+        ],
+        "human_judgment_needed": "Whether the system uses training techniques",
+        "rationale": "Distinguishing training-based from rule-based requires understanding system architecture"
+      }
+    }
+  ],
+  "summary": {
+    "total_obligations": 11,
+    "obligation_count": 9,
+    "permission_count": 2,
+    "addressee_breakdown": {
+      "provider": 10,
+      "deployer": 0,
+      "commission": 0
+    },
+    "automation_breakdown": {
+      "full": 0,
+      "partial": 4,
+      "manual": 6
+    },
+    "scope_notes": {
+      "general_obligations": "ART10-OBL-1 through ART10-OBL-4 — apply to ALL high-risk AI systems using training data",
+      "conditional": "ART10-PERM-5 — permission for special category data processing with 6 conditions",
+      "scope_rule": "ART10-OBL-6 — non-training systems: only testing data subject to requirements"
+    }
+  }
+}

@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ComplianceLint — EU AI Act Compliance for Code</title>
+    <meta name="description" content="Open-source compliance linter for code. Scan your project against EU AI Act requirements, get findings with exact legal citations.">
+    <style>
+        :root {
+            --bg: #0d1117;
+            --surface: #161b22;
+            --border: #30363d;
+            --text: #e6edf3;
+            --text-muted: #8b949e;
+            --accent: #58a6ff;
+            --accent-green: #3fb950;
+            --accent-yellow: #d29922;
+            --accent-red: #f85149;
+            --accent-purple: #bc8cff;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        .container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 80px 0 60px;
+        }
+        .hero h1 {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 16px;
+            letter-spacing: -1px;
+        }
+        .hero .tagline {
+            font-size: 20px;
+            color: var(--text-muted);
+            margin-bottom: 32px;
+        }
+        .hero .tagline em {
+            color: var(--accent);
+            font-style: normal;
+        }
+        .deadline-banner {
+            display: inline-block;
+            background: rgba(210, 153, 34, 0.15);
+            border: 1px solid var(--accent-yellow);
+            color: var(--accent-yellow);
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 40px;
+        }
+        .cta-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+        .btn:hover { opacity: 0.85; }
+        .btn-primary { background: var(--accent); color: #fff; }
+        .btn-secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+
+        /* Sections */
+        section { padding: 60px 0; }
+        section h2 {
+            font-size: 28px;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        /* How it works */
+        .flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin: 32px 0;
+        }
+        .flow-step {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            width: 200px;
+        }
+        .flow-step .number {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--accent);
+        }
+        .flow-step p { font-size: 14px; color: var(--text-muted); margin-top: 8px; }
+        .flow-arrow { font-size: 24px; color: var(--text-muted); }
+
+        /* Quick start */
+        .quickstart {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 32px;
+            margin: 32px 0;
+        }
+        .quickstart h3 { margin-bottom: 16px; font-size: 18px; }
+        pre {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 16px;
+            overflow-x: auto;
+            font-size: 14px;
+            line-height: 1.5;
+            margin: 12px 0;
+        }
+        code { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; }
+
+        /* Comparison table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 24px 0;
+        }
+        th, td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        th {
+            background: var(--surface);
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        td { font-size: 15px; }
+
+        /* Example output */
+        .example-output {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 32px;
+            margin: 24px 0;
+        }
+        .finding {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .finding:last-child { border-bottom: none; }
+        .finding-id { font-weight: 600; font-family: monospace; }
+        .badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .badge-partial { background: rgba(210, 153, 34, 0.2); color: var(--accent-yellow); }
+        .badge-compliant { background: rgba(63, 185, 80, 0.2); color: var(--accent-green); }
+        .badge-na { background: rgba(139, 148, 158, 0.2); color: var(--text-muted); }
+        .badge-unable { background: rgba(248, 81, 73, 0.2); color: var(--accent-red); }
+        .citation {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-style: italic;
+            margin-top: 16px;
+            padding: 12px;
+            border-left: 3px solid var(--accent);
+        }
+
+        /* Articles grid */
+        .articles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 12px;
+            margin: 24px 0;
+        }
+        .article-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+        }
+        .article-card .art-num {
+            font-weight: 700;
+            color: var(--accent);
+            font-size: 14px;
+        }
+        .article-card .art-title {
+            font-weight: 600;
+            margin: 4px 0;
+        }
+        .article-card .art-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* Prompts */
+        .prompt-list {
+            display: grid;
+            gap: 12px;
+            margin: 24px 0;
+        }
+        .prompt-item {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            font-family: monospace;
+            font-size: 14px;
+            cursor: pointer;
+            transition: border-color 0.2s;
+            position: relative;
+        }
+        .prompt-item:hover { border-color: var(--accent); }
+        .prompt-item .copy-hint {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 12px;
+            color: var(--text-muted);
+            font-family: -apple-system, sans-serif;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            color: var(--text-muted);
+            font-size: 14px;
+            border-top: 1px solid var(--border);
+        }
+        footer a { color: var(--accent); text-decoration: none; }
+
+        @media (max-width: 640px) {
+            .hero h1 { font-size: 32px; }
+            .flow { flex-direction: column; }
+            .flow-arrow { transform: rotate(90deg); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Hero -->
+    <div class="hero">
+        <h1>ComplianceLint</h1>
+        <p class="tagline"><em>ESLint</em> checks your JavaScript. <em>ComplianceLint</em> checks your legal compliance.</p>
+        <div class="deadline-banner">2026-08-02 — EU AI Act high-risk AI system requirements (Art. 6–49) become enforceable</div>
+        <br><br>
+        <div class="cta-buttons">
+            <a href="https://github.com/ki-sum/compliancelint" class="btn btn-primary">View on GitHub</a>
+            <a href="#quickstart" class="btn btn-secondary">Get Started</a>
+        </div>
+    </div>
+
+    <!-- How it works -->
+    <section>
+        <h2>How It Works</h2>
+        <div class="flow">
+            <div class="flow-step">
+                <div class="number">1</div>
+                <p>AI reads your<br>entire codebase</p>
+            </div>
+            <span class="flow-arrow">&rarr;</span>
+            <div class="flow-step">
+                <div class="number">2</div>
+                <p>Obligation Engine<br>checks legal requirements</p>
+            </div>
+            <span class="flow-arrow">&rarr;</span>
+            <div class="flow-step">
+                <div class="number">3</div>
+                <p>Report with exact<br>legal citations</p>
+            </div>
+        </div>
+        <p style="text-align:center; color: var(--text-muted); font-size: 14px;">
+            No extra API key. No cloud upload. 100% local. Uses your existing AI subscription (Claude Code, Cursor, or Windsurf).
+        </p>
+    </section>
+
+    <!-- Quick Start -->
+    <section id="quickstart">
+        <h2>Quick Start</h2>
+        <div class="quickstart">
+            <h3>Step 1 — Add to your MCP config</h3>
+            <pre><code>{
+  "mcpServers": {
+    "compliancelint": {
+      "type": "stdio",
+      "command": "python",
+      "args": ["/path/to/scanner/server.py"],
+      "env": { "PYTHONUNBUFFERED": "1" }
+    }
+  }
+}</code></pre>
+            <p style="color: var(--text-muted); font-size: 14px; margin-top: 8px;">
+                Works with Claude Code, Cursor, Windsurf, and any MCP-compatible AI client.
+            </p>
+            <h3 style="margin-top: 24px;">Step 2 — Ask your AI assistant</h3>
+            <pre><code>"Please scan my project for EU AI Act compliance."</code></pre>
+            <p style="color: var(--text-muted); font-size: 14px;">That's it. Two steps.</p>
+        </div>
+    </section>
+
+    <!-- Try these prompts -->
+    <section>
+        <h2>Try These Prompts</h2>
+        <p style="text-align:center; color: var(--text-muted); margin-bottom: 16px;">Copy and paste into your AI assistant</p>
+        <div class="prompt-list">
+            <div class="prompt-item">
+                Scan my project at /path/to/project for EU AI Act compliance.
+                <span class="copy-hint">click to copy</span>
+            </div>
+            <div class="prompt-item">
+                Explain Article 12 (Record-keeping) in plain language.
+                <span class="copy-hint">click to copy</span>
+            </div>
+            <div class="prompt-item">
+                Generate a compliance action plan with effort estimates.
+                <span class="copy-hint">click to copy</span>
+            </div>
+            <div class="prompt-item">
+                Scan article by article, showing which files you read.
+                <span class="copy-hint">click to copy</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Example output -->
+    <section>
+        <h2>Example Output</h2>
+        <div class="example-output">
+            <h3 style="margin-bottom: 16px;">Art. 12 — Record-keeping</h3>
+            <div class="finding">
+                <span><span class="finding-id">ART12-OBL-1</span> &nbsp; Automatic event recording</span>
+                <span class="badge badge-partial">PARTIAL</span>
+            </div>
+            <div class="finding">
+                <span><span class="finding-id">ART12-OBL-2a</span> &nbsp; Risk event logging</span>
+                <span class="badge badge-partial">PARTIAL</span>
+            </div>
+            <div class="finding">
+                <span><span class="finding-id">ART12-OBL-4</span> &nbsp; Log retention policy</span>
+                <span class="badge badge-unable">UNABLE TO DETERMINE</span>
+            </div>
+            <div class="finding">
+                <span><span class="finding-id">ART12-OBL-3a</span> &nbsp; Biometric session timestamps</span>
+                <span class="badge badge-na">NOT APPLICABLE</span>
+            </div>
+            <div class="citation">
+                Art. 12(1): "High-risk AI systems shall technically allow for the automatic recording of events (logs) over the lifetime of the system..."
+            </div>
+        </div>
+    </section>
+
+    <!-- Why different -->
+    <section>
+        <h2>Why ComplianceLint Is Different</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Feature</th>
+                    <th>Other Tools</th>
+                    <th>ComplianceLint</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>How it works</td>
+                    <td>Check if <code>RISK_MANAGEMENT.md</code> exists</td>
+                    <td>AI reads your entire codebase, checks against decomposed legal obligations</td>
+                </tr>
+                <tr>
+                    <td>Legal grounding</td>
+                    <td>Generic checklists</td>
+                    <td>Deontic decomposition &mdash; every obligation traces to exact law text</td>
+                </tr>
+                <tr>
+                    <td>Citations</td>
+                    <td>"You need logging"</td>
+                    <td><code>Art. 12(1): "High-risk AI systems shall..."</code></td>
+                </tr>
+                <tr>
+                    <td>False positives</td>
+                    <td>Keyword matching &rarr; many</td>
+                    <td>AI understands context &rarr; near zero</td>
+                </tr>
+                <tr>
+                    <td>Privacy</td>
+                    <td>Cloud upload required</td>
+                    <td>100% local &mdash; code never leaves your machine</td>
+                </tr>
+                <tr>
+                    <td>AI required</td>
+                    <td>No (static rules)</td>
+                    <td>Yes &mdash; AI reads your code. That&rsquo;s the point: AI understands context, regex does not.</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- Articles covered -->
+    <section>
+        <h2>10 EU AI Act Articles Covered</h2>
+        <div class="articles-grid">
+            <div class="article-card">
+                <span class="art-num">Art. 5</span>
+                <div class="art-title">Prohibited Practices</div>
+                <div class="art-desc">Social scoring, real-time biometric surveillance, manipulation</div>
+            </div>
+            <div class="article-card">
+                <span class="art-num">Art. 6</span>
+                <div class="art-title">Risk Classification</div>
+                <div class="art-desc">Determine if your system is high-risk</div>
+            </div>
+            <div class="article-card">
+                <span class="art-num">Art. 9</span>
+                <div class="art-title">Risk Management</div>
+                <div class="art-desc">Documented risk assessment and mitigation</div>
+            </div>
+            <div class="article-card">
+                <span class="art-num">Art. 10</span>
+                <div class="art-title">Data Governance</div>
+                <div class="art-desc">Training data quality and bias mitigation</div>
+            </div>
+            <div class="article-card">
+                <span class="art-num">Art. 11</span>
+                <div class="art-title">Technical Documentation</div>
+                <div class="art-desc">System documentation per Annex IV</div>
+            </div>
+            <div class="article-card">
+                <span class="art-num">Art. 12</span>
+                <div class="art-title">Record-keeping</div>
+                <div class="art-desc">Automatic event logging with retention</div>
+            </div>
+            <div class="article-card">
+                <span class="art-num">Art. 13</span>
+                <div class="art-title">Transparency</div>
+                <div class="art-desc">User-facing explanations of AI decisions</div>
+            </div>
+            <div class="article-card">
+                <span class="art-num">Art. 14</span>
+                <div class="art-title">Human Oversight</div>
+                <div class="art-desc">Human-in-the-loop controls</div>
+            </div>
+            <div class="article-card">
+                <span class="art-num">Art. 15</span>
+                <div class="art-title">Accuracy & Robustness</div>
+                <div class="art-desc">Testing, monitoring, cybersecurity</div>
+            </div>
+            <div class="article-card">
+                <span class="art-num">Art. 50</span>
+                <div class="art-title">Transparency Obligations</div>
+                <div class="art-desc">AI-generated content disclosure</div>
+            </div>
+        </div>
+    </section>
+
+</div>
+
+<footer>
+    <div class="container">
+        <p>
+            <a href="https://github.com/ki-sum/compliancelint">GitHub</a> &middot;
+            Apache License 2.0 &middot;
+            Built with deontic decomposition
+        </p>
+    </div>
+</footer>
+
+<script>
+    document.querySelectorAll('.prompt-item').forEach(item => {
+        item.addEventListener('click', () => {
+            const text = item.childNodes[0].textContent.trim();
+            navigator.clipboard.writeText(text).then(() => {
+                const hint = item.querySelector('.copy-hint');
+                hint.textContent = 'copied!';
+                setTimeout(() => { hint.textContent = 'click to copy'; }, 1500);
+            });
+        });
+    });
+</script>
+
+</body>
+</html>

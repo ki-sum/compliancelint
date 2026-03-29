@@ -1,0 +1,133 @@
+{
+  "_metadata": {
+    "standard_id": "CL-IS-ART14-v0.1",
+    "title": "ComplianceLint Interim Standard for EU AI Act Article 14: Human Oversight",
+    "version": "0.1.0",
+    "date": "2026-03-17",
+    "status": "draft",
+    "disclaimer": "This is an interim standard developed by ComplianceLint based on available guidance, industry best practices, and relevant ISO standards. It is NOT an official standard. It will be superseded when CEN-CENELEC publishes the harmonized standard for Article 14 (expected Q4 2026).",
+    "basis": [
+      "EU AI Act Article 14 (official text)",
+      "EU AI Act Recital 73 (legislative intent on human oversight)",
+      "ISO/IEC 42001:2023 — AI management system",
+      "ISO/IEC TR 24028:2020 — Overview of trustworthiness in artificial intelligence",
+      "ISO 9241-210:2019 — Ergonomics of human-system interaction",
+      "ISO/IEC TR 24027:2021 — Bias in AI systems and AI aided decision making",
+      "NIST AI 100-1 (AI Risk Management Framework — Governable AI)",
+      "EU High-Level Expert Group on AI — Ethics Guidelines (Human Agency and Oversight)"
+    ],
+    "awaiting_standard": "CEN-CENELEC harmonized standard for Art. 14 (expected Q4 2026)"
+  },
+
+  "requirements": [
+    {
+      "id": "IS-ART14-R01",
+      "obligation_ref": "ART14-OBL-1",
+      "title": "Human-in-the-Loop Workflows",
+      "requirement": "The provider MUST implement human-in-the-loop workflows for decisions that have significant impact on natural persons.",
+      "rationale": "Art. 14(1) requires the system to 'be effectively overseen by natural persons during the period in which it is in use.' For high-risk decisions, this means human review before action is taken.",
+      "acceptable_implementations": [
+        "Approval flows for critical decisions (human must approve before execution)",
+        "Review queues for flagged or uncertain cases",
+        "Two-stage decision process: AI recommends, human decides",
+        "Batch review of AI decisions with human spot-checking",
+        "Exception-based review (human reviews only flagged cases)"
+      ],
+      "note": "The level of human involvement should be proportionate to the risk (Art. 14(3)). Not every decision needs full human review — risk-based routing is acceptable."
+    },
+    {
+      "id": "IS-ART14-R02",
+      "obligation_ref": "ART14-OBL-2",
+      "title": "Override and Intervention Mechanisms",
+      "requirement": "The provider MUST implement mechanisms allowing human overseers to override individual decisions and to stop the system entirely.",
+      "rationale": "Art. 14(4)(d) requires ability to 'disregard, override or reverse the output.' Art. 14(4)(e) requires ability to 'intervene in the operation or interrupt the system through a stop button or similar procedure.'",
+      "required_mechanisms": [
+        "Manual override: ability to override any individual AI decision",
+        "Kill switch: ability to disable AI functionality entirely",
+        "Emergency stop: ability to halt system operation immediately",
+        "Reversibility: ability to reverse decisions already executed where possible"
+      ],
+      "acceptable_implementations": [
+        "Override API endpoint or UI button",
+        "Feature flag or configuration to disable AI component",
+        "Circuit breaker pattern with manual trigger",
+        "Admin panel with system disable capability"
+      ]
+    },
+    {
+      "id": "IS-ART14-R03",
+      "obligation_ref": "ART14-OBL-3",
+      "title": "Monitoring Dashboard",
+      "requirement": "The provider SHOULD provide a monitoring interface enabling human overseers to observe system behavior in real time or near-real-time.",
+      "rationale": "Art. 14(4)(a) requires humans to 'properly understand the relevant capacities and limitations of the high-risk AI system and be able to duly monitor its operation.' A monitoring dashboard is the standard mechanism for operational monitoring.",
+      "recommended_features": [
+        "System status and health metrics",
+        "Recent decision log with outcomes",
+        "Performance metrics (accuracy, latency, throughput)",
+        "Anomaly detection flags",
+        "Human review queue status",
+        "Drift detection indicators",
+        "Error rate tracking"
+      ]
+    },
+    {
+      "id": "IS-ART14-R04",
+      "obligation_ref": "ART14-OBL-4",
+      "title": "Alerting and Notification System",
+      "requirement": "The provider SHOULD implement an alerting system that notifies human overseers of anomalous behavior, performance degradation, or situations requiring human intervention.",
+      "rationale": "Effective human oversight cannot be maintained without timely notification. Passive monitoring alone is insufficient — active alerting ensures human overseers are made aware of issues.",
+      "recommended_alert_types": [
+        "Performance degradation below threshold",
+        "Input data distribution shift",
+        "High-risk or edge-case decision detected",
+        "System error or failure",
+        "Unusual usage patterns",
+        "Confidence score consistently below threshold"
+      ]
+    },
+    {
+      "id": "IS-ART14-R05",
+      "obligation_ref": "ART14-OBL-5",
+      "title": "Automation Bias Mitigation",
+      "requirement": "The provider MUST implement measures to mitigate automation bias — the tendency of humans to over-rely on AI output.",
+      "rationale": "Art. 14(4)(b) explicitly requires the human overseer to 'remain aware of the possible tendency of automatically relying or over-relying on the output produced by a high-risk AI system (automation bias).'",
+      "acceptable_implementations": [
+        "Present AI output as 'suggestion' or 'recommendation' (not 'decision')",
+        "Display confidence levels prominently alongside predictions",
+        "Add deliberate friction for high-stakes decisions (require explicit confirmation)",
+        "Periodically present cases without AI suggestion (calibration trials)",
+        "Display warning labels about automation bias in the UI",
+        "Require human to provide independent assessment before seeing AI output",
+        "Training materials on automation bias for operators"
+      ]
+    },
+    {
+      "id": "IS-ART14-R06",
+      "obligation_ref": "ART14-OBL-6",
+      "title": "Confidence-Based Escalation Thresholds",
+      "requirement": "The provider SHOULD implement confidence-based routing that escalates low-confidence predictions to human review.",
+      "rationale": "Art. 14(4)(c) requires humans to 'correctly interpret the high-risk AI system's output, in particular taking into account the characteristics of the system and the interpretation tools and methods available.' Confidence thresholds operationalize this by routing uncertain cases to human review.",
+      "acceptable_implementations": [
+        "Configurable confidence threshold below which predictions go to human review",
+        "Multi-tier routing: auto-approve above high threshold, human review below",
+        "Uncertainty-based sampling for human review",
+        "Domain-specific thresholds (e.g., stricter for medical, legal)",
+        "Adaptive thresholds that adjust based on observed performance"
+      ]
+    },
+    {
+      "id": "IS-ART14-R07",
+      "obligation_ref": "ART14-OBL-7",
+      "title": "Biometric System Dual Verification",
+      "requirement": "For biometric identification systems (Annex III, point 1(a)), no action or decision MUST be taken based solely on AI output without independent human verification by at least two natural persons.",
+      "rationale": "Art. 14(5) explicitly requires that for remote biometric identification systems, 'no action or decision shall be taken by the deployer on the basis of the identification resulting from the system unless this has been separately verified and confirmed by at least two natural persons.'",
+      "scope": "Only applies to systems in Annex III, point 1(a) — real-time and post remote biometric identification systems."
+    }
+  ],
+
+  "scoring": {
+    "compliant": "R01 + R02 met, and at least 3 of R03-R06 met",
+    "partial": "R01 or R02 met + at least 2 others met",
+    "non_compliant": "Neither R01 nor R02 met"
+  }
+}

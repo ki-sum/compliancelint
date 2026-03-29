@@ -1,0 +1,451 @@
+{
+  "_metadata": {
+    "article": 5,
+    "title": "Prohibited AI Practices",
+    "prerequisites": [],
+    "decomposition_date": "2026-03-17",
+    "related_standards": {
+      "published": [
+        "European Data Protection Board Guidelines on biometric data processing under GDPR",
+        "Fundamental Rights Agency — AI and Fundamental Rights (structural alignment with Art. 5 prohibitions)",
+        "ISO/IEC 42001:2023 — AI management system (governance controls relevant to Art. 5 self-assessment)"
+      ],
+      "upcoming": [
+        "AI Office guidelines on interpretation of Art. 5 prohibited practices (expected 2026)",
+        "CEN-CENELEC guidance on prohibited practice identification methodologies"
+      ]
+    },
+    "primary_official_source": {
+      "name": "EUR-Lex — Official Journal of the European Union",
+      "eli_uri": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng",
+      "celex": "32024R1689",
+      "oj_citation": "OJ L 2024/1689, 12.7.2024",
+      "eli_note": "ELI (European Legislation Identifier) is designed for permanent persistence. Preferred over CELEX-based URLs."
+    }
+  },
+  "obligations": [
+    {
+      "id": "ART05-PRO-1a",
+      "source": "Art. 5(1)(a)",
+      "source_quote": "The following AI practices shall be prohibited: (a) the placing on the market, the putting into service or the use of an AI system that deploys subliminal techniques beyond a person's consciousness or purposefully manipulative or deceptive techniques, with the objective, or the effect of materially distorting the behaviour of a person or a group of persons by appreciably impairing their ability to make an informed decision, thereby causing them to take a decision that they would not have otherwise taken in a manner that causes or is reasonably likely to cause that person, another person or group of persons significant harm.",
+      "deontic_type": "prohibition",
+      "modality": "shall not",
+      "addressee": "any_person",
+      "addressee_note": "Applies to any natural or legal person placing on the market, putting into service, or using an AI system (provider, deployer, or any other party)",
+      "decomposed_atoms": [
+        {
+          "atom": "no_subliminal_techniques",
+          "description": "AI systems must not deploy subliminal techniques beyond conscious perception",
+          "requirement": "An AI system SHALL NOT deploy subliminal techniques beyond a person's consciousness that materially distort behaviour and cause or are reasonably likely to cause significant harm"
+        },
+        {
+          "atom": "no_manipulative_techniques",
+          "description": "AI systems must not deploy purposefully manipulative techniques",
+          "requirement": "An AI system SHALL NOT deploy purposefully manipulative techniques that appreciably impair informed decision-making and cause or are reasonably likely to cause significant harm"
+        },
+        {
+          "atom": "no_deceptive_techniques",
+          "description": "AI systems must not deploy purposefully deceptive techniques",
+          "requirement": "An AI system SHALL NOT deploy purposefully deceptive techniques that appreciably impair informed decision-making and cause or are reasonably likely to cause significant harm"
+        },
+        {
+          "atom": "harm_threshold_applies",
+          "description": "The prohibition is triggered by significant harm or reasonable likelihood thereof",
+          "requirement": "The prohibition applies when the manipulative/subliminal/deceptive technique causes or is REASONABLY LIKELY to cause significant harm — actual harm is not required, likelihood suffices"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "low",
+        "detection_method": "Heuristic: detect dark pattern libraries, subliminal messaging code, A/B testing frameworks that optimize for behavioural manipulation",
+        "what_to_scan": [
+          "code",
+          "config",
+          "dependencies"
+        ],
+        "human_judgment_needed": "Whether a detected pattern constitutes a 'subliminal technique' or 'purposeful manipulation' requires legal assessment of intent, effect, and harm threshold",
+        "rationale": "Can detect code patterns associated with manipulation (dark patterns, subliminal stimuli) but cannot determine intent, effect on decision-making, or whether harm threshold is met"
+      }
+    },
+    {
+      "id": "ART05-PRO-1b",
+      "source": "Art. 5(1)(b)",
+      "source_quote": "The following AI practices shall be prohibited: (b) the placing on the market, the putting into service or the use of an AI system that exploits any of the vulnerabilities of a natural person or a specific group of persons due to their age, disability or a specific social or economic situation, with the objective, or the effect, of materially distorting the behaviour of that person or a person belonging to that group in a manner that causes or is reasonably likely to cause that person or another person significant harm.",
+      "deontic_type": "prohibition",
+      "modality": "shall not",
+      "addressee": "any_person",
+      "addressee_note": "Applies to any natural or legal person placing on the market, putting into service, or using an AI system",
+      "decomposed_atoms": [
+        {
+          "atom": "no_exploitation_age_vulnerability",
+          "description": "AI systems must not exploit age-related vulnerabilities (children, elderly)",
+          "requirement": "An AI system SHALL NOT exploit vulnerabilities due to age (e.g., targeting children or elderly) to materially distort behaviour causing significant harm"
+        },
+        {
+          "atom": "no_exploitation_disability_vulnerability",
+          "description": "AI systems must not exploit disability-related vulnerabilities",
+          "requirement": "An AI system SHALL NOT exploit vulnerabilities due to disability (cognitive, physical, sensory) to materially distort behaviour causing significant harm"
+        },
+        {
+          "atom": "no_exploitation_socioeconomic_vulnerability",
+          "description": "AI systems must not exploit social or economic vulnerability",
+          "requirement": "An AI system SHALL NOT exploit vulnerabilities due to specific social or economic situation (poverty, homelessness, immigration status) to materially distort behaviour causing significant harm"
+        },
+        {
+          "atom": "exploitation_requires_distortion_and_harm",
+          "description": "Both material distortion of behaviour and significant harm must be present",
+          "requirement": "The prohibition is triggered when exploitation BOTH materially distorts behaviour AND causes or is reasonably likely to cause significant harm — both elements are required"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "low",
+        "detection_method": "Heuristic: detect code that segments users by age/disability/socioeconomic status and applies differentiated manipulation strategies",
+        "what_to_scan": [
+          "code",
+          "config"
+        ],
+        "human_judgment_needed": "Whether targeting vulnerable groups constitutes 'exploitation' vs. legitimate accessibility or age-appropriate content — intent and effect on behaviour must be assessed",
+        "rationale": "Can detect user segmentation by vulnerability factors but cannot determine whether the purpose is exploitation vs. legitimate adaptation"
+      }
+    },
+    {
+      "id": "ART05-PRO-1c",
+      "source": "Art. 5(1)(c)",
+      "source_quote": "The following AI practices shall be prohibited: (c) the placing on the market, the putting into service or the use of AI systems for the evaluation or classification of natural persons or groups of persons over a certain period of time based on their social behaviour or known, inferred or predicted personal or personality characteristics, with the social score leading to either or both of the following: (i) detrimental or unfavourable treatment of certain natural persons or groups of persons in social contexts that are unrelated to the contexts in which the data was originally generated or collected; (ii) detrimental or unfavourable treatment of certain natural persons or groups of persons that is unjustified or disproportionate to their social behaviour or its gravity.",
+      "deontic_type": "prohibition",
+      "modality": "shall not",
+      "addressee": "any_person",
+      "addressee_note": "Applies to any natural or legal person — the final text removed the earlier draft limitation to public authorities; social scoring by private entities is also prohibited",
+      "decomposed_atoms": [
+        {
+          "atom": "no_social_scoring_cross_context",
+          "description": "AI systems must not produce social scores leading to detrimental treatment in unrelated contexts",
+          "requirement": "An AI system SHALL NOT evaluate or classify persons based on social behaviour or personal characteristics where the resulting score leads to detrimental treatment in social contexts UNRELATED to where the data was originally generated"
+        },
+        {
+          "atom": "no_social_scoring_disproportionate",
+          "description": "AI systems must not produce social scores leading to disproportionate treatment",
+          "requirement": "An AI system SHALL NOT evaluate or classify persons based on social behaviour or personal characteristics where the resulting score leads to detrimental treatment that is UNJUSTIFIED or DISPROPORTIONATE to the behaviour or its gravity"
+        },
+        {
+          "atom": "social_scoring_covers_inferred_characteristics",
+          "description": "The prohibition covers scores based on known, inferred, or predicted characteristics",
+          "requirement": "The prohibition applies whether the social score is based on KNOWN, INFERRED, or PREDICTED personal or personality characteristics — all three bases are covered"
+        },
+        {
+          "atom": "social_scoring_temporal_element",
+          "description": "The prohibition covers scoring over a period of time",
+          "requirement": "The prohibition applies to evaluation or classification over a certain period of time — aggregate behavioural scoring, not single-instance assessments in isolation"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Heuristic: detect social scoring variables, person rating/ranking systems, trustworthiness score computation, cross-context behaviour aggregation, citizen score patterns",
+        "what_to_scan": [
+          "code",
+          "config",
+          "documentation"
+        ],
+        "human_judgment_needed": "Whether a scoring system constitutes prohibited 'social scoring' vs. legitimate single-context reputation systems (e.g., marketplace seller ratings) — context, cross-domain application, and proportionality must be assessed",
+        "rationale": "Can detect scoring patterns and cross-context data aggregation but cannot determine whether the treatment is disproportionate or whether contexts are sufficiently related"
+      }
+    },
+    {
+      "id": "ART05-PRO-1d",
+      "source": "Art. 5(1)(d)",
+      "source_quote": "The following AI practices shall be prohibited: (d) the placing on the market, the putting into service for this specific purpose, or the use of an AI system for making risk assessments of natural persons in order to assess or predict the risk of a natural person committing a criminal offence, based solely on the profiling of a natural person or on assessing their personality traits and characteristics; this prohibition shall not apply to AI systems used to support the human assessment of the involvement of a person in a criminal activity, which is already based on objective and verifiable facts directly linked to a criminal activity.",
+      "deontic_type": "prohibition",
+      "modality": "shall not",
+      "addressee": "any_person",
+      "addressee_note": "Applies broadly, but primarily relevant to law enforcement and justice system actors",
+      "decomposed_atoms": [
+        {
+          "atom": "no_criminal_risk_from_profiling_alone",
+          "description": "AI systems must not assess criminal risk based solely on profiling",
+          "requirement": "An AI system SHALL NOT assess or predict the risk of a person committing a criminal offence based SOLELY on profiling of that person"
+        },
+        {
+          "atom": "no_criminal_risk_from_personality_alone",
+          "description": "AI systems must not assess criminal risk based solely on personality traits",
+          "requirement": "An AI system SHALL NOT assess or predict criminal risk based solely on assessing a person's personality traits and characteristics — without objective factual basis"
+        },
+        {
+          "atom": "exception_human_assessment_with_facts",
+          "description": "Exception: AI may support human assessment when based on objective verifiable facts",
+          "requirement": "The prohibition does NOT apply when AI is used to SUPPORT (not replace) human assessment of involvement in criminal activity that is ALREADY based on objective, verifiable facts DIRECTLY linked to criminal activity"
+        },
+        {
+          "atom": "exception_requires_all_three_conditions",
+          "description": "The exception has three cumulative conditions",
+          "requirement": "For the exception to apply, ALL three conditions must be met: (1) the AI supports (not replaces) human assessment; (2) the assessment is based on objective, verifiable facts; (3) those facts are directly linked to criminal activity"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Heuristic: detect criminal risk scoring functions, recidivism prediction models, person-level crime risk profiling patterns",
+        "what_to_scan": [
+          "code",
+          "config",
+          "documentation"
+        ],
+        "human_judgment_needed": "Whether the system relies 'solely' on profiling vs. incorporating objective facts, and whether the exception conditions are met — requires analysis of data sources and human oversight mechanisms",
+        "rationale": "Can detect criminal risk prediction code patterns but cannot determine whether the system relies solely on profiling or incorporates objective facts"
+      },
+      "cross_references": [
+        {
+          "article": 6,
+          "context": "AI systems supporting criminal justice that are not prohibited under Art. 5(1)(d) may still be classified as high-risk under Art. 6"
+        }
+      ]
+    },
+    {
+      "id": "ART05-PRO-1e",
+      "source": "Art. 5(1)(e)",
+      "source_quote": "The following AI practices shall be prohibited: (e) the placing on the market, the putting into service for this specific purpose, or the use of AI systems that create or expand facial recognition databases through the untargeted scraping of facial images from the internet or CCTV footage.",
+      "deontic_type": "prohibition",
+      "modality": "shall not",
+      "addressee": "any_person",
+      "addressee_note": "Applies to any natural or legal person — no exceptions exist for this prohibition",
+      "decomposed_atoms": [
+        {
+          "atom": "no_facial_db_from_internet_scraping",
+          "description": "Must not create facial recognition databases by scraping the internet",
+          "requirement": "An AI system SHALL NOT create or expand facial recognition databases through untargeted scraping of facial images from the internet"
+        },
+        {
+          "atom": "no_facial_db_from_cctv_scraping",
+          "description": "Must not create facial recognition databases by scraping CCTV footage",
+          "requirement": "An AI system SHALL NOT create or expand facial recognition databases through untargeted scraping of facial images from CCTV footage"
+        },
+        {
+          "atom": "untargeted_is_key_qualifier",
+          "description": "The prohibition targets untargeted scraping specifically",
+          "requirement": "The prohibition applies to UNTARGETED scraping — bulk, indiscriminate collection. Targeted collection with lawful basis is not covered by this specific prohibition"
+        },
+        {
+          "atom": "covers_creation_and_expansion",
+          "description": "Both creating new databases and expanding existing ones are prohibited",
+          "requirement": "The prohibition covers both CREATING new facial recognition databases AND EXPANDING existing ones through untargeted scraping"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Heuristic: detect web scraping libraries combined with face detection/extraction, CCTV processing with face extraction pipelines, bulk image download combined with facial recognition, face database building code",
+        "what_to_scan": [
+          "code",
+          "config",
+          "dependencies"
+        ],
+        "human_judgment_needed": "Whether scraping is 'untargeted' vs. targeted with lawful basis, and whether the purpose is to build or expand a facial recognition database",
+        "rationale": "Can detect combinations of scraping and facial recognition code but cannot determine whether scraping is targeted or untargeted, or whether consent/legal basis exists"
+      }
+    },
+    {
+      "id": "ART05-PRO-1f",
+      "source": "Art. 5(1)(f)",
+      "source_quote": "The following AI practices shall be prohibited: (f) the placing on the market, the putting into service for this specific purpose, or the use of AI systems to infer emotions of a natural person in the areas of workplace and education institutions, except where the use of the AI system is intended to be put in place or into the market for medical or safety reasons.",
+      "deontic_type": "prohibition",
+      "modality": "shall not",
+      "addressee": "any_person",
+      "addressee_note": "Applies to any natural or legal person deploying emotion recognition in workplace or education settings",
+      "decomposed_atoms": [
+        {
+          "atom": "no_emotion_recognition_workplace",
+          "description": "AI systems must not infer emotions in the workplace",
+          "requirement": "An AI system SHALL NOT be used to infer emotions of persons in the area of workplace — including employee mood detection, engagement monitoring, hiring interview emotion analysis"
+        },
+        {
+          "atom": "no_emotion_recognition_education",
+          "description": "AI systems must not infer emotions in educational institutions",
+          "requirement": "An AI system SHALL NOT be used to infer emotions of persons in the area of education institutions — including student attention monitoring, engagement tracking, and emotional state assessment"
+        },
+        {
+          "atom": "exception_medical_reasons",
+          "description": "Exception for medical purposes",
+          "requirement": "The prohibition does NOT apply when the AI system is intended for medical reasons — e.g., therapeutic monitoring, clinical assessment, mental health support. The medical purpose must be genuine and documented"
+        },
+        {
+          "atom": "exception_safety_reasons",
+          "description": "Exception for safety purposes",
+          "requirement": "The prohibition does NOT apply when the AI system is intended for safety reasons — e.g., driver drowsiness detection, operator fatigue monitoring in safety-critical operations. The safety purpose must be genuine and documented"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Heuristic: detect emotion recognition library imports (fer, deepface emotion mode, py-feat, opensmile, speech emotion), facial expression analysis, voice emotion analysis, engagement/attention scoring patterns",
+        "what_to_scan": [
+          "code",
+          "config",
+          "dependencies"
+        ],
+        "human_judgment_needed": "Whether the deployment context is workplace/education, and whether medical or safety exceptions apply — requires analysis of intended use context and documentation of exception justification",
+        "rationale": "Can detect emotion recognition code but cannot determine deployment context (workplace/education vs. other) or whether exceptions genuinely apply"
+      }
+    },
+    {
+      "id": "ART05-PRO-1g",
+      "source": "Art. 5(1)(g)",
+      "source_quote": "The following AI practices shall be prohibited: (g) the placing on the market, the putting into service for this specific purpose, or the use of biometric categorisation systems that categorise individually natural persons based on their biometric data to deduce or infer their race, political opinions, trade union membership, religious or philosophical beliefs, sex life or sexual orientation; this prohibition does not cover any labelling or filtering of lawfully acquired biometric datasets, such as images, based on biometric data or categorizing of biometric data in the area of law enforcement.",
+      "deontic_type": "prohibition",
+      "modality": "shall not",
+      "addressee": "any_person",
+      "addressee_note": "Applies to any natural or legal person, with narrow exceptions for dataset labelling and law enforcement",
+      "decomposed_atoms": [
+        {
+          "atom": "no_biometric_inference_race",
+          "description": "Must not use biometric data to infer race",
+          "requirement": "A biometric categorization system SHALL NOT categorize persons based on biometric data to deduce or infer their race"
+        },
+        {
+          "atom": "no_biometric_inference_political_opinions",
+          "description": "Must not use biometric data to infer political opinions",
+          "requirement": "A biometric categorization system SHALL NOT categorize persons based on biometric data to deduce or infer their political opinions"
+        },
+        {
+          "atom": "no_biometric_inference_trade_union",
+          "description": "Must not use biometric data to infer trade union membership",
+          "requirement": "A biometric categorization system SHALL NOT categorize persons based on biometric data to deduce or infer their trade union membership"
+        },
+        {
+          "atom": "no_biometric_inference_religion",
+          "description": "Must not use biometric data to infer religious or philosophical beliefs",
+          "requirement": "A biometric categorization system SHALL NOT categorize persons based on biometric data to deduce or infer their religious or philosophical beliefs"
+        },
+        {
+          "atom": "no_biometric_inference_sex_life_orientation",
+          "description": "Must not use biometric data to infer sex life or sexual orientation",
+          "requirement": "A biometric categorization system SHALL NOT categorize persons based on biometric data to deduce or infer their sex life or sexual orientation"
+        },
+        {
+          "atom": "exception_lawful_dataset_labelling",
+          "description": "Exception for lawful labelling/filtering of biometric datasets",
+          "requirement": "The prohibition does NOT apply to labelling or filtering of lawfully acquired biometric datasets — e.g., annotating training data images based on biometric data, provided acquisition was lawful"
+        },
+        {
+          "atom": "exception_law_enforcement_categorization",
+          "description": "Exception for law enforcement biometric categorization",
+          "requirement": "The prohibition does NOT apply to categorizing of biometric data in the area of law enforcement — subject to applicable legal basis and safeguards"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Heuristic: detect race/ethnicity classification from facial images, political opinion inference from biometric data, sexual orientation prediction, religion inference from appearance analysis, sensitive attribute classification patterns",
+        "what_to_scan": [
+          "code",
+          "config",
+          "dependencies"
+        ],
+        "human_judgment_needed": "Whether the biometric processing actually infers the listed sensitive attributes, and whether the dataset labelling or law enforcement exceptions apply",
+        "rationale": "Can detect sensitive attribute classification code patterns but cannot determine whether the system genuinely infers these attributes from biometric data or whether exceptions are validly claimed"
+      }
+    },
+    {
+      "id": "ART05-PRO-1h",
+      "source": "Art. 5(1)(h)",
+      "source_quote": "The following AI practices shall be prohibited: (h) the use of 'real-time' remote biometric identification systems in publicly accessible spaces for the purposes of law enforcement, unless and in so far as such use is strictly necessary for one of the following objectives: (i) the targeted search for specific victims of abduction, trafficking in human beings or sexual exploitation of human beings, as well as the search for missing persons; (ii) the prevention of a specific, substantial and imminent threat to the life or physical safety of natural persons or a genuine and present or genuine and foreseeable threat of a terrorist attack; (iii) the localisation or identification of a person suspected of having committed a criminal offence, for the purpose of conducting a criminal investigation or prosecution or executing a criminal penalty for offences referred to in Annex II and punishable in the Member State concerned by a custodial sentence or a detention order for a maximum period of at least four years.",
+      "deontic_type": "prohibition",
+      "modality": "shall not",
+      "addressee": "law_enforcement",
+      "addressee_note": "This prohibition specifically targets law enforcement use in publicly accessible spaces. Non-law-enforcement real-time biometric ID in public spaces is regulated under Art. 6 as high-risk",
+      "decomposed_atoms": [
+        {
+          "atom": "no_realtime_biometric_id_public_spaces",
+          "description": "Real-time remote biometric identification in public spaces is prohibited for law enforcement",
+          "requirement": "The use of real-time remote biometric identification systems in publicly accessible spaces SHALL be prohibited for law enforcement purposes — this is the default rule"
+        },
+        {
+          "atom": "realtime_means_live_processing",
+          "description": "Real-time means live or near-live processing without significant delay",
+          "requirement": "The prohibition covers 'real-time' systems — live biometric matching, not post-facto analysis. Post-facto analysis is regulated as high-risk under Art. 6 but not banned"
+        },
+        {
+          "atom": "public_space_scope",
+          "description": "The prohibition applies only in publicly accessible spaces",
+          "requirement": "The prohibition applies in PUBLICLY ACCESSIBLE spaces — streets, parks, transport hubs, shopping centres. Private or access-controlled spaces are not covered by this specific prohibition"
+        },
+        {
+          "atom": "exception_victim_search",
+          "description": "Exception (i): targeted search for victims or missing persons",
+          "requirement": "Exception: real-time biometric ID MAY be used for targeted search for specific victims of abduction, trafficking, sexual exploitation, or search for missing persons — strictly necessary use only"
+        },
+        {
+          "atom": "exception_imminent_threat",
+          "description": "Exception (ii): prevention of imminent threats or terrorist attacks",
+          "requirement": "Exception: real-time biometric ID MAY be used for prevention of a specific, substantial, and imminent threat to life or physical safety, or a genuine and present/foreseeable terrorist threat — strictly necessary use only"
+        },
+        {
+          "atom": "exception_suspect_identification",
+          "description": "Exception (iii): identification of suspects for serious crimes",
+          "requirement": "Exception: real-time biometric ID MAY be used for localization or identification of suspects of criminal offences punishable by custodial sentence of at least 4 years, for offences listed in Annex II — strictly necessary use only"
+        },
+        {
+          "atom": "exception_requires_judicial_authorization",
+          "description": "All exceptions require prior judicial authorization",
+          "requirement": "Use under any exception SHALL require prior judicial authorization — except in duly justified urgency, where authorization must be sought within 24 hours. If authorization is refused, use must cease immediately and all data deleted"
+        },
+        {
+          "atom": "exception_requires_proportionality",
+          "description": "All exceptions must comply with proportionality and necessity requirements",
+          "requirement": "Use under any exception SHALL be subject to temporal, geographic, and personal limitations, fundamental rights impact assessment, notification to market surveillance authority, and registration in the EU database (Art. 49)"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Heuristic: detect real-time facial recognition pipelines with camera/stream input, live biometric matching against watchlists, surveillance system integration with biometric identification, public space deployment configuration",
+        "what_to_scan": [
+          "code",
+          "config",
+          "dependencies"
+        ],
+        "human_judgment_needed": "Whether the system is 'real-time', whether deployment is in publicly accessible spaces, whether it is for law enforcement purposes, and whether any exception is validly claimed with proper authorization",
+        "rationale": "Can detect real-time biometric identification code patterns but cannot determine deployment context, law enforcement purpose, or whether exception conditions (including judicial authorization) are met"
+      },
+      "cross_references": [
+        {
+          "article": "5(2)-(7)",
+          "context": "Detailed conditions, safeguards, and procedures for the law enforcement biometric ID exceptions"
+        },
+        {
+          "article": 49,
+          "context": "EU database registration requirement for real-time biometric ID systems under exception"
+        },
+        {
+          "annex": "II",
+          "context": "List of criminal offences for which Art. 5(1)(h)(iii) exception may apply"
+        },
+        {
+          "article": 99,
+          "paragraph": 1,
+          "context": "Penalties for Art. 5 violations: up to EUR 35M or 7% of global annual turnover"
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "total_obligations": 8,
+    "addressee_breakdown": {
+      "any_person": 7,
+      "law_enforcement": 1,
+      "provider": 0,
+      "deployer": 0
+    },
+    "automation_breakdown": {
+      "full": 0,
+      "partial": 8,
+      "manual": 0
+    },
+    "scope_notes": {
+      "absolute_prohibitions_no_exceptions": "ART05-PRO-1a, ART05-PRO-1b, ART05-PRO-1c, ART05-PRO-1e — absolute prohibitions with no exceptions (harm threshold still applies for OBL-1 and OBL-2)",
+      "prohibitions_with_narrow_exceptions": "ART05-PRO-1d (human assessment + objective facts exception), ART05-PRO-1f (medical/safety exception), ART05-PRO-1g (dataset labelling + law enforcement exception), ART05-PRO-1h (three narrow law enforcement exceptions with judicial authorization)",
+      "enforcement_date": "2025-02-02 — Art. 5 prohibitions are in force since this date (6 months after entry into force of the AI Act)",
+      "penalty_tier": "Highest under the AI Act: up to EUR 35,000,000 or 7% of total worldwide annual turnover (Art. 99(1))"
+    }
+  }
+}

@@ -1,0 +1,200 @@
+{
+  "name": "Fully compliant high-risk AI system",
+  "description": "Perfect AI system with everything: risk docs, logging, retention, human oversight, accuracy testing, robustness testing, transparency docs, AI disclosure, watermarking. NOT open source, high risk.",
+  "project_context": {
+    "primary_language": "Python",
+    "risk_classification": "high-risk",
+    "risk_classification_confidence": "high",
+    "compliance_answers": {
+      "_scope": {
+        "is_ai_system": true,
+        "is_ai_system_reasoning": "ML-based credit scoring system",
+        "territorial_scope_applies": true,
+        "territorial_scope_reasoning": "Deployed in EU financial institutions",
+        "is_open_source": false,
+        "open_source_license": null,
+        "user_role": "provider",
+        "user_role_reasoning": "Develops and maintains the credit scoring system",
+        "is_military_defense": false,
+        "is_research_only": false
+      },
+      "art5": {
+        "has_facial_recognition_scraping": false,
+        "has_social_scoring": false,
+        "has_subliminal_manipulation": false,
+        "has_emotion_recognition_workplace": false,
+        "has_exploitation_of_vulnerabilities": false,
+        "has_predictive_policing": false,
+        "has_biometric_categorization": false,
+        "has_real_time_biometric_id": false
+      },
+      "art6": {
+        "annex_iii_categories": [
+          "creditworthiness_assessment"
+        ],
+        "annex_i_product_type": null,
+        "is_high_risk": true,
+        "reasoning": "Creditworthiness assessment under Annex III point 5(b)"
+      },
+      "art9": {
+        "has_risk_docs": true,
+        "risk_doc_paths": [
+          "docs/risk-management-system.md",
+          "docs/risk-assessment.md"
+        ],
+        "has_testing_infrastructure": true,
+        "testing_evidence": [
+          "tests/",
+          "tests/integration/"
+        ],
+        "has_risk_code_patterns": true,
+        "risk_code_evidence": [
+          "risk_manager.py",
+          "risk_monitor.py"
+        ],
+        "has_defined_metrics": true,
+        "metrics_evidence": ["accuracy=0.95"]
+      },
+      "art10": {
+        "has_data_governance_doc": true,
+        "data_doc_paths": [
+          "docs/data-governance.md",
+          "docs/data-quality.md"
+        ],
+        "has_bias_mitigation": true,
+        "bias_evidence": [
+          "bias_detector.py",
+          "fairness_metrics.py"
+        ],
+        "has_data_lineage": true
+      },
+      "art11": {
+        "has_technical_docs": true,
+        "doc_paths": [
+          "docs/technical-documentation.md",
+          "docs/system-architecture.md",
+          "docs/model-card.md"
+        ],
+        "documented_aspects": [
+          "system_design",
+          "data_pipeline",
+          "model_architecture",
+          "performance_metrics",
+          "limitations"
+        ]
+      },
+      "art12": {
+        "has_logging": true,
+        "logging_description": "Comprehensive structured logging with audit trail",
+        "logging_evidence": [
+          "audit_logger.py",
+          "event_tracker.py"
+        ],
+        "has_retention_config": true,
+        "retention_days": 730,
+        "retention_evidence": "config/logging.yaml"
+      },
+      "art13": {
+        "has_explainability": true,
+        "explainability_evidence": [
+          "explainer.py",
+          "shap_integration.py"
+        ],
+        "has_transparency_info": true,
+        "transparency_paths": [
+          "docs/transparency-notice.md",
+          "docs/instructions-for-use.md"
+        ]
+      },
+      "art14": {
+        "has_human_oversight": true,
+        "oversight_evidence": [
+          "human_review.py",
+          "escalation_handler.py"
+        ],
+        "has_override_mechanism": true,
+        "override_evidence": [
+          "override_controller.py",
+          "manual_decision.py"
+        ]
+      },
+      "art15": {
+        "has_accuracy_testing": true,
+        "accuracy_evidence": [
+          "tests/test_accuracy.py",
+          "tests/test_precision_recall.py"
+        ],
+        "has_robustness_testing": true,
+        "robustness_evidence": [
+          "tests/test_adversarial.py",
+          "tests/test_edge_cases.py"
+        ],
+        "has_fallback_behavior": true
+      },
+      "art50": {
+        "is_chatbot_or_interactive_ai": false,
+        "is_generating_synthetic_content": false,
+        "has_ai_disclosure_to_users": true,
+        "disclosure_evidence": [
+          "docs/transparency-notice.md",
+          "ui/disclosure_banner.py"
+        ],
+        "has_content_watermarking": true,
+        "is_emotion_recognition_system": false,
+        "is_biometric_categorization_system": false,
+        "has_emotion_biometric_disclosure": false,
+        "emotion_biometric_evidence": [],
+        "is_deep_fake_system": false,
+        "has_deep_fake_disclosure": false,
+        "deep_fake_evidence": []
+      }
+    }
+  },
+  "expected": {
+    "art5": {
+      "overall": "compliant",
+      "legal_basis": "Art. 5(1): no prohibited practices detected — credit scoring uses financial data only, not social behavior; all 4 categories checked with high confidence"
+    },
+    "art6": {
+      "overall": "non_compliant",
+      "legal_basis": "Art. 6(2): creditworthiness assessment under Annex III point 5(b) confirmed high-risk — requires full conformity assessment and registration obligations"
+    },
+    "art9": {
+      "overall": "partial",
+      "legal_basis": "Art. 9(1)-(9): high-risk AI requires risk management system; has_risk_docs=true, has_risk_code_patterns=true — evidence found but needs human verification of completeness against all Art. 9 requirements (PARTIAL)"
+    },
+    "art10": {
+      "overall": "partial",
+      "legal_basis": "Art. 10(1)-(6): high-risk AI requires data governance; has_data_governance_doc=true, has_bias_mitigation=true, has_data_lineage=true — evidence found but needs human verification of full Art. 10 compliance (PARTIAL)"
+    },
+    "art11": {
+      "overall": "partial",
+      "legal_basis": "Art. 11(1): high-risk AI requires technical documentation per Annex IV; has_technical_docs=true with 5 documented_aspects — evidence found but needs human verification against all Annex IV requirements (PARTIAL)"
+    },
+    "art12": {
+      "overall": "partial",
+      "must_have_obligations": [
+        "ART12-OBL-1",
+        "ART12-OBL-2a",
+        "ART19-OBL-1"
+      ],
+      "legal_basis": "Art. 12(1)-(3): high-risk AI requires automatic logging; has_logging=true, has_retention_config=true (730 days) — evidence found but needs human verification of event coverage completeness (PARTIAL)"
+    },
+    "art13": {
+      "overall": "partial",
+      "legal_basis": "Art. 13(1)-(3): high-risk AI requires transparency and instructions for use; has_explainability=true, has_transparency_info=true — evidence found but needs human verification of completeness (PARTIAL)"
+    },
+    "art14": {
+      "overall": "partial",
+      "legal_basis": "Art. 14(1)-(5): high-risk AI requires human oversight; has_human_oversight=true, has_override_mechanism=true — evidence found but needs human verification of oversight measure completeness (PARTIAL)"
+    },
+    "art15": {
+      "overall": "partial",
+      "legal_basis": "Art. 15(1)-(5): high-risk AI requires accuracy, robustness, cybersecurity; has_accuracy_testing=true, has_robustness_testing=true, has_fallback_behavior=true — evidence found but needs human verification (PARTIAL)"
+    },
+    "art50": {
+      "overall": "not_applicable",
+      "legal_basis": "Art. 50(1)-(4): system is not a chatbot, does not generate synthetic content, no emotion recognition, no deep fakes — no Art. 50 paragraphs apply"
+    }
+  }
+}

@@ -1,0 +1,414 @@
+{
+  "_metadata": {
+    "article": 12,
+    "title": "Record-keeping",
+    "prerequisites": [
+      {
+        "type": "risk_classification",
+        "required_level": "high-risk",
+        "source_article": 6,
+        "context_field": "risk_classification",
+        "skip_when": "not high-risk with medium/high confidence"
+      }
+    ],
+    "decomposition_date": "2026-03-16",
+    "related_standards": {
+      "draft": [
+        "ISO/IEC DIS 24970:2025 — Artificial intelligence — AI system logging"
+      ],
+      "published": [
+        "ISO/IEC 42001:2023 — AI management system (governance controls map to Art. 12)"
+      ],
+      "upcoming": [
+        "CEN-CENELEC harmonized standard for Art. 12 (expected Q4 2026)"
+      ]
+    }
+  },
+  "obligations": [
+    {
+      "id": "ART12-OBL-1",
+      "source": "Art. 12(1)",
+      "source_quote": "High-risk AI systems shall technically allow for the automatic recording of events (logs) over the lifetime of the system.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "addressee_note": "Provider of a high-risk AI system (as defined in Art. 3(3))",
+      "decomposed_atoms": [
+        {
+          "atom": "system_has_logging_capability",
+          "description": "The AI system must have a technical mechanism for recording events",
+          "requirement": "The system SHALL have logging functionality built in — not optional, not a plugin, but a core technical capability"
+        },
+        {
+          "atom": "logging_is_automatic",
+          "description": "Logging must happen automatically without manual intervention",
+          "requirement": "Events SHALL be recorded automatically — not requiring a human to manually trigger logging"
+        },
+        {
+          "atom": "logging_records_events",
+          "description": "What is logged must be 'events' (discrete occurrences)",
+          "requirement": "The system SHALL record discrete events, not just aggregate metrics or summaries"
+        },
+        {
+          "atom": "logging_covers_full_lifetime",
+          "description": "Logging must operate from deployment to decommission",
+          "requirement": "Logging SHALL be active for the entire operational lifetime of the system — from first deployment to final shutdown"
+        }
+      ],
+      "automation_assessment": {
+        "level": "full",
+        "confidence": "high",
+        "detection_method": "Static analysis: check for logging framework imports, logging calls in critical paths",
+        "what_to_scan": [
+          "code",
+          "config",
+          "dependencies"
+        ],
+        "rationale": "Whether a system has automatic logging is a binary technical fact, fully determinable from code analysis"
+      },
+      "recital_alignment": {
+        "recital": 71,
+        "relevant_excerpt": "high-risk AI systems should technically allow for the automatic recording of events, by means of logs, over the duration of the lifetime of the system",
+        "alignment_score": "exact_match",
+        "additional_context": "Recital 71 adds that this is to 'enable traceability' and 'verify compliance'"
+      }
+    },
+    {
+      "id": "ART12-OBL-2a",
+      "source": "Art. 12(2)(a)",
+      "source_quote": "logging capabilities shall enable the recording of events relevant for: (a) identifying situations that may result in the high-risk AI system presenting a risk within the meaning of Article 79(1) or in a substantial modification;",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "logs_capture_risk_events",
+          "description": "Logs must capture events that could indicate the system is presenting a risk",
+          "requirement": "Logs SHALL include events that help identify when the system may be operating outside its intended parameters or causing harm"
+        },
+        {
+          "atom": "logs_capture_modification_events",
+          "description": "Logs must capture events related to substantial modifications",
+          "requirement": "Logs SHALL record events that indicate the system has undergone or is undergoing a substantial change in behavior or capability"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check if logging covers: error states, anomaly detection, model drift, performance degradation, input/output distribution shifts",
+        "what_to_scan": [
+          "code",
+          "config"
+        ],
+        "human_judgment_needed": "What constitutes a 'risk' or 'substantial modification' is context-dependent — depends on the specific AI system's intended purpose",
+        "rationale": "We can check IF risk-related events are logged, but cannot fully determine if ALL relevant risk events are covered without understanding the specific system's risk profile"
+      },
+      "cross_references": [
+        {
+          "article": 79,
+          "paragraph": 1,
+          "context": "Defines when an AI system 'presents a risk' — when it affects health, safety, fundamental rights, environment, democracy, rule of law, or leads to non-compliance"
+        }
+      ]
+    },
+    {
+      "id": "ART12-OBL-2b",
+      "source": "Art. 12(2)(b)",
+      "source_quote": "logging capabilities shall enable the recording of events relevant for: (b) facilitating the post-market monitoring referred to in Article 72;",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "logs_support_post_market_monitoring",
+          "description": "Logs must contain data useful for ongoing monitoring after deployment",
+          "requirement": "Logs SHALL include sufficient operational data to support post-market monitoring activities (performance metrics, usage patterns, incident data)"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check for: performance metric logging, usage statistics collection, error rate tracking, feedback loop mechanisms",
+        "what_to_scan": [
+          "code",
+          "config",
+          "monitoring"
+        ],
+        "human_judgment_needed": "What constitutes 'sufficient' monitoring data depends on the system's risk profile and Art. 72 monitoring plan",
+        "rationale": "Can verify presence of monitoring infrastructure but cannot determine completeness without the specific monitoring plan"
+      },
+      "cross_references": [
+        {
+          "article": 72,
+          "context": "Post-market monitoring system requirements — provider must establish proportionate monitoring"
+        }
+      ]
+    },
+    {
+      "id": "ART12-OBL-2c",
+      "source": "Art. 12(2)(c)",
+      "source_quote": "logging capabilities shall enable the recording of events relevant for: (c) monitoring the operation of high-risk AI systems referred to in Article 26(5).",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "logs_enable_deployer_monitoring",
+          "description": "Logs must provide deployers with operational monitoring capability",
+          "requirement": "The logging system SHALL produce data that deployers can use to monitor the AI system's operation (as required by Art. 26(5))"
+        },
+        {
+          "atom": "logs_accessible_to_deployers",
+          "description": "Logs or log summaries must be accessible to the deployer",
+          "requirement": "The provider SHALL make relevant log data available to deployers — either directly or through a monitoring interface"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "medium",
+        "detection_method": "Check for: log export capability, monitoring API/dashboard, deployer-facing log access controls",
+        "what_to_scan": [
+          "code",
+          "config",
+          "api"
+        ],
+        "human_judgment_needed": "Whether the log format and access mechanism is adequate for deployer monitoring",
+        "rationale": "Deployer operational monitoring cannot be verified from provider code — requires human review of deployer access controls"
+      },
+      "cross_references": [
+        {
+          "article": 26,
+          "paragraph": 5,
+          "context": "Deployer obligation to monitor operation based on instructions of use — requires provider to enable this"
+        }
+      ]
+    },
+    {
+      "id": "ART12-OBL-3a",
+      "source": "Art. 12(3)(a)",
+      "source_quote": "For high-risk AI systems referred to in point 1 (a), of Annex III, the logging capabilities shall provide, at a minimum: (a) recording of the period of each use of the system (start date and time and end date and time of each use);",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "scope_limitation": "Only applies to biometric identification systems (Annex III, point 1(a))",
+      "context_skip_field": "is_biometric_system",
+      "context_skip_value": false,
+      "decomposed_atoms": [
+        {
+          "atom": "logs_record_session_timestamps",
+          "description": "Each use session must have start and end timestamps",
+          "requirement": "Logs SHALL record the start date/time and end date/time of every use session"
+        }
+      ],
+      "automation_assessment": {
+        "level": "full",
+        "confidence": "high",
+        "detection_method": "Check for session tracking with timestamp logging (start/end events)",
+        "what_to_scan": [
+          "code"
+        ],
+        "rationale": "Session timestamp logging is a binary technical check — either session start/end is logged or it isn't"
+      }
+    },
+    {
+      "id": "ART12-OBL-3b",
+      "source": "Art. 12(3)(b)",
+      "source_quote": "the reference database against which input data has been checked by the system;",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "scope_limitation": "Only applies to biometric identification systems (Annex III, point 1(a))",
+      "context_skip_field": "is_biometric_system",
+      "context_skip_value": false,
+      "decomposed_atoms": [
+        {
+          "atom": "logs_record_reference_database",
+          "description": "Logs must identify which database was used for matching",
+          "requirement": "Logs SHALL record a reference/identifier for the database used in each matching operation"
+        }
+      ],
+      "automation_assessment": {
+        "level": "full",
+        "confidence": "high",
+        "detection_method": "Check that database identifier is included in matching operation logs",
+        "what_to_scan": [
+          "code"
+        ],
+        "rationale": "Whether database reference is logged is deterministic"
+      }
+    },
+    {
+      "id": "ART12-OBL-3c",
+      "source": "Art. 12(3)(c)",
+      "source_quote": "the input data for which the search has led to a match;",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "scope_limitation": "Only applies to biometric identification systems (Annex III, point 1(a))",
+      "context_skip_field": "is_biometric_system",
+      "context_skip_value": false,
+      "decomposed_atoms": [
+        {
+          "atom": "logs_record_matched_input",
+          "description": "When a match occurs, the input that caused the match must be logged",
+          "requirement": "Logs SHALL record the input data that resulted in a positive match (note: GDPR constraints on storing biometric data apply)"
+        }
+      ],
+      "automation_assessment": {
+        "level": "full",
+        "confidence": "high",
+        "detection_method": "Check that match events include input reference/hash",
+        "what_to_scan": [
+          "code"
+        ],
+        "rationale": "Whether matched input is logged is deterministic. Note: implementation may use hashes rather than raw biometric data for GDPR compliance."
+      }
+    },
+    {
+      "id": "ART12-OBL-3d",
+      "source": "Art. 12(3)(d)",
+      "source_quote": "the identification of the natural persons involved in the verification of the results, as referred to in Article 14(5).",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "scope_limitation": "Only applies to biometric identification systems (Annex III, point 1(a))",
+      "context_skip_field": "is_biometric_system",
+      "context_skip_value": false,
+      "decomposed_atoms": [
+        {
+          "atom": "logs_record_human_verifier_identity",
+          "description": "The person who verified AI results must be identified in logs",
+          "requirement": "Logs SHALL record the identity of the natural person(s) who verified the system's results"
+        }
+      ],
+      "automation_assessment": {
+        "level": "full",
+        "confidence": "high",
+        "detection_method": "Check for user/operator ID logging on verification/approval actions",
+        "what_to_scan": [
+          "code"
+        ],
+        "rationale": "Whether human verifier identity is logged is deterministic"
+      },
+      "cross_references": [
+        {
+          "article": 14,
+          "paragraph": 5,
+          "context": "Human oversight — results of biometric identification must be verified by at least two natural persons"
+        }
+      ]
+    },
+    {
+      "id": "ART19-OBL-1",
+      "source": "Art. 19(1)",
+      "source_quote": "the logs shall be kept for a period appropriate to the intended purpose of the high-risk AI system, of at least six months, unless provided otherwise in applicable Union or national law, in particular in Union law on the protection of personal data.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "note": "This obligation is in Art. 19 but directly extends Art. 12 logging requirements",
+      "decomposed_atoms": [
+        {
+          "atom": "logs_retained_minimum_six_months",
+          "description": "Logs must be kept for at least 6 months",
+          "requirement": "Provider SHALL retain automatically generated logs for a minimum of 6 months"
+        },
+        {
+          "atom": "retention_appropriate_to_purpose",
+          "description": "Retention period should match the system's intended purpose",
+          "requirement": "If the system's purpose warrants longer retention, logs SHALL be kept for a period appropriate to that purpose (6 months is the floor, not the ceiling)"
+        },
+        {
+          "atom": "retention_respects_data_protection",
+          "description": "Retention must comply with GDPR and other data protection law",
+          "requirement": "Log retention SHALL comply with applicable data protection law — if GDPR requires deletion before 6 months for certain personal data, that takes precedence"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check for: log retention configuration, log rotation policies, TTL settings, archive policies",
+        "what_to_scan": [
+          "config",
+          "infrastructure"
+        ],
+        "human_judgment_needed": "Whether 6 months is sufficient for the specific system's purpose, and whether retention conflicts with GDPR data minimization",
+        "rationale": "Can verify if retention policy exists and meets 6-month minimum, but appropriateness to purpose requires human judgment"
+      }
+    },
+    {
+      "id": "ART19-OBL-2",
+      "source": "Art. 19(2)",
+      "source_quote": "Providers that are financial institutions subject to requirements regarding their internal governance, arrangements or processes under Union financial services law shall maintain the logs automatically generated by their high-risk AI systems as part of the documentation kept under the relevant financial services law.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "scope_limitation": "Only applies to providers that are financial institutions subject to Union financial services law",
+      "context_skip_field": "is_financial_institution",
+      "context_skip_value": false,
+      "decomposed_atoms": [
+        {
+          "atom": "financial_logs_in_financial_docs",
+          "description": "Financial institution providers must keep AI logs as part of their financial services documentation",
+          "requirement": "Provider financial institutions SHALL maintain AI system logs as part of the documentation required under Union financial services law"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual",
+        "confidence": "low",
+        "detection_method": "Check if system is operated by a financial institution — requires human confirmation",
+        "what_to_scan": [],
+        "human_judgment_needed": "Whether the provider is a financial institution and which financial services law applies",
+        "rationale": "Cannot determine from code whether the operator is a financial institution"
+      }
+    },
+    {
+      "id": "ART26-OBL-6",
+      "source": "Art. 26(6)",
+      "source_quote": "Deployers of high-risk AI systems shall keep the logs automatically generated by that high-risk AI system to the extent such logs are under their control, for a period appropriate to the intended purpose of the high-risk AI system, of at least six months, unless provided otherwise in applicable Union or national law, in particular in Union law on the protection of personal data.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "deployer",
+      "scope_limitation": "Deployer obligation — applies only when scanning as deployer, not provider",
+      "decomposed_atoms": [
+        {
+          "atom": "deployer_retains_logs_six_months",
+          "description": "Deployer must retain AI-generated logs for at least 6 months",
+          "requirement": "Deployer SHALL keep automatically generated logs for at least 6 months, appropriate to the intended purpose"
+        },
+        {
+          "atom": "deployer_retention_respects_data_protection",
+          "description": "Deployer retention must comply with data protection law",
+          "requirement": "Deployer log retention SHALL comply with applicable data protection law (GDPR)"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial",
+        "confidence": "medium",
+        "detection_method": "Check for log retention config — same as ART19-OBL-1 but from deployer perspective",
+        "what_to_scan": [
+          "config",
+          "infrastructure"
+        ],
+        "human_judgment_needed": "Whether deployer has control over logs and whether retention period is appropriate",
+        "rationale": "Technical retention check is same as provider; but deployer control scope requires human judgment"
+      }
+    }
+  ],
+  "summary": {
+    "total_obligations": 11,
+    "addressee_breakdown": {
+      "provider": 10,
+      "deployer": 1,
+      "commission": 0
+    },
+    "automation_breakdown": {
+      "full": 5,
+      "partial": 3,
+      "manual": 3
+    },
+    "scope_notes": {
+      "general_obligations": "ART12-OBL-1, ART12-OBL-2a, ART12-OBL-2b, ART12-OBL-2c, ART19-OBL-1 — apply to ALL high-risk AI systems",
+      "biometric_only": "ART12-OBL-3a, ART12-OBL-3b, ART12-OBL-3c, ART12-OBL-3d — apply ONLY to biometric identification systems (Annex III, point 1(a))"
+    }
+  }
+}

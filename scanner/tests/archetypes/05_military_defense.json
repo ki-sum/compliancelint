@@ -1,0 +1,178 @@
+{
+  "name": "Military AI defense system",
+  "description": "Military AI system, is_military_defense=true. ALL articles NOT_APPLICABLE per Art. 2(3) exclusion for national security/defense.",
+  "project_context": {
+    "primary_language": "C++",
+    "risk_classification": "high-risk",
+    "risk_classification_confidence": "high",
+    "compliance_answers": {
+      "_scope": {
+        "is_ai_system": true,
+        "is_ai_system_reasoning": "Autonomous threat detection and classification system",
+        "territorial_scope_applies": true,
+        "territorial_scope_reasoning": "EU member state military",
+        "is_open_source": false,
+        "open_source_license": null,
+        "user_role": "provider",
+        "user_role_reasoning": "Defense contractor developing the system",
+        "is_military_defense": true,
+        "is_research_only": false
+      },
+      "art5": {
+        "has_facial_recognition_scraping": true,
+        "has_social_scoring": false,
+        "has_subliminal_manipulation": false,
+        "has_emotion_recognition_workplace": false,
+        "has_exploitation_of_vulnerabilities": false,
+        "has_predictive_policing": false,
+        "has_biometric_categorization": false,
+        "has_real_time_biometric_id": false
+      },
+      "art6": {
+        "annex_iii_categories": [
+          "biometric_identification"
+        ],
+        "annex_i_product_type": null,
+        "is_high_risk": true,
+        "reasoning": "Biometric identification"
+      },
+      "art9": {
+        "has_risk_docs": true,
+        "risk_doc_paths": [
+          "docs/risk.md"
+        ],
+        "has_testing_infrastructure": true,
+        "testing_evidence": [
+          "tests/"
+        ],
+        "has_risk_code_patterns": true,
+        "risk_code_evidence": [
+          "risk_engine.cpp"
+        ],
+        "has_defined_metrics": true,
+        "metrics_evidence": ["accuracy=0.95"]
+      },
+      "art10": {
+        "has_data_governance_doc": true,
+        "data_doc_paths": [
+          "docs/data.md"
+        ],
+        "has_bias_mitigation": false,
+        "bias_evidence": [],
+        "has_data_lineage": true
+      },
+      "art11": {
+        "has_technical_docs": true,
+        "doc_paths": [
+          "docs/tech-spec.md"
+        ],
+        "documented_aspects": [
+          "system_design"
+        ]
+      },
+      "art12": {
+        "has_logging": true,
+        "logging_description": "Operational logging",
+        "logging_evidence": [
+          "logger.cpp"
+        ],
+        "has_retention_config": true,
+        "retention_days": 365,
+        "retention_evidence": "config.yaml"
+      },
+      "art13": {
+        "has_explainability": false,
+        "explainability_evidence": [],
+        "has_transparency_info": false,
+        "transparency_paths": []
+      },
+      "art14": {
+        "has_human_oversight": true,
+        "oversight_evidence": [
+          "command_override.cpp"
+        ],
+        "has_override_mechanism": true,
+        "override_evidence": [
+          "manual_control.cpp"
+        ]
+      },
+      "art15": {
+        "has_accuracy_testing": true,
+        "accuracy_evidence": [
+          "tests/accuracy/"
+        ],
+        "has_robustness_testing": true,
+        "robustness_evidence": [
+          "tests/adversarial/"
+        ],
+        "has_fallback_behavior": true
+      },
+      "art50": {
+        "is_chatbot_or_interactive_ai": false,
+        "is_generating_synthetic_content": false,
+        "has_ai_disclosure_to_users": false,
+        "disclosure_evidence": [],
+        "has_content_watermarking": false,
+        "is_emotion_recognition_system": false,
+        "is_biometric_categorization_system": false,
+        "has_emotion_biometric_disclosure": false,
+        "emotion_biometric_evidence": [],
+        "is_deep_fake_system": false,
+        "has_deep_fake_disclosure": false,
+        "deep_fake_evidence": []
+      }
+    }
+  },
+  "expected": {
+    "art5": {
+      "overall": "not_applicable",
+      "reason_contains": "Art. 2(3)",
+      "legal_basis": "Art. 2(3): EU AI Act does not apply to AI systems developed or used exclusively for military/defense purposes"
+    },
+    "art6": {
+      "overall": "not_applicable",
+      "reason_contains": "Art. 2(3)",
+      "legal_basis": "Art. 2(3): military/defense exclusion — Art. 6 risk classification does not apply"
+    },
+    "art9": {
+      "overall": "not_applicable",
+      "reason_contains": "Art. 2(3)",
+      "legal_basis": "Art. 2(3): military/defense exclusion — Art. 9 risk management does not apply"
+    },
+    "art10": {
+      "overall": "not_applicable",
+      "reason_contains": "Art. 2(3)",
+      "legal_basis": "Art. 2(3): military/defense exclusion — Art. 10 data governance does not apply"
+    },
+    "art11": {
+      "overall": "not_applicable",
+      "reason_contains": "Art. 2(3)",
+      "legal_basis": "Art. 2(3): military/defense exclusion — Art. 11 technical documentation does not apply"
+    },
+    "art12": {
+      "overall": "not_applicable",
+      "reason_contains": "Art. 2(3)",
+      "legal_basis": "Art. 2(3): military/defense exclusion — Art. 12 record-keeping does not apply"
+    },
+    "art13": {
+      "overall": "not_applicable",
+      "reason_contains": "Art. 2(3)",
+      "legal_basis": "Art. 2(3): military/defense exclusion — Art. 13 transparency does not apply"
+    },
+    "art14": {
+      "overall": "not_applicable",
+      "reason_contains": "Art. 2(3)",
+      "legal_basis": "Art. 2(3): military/defense exclusion — Art. 14 human oversight does not apply"
+    },
+    "art15": {
+      "overall": "not_applicable",
+      "reason_contains": "Art. 2(3)",
+      "legal_basis": "Art. 2(3): military/defense exclusion — Art. 15 accuracy/robustness does not apply"
+    },
+    "art50": {
+      "overall": "not_applicable",
+      "reason_contains": "Art. 2(3)",
+      "legal_basis": "Art. 2(3): military/defense exclusion — Art. 50 transparency obligations do not apply"
+    }
+  }
+}

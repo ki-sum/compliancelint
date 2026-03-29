@@ -1,0 +1,154 @@
+{
+  "_metadata": {
+    "standard_id": "CL-IS-ART09-v0.1",
+    "title": "ComplianceLint Interim Standard for EU AI Act Article 9: Risk Management System",
+    "version": "0.1.0",
+    "date": "2026-03-17",
+    "status": "draft",
+    "disclaimer": "This is an interim standard developed by ComplianceLint based on available guidance, industry best practices, and existing risk management standards. It is NOT an official standard. It will be superseded when CEN-CENELEC publishes the harmonized standard for Article 9 (expected Q4 2026).",
+    "basis": [
+      "EU AI Act Article 9 (official text)",
+      "EU AI Act Recitals 65-67 (legislative intent on risk management)",
+      "ISO 14971:2019 — Medical device risk management (adapted for AI)",
+      "ISO/IEC 23894:2023 — AI risk management guidance",
+      "NIST AI Risk Management Framework (AI RMF 1.0)",
+      "ISO/IEC 42001:2023 — AI management system",
+      "ISO 31000:2018 — General risk management principles",
+      "OECD AI Principles — Risk-based approach"
+    ],
+    "awaiting_standard": "CEN-CENELEC harmonized standard for Art. 9 (expected Q4 2026)"
+  },
+
+  "requirements": [
+    {
+      "id": "IS-ART09-R01",
+      "obligation_ref": "ART09-OBL-1",
+      "title": "Risk Management System Documentation",
+      "requirement": "The provider MUST establish, implement, document, and maintain a risk management system throughout the entire lifecycle of the high-risk AI system.",
+      "rationale": "Art. 9(1) mandates a continuous, documented risk management process — not a one-time assessment. The system must be a living document updated throughout the AI lifecycle.",
+      "acceptable_implementations": [
+        "Dedicated risk_assessment.md or risk management plan document",
+        "Risk register (spreadsheet, database, or structured file) with identified risks",
+        "Formal FMEA (Failure Mode and Effects Analysis) document",
+        "ISO 14971 or ISO/IEC 23894 compliant risk management file",
+        "Risk management section in system design documentation"
+      ],
+      "not_acceptable": [
+        "No documented risk management process",
+        "One-time risk assessment with no update mechanism",
+        "Risk management only in meeting notes or emails"
+      ]
+    },
+    {
+      "id": "IS-ART09-R02",
+      "obligation_ref": "ART09-OBL-2",
+      "title": "Risk Identification and Analysis",
+      "requirement": "The provider MUST identify and analyze known and reasonably foreseeable risks that the high-risk AI system can pose to health, safety, or fundamental rights.",
+      "rationale": "Art. 9(2)(a) requires systematic identification of risks from intended use AND reasonably foreseeable misuse. This must go beyond technical failures to include societal impacts.",
+      "required_content": [
+        "List of identified risks with severity and likelihood ratings",
+        "Analysis of risks from intended use scenarios",
+        "Analysis of risks from reasonably foreseeable misuse",
+        "Consideration of risks to health, safety, and fundamental rights",
+        "Risk categorization (technical, ethical, societal, legal)"
+      ],
+      "acceptable_implementations": [
+        "Risk register with risk ID, description, category, likelihood, severity, and risk score",
+        "FMEA table with failure modes, effects, severity, occurrence, and detection ratings",
+        "Structured threat modeling document (STRIDE, LINDDUN for privacy)",
+        "NIST AI RMF MAP function outputs"
+      ]
+    },
+    {
+      "id": "IS-ART09-R03",
+      "obligation_ref": "ART09-OBL-2b",
+      "title": "Post-Market Risk Evaluation",
+      "requirement": "The provider MUST evaluate risks using data gathered from post-market monitoring systems (Art. 72).",
+      "rationale": "Art. 9(2)(c) requires ongoing risk evaluation based on real-world usage data. Pre-deployment risk assessment alone is insufficient.",
+      "acceptable_implementations": [
+        "Documented process for incorporating post-market monitoring findings into risk register",
+        "Incident tracking linked to risk assessment updates",
+        "Periodic risk review schedule tied to monitoring data",
+        "Feedback loop from deployment metrics to risk scores"
+      ]
+    },
+    {
+      "id": "IS-ART09-R04",
+      "obligation_ref": "ART09-OBL-3",
+      "title": "Risk Management Measures",
+      "requirement": "Risk management measures MUST eliminate or reduce risks as far as possible through adequate design and development. Remaining residual risks MUST be mitigated and controlled. Measures MUST consider cumulative effects and be proportionate.",
+      "rationale": "Art. 9(3) establishes a hierarchy: eliminate > reduce > mitigate > communicate. Measures must be proportionate to the level of risk and consider effects in combination, not in isolation.",
+      "required_content": [
+        "For each identified risk: mitigation strategy with rationale",
+        "Evidence that elimination was considered before mitigation",
+        "Assessment of cumulative/combined effects of multiple risks",
+        "Proportionality justification for chosen measures"
+      ],
+      "acceptable_implementations": [
+        "Risk treatment plan with risk ID linked to specific mitigations",
+        "Design controls document showing risk-driven design decisions",
+        "Code-level safety checks, guardrails, and input validation linked to risk items",
+        "Operational controls and monitoring procedures for residual risks"
+      ]
+    },
+    {
+      "id": "IS-ART09-R05",
+      "obligation_ref": "ART09-OBL-4",
+      "title": "Testing with Appropriate Metrics and Thresholds",
+      "requirement": "The high-risk AI system MUST be tested to identify the most appropriate and targeted risk management measures. Testing MUST use appropriate metrics and probabilistic thresholds.",
+      "rationale": "Art. 9(4) requires that risk management is validated through testing — not just documented. Tests must use quantitative metrics, not just qualitative assessments.",
+      "required_content": [
+        "Test plans linked to identified risks",
+        "Quantitative metrics (accuracy, precision, recall, F1, AUC, etc.)",
+        "Defined probabilistic thresholds for acceptable performance",
+        "Test results documenting whether thresholds were met",
+        "Evaluation against intended purpose and foreseeable conditions"
+      ],
+      "acceptable_implementations": [
+        "Automated test suites with documented coverage of risk scenarios",
+        "Benchmark evaluation scripts with threshold assertions",
+        "Model evaluation reports with metrics and pass/fail criteria",
+        "Red-teaming or adversarial testing results",
+        "Performance evaluation across demographic subgroups (fairness testing)"
+      ],
+      "not_acceptable": [
+        "No testing infrastructure at all",
+        "Tests without quantitative metrics or thresholds",
+        "Manual-only testing with no reproducible results"
+      ]
+    },
+    {
+      "id": "IS-ART09-R06",
+      "obligation_ref": "ART09-OBL-5",
+      "title": "Child-Specific Risk Assessment",
+      "requirement": "If the high-risk AI system is intended to be used by or affect children, the risk management system MUST specifically assess child-specific risks.",
+      "rationale": "Art. 9(5) explicitly requires that systems intended for children account for their specific vulnerabilities. This is a distinct obligation beyond general risk assessment.",
+      "acceptable_implementations": [
+        "Dedicated section in risk assessment for child-specific risks",
+        "Age-appropriate design assessment",
+        "Child safety impact analysis",
+        "Consultation with child development or protection experts"
+      ],
+      "note": "This requirement only applies when the system is intended to interact with or be used by children. If not applicable, document the non-applicability."
+    },
+    {
+      "id": "IS-ART09-R07",
+      "obligation_ref": "ART09-OBL-6",
+      "title": "Residual Risk Communication",
+      "requirement": "The provider MUST communicate residual risks to deployers via instructions for use (Art. 13) and, where appropriate, to affected persons.",
+      "rationale": "Art. 9(6-8) requires that risks which cannot be eliminated or sufficiently mitigated are transparently communicated to downstream users and affected persons.",
+      "acceptable_implementations": [
+        "Residual risk section in user documentation or instructions for use",
+        "Known limitations document listing unmitigated risks",
+        "Model card with risk and limitation disclosures",
+        "Safety datasheet or risk communication document"
+      ]
+    }
+  ],
+
+  "scoring": {
+    "compliant": "R01 met + R02 met + R04 or R05 met + at least 3 others met",
+    "partial": "R01 met + at least 2 of R02-R07 met",
+    "non_compliant": "R01 not met, or fewer than 2 of R02-R07 met"
+  }
+}
