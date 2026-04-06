@@ -34,9 +34,9 @@ If your software uses AI and you serve EU customers, the EU AI Act applies to yo
 npx compliancelint init
 ```
 
-This adds ComplianceLint to your project's MCP config. Works with Claude Code, Cursor, Windsurf, and any MCP-compatible IDE.
+This auto-detects your environment, installs dependencies if needed, and adds ComplianceLint to your project's MCP config. Then restart your AI IDE.
 
-### Option B: pip install
+**Option B: pip install**
 
 ```bash
 pip install compliancelint
@@ -48,14 +48,15 @@ Then add to your `.mcp.json`:
 {
   "mcpServers": {
     "compliancelint": {
-      "command": "compliancelint-server",
+      "command": "python",
+      "args": ["-m", "scanner.server"],
       "env": { "PYTHONUNBUFFERED": "1" }
     }
   }
 }
 ```
 
-### Option C: Manual setup
+**Option C: Manual setup**
 
 Add to your `.mcp.json`:
 
@@ -63,7 +64,6 @@ Add to your `.mcp.json`:
 {
   "mcpServers": {
     "compliancelint": {
-      "type": "stdio",
       "command": "python",
       "args": ["/path/to/scanner/server.py"],
       "env": { "PYTHONUNBUFFERED": "1" }
@@ -80,11 +80,11 @@ Add to your `.mcp.json`:
 | Codex | MCP settings |
 | Zed | MCP settings |
 
-### Then ask your AI
+After installing, restart your AI IDE so it picks up the new MCP server, then ask:
 
 > "Scan my project for EU AI Act compliance."
 
-That's it. No extra API key needed — uses your existing AI subscription.
+No extra API key needed — uses your existing AI subscription.
 
 ### Track over time (optional)
 
@@ -254,19 +254,20 @@ All obligations verified against EUR-Lex source text.
 
 | Tool | Purpose |
 |------|---------|
-| `cl_scan` | Scan any article(s) — e.g. `cl_scan(articles="12")` or `cl_scan(articles="all")` |
+| `cl_scan` | Scan article(s) — `cl_scan(regulation="eu-ai-act", articles="12")` or `articles="all"` |
+| `cl_scan_all` | Scan all articles in a regulation at once (summary report) |
 | `cl_analyze_project` | Understand project structure before scanning |
-| `cl_explain_article` | Plain-language explanation of any article |
+| `cl_explain` | Plain-language explanation of any article |
 | `cl_action_plan` | Prioritized remediation plan with effort estimates |
 | `cl_update_finding` | Submit evidence, rebuttals, acknowledgements |
 | `cl_verify_evidence` | Verify submitted evidence |
-| `cl_export_report` | Export Markdown or JSON compliance report |
+| `cl_report` | Export Markdown or JSON compliance report |
 | `cl_connect` | Link to dashboard (browser OAuth) |
 | `cl_sync` | Upload scan results to dashboard |
 | `cl_check_updates` | Enforcement deadlines and regulation status |
 | `cl_version` | Show ComplianceLint version |
 
-The `cl_scan` tool accepts `regulation` and `articles` parameters, designed to support multiple regulations as they are added.
+All scanning tools accept a `regulation` parameter (default: `"eu-ai-act"`), designed to support multiple regulations as they are added.
 
 ---
 

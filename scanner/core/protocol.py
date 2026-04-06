@@ -522,11 +522,11 @@ class BaseArticleModule:
                 return json.load(f)
         return {}
 
-    def _load_source(self) -> dict:
+    def _load_source(self, regulation: str = "eu-ai-act") -> dict:
         """Load the official source text for this article."""
         sources_dir = os.path.join(
             os.path.dirname(os.path.dirname(self._module_dir)),
-            "sources", "eu-ai-act",
+            "sources", regulation,
         )
         filepath = os.path.join(sources_dir, f"article-{self._article_number}.json")
         if os.path.exists(filepath):

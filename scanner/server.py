@@ -352,7 +352,7 @@ def cl_scan(
 
     # Single article → return full findings + post-scan hint
     if len(article_numbers) == 1:
-        output = _scan_single_article(article_numbers[0], project_path, context=ctx)
+        output = _scan_single_article(article_numbers[0], project_path, context=ctx, regulation=regulation)
         config = ProjectConfig.load(project_path)
         if config.saas_api_key and config.auto_sync:
             try:
@@ -369,7 +369,7 @@ def cl_scan(
     # Multiple articles → scan each and return combined result
     results = {}
     for art_num in article_numbers:
-        result_json = _scan_single_article(art_num, project_path, context=ctx)
+        result_json = _scan_single_article(art_num, project_path, context=ctx, regulation=regulation)
         try:
             result_data = json.loads(result_json)
             results[f"article_{art_num}"] = result_data
@@ -402,1074 +402,61 @@ def cl_scan(
 def cl_explain(regulation: str = "eu-ai-act", article: int = 0) -> str:
     """Explain a regulation article in plain language.
 
+    Provides:
+    - The official requirement summary
+    - What can be automated vs. needs human judgment
+    - The ComplianceLint compliance checklist
+    - Cross-references to related articles
+
     Args:
         regulation: Which regulation (default: "eu-ai-act").
         article: Article number to explain (e.g. 12 for Article 12).
     """
     if regulation != "eu-ai-act":
-        return json.dumps({"error": f"Regulation '{regulation}' not yet supported."})
-    return cl_explain_article(article)
+        return json.dumps({"error": f"Regulation '{regulation}' not yet supported.",
+                           "supported": ["eu-ai-act"]})
+    _ensure_module_loaded(article)
+    if article in _modules:
+        explanation = _modules[article].explain()
+        return explanation.to_json()
+    return json.dumps({
+        "error": f"Article {article} explanation not yet available.",
+        "available_articles": sorted(_modules.keys()),
+    })
 
 
 @mcp.tool()
 def cl_report(
     project_path: str,
-    regulation: str = "",
+    regulation: str = "eu-ai-act",
     format: str = "md",
 ) -> str:
     """Export a compliance report.
 
+    Reads .compliancelint/state.json and generates a report file.
+    Requires a previous scan (state.json must exist).
+
+    Supported formats:
+      - md: Markdown report with tables
+      - json: Raw JSON state dump
+
     Args:
         project_path: Absolute path to the project directory.
-        regulation: Filter by regulation (empty = all regulations in state).
-        format: Report format — "md" (Markdown) or "json".
+        regulation: Which regulation to report on (default: "eu-ai-act").
+        format: Report format — "md" or "json".
     """
-    return cl_export_report(project_path, format)
+    from core.state import export_report
+    result = export_report(project_path, fmt=format)
+    return json.dumps(result, indent=2, default=str)
 
-
-# ── Legacy per-article tools (backward compatibility) ─────────────────────
-# These delegate to cl_scan(). They will be deprecated in a future version.
-
-@mcp.tool()
-def cl_scan_article_5(project_path: str, project_context: str = "") -> str:
-    """Scan a project for EU AI Act Article 5 (Prohibited Practices) compliance.
-
-    Checks for code patterns that may indicate prohibited AI practices:
-    - Subliminal manipulation or dark patterns targeting vulnerabilities
-    - Social scoring systems
-    - Real-time biometric identification in public spaces
-    - Emotion inference in workplace/education contexts
-
-    Args:
-        project_path: Absolute path to the project directory to scan.
-        project_context: Optional JSON string with AI-enriched project context.
-    """
-    ctx = None
-    if project_context:
-        try:
-            ctx = ProjectContext.from_json(project_context)
-        except (json.JSONDecodeError, TypeError):
-            pass
-    return _scan_single_article(5, project_path, context=ctx)
 
 
 @mcp.tool()
-def cl_scan_article_6(project_path: str, project_context: str = "") -> str:
-    """Scan a project for EU AI Act Article 6 (High-Risk Classification) compliance.
-
-    Determines whether the system falls under Annex III high-risk categories:
-    - Biometric identification/categorisation
-    - Critical infrastructure management
-    - Education and vocational training
-    - Employment and worker management
-    - Access to essential services
-    - Law enforcement
-    - Migration and border control
-    - Administration of justice
-
-    Args:
-        project_path: Absolute path to the project directory to scan.
-        project_context: Optional JSON string with AI-enriched project context.
-    """
-    ctx = None
-    if project_context:
-        try:
-            ctx = ProjectContext.from_json(project_context)
-        except (json.JSONDecodeError, TypeError):
-            pass
-    return _scan_single_article(6, project_path, context=ctx)
-
-
-@mcp.tool()
-def cl_scan_article_9(project_path: str, project_context: str = "") -> str:
-    """Scan a project for EU AI Act Article 9 (Risk Management System) compliance.
-
-    Checks for:
-    - Risk management documentation (risk register, risk assessment)
-    - Intended use and foreseeable misuse documentation
-    - Residual risk documentation
-    - Testing against pre-defined metrics
-    - Post-market monitoring integration
-
-    Args:
-        project_path: Absolute path to the project directory to scan.
-        project_context: Optional JSON string with AI-enriched project context.
-    """
-    ctx = None
-    if project_context:
-        try:
-            ctx = ProjectContext.from_json(project_context)
-        except (json.JSONDecodeError, TypeError):
-            pass
-    return _scan_single_article(9, project_path, context=ctx)
-
-
-@mcp.tool()
-def cl_scan_article_10(project_path: str, project_context: str = "") -> str:
-    """Scan a project for EU AI Act Article 10 (Data Governance) compliance.
-
-    Checks for:
-    - Dataset documentation (data cards, datasheets)
-    - Data pipeline and preprocessing documentation
-    - Bias detection tooling
-    - Data versioning and traceability
-    - Train/validation/test split documentation
-
-    Args:
-        project_path: Absolute path to the project directory to scan.
-        project_context: Optional JSON string with AI-enriched project context.
-    """
-    ctx = None
-    if project_context:
-        try:
-            ctx = ProjectContext.from_json(project_context)
-        except (json.JSONDecodeError, TypeError):
-            pass
-    return _scan_single_article(10, project_path, context=ctx)
-
-
-@mcp.tool()
-def cl_scan_article_11(project_path: str, project_context: str = "") -> str:
-    """Scan a project for EU AI Act Article 11 (Technical Documentation) compliance.
-
-    Checks for:
-    - System description and intended purpose (README/docs)
-    - Architecture documentation
-    - API specification
-    - Model card with training/evaluation details
-    - Testing and change log documentation
-
-    Args:
-        project_path: Absolute path to the project directory to scan.
-        project_context: Optional JSON string with AI-enriched project context.
-    """
-    ctx = None
-    if project_context:
-        try:
-            ctx = ProjectContext.from_json(project_context)
-        except (json.JSONDecodeError, TypeError):
-            pass
-    return _scan_single_article(11, project_path, context=ctx)
-
-
-@mcp.tool()
-def cl_scan_article_12(project_path: str, project_context: str = "") -> str:
-    """Scan a project for EU AI Act Article 12 (Record-keeping) compliance.
-
-    Performs static analysis to check:
-    - Logging framework presence and type
-    - API endpoint logging coverage
-    - Structured log fields (timestamp, user_id, action, etc.)
-    - Log retention policy (Art. 19 requires >= 6 months)
-    - Tamper protection mechanisms
-
-    Args:
-        project_path: Absolute path to the project directory to scan.
-        project_context: Optional JSON string with AI-enriched project context.
-    """
-    ctx = None
-    if project_context:
-        try:
-            ctx = ProjectContext.from_json(project_context)
-        except (json.JSONDecodeError, TypeError):
-            pass
-    return _scan_single_article(12, project_path, context=ctx)
-
-
-@mcp.tool()
-def cl_scan_article_13(project_path: str, project_context: str = "") -> str:
-    """Scan a project for EU AI Act Article 13 (Transparency) compliance.
-
-    Checks for:
-    - User/deployer documentation (instructions of use)
-    - Model interpretability tooling (SHAP, LIME, etc.)
-    - Confidence/uncertainty scores in outputs
-    - Documented intended purpose
-    - Known limitations documentation
-    - Input data specifications
-
-    Args:
-        project_path: Absolute path to the project directory to scan.
-        project_context: Optional JSON string with AI-enriched project context.
-    """
-    ctx = None
-    if project_context:
-        try:
-            ctx = ProjectContext.from_json(project_context)
-        except (json.JSONDecodeError, TypeError):
-            pass
-    return _scan_single_article(13, project_path, context=ctx)
-
-
-@mcp.tool()
-def cl_scan_article_14(project_path: str, project_context: str = "") -> str:
-    """Scan a project for EU AI Act Article 14 (Human Oversight) compliance.
-
-    Checks for:
-    - Human-in-the-loop patterns (approval flows, review queues)
-    - Override and kill-switch mechanisms
-    - Monitoring dashboard components
-    - Alert and notification systems
-    - Automation bias awareness measures
-    - Confidence-based escalation to human review
-
-    Args:
-        project_path: Absolute path to the project directory to scan.
-        project_context: Optional JSON string with AI-enriched project context.
-    """
-    ctx = None
-    if project_context:
-        try:
-            ctx = ProjectContext.from_json(project_context)
-        except (json.JSONDecodeError, TypeError):
-            pass
-    return _scan_single_article(14, project_path, context=ctx)
-
-
-@mcp.tool()
-def cl_scan_article_15(project_path: str, project_context: str = "") -> str:
-    """Scan a project for EU AI Act Article 15 (Accuracy, Robustness & Cybersecurity) compliance.
-
-    Checks for:
-    - Accuracy metrics and testing infrastructure
-    - Input validation and error handling
-    - Rate limiting and authentication/authorization
-    - Dependency vulnerability scanning
-    - Adversarial testing patterns
-    - Redundancy and failover configuration
-
-    Args:
-        project_path: Absolute path to the project directory to scan.
-        project_context: Optional JSON string with AI-enriched project context.
-    """
-    ctx = None
-    if project_context:
-        try:
-            ctx = ProjectContext.from_json(project_context)
-        except (json.JSONDecodeError, TypeError):
-            pass
-    return _scan_single_article(15, project_path, context=ctx)
-
-
-@mcp.tool()
-def cl_scan_article_16(project_path: str, project_context: str = "") -> str:
-    """Scan a project for EU AI Act Article 16 (Obligations of providers of high-risk AI systems) compliance.
-
-    Checks for:
-    - Section 2 compliance (Art. 8-15 requirements)
-    - Provider identification on system/packaging/documentation
-    - Quality management system (Art. 17)
-    - Documentation keeping (Art. 18)
-    - Log retention (Art. 19)
-    - Conformity assessment (Art. 43)
-    - EU declaration of conformity (Art. 47)
-    - CE marking (Art. 48)
-    - EU database registration (Art. 49)
-    - Corrective actions process (Art. 20)
-    - Conformity demonstrability on authority request
-    - Accessibility requirements compliance
-
-    Args:
-        project_path: Absolute path to the project directory to scan.
-        project_context: Optional JSON string with AI-enriched project context.
-    """
-    ctx = None
-    if project_context:
-        try:
-            ctx = ProjectContext.from_json(project_context)
-        except (json.JSONDecodeError, TypeError):
-            pass
-    return _scan_single_article(16, project_path, context=ctx)
-
-
-@mcp.tool()
-def cl_scan_article_50(project_path: str, project_context: str = "") -> str:
-    """Scan a project for EU AI Act Article 50 (Transparency for General-Purpose AI) compliance.
-
-    Checks for:
-    - AI interaction disclosure (chatbot/assistant identification)
-    - C2PA content credentials for AI-generated media
-    - Machine-readable AI-generation markers
-    - Deep fake disclosure mechanisms
-    - Emotion recognition / biometric categorisation notice
-
-    NOTE: Art. 50 applies broadly — almost ALL AI-facing user interfaces
-    must comply. Enforcement began August 2025.
-
-    Args:
-        project_path: Absolute path to the project directory to scan.
-        project_context: Optional JSON string with AI-enriched project context.
-    """
-    ctx = None
-    if project_context:
-        try:
-            ctx = ProjectContext.from_json(project_context)
-        except (json.JSONDecodeError, TypeError):
-            pass
-    return _scan_single_article(50, project_path, context=ctx)
-
-
-@mcp.tool()
-def cl_scan_article_4(project_path: str, project_context: str = "") -> str:
-    """Scan a project for EU AI Act Article 4 (AI Literacy) compliance.
-
-    Checks for:
-    - AI literacy programs and training documentation
-    - AI usage policies for staff
-    - Competency frameworks mentioning AI
-
-    NOTE: Art. 4 applies to ALL AI systems (not just high-risk).
-    Enforcement began February 2025.
-
-    Args:
-        project_path: Absolute path to the project directory to scan.
-        project_context: Optional JSON string with AI-enriched project context.
-    """
-    ctx = None
-    if project_context:
-        try:
-            ctx = ProjectContext.from_json(project_context)
-        except (json.JSONDecodeError, TypeError):
-            pass
-    return _scan_single_article(4, project_path, context=ctx)
-
-
-@mcp.tool()
-def cl_scan_article_17(project_path: str, project_context: str = "") -> str:
-    """Scan a project for EU AI Act Article 17 (Quality Management System) compliance.
-
-    Checks for:
-    - Documented QMS (policies, procedures, instructions)
-    - Regulatory compliance strategy
-    - Design, QA, and testing procedures
-    - Data management systems
-    - Accountability framework
-
-    Args:
-        project_path: Absolute path to the project directory to scan.
-        project_context: Optional JSON string with AI-enriched project context.
-    """
-    ctx = None
-    if project_context:
-        try:
-            ctx = ProjectContext.from_json(project_context)
-        except (json.JSONDecodeError, TypeError):
-            pass
-    return _scan_single_article(17, project_path, context=ctx)
-
-
-@mcp.tool()
-def cl_scan_article_18(project_path: str, project_context: str = "") -> str:
-    """Scan a project for EU AI Act Article 18 (Documentation keeping) compliance.
-
-    Checks for:
-    - Documentation retention policy (10-year minimum)
-    - Technical documentation retention (Art. 11)
-    - QMS documentation retention (Art. 17)
-    - EU declaration of conformity retention (Art. 47)
-    - Financial institution documentation integration (conditional)
-
-    Args:
-        project_path: Absolute path to the project directory to scan.
-        project_context: Optional JSON string with AI-enriched project context.
-    """
-    ctx = None
-    if project_context:
-        try:
-            ctx = ProjectContext.from_json(project_context)
-        except (json.JSONDecodeError, TypeError):
-            pass
-    return _scan_single_article(18, project_path, context=ctx)
-
-
-@mcp.tool()
-def cl_scan_article_19(project_path: str, project_context: str = "") -> str:
-    """Scan a project for EU AI Act Article 19 (Automatically generated logs) compliance.
-
-    Checks for:
-    - Log retention by provider (Art. 12(1) logs kept under provider control)
-    - Minimum six-month retention period
-    - Retention period appropriate to intended purpose
-    - Financial institution log integration (conditional)
-
-    Args:
-        project_path: Absolute path to the project directory to scan.
-        project_context: Optional JSON string with AI-enriched project context.
-    """
-    ctx = None
-    if project_context:
-        try:
-            ctx = ProjectContext.from_json(project_context)
-        except (json.JSONDecodeError, TypeError):
-            pass
-    return _scan_single_article(19, project_path, context=ctx)
-
-
-@mcp.tool()
-def cl_scan_article_26(project_path: str, project_context: str = "") -> str:
-    """Scan a project for EU AI Act Article 26 (Deployer Obligations) compliance.
-
-    Checks for:
-    - Use per provider instructions
-    - Human oversight assignment to competent persons
-    - Operational monitoring
-    - Log retention (>= 6 months)
-    - Affected person notification
-
-    Args:
-        project_path: Absolute path to the project directory to scan.
-        project_context: Optional JSON string with AI-enriched project context.
-    """
-    ctx = None
-    if project_context:
-        try:
-            ctx = ProjectContext.from_json(project_context)
-        except (json.JSONDecodeError, TypeError):
-            pass
-    return _scan_single_article(26, project_path, context=ctx)
-
-
-@mcp.tool()
-def cl_scan_article_27(project_path: str, project_context: str = "") -> str:
-    """Scan a project for EU AI Act Article 27 (Fundamental Rights Impact Assessment) compliance.
-
-    Checks for:
-    - FRIA documentation covering six required elements
-    - FRIA versioning and pre-deployment dating
-    - Authority notification (manual)
-    - DPIA complementarity (conditional, manual)
-
-    NOTE: Art. 27 applies to deployers that are public law bodies, private entities
-    providing public services, or deployers of Annex III point 5(b) and (c) systems.
-
-    Args:
-        project_path: Absolute path to the project directory to scan.
-        project_context: Optional JSON string with AI-enriched project context.
-    """
-    ctx = None
-    if project_context:
-        try:
-            ctx = ProjectContext.from_json(project_context)
-        except (json.JSONDecodeError, TypeError):
-            pass
-    return _scan_single_article(27, project_path, context=ctx)
-
-
-@mcp.tool()
-def cl_scan_article_72(project_path: str, project_context: str = "") -> str:
-    """Scan a project for EU AI Act Article 72 (Post-Market Monitoring by Providers) compliance.
-
-    Checks for:
-    - Post-market monitoring system documentation
-    - Active data collection and compliance evaluation
-    - Post-market monitoring plan (Annex IV)
-    - Integration with existing monitoring (Annex I products)
-
-    Args:
-        project_path: Absolute path to the project directory to scan.
-        project_context: Optional JSON string with AI-enriched project context.
-    """
-    ctx = None
-    if project_context:
-        try:
-            ctx = ProjectContext.from_json(project_context)
-        except (json.JSONDecodeError, TypeError):
-            pass
-    return _scan_single_article(72, project_path, context=ctx)
-
-
-@mcp.tool()
-def cl_scan_article_73(project_path: str, project_context: str = "") -> str:
-    """Scan a project for EU AI Act Article 73 (Reporting of Serious Incidents) compliance.
-
-    Checks for:
-    - Incident reporting procedures and authority contact information
-    - Reporting timelines (15 days general, 2 days widespread, 10 days death)
-    - Expedited reporting procedures for severe incidents
-    - Investigation procedures with risk assessment and corrective action
-
-    Args:
-        project_path: Absolute path to the project directory to scan.
-        project_context: Optional JSON string with AI-enriched project context.
-    """
-    ctx = None
-    if project_context:
-        try:
-            ctx = ProjectContext.from_json(project_context)
-        except (json.JSONDecodeError, TypeError):
-            pass
-    return _scan_single_article(73, project_path, context=ctx)
-
-
-@mcp.tool()
-def cl_scan_article_86(project_path: str, project_context: str = "") -> str:
-    """Scan a project for EU AI Act Article 86 (Right to Explanation of Individual Decision-Making) compliance.
-
-    Checks for:
-    - Explanation mechanisms for AI-assisted decisions
-    - Clear and meaningful explanation of AI system's role in decision-making
-    - Explanation of main elements of decisions taken
-    - User-facing explainability interfaces
-
-    NOTE: Art. 86 applies to deployers of Annex III high-risk systems (excluding
-    point 2) that produce legal effects or similarly significant effects.
-
-    Args:
-        project_path: Absolute path to the project directory to scan.
-        project_context: Optional JSON string with AI-enriched project context.
-    """
-    ctx = None
-    if project_context:
-        try:
-            ctx = ProjectContext.from_json(project_context)
-        except (json.JSONDecodeError, TypeError):
-            pass
-    return _scan_single_article(86, project_path, context=ctx)
-
-
-@mcp.tool()
-def cl_scan_article_20(project_path: str, project_context: str = "") -> str:
-    """Scan a project for EU AI Act Article 20 (Corrective actions and duty of information) compliance.
-
-    Checks for:
-    - Corrective action procedures (bring into conformity, withdraw, disable, recall)
-    - Supply chain notification mechanisms (distributors, deployers, authorised representatives)
-    - Risk investigation procedures and authority notification protocols
-
-    Args:
-        project_path: Absolute path to the project directory to scan.
-        project_context: Optional JSON string with AI-enriched project context.
-    """
-    ctx = None
-    if project_context:
-        try:
-            ctx = ProjectContext.from_json(project_context)
-        except (json.JSONDecodeError, TypeError):
-            pass
-    return _scan_single_article(20, project_path, context=ctx)
-
-
-@mcp.tool()
-def cl_scan_article_41(project_path: str, project_context: str = "") -> str:
-    """Scan a project for EU AI Act Article 41 (Common specifications) compliance.
-
-    Checks for:
-    - Standards compliance documentation or alternative technical solution justification
-    - Documented justification when provider does not follow common specifications
-
-    NOTE: Art. 41 applies to providers of high-risk AI systems only.
-
-    Args:
-        project_path: Absolute path to the project directory to scan.
-        project_context: Optional JSON string with AI-enriched project context.
-    """
-    ctx = None
-    if project_context:
-        try:
-            ctx = ProjectContext.from_json(project_context)
-        except (json.JSONDecodeError, TypeError):
-            pass
-    return _scan_single_article(41, project_path, context=ctx)
-
-
-@mcp.tool()
-def cl_scan_article_43(project_path: str, project_context: str = "") -> str:
-    """Scan a project for EU AI Act Article 43 (Conformity Assessment) compliance.
-
-    Checks for:
-    - Conformity assessment documentation (Annex VI or VII)
-    - Substantial modification tracking / change management
-
-    Args:
-        project_path: Absolute path to the project directory to scan.
-        project_context: Optional JSON string with AI-enriched project context.
-    """
-    ctx = None
-    if project_context:
-        try:
-            ctx = ProjectContext.from_json(project_context)
-        except (json.JSONDecodeError, TypeError):
-            pass
-    return _scan_single_article(43, project_path, context=ctx)
-
-
-@mcp.tool()
-def cl_scan_article_47(project_path: str, project_context: str = "") -> str:
-    """Scan a project for EU AI Act Article 47 (EU Declaration of Conformity) compliance.
-
-    Checks for:
-    - Written EU Declaration of Conformity document
-    - Machine-readable format
-    - Annex V content coverage
-    - 10-year retention plan
-
-    Args:
-        project_path: Absolute path to the project directory to scan.
-        project_context: Optional JSON string with AI-enriched project context.
-    """
-    ctx = None
-    if project_context:
-        try:
-            ctx = ProjectContext.from_json(project_context)
-        except (json.JSONDecodeError, TypeError):
-            pass
-    return _scan_single_article(47, project_path, context=ctx)
-
-
-@mcp.tool()
-def cl_scan_article_49(project_path: str, project_context: str = "") -> str:
-    """Scan a project for EU AI Act Article 49 (Registration) compliance.
-
-    Checks for:
-    - EU database registration documentation
-    - Registration ID / confirmation
-
-    Args:
-        project_path: Absolute path to the project directory to scan.
-        project_context: Optional JSON string with AI-enriched project context.
-    """
-    ctx = None
-    if project_context:
-        try:
-            ctx = ProjectContext.from_json(project_context)
-        except (json.JSONDecodeError, TypeError):
-            pass
-    return _scan_single_article(49, project_path, context=ctx)
-
-
-@mcp.tool()
-def cl_scan_article_51(project_path: str, project_context: str = "") -> str:
-    """Scan a project for EU AI Act Article 51 (GPAI Classification) compliance.
-
-    Checks for:
-    - Systemic risk classification (10^25 FLOPs threshold)
-    - High impact capability evaluation
-
-    NOTE: Art. 51-55 apply to GPAI model providers, not downstream integrators.
-    Enforcement began August 2025.
-
-    Args:
-        project_path: Absolute path to the project directory to scan.
-        project_context: Optional JSON string with AI-enriched project context.
-    """
-    ctx = None
-    if project_context:
-        try:
-            ctx = ProjectContext.from_json(project_context)
-        except (json.JSONDecodeError, TypeError):
-            pass
-    return _scan_single_article(51, project_path, context=ctx)
-
-
-@mcp.tool()
-def cl_scan_article_52(project_path: str, project_context: str = "") -> str:
-    """Scan a project for EU AI Act Article 52 (GPAI Notification Procedure) compliance.
-
-    Checks for:
-    - Commission notification for systemic risk models
-    - Notification documentation
-
-    Args:
-        project_path: Absolute path to the project directory to scan.
-        project_context: Optional JSON string with AI-enriched project context.
-    """
-    ctx = None
-    if project_context:
-        try:
-            ctx = ProjectContext.from_json(project_context)
-        except (json.JSONDecodeError, TypeError):
-            pass
-    return _scan_single_article(52, project_path, context=ctx)
-
-
-@mcp.tool()
-def cl_scan_article_53(project_path: str, project_context: str = "") -> str:
-    """Scan a project for EU AI Act Article 53 (GPAI Provider Obligations) compliance.
-
-    Checks for:
-    - Model technical documentation (Annex XI)
-    - Downstream provider documentation (Annex XII)
-    - Copyright compliance policy
-    - Public training data summary
-
-    Args:
-        project_path: Absolute path to the project directory to scan.
-        project_context: Optional JSON string with AI-enriched project context.
-    """
-    ctx = None
-    if project_context:
-        try:
-            ctx = ProjectContext.from_json(project_context)
-        except (json.JSONDecodeError, TypeError):
-            pass
-    return _scan_single_article(53, project_path, context=ctx)
-
-
-@mcp.tool()
-def cl_scan_article_54(project_path: str, project_context: str = "") -> str:
-    """Scan a project for EU AI Act Article 54 (GPAI Authorised Representatives) compliance.
-
-    Checks for:
-    - Authorised representative appointment (third-country providers)
-    - Written mandate documentation
-
-    Args:
-        project_path: Absolute path to the project directory to scan.
-        project_context: Optional JSON string with AI-enriched project context.
-    """
-    ctx = None
-    if project_context:
-        try:
-            ctx = ProjectContext.from_json(project_context)
-        except (json.JSONDecodeError, TypeError):
-            pass
-    return _scan_single_article(54, project_path, context=ctx)
-
-
-@mcp.tool()
-def cl_scan_article_55(project_path: str, project_context: str = "") -> str:
-    """Scan a project for EU AI Act Article 55 (GPAI Systemic Risk) compliance.
-
-    Checks for:
-    - Adversarial testing / red-teaming
-    - Systemic risk assessment
-    - Incident tracking and reporting
-    - Model cybersecurity measures
-
-    Args:
-        project_path: Absolute path to the project directory to scan.
-        project_context: Optional JSON string with AI-enriched project context.
-    """
-    ctx = None
-    if project_context:
-        try:
-            ctx = ProjectContext.from_json(project_context)
-        except (json.JSONDecodeError, TypeError):
-            pass
-    return _scan_single_article(55, project_path, context=ctx)
-
-
-@mcp.tool()
-def cl_scan_article_21(project_path: str, project_context: str = "") -> str:
-    """Scan a project for EU AI Act Article 21 (Cooperation with competent authorities) compliance.
-
-    Checks for:
-    - Compliance documentation availability for authority requests
-    - Log export mechanisms for authority access
-
-    Args:
-        project_path: Absolute path to the project directory to scan.
-        project_context: Optional JSON string with AI-enriched project context.
-    """
-    ctx = None
-    if project_context:
-        try:
-            ctx = ProjectContext.from_json(project_context)
-        except (json.JSONDecodeError, TypeError):
-            pass
-    return _scan_single_article(21, project_path, context=ctx)
-
-
-@mcp.tool()
-def cl_scan_article_22(project_path: str, project_context: str = "") -> str:
-    """Scan a project for EU AI Act Article 22 (Authorised Representatives) compliance.
-
-    Checks for:
-    - Authorised representative appointment for non-EU providers
-    - Representative enablement and mandate documentation
-    - Authority contact information in mandate
-
-    Args:
-        project_path: Absolute path to the project directory to scan.
-        project_context: Optional JSON string with AI-enriched project context.
-    """
-    ctx = None
-    if project_context:
-        try:
-            ctx = ProjectContext.from_json(project_context)
-        except (json.JSONDecodeError, TypeError):
-            pass
-    return _scan_single_article(22, project_path, context=ctx)
-
-
-@mcp.tool()
-def cl_scan_article_23(project_path: str, project_context: str = "") -> str:
-    """Scan a project for EU AI Act Article 23 (Obligations of importers) compliance.
-
-    Checks for:
-    - Pre-market conformity verification (Art. 43, Art. 11, CE marking, Art. 47, Art. 22(1))
-    - Conformity review procedures (non-placement of non-conforming systems)
-    - Importer identification on system/packaging/documentation
-    - Documentation retention (10 years)
-    - Authority documentation capability
-    - Storage/transport conditions
-    - Authority cooperation
-
-    Args:
-        project_path: Absolute path to the project directory to scan.
-        project_context: Optional JSON string with AI-enriched project context.
-    """
-    ctx = None
-    if project_context:
-        try:
-            ctx = ProjectContext.from_json(project_context)
-        except (json.JSONDecodeError, TypeError):
-            pass
-    return _scan_single_article(23, project_path, context=ctx)
-
-
-@mcp.tool()
-def cl_scan_article_24(project_path: str, project_context: str = "") -> str:
-    """Scan a project for EU AI Act Article 24 (Obligations of distributors) compliance.
-
-    Checks for:
-    - Pre-market verification (CE marking, EU declaration, instructions)
-    - Conformity review procedures
-    - Authority documentation capability
-    - Storage/transport conditions
-    - Corrective action procedures
-
-    Args:
-        project_path: Absolute path to the project directory to scan.
-        project_context: Optional JSON string with AI-enriched project context.
-    """
-    ctx = None
-    if project_context:
-        try:
-            ctx = ProjectContext.from_json(project_context)
-        except (json.JSONDecodeError, TypeError):
-            pass
-    return _scan_single_article(24, project_path, context=ctx)
-
-
-@mcp.tool()
-def cl_scan_article_25(project_path: str, project_context: str = "") -> str:
-    """Scan a project for EU AI Act Article 25 (Responsibilities along the AI value chain) compliance.
-
-    Checks for:
-    - Rebranding/modification triggering provider status (Art. 25(1))
-    - Initial provider cooperation documentation (Art. 25(2))
-    - Product manufacturer classification for Annex I safety components (Art. 25(3))
-    - Written agreements with third-party AI suppliers (Art. 25(4))
-    - IP and trade secret protection (Art. 25(5))
-
-    Args:
-        project_path: Absolute path to the project directory to scan.
-        project_context: Optional JSON string with AI-enriched project context.
-    """
-    ctx = None
-    if project_context:
-        try:
-            ctx = ProjectContext.from_json(project_context)
-        except (json.JSONDecodeError, TypeError):
-            pass
-    return _scan_single_article(25, project_path, context=ctx)
-
-
-@mcp.tool()
-def cl_scan_article_60(project_path: str, project_context: str = "") -> str:
-    """Scan a project for EU AI Act Article 60 (Testing of high-risk AI systems in real world conditions outside AI regulatory sandboxes) compliance.
-
-    Checks for:
-    - Real-world testing plan drawn up and submitted to market surveillance authority
-    - Authority approval for testing in real world conditions
-    - Registration in EU database with unique identification number
-    - Serious incident reporting procedures during testing
-    - Testing suspension/termination notification procedures
-
-    NOTE: Art. 60 applies only to providers conducting real-world testing of Annex III
-    high-risk AI systems outside regulatory sandboxes.
-
-    Args:
-        project_path: Absolute path to the project directory to scan.
-        project_context: Optional JSON string with AI-enriched project context.
-    """
-    ctx = None
-    if project_context:
-        try:
-            ctx = ProjectContext.from_json(project_context)
-        except (json.JSONDecodeError, TypeError):
-            pass
-    return _scan_single_article(60, project_path, context=ctx)
-
-
-@mcp.tool()
-def cl_scan_article_61(project_path: str, project_context: str = "") -> str:
-    """Scan a project for EU AI Act Article 61 (Informed consent to participate in testing in real world conditions) compliance.
-
-    Checks for:
-    - Freely-given informed consent procedures for real-world testing subjects
-    - Information disclosure covering nature/objectives, conditions/duration, rights, reversal, and ID/contact
-    - Consent documentation (dated, documented, copy given to subject)
-
-    NOTE: Art. 61 applies only to providers conducting real-world testing of Annex III
-    high-risk AI systems outside regulatory sandboxes under Art. 60.
-
-    Args:
-        project_path: Absolute path to the project directory to scan.
-        project_context: Optional JSON string with AI-enriched project context.
-    """
-    ctx = None
-    if project_context:
-        try:
-            ctx = ProjectContext.from_json(project_context)
-        except (json.JSONDecodeError, TypeError):
-            pass
-    return _scan_single_article(61, project_path, context=ctx)
-
-
-@mcp.tool()
-def cl_scan_article_71(project_path: str, project_context: str = "") -> str:
-    """Scan a project for EU AI Act Article 71 (EU database for high-risk AI systems listed in Annex III) compliance.
-
-    Checks for:
-    - Provider data entry in EU database (Annex VIII Sections A and B)
-    - Public-authority deployer data entry (Annex VIII Section C)
-
-    NOTE: Art. 71 applies to providers of high-risk AI systems listed in Annex III
-    and to deployers who are public authorities.
-
-    Args:
-        project_path: Absolute path to the project directory to scan.
-        project_context: Optional JSON string with AI-enriched project context.
-    """
-    ctx = None
-    if project_context:
-        try:
-            ctx = ProjectContext.from_json(project_context)
-        except (json.JSONDecodeError, TypeError):
-            pass
-    return _scan_single_article(71, project_path, context=ctx)
-
-
-@mcp.tool()
-def cl_scan_article_80(project_path: str, project_context: str = "") -> str:
-    """Scan a project for EU AI Act Article 80 (Procedure for dealing with AI systems classified by the provider as non-high-risk in application of Annex III) compliance.
-
-    Checks for:
-    - Compliance remediation plan when system is reclassified as high-risk
-    - Corrective action covering all affected systems on the Union market
-    - Classification rationale documentation to demonstrate non-deliberate misclassification
-
-    NOTE: Art. 80 applies to providers whose AI system was classified as non-high-risk
-    under Art. 6(3) but is found by market surveillance authorities to present a risk.
-
-    Args:
-        project_path: Absolute path to the project directory to scan.
-        project_context: Optional JSON string with AI-enriched project context.
-    """
-    ctx = None
-    if project_context:
-        try:
-            ctx = ProjectContext.from_json(project_context)
-        except (json.JSONDecodeError, TypeError):
-            pass
-    return _scan_single_article(80, project_path, context=ctx)
-
-
-@mcp.tool()
-def cl_scan_article_82(project_path: str, project_context: str = "") -> str:
-    """Scan a project for EU AI Act Article 82 (Compliant AI systems which present a risk) compliance.
-
-    Checks for:
-    - Corrective action plans covering all affected systems on the Union market
-    - Corrective action taken within the timeline prescribed by the market surveillance authority
-
-    NOTE: Art. 82 applies to providers of compliant high-risk AI systems that are
-    nonetheless found by market surveillance authorities to present a risk.
-
-    Args:
-        project_path: Absolute path to the project directory to scan.
-        project_context: Optional JSON string with AI-enriched project context.
-    """
-    ctx = None
-    if project_context:
-        try:
-            ctx = ProjectContext.from_json(project_context)
-        except (json.JSONDecodeError, TypeError):
-            pass
-    return _scan_single_article(82, project_path, context=ctx)
-
-
-@mcp.tool()
-def cl_scan_article_91(project_path: str, project_context: str = "") -> str:
-    """Scan a project for EU AI Act Article 91 (Power to request documentation and information) compliance.
-
-    Checks for:
-    - GPAI model documentation readiness (Art. 53/55 documentation completeness)
-    - Information request response procedures
-
-    NOTE: Art. 91 applies to providers of general-purpose AI models when requested
-    by the Commission during investigations.
-
-    Args:
-        project_path: Absolute path to the project directory to scan.
-        project_context: Optional JSON string with AI-enriched project context.
-    """
-    ctx = None
-    if project_context:
-        try:
-            ctx = ProjectContext.from_json(project_context)
-        except (json.JSONDecodeError, TypeError):
-            pass
-    return _scan_single_article(91, project_path, context=ctx)
-
-
-@mcp.tool()
-def cl_scan_article_92(project_path: str, project_context: str = "") -> str:
-    """Scan a project for EU AI Act Article 92 (Power to conduct evaluations) compliance.
-
-    Checks for:
-    - GPAI model evaluation cooperation readiness
-    - Evaluation response procedures and documentation
-
-    NOTE: Art. 92 applies to providers of general-purpose AI models during
-    Commission evaluations.
-
-    Args:
-        project_path: Absolute path to the project directory to scan.
-        project_context: Optional JSON string with AI-enriched project context.
-    """
-    ctx = None
-    if project_context:
-        try:
-            ctx = ProjectContext.from_json(project_context)
-        except (json.JSONDecodeError, TypeError):
-            pass
-    return _scan_single_article(92, project_path, context=ctx)
-
-
-@mcp.tool()
-def cl_scan_article_111(project_path: str, project_context: str = "") -> str:
-    """Scan a project for EU AI Act Article 111 (Transitional Provisions) compliance.
-
-    Checks for:
-    - Annex X legacy system transition planning
-    - Significant change tracking for pre-existing high-risk systems
-    - GPAI model compliance timeline tracking
-
-    NOTE: Art. 111 applies to AI systems and GPAI models already placed on
-    the market before the EU AI Act's application dates.
-
-    Args:
-        project_path: Absolute path to the project directory to scan.
-        project_context: Optional JSON string with AI-enriched project context.
-    """
-    ctx = None
-    if project_context:
-        try:
-            ctx = ProjectContext.from_json(project_context)
-        except (json.JSONDecodeError, TypeError):
-            pass
-    return _scan_single_article(111, project_path, context=ctx)
-
-
-@mcp.tool()
-def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str = "") -> str:
-    """Scan a project for ALL available EU AI Act compliance checks.
+def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str = "", regulation: str = "eu-ai-act") -> str:
+    """Scan a project for ALL available compliance checks in a regulation.
 
     Returns a SUMMARY report — one row per article with overall status and
-    top findings. Full findings are available via cl_scan_article_N tools.
+    top findings. For detailed findings, use cl_scan(regulation=..., articles="N").
 
     For best results, call cl_analyze_project() first, then pass your
     understanding as project_context. This enables context-aware scanning
@@ -1597,7 +584,7 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
                 "finding_count": len(result.findings),
                 "top_findings": top_findings,
                 "assessed_by": result.assessed_by or "",
-                "note": f"Call cl_scan_article_{art_num}() for full findings.",
+                "note": f"Use cl_scan(articles=\"{art_num}\") for full findings.",
             }
         except Exception as e:
             logger.error("Art. %d scan ERROR: %s", art_num, e)
@@ -1631,7 +618,7 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
                 return {
                     "error": f"Scan timed out after {_ARTICLE_TIMEOUT_SECS}s",
                     "overall": "unable_to_determine",
-                    "note": f"Call cl_scan_article_{art_num}() directly to retry.",
+                    "note": f"Use cl_scan(articles=\"{art_num}\") to retry.",
                 }
 
     for phase in _PHASE_ORDER:
@@ -1722,32 +709,6 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
         output += _build_post_scan_hint(project_path, nc_count=nc_total)
 
     return output
-
-
-@mcp.tool()
-def cl_explain_article(article_number: int) -> str:
-    """Explain what a specific EU AI Act article requires, in plain language.
-
-    Provides:
-    - The official requirement summary
-    - What can be automated vs. needs human judgment
-    - The ComplianceLint compliance checklist (where official standards don't exist yet)
-    - Cross-references to related articles
-
-    Args:
-        article_number: The article number (e.g., 12 for Article 12).
-    """
-    _ensure_module_loaded(article_number)
-
-    if article_number in _modules:
-        explanation = _modules[article_number].explain()
-        return explanation.to_json()
-
-    return json.dumps({
-        "error": f"Article {article_number} explanation not yet available.",
-        "available_articles": sorted(_modules.keys()),
-        "note": "More articles will be added progressively.",
-    })
 
 
 @mcp.tool()
@@ -1985,26 +946,6 @@ def cl_update_finding(
 
 
 @mcp.tool()
-def cl_export_report(project_path: str, format: str = "md") -> str:
-    """Export the compliance state as a formatted report.
-
-    Reads .compliancelint/state.json and generates a report file.
-    Requires a previous scan (state.json must exist).
-
-    Supported formats:
-      - md: Markdown report with tables
-      - json: Raw JSON state dump
-
-    Args:
-        project_path: Absolute path to the project directory.
-        format: Report format — "md" or "json".
-    """
-    from core.state import export_report
-    result = export_report(project_path, fmt=format)
-    return json.dumps(result, indent=2, default=str)
-
-
-@mcp.tool()
 def cl_verify_evidence(project_path: str) -> str:
     """Load and return compliance evidence declared by the project maintainer.
 
@@ -2091,8 +1032,15 @@ def cl_verify_evidence(project_path: str) -> str:
 
 # ── Internal helpers ──
 
-def _scan_single_article(article_number: int, project_path: str, context=None) -> str:
-    """Scan a project for a specific article's compliance."""
+def _scan_single_article(article_number: int, project_path: str, context=None, regulation: str = "eu-ai-act") -> str:
+    """Scan a project for a specific article's compliance.
+
+    Args:
+        article_number: Article number to scan.
+        project_path: Absolute path to the project directory.
+        context: ProjectContext object (parsed, not JSON string).
+        regulation: Which regulation to scan against (default: "eu-ai-act").
+    """
     if not os.path.isdir(project_path):
         return json.dumps({"error": f"Directory not found: {project_path}"})
 
@@ -2642,7 +1590,7 @@ def cl_sync(project_path: str, regulation: str = "") -> str:
 
     if not state.get("articles"):
         return json.dumps({
-            "error": "No scan results found. Run a scan first (e.g., cl_scan_article_9).",
+            "error": "No scan results found. Run a scan first (e.g., cl_scan(articles='9')).",
             "hint": "Scan at least one article before syncing to the dashboard.",
         })
 

@@ -49,12 +49,24 @@ function detectServerConfig() {
     };
   } catch {}
 
-  // Default: uvx (will prompt user to install uv if not available)
-  return {
-    command: "uvx",
-    args: ["compliancelint-server"],
-    method: "uvx (default)",
-  };
+  // Default: pip install compliancelint, then use compliancelint-server
+  try {
+    console.log(`${dim("Installing compliancelint via pip...")}`);
+    execSync("pip install compliancelint", { stdio: "inherit", timeout: 60000 });
+    return {
+      command: "compliancelint-server",
+      args: [],
+      method: "pip (auto-installed)",
+    };
+  } catch {}
+
+  // Last resort: tell user what to do
+  console.error(
+    `\x1b[31mError:\x1b[0m Could not find or install ComplianceLint.\n` +
+    `Please install manually: ${cyan("pip install compliancelint")}\n` +
+    `Then re-run: ${cyan("npx compliancelint init")}`
+  );
+  process.exit(1);
 }
 
 function main() {
@@ -138,13 +150,6 @@ ${bold("Next steps:")}
   3. ${dim("Optional:")} Run ${cyan("cl_connect()")} to link your dashboard
 `);
 
-  // If uvx is not available, suggest install
-  if (serverConfig.method === "uvx (default)") {
-    console.log(`${yellow("Note:")} If you don't have ${bold("uv")} installed, run:
-  ${cyan("pip install compliancelint")}
-  Then update ${MCP_CONFIG_FILE} to use: ${cyan('"command": "compliancelint-server"')}
-`);
-  }
 }
 
 main();

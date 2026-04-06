@@ -152,14 +152,14 @@ def load_state(project_path: str) -> dict:
     return state
 
 
-def _empty_state(project_path: str) -> dict:
+def _empty_state(project_path: str, regulation: str = "eu-ai-act") -> dict:
     now = datetime.now(timezone.utc).isoformat()
     return {
         "project_path": project_path,
         "created": now,
         "last_scan": now,
         "last_updated": now,
-        "regulation": "eu-ai-act",
+        "regulation": regulation,
         "overall_compliance": "no_data",
         "articles": {},
     }
