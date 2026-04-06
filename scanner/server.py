@@ -1341,8 +1341,6 @@ def cl_connect(project_path: str, email: str = "", switch_account: bool = False)
     Returns: JSON with connection status and API key.
     """
     import webbrowser
-    import http.server
-    import threading
 
     if not os.path.isdir(project_path):
         return json.dumps({"error": f"Directory not found: {project_path}"})
@@ -1398,92 +1396,59 @@ def cl_connect(project_path: str, email: str = "", switch_account: bool = False)
         except Exception:
             pass  # Key invalid or server unreachable, proceed to reconnect
 
-    # ── Browser OAuth flow ──
-    # 1. Start a temporary local HTTP server to receive the API key callback
-    # 2. Open browser to dashboard connect page with callback port
+    # ── Device flow (no local server needed) ──
+    # 1. Generate a connect token
+    # 2. Open browser to dashboard with token
     # 3. User signs in with GitHub/Google
-    # 4. Dashboard redirects to localhost with API key
-    # 5. Local server captures key and saves to .compliancelintrc
+    # 4. Dashboard stores API key server-side
+    # 5. Scanner polls dashboard API to get the key
 
-    received_key = {"api_key": "", "email": "", "error": ""}
+    import uuid
+    connect_token = uuid.uuid4().hex
 
-    class CallbackHandler(http.server.BaseHTTPRequestHandler):
-        def do_GET(self):
-            """Handle the OAuth callback with API key."""
-            from urllib.parse import urlparse, parse_qs
-            query = parse_qs(urlparse(self.path).query)
-            received_key["api_key"] = query.get("api_key", [""])[0]
-            received_key["email"] = query.get("email", [""])[0]
-            received_key["error"] = query.get("error", [""])[0]
-
-            # Send a nice HTML response to close the browser tab
-            self.send_response(200)
-            self.send_header("Content-Type", "text/html")
-            self.end_headers()
-            html = """<!DOCTYPE html><html><head><meta charset="utf-8"><style>
-                body { background: #09090A; color: #e2e8f0; font-family: system-ui;
-                       display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-                .card { text-align: center; }
-                .ok { color: #10b981; font-size: 48px; }
-                .err { color: #ef4444; font-size: 48px; }
-                h1 { margin-top: 16px; }
-                p { color: #94a3b8; }
-            </style></head><body><div class="card">"""
-
-            dashboard_url = f"{saas_url}/dashboard"
-            if received_key["api_key"]:
-                html += '<div class="ok">✓</div><h1>Connected!</h1>'
-                html += "<p>Redirecting to dashboard...</p>"
-                html += '<p>Run <code>cl_sync()</code> or tell your AI: <em>"Sync my scan results"</em></p>'
-                html += f'<script>setTimeout(function(){{ window.location.href="{dashboard_url}"; }}, 2000);</script>'
-            else:
-                err = received_key["error"] or "Unknown error"
-                html += f'<div class="err">✗</div><h1>Connection Failed</h1><p>{err}</p>'
-
-            html += "</div></body></html>"
-            self.wfile.write(html.encode("utf-8"))
-
-        def log_message(self, format, *args):
-            pass  # Suppress HTTP log output
-
-    # Find an available port
-    import socket
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.bind(("127.0.0.1", 0))
-    port = sock.getsockname()[1]
-    sock.close()
-
-    # Start local server in a thread
-    server = http.server.HTTPServer(("127.0.0.1", port), CallbackHandler)
-    server.timeout = 120  # 2 minute timeout
-
-    def serve_once():
-        server.handle_request()  # Handle exactly one request then stop
-
-    thread = threading.Thread(target=serve_once, daemon=True)
-    thread.start()
-
-    # Open browser to dashboard connect page
-    connect_url = f"{saas_url}/api/v1/auth/connect?callback=http://127.0.0.1:{port}/callback"
+    connect_url = f"{saas_url}/api/v1/auth/connect?token={connect_token}"
     logger.info("Opening browser for authentication: %s", connect_url)
 
     try:
         webbrowser.open(connect_url)
     except Exception:
-        server.server_close()
         return json.dumps({
             "error": "Could not open browser.",
             "hint": f"Open this URL manually: {connect_url}",
         })
 
-    # Wait for the callback (up to 2 minutes)
-    logger.info("Waiting for authentication callback on port %d...", port)
-    thread.join(timeout=120)
-    server.server_close()
+    # Poll dashboard every 3 seconds for up to 2 minutes
+    poll_url = f"{saas_url}/api/v1/auth/connect/poll?token={connect_token}"
+    logger.info("Polling for authentication completion...")
+
+    import time
+    received_key = {"api_key": "", "email": ""}
+    max_attempts = 40  # 40 × 3s = 120s
+    for attempt in range(max_attempts):
+        time.sleep(3)
+        try:
+            _curl_flags = {}
+            if hasattr(subprocess, "CREATE_NO_WINDOW"):
+                _curl_flags["creationflags"] = subprocess.CREATE_NO_WINDOW
+            poll_result = subprocess.run(
+                ["curl", "-s", "--max-time", "5", poll_url],
+                capture_output=True, text=True, timeout=8, **_curl_flags,
+            )
+            if poll_result.returncode == 0 and poll_result.stdout.strip():
+                poll_data = json.loads(poll_result.stdout.strip())
+                if poll_data.get("status") == "complete":
+                    received_key["api_key"] = poll_data.get("api_key", "")
+                    received_key["email"] = poll_data.get("email", "")
+                    break
+                elif poll_data.get("status") == "expired":
+                    return json.dumps({
+                        "error": "Connect token expired. Please try cl_connect again.",
+                    })
+                # status == "pending" → continue polling
+        except Exception:
+            pass  # Network error, keep polling
 
     if not received_key["api_key"]:
-        if received_key["error"]:
-            return json.dumps({"error": f"Authentication failed: {received_key['error']}"})
         return json.dumps({
             "error": "Timed out waiting for authentication.",
             "hint": "Make sure you completed the sign-in in your browser.",
