@@ -195,7 +195,7 @@ class TestClScanArticle12:
     def test_invalid_directory_returns_error(self):
         """Non-existent directory returns error, not crash."""
         ctx = ProjectContext.from_json('{"art12": {"has_logging": true}}')
-        result_json = _scan_single_article(12, "/nonexistent/path", context=ctx)
+        result_json = _scan_single_article(12, "C:/nonexistent_cl_test_path_12345", context=ctx)
         result = json.loads(result_json)
         assert "error" in result
 
@@ -604,7 +604,7 @@ class TestClScanArticle9:
     def test_invalid_directory_returns_error(self):
         """Non-existent directory returns error."""
         ctx = ProjectContext.from_json('{"art9": {"has_risk_docs": true}}')
-        result_json = _scan_single_article(9, "/nonexistent/path", context=ctx)
+        result_json = _scan_single_article(9, "C:/nonexistent_cl_test_path_12345", context=ctx)
         result = json.loads(result_json)
         assert "error" in result
 
@@ -903,7 +903,7 @@ class TestClScanArticle10:
 
     def test_invalid_directory_returns_error(self):
         ctx = ProjectContext.from_json('{"art10": {"has_data_governance_doc": true}}')
-        result_json = _scan_single_article(10, "/nonexistent/path", context=ctx)
+        result_json = _scan_single_article(10, "C:/nonexistent_cl_test_path_12345", context=ctx)
         result = json.loads(result_json)
         assert "error" in result
 
@@ -989,7 +989,7 @@ class TestClScanArticle11:
 
     def test_invalid_directory_returns_error(self):
         ctx = ProjectContext.from_json('{"art11": {"has_technical_docs": true}}')
-        result_json = _scan_single_article(11, "/nonexistent/path", context=ctx)
+        result_json = _scan_single_article(11, "C:/nonexistent_cl_test_path_12345", context=ctx)
         result = json.loads(result_json)
         assert "error" in result
 
@@ -1118,7 +1118,7 @@ class TestClScanArticle13:
 
     def test_invalid_directory_returns_error(self):
         ctx = ProjectContext.from_json('{"art13": {"has_explainability": true}}')
-        result_json = _scan_single_article(13, "/nonexistent/path", context=ctx)
+        result_json = _scan_single_article(13, "C:/nonexistent_cl_test_path_12345", context=ctx)
         result = json.loads(result_json)
         assert "error" in result
 
@@ -1238,7 +1238,7 @@ class TestClScanArticle14:
 
     def test_invalid_directory_returns_error(self):
         ctx = ProjectContext.from_json('{"art14": {"has_human_oversight": true}}')
-        result_json = _scan_single_article(14, "/nonexistent/path", context=ctx)
+        result_json = _scan_single_article(14, "C:/nonexistent_cl_test_path_12345", context=ctx)
         result = json.loads(result_json)
         assert "error" in result
 
@@ -1396,7 +1396,7 @@ class TestClScanArticle15:
 
     def test_invalid_directory_returns_error(self):
         ctx = ProjectContext.from_json('{"art15": {"has_accuracy_testing": true}}')
-        result_json = _scan_single_article(15, "/nonexistent/path", context=ctx)
+        result_json = _scan_single_article(15, "C:/nonexistent_cl_test_path_12345", context=ctx)
         result = json.loads(result_json)
         assert "error" in result
 
@@ -1534,7 +1534,7 @@ class TestClScanArticle4:
 
     def test_invalid_directory_returns_error(self):
         ctx = ProjectContext.from_json('{"art4": {"has_ai_literacy_measures": true}}')
-        result_json = _scan_single_article(4, "/nonexistent/path", context=ctx)
+        result_json = _scan_single_article(4, "C:/nonexistent_cl_test_path_12345", context=ctx)
         result = json.loads(result_json)
         assert "error" in result
 
@@ -1635,7 +1635,7 @@ class TestClScanArticle5:
 
     def test_invalid_directory_returns_error(self):
         ctx = ProjectContext.from_json('{"art5": {"has_subliminal_manipulation": false}}')
-        result_json = _scan_single_article(5, "/nonexistent/path", context=ctx)
+        result_json = _scan_single_article(5, "C:/nonexistent_cl_test_path_12345", context=ctx)
         result = json.loads(result_json)
         assert "error" in result
 
@@ -1761,7 +1761,7 @@ class TestClScanArticle6:
 
     def test_invalid_directory_returns_error(self):
         ctx = ProjectContext.from_json('{"art6": {"annex_iii_categories": []}}')
-        result_json = _scan_single_article(6, "/nonexistent/path", context=ctx)
+        result_json = _scan_single_article(6, "C:/nonexistent_cl_test_path_12345", context=ctx)
         result = json.loads(result_json)
         assert "error" in result
 
@@ -1842,7 +1842,7 @@ class TestClScanArticle17:
 
     def test_invalid_directory_returns_error(self):
         ctx = ProjectContext.from_json('{"art17": {"has_qms_documentation": true}}')
-        result_json = _scan_single_article(17, "/nonexistent/path", context=ctx)
+        result_json = _scan_single_article(17, "C:/nonexistent_cl_test_path_12345", context=ctx)
         result = json.loads(result_json)
         assert "error" in result
 
@@ -1955,7 +1955,7 @@ class TestClScanArticle50:
 
     def test_invalid_directory_returns_error(self):
         ctx = ProjectContext.from_json('{"art50": {"is_chatbot_or_interactive_ai": false}}')
-        result_json = _scan_single_article(50, "/nonexistent/path", context=ctx)
+        result_json = _scan_single_article(50, "C:/nonexistent_cl_test_path_12345", context=ctx)
         result = json.loads(result_json)
         assert "error" in result
 
@@ -2067,7 +2067,7 @@ class TestClScanArticle26:
 
     def test_invalid_directory_returns_error(self):
         ctx = ProjectContext.from_json('{"art26": {"has_deployment_documentation": true}}')
-        result_json = _scan_single_article(26, "/nonexistent/path", context=ctx)
+        result_json = _scan_single_article(26, "C:/nonexistent_cl_test_path_12345", context=ctx)
         result = json.loads(result_json)
         assert "error" in result
 
@@ -2171,7 +2171,7 @@ class TestClScanArticle27:
 
     def test_invalid_directory_returns_error(self):
         ctx = ProjectContext.from_json('{"art27": {"has_fria_documentation": true}}')
-        result_json = _scan_single_article(27, "/nonexistent/path", context=ctx)
+        result_json = _scan_single_article(27, "C:/nonexistent_cl_test_path_12345", context=ctx)
         result = json.loads(result_json)
         assert "error" in result
 
@@ -2268,7 +2268,7 @@ class TestClScanArticle72:
 
     def test_invalid_directory_returns_error(self):
         ctx = ProjectContext.from_json('{"art72": {"has_pmm_system": true}}')
-        result_json = _scan_single_article(72, "/nonexistent/path", context=ctx)
+        result_json = _scan_single_article(72, "C:/nonexistent_cl_test_path_12345", context=ctx)
         result = json.loads(result_json)
         assert "error" in result
 
@@ -2368,7 +2368,7 @@ class TestClScanArticle43:
 
     def test_invalid_directory_returns_error(self):
         ctx = ProjectContext.from_json('{"art43": {"has_internal_control_assessment": true}}')
-        result_json = _scan_single_article(43, "/nonexistent/path", context=ctx)
+        result_json = _scan_single_article(43, "C:/nonexistent_cl_test_path_12345", context=ctx)
         result = json.loads(result_json)
         assert "error" in result
 
@@ -2455,7 +2455,7 @@ class TestClScanArticle47:
 
     def test_invalid_directory_returns_error(self):
         ctx = ProjectContext.from_json('{"art47": {"has_doc_declaration": true}}')
-        result_json = _scan_single_article(47, "/nonexistent/path", context=ctx)
+        result_json = _scan_single_article(47, "C:/nonexistent_cl_test_path_12345", context=ctx)
         result = json.loads(result_json)
         assert "error" in result
 
@@ -2541,7 +2541,7 @@ class TestClScanArticle49:
 
     def test_invalid_directory_returns_error(self):
         ctx = ProjectContext.from_json('{"art49": {"has_eu_database_registration": true}}')
-        result_json = _scan_single_article(49, "/nonexistent/path", context=ctx)
+        result_json = _scan_single_article(49, "C:/nonexistent_cl_test_path_12345", context=ctx)
         result = json.loads(result_json)
         assert "error" in result
 
@@ -2648,7 +2648,7 @@ class TestClScanArticle51:
     def test_invalid_directory_returns_error(self):
         """Invalid path → error, not crash."""
         ctx = ProjectContext.from_json('{"art51": {"has_systemic_risk_assessment": false}}')
-        result_json = _scan_single_article(51, "/nonexistent/path", context=ctx)
+        result_json = _scan_single_article(51, "C:/nonexistent_cl_test_path_12345", context=ctx)
         result = json.loads(result_json)
         assert "error" in result
 
@@ -2763,7 +2763,7 @@ class TestClScanArticle52:
     def test_invalid_directory_returns_error(self):
         """Invalid path → error, not crash."""
         ctx = ProjectContext.from_json('{"art52": {"has_commission_notification": false}}')
-        result_json = _scan_single_article(52, "/nonexistent/path", context=ctx)
+        result_json = _scan_single_article(52, "C:/nonexistent_cl_test_path_12345", context=ctx)
         result = json.loads(result_json)
         assert "error" in result
 
@@ -2889,7 +2889,7 @@ class TestClScanArticle53:
     def test_invalid_directory_returns_error(self):
         """Invalid path → error, not crash."""
         ctx = ProjectContext.from_json('{"art53": {"has_technical_documentation": false}}')
-        result_json = _scan_single_article(53, "/nonexistent/path", context=ctx)
+        result_json = _scan_single_article(53, "C:/nonexistent_cl_test_path_12345", context=ctx)
         result = json.loads(result_json)
         assert "error" in result
 
@@ -3011,7 +3011,7 @@ class TestClScanArticle54:
     def test_invalid_directory_returns_error(self):
         """Invalid path → error, not crash."""
         ctx = ProjectContext.from_json('{"art54": {"is_third_country_provider": true}}')
-        result_json = _scan_single_article(54, "/nonexistent/path", context=ctx)
+        result_json = _scan_single_article(54, "C:/nonexistent_cl_test_path_12345", context=ctx)
         result = json.loads(result_json)
         assert "error" in result
 
@@ -3150,7 +3150,7 @@ class TestClScanArticle55:
     def test_invalid_directory_returns_error(self):
         """Invalid path → error, not crash."""
         ctx = ProjectContext.from_json('{"art55": {"has_systemic_risk": true}}')
-        result_json = _scan_single_article(55, "/nonexistent/path", context=ctx)
+        result_json = _scan_single_article(55, "C:/nonexistent_cl_test_path_12345", context=ctx)
         result = json.loads(result_json)
         assert "error" in result
 
@@ -3244,7 +3244,7 @@ class TestClScanArticle73:
 
     def test_invalid_directory_returns_error(self):
         ctx = ProjectContext.from_json('{"art73": {"has_incident_reporting_procedure": true}}')
-        result_json = _scan_single_article(73, "/nonexistent/path", context=ctx)
+        result_json = _scan_single_article(73, "C:/nonexistent_cl_test_path_12345", context=ctx)
         result = json.loads(result_json)
         assert "error" in result
 
@@ -3345,7 +3345,7 @@ class TestClScanArticle86:
 
     def test_invalid_directory_returns_error(self):
         ctx = ProjectContext.from_json('{"art86": {"has_explanation_mechanism": true}}')
-        result_json = _scan_single_article(86, "/nonexistent/path", context=ctx)
+        result_json = _scan_single_article(86, "C:/nonexistent_cl_test_path_12345", context=ctx)
         result = json.loads(result_json)
         assert "error" in result
 
@@ -3449,7 +3449,7 @@ class TestClScanArticle16:
 
     def test_invalid_directory_returns_error(self):
         ctx = ProjectContext.from_json('{"art16": {"has_section_2_compliance": false}}')
-        result_json = _scan_single_article(16, "/nonexistent/path", context=ctx)
+        result_json = _scan_single_article(16, "C:/nonexistent_cl_test_path_12345", context=ctx)
         result = json.loads(result_json)
         assert "error" in result
 
@@ -3575,7 +3575,7 @@ class TestClScanArticle18:
 
     def test_invalid_directory_returns_error(self):
         ctx = ProjectContext.from_json('{"art18": {"has_documentation_retention_policy": false}}')
-        result_json = _scan_single_article(18, "/nonexistent/path", context=ctx)
+        result_json = _scan_single_article(18, "C:/nonexistent_cl_test_path_12345", context=ctx)
         result = json.loads(result_json)
         assert "error" in result
 
@@ -3665,7 +3665,7 @@ class TestClScanArticle19:
 
     def test_invalid_directory_returns_error(self):
         ctx = ProjectContext.from_json('{"art19": {"has_log_retention": false}}')
-        result_json = _scan_single_article(19, "/nonexistent/path", context=ctx)
+        result_json = _scan_single_article(19, "C:/nonexistent_cl_test_path_12345", context=ctx)
         result = json.loads(result_json)
         assert "error" in result
 
@@ -3766,7 +3766,7 @@ class TestClScanArticle8:
 
     def test_invalid_directory_returns_error(self):
         ctx = ProjectContext.from_json('{"art8": {"has_section_2_compliance": false}}')
-        result_json = _scan_single_article(8, "/nonexistent/path", context=ctx)
+        result_json = _scan_single_article(8, "C:/nonexistent_cl_test_path_12345", context=ctx)
         result = json.loads(result_json)
         assert "error" in result
 
@@ -3858,7 +3858,7 @@ class TestClScanArticle20:
 
     def test_invalid_directory_returns_error(self):
         ctx = ProjectContext.from_json('{"art20": {"has_corrective_action_procedure": false}}')
-        result_json = _scan_single_article(20, "/nonexistent/path", context=ctx)
+        result_json = _scan_single_article(20, "C:/nonexistent_cl_test_path_12345", context=ctx)
         result = json.loads(result_json)
         assert "error" in result
 
@@ -3945,7 +3945,7 @@ class TestClScanArticle21:
 
     def test_invalid_directory_returns_error(self):
         ctx = ProjectContext.from_json('{"art21": {"has_conformity_documentation": false}}')
-        result_json = _scan_single_article(21, "/nonexistent/path", context=ctx)
+        result_json = _scan_single_article(21, "C:/nonexistent_cl_test_path_12345", context=ctx)
         result = json.loads(result_json)
         assert "error" in result
 
@@ -4036,7 +4036,7 @@ class TestClScanArticle22:
 
     def test_invalid_directory_returns_error(self):
         ctx = ProjectContext.from_json('{"art22": {"has_authorised_representative": false}}')
-        result_json = _scan_single_article(22, "/nonexistent/path", context=ctx)
+        result_json = _scan_single_article(22, "C:/nonexistent_cl_test_path_12345", context=ctx)
         result = json.loads(result_json)
         assert "error" in result
 
@@ -4156,7 +4156,7 @@ class TestClScanArticle23:
 
     def test_invalid_directory_returns_error(self):
         ctx = ProjectContext.from_json('{"art23": {"is_importer": true, "has_pre_market_verification": false}}')
-        result_json = _scan_single_article(23, "/nonexistent/path", context=ctx)
+        result_json = _scan_single_article(23, "C:/nonexistent_cl_test_path_12345", context=ctx)
         result = json.loads(result_json)
         assert "error" in result
 
@@ -4272,7 +4272,7 @@ class TestClScanArticle24:
 
     def test_invalid_directory_returns_error(self):
         ctx = ProjectContext.from_json('{"art24": {"is_distributor": true, "has_pre_market_verification": false}}')
-        result_json = _scan_single_article(24, "/nonexistent/path", context=ctx)
+        result_json = _scan_single_article(24, "C:/nonexistent_cl_test_path_12345", context=ctx)
         result = json.loads(result_json)
         assert "error" in result
 
@@ -4391,7 +4391,7 @@ class TestClScanArticle25:
 
     def test_invalid_directory_returns_error(self):
         ctx = ProjectContext.from_json('{"art25": {"has_rebranding_or_modification": false}}')
-        result_json = _scan_single_article(25, "/nonexistent/path", context=ctx)
+        result_json = _scan_single_article(25, "C:/nonexistent_cl_test_path_12345", context=ctx)
         result = json.loads(result_json)
         assert "error" in result
 
@@ -4480,7 +4480,7 @@ class TestClScanArticle41:
 
     def test_invalid_directory_returns_error(self):
         ctx = ProjectContext.from_json('{"art41": {"follows_common_specifications": true}}')
-        result_json = _scan_single_article(41, "/nonexistent/path", context=ctx)
+        result_json = _scan_single_article(41, "C:/nonexistent_cl_test_path_12345", context=ctx)
         result = json.loads(result_json)
         assert "error" in result
 
@@ -4556,7 +4556,7 @@ class TestClScanArticle60:
 
     def test_invalid_directory_returns_error(self):
         ctx = ProjectContext.from_json('{"art60": {"has_testing_plan": false}}')
-        result_json = _scan_single_article(60, "/nonexistent/path", context=ctx)
+        result_json = _scan_single_article(60, "C:/nonexistent_cl_test_path_12345", context=ctx)
         result = json.loads(result_json)
         assert "error" in result
 
@@ -4648,7 +4648,7 @@ class TestClScanArticle61:
 
     def test_invalid_directory_returns_error(self):
         ctx = ProjectContext.from_json('{"art61": {"has_informed_consent_procedure": false}}')
-        result_json = _scan_single_article(61, "/nonexistent/path", context=ctx)
+        result_json = _scan_single_article(61, "C:/nonexistent_cl_test_path_12345", context=ctx)
         result = json.loads(result_json)
         assert "error" in result
 
@@ -4734,7 +4734,7 @@ class TestClScanArticle71:
 
     def test_invalid_directory_returns_error(self):
         ctx = ProjectContext.from_json('{"art71": {"has_provider_database_entry": true}}')
-        result_json = _scan_single_article(71, "/nonexistent/path", context=ctx)
+        result_json = _scan_single_article(71, "C:/nonexistent_cl_test_path_12345", context=ctx)
         result = json.loads(result_json)
         assert "error" in result
 
@@ -4822,7 +4822,7 @@ class TestClScanArticle80:
 
     def test_invalid_directory_returns_error(self):
         ctx = ProjectContext.from_json('{"art80": {"has_compliance_remediation_plan": true}}')
-        result_json = _scan_single_article(80, "/nonexistent/path", context=ctx)
+        result_json = _scan_single_article(80, "C:/nonexistent_cl_test_path_12345", context=ctx)
         result = json.loads(result_json)
         assert "error" in result
 
@@ -4896,7 +4896,7 @@ class TestClScanArticle82:
 
     def test_invalid_directory_returns_error(self):
         ctx = ProjectContext.from_json('{"art82": {"has_corrective_action_procedure": true}}')
-        result_json = _scan_single_article(82, "/nonexistent/path", context=ctx)
+        result_json = _scan_single_article(82, "C:/nonexistent_cl_test_path_12345", context=ctx)
         result = json.loads(result_json)
         assert "error" in result
 
@@ -4968,7 +4968,7 @@ class TestClScanArticle91:
 
     def test_invalid_directory_returns_error(self):
         ctx = ProjectContext.from_json('{"art91": {"has_information_supply_readiness": true}}')
-        result_json = _scan_single_article(91, "/nonexistent/path", context=ctx)
+        result_json = _scan_single_article(91, "C:/nonexistent_cl_test_path_12345", context=ctx)
         result = json.loads(result_json)
         assert "error" in result
 
@@ -5041,7 +5041,7 @@ class TestClScanArticle92:
 
     def test_invalid_directory_returns_error(self):
         ctx = ProjectContext.from_json('{"art92": {"has_evaluation_cooperation_readiness": true}}')
-        result_json = _scan_single_article(92, "/nonexistent/path", context=ctx)
+        result_json = _scan_single_article(92, "C:/nonexistent_cl_test_path_12345", context=ctx)
         result = json.loads(result_json)
         assert "error" in result
 
@@ -5122,7 +5122,7 @@ class TestClScanArticle111:
 
     def test_invalid_directory_returns_error(self):
         ctx = ProjectContext.from_json('{"art111": {"has_transition_plan": true}}')
-        result_json = _scan_single_article(111, "/nonexistent/path", context=ctx)
+        result_json = _scan_single_article(111, "C:/nonexistent_cl_test_path_12345", context=ctx)
         result = json.loads(result_json)
         assert "error" in result
 

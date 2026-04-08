@@ -19,7 +19,7 @@ from datetime import datetime, timezone
 
 from mcp.server.fastmcp import FastMCP
 
-CL_VERSION = "1.0.0"  # ComplianceLint version — displayed in UI, PDF, and scan metadata
+CL_VERSION = "1.0.5"  # ComplianceLint version — displayed in UI, PDF, and scan metadata
 
 logger = logging.getLogger("compliancelint")
 logging.basicConfig(level=logging.INFO, format="%(name)s %(levelname)s: %(message)s",
@@ -113,6 +113,18 @@ _loaded_entries: set[str] = set()    # entries already loaded
 _discover_modules()
 
 
+def _read_ai_provider(project_path: str) -> str:
+    """Read ai_provider from .compliancelint/metadata.json (written by save_metadata)."""
+    meta_path = os.path.join(project_path, ".compliancelint", "metadata.json")
+    if os.path.isfile(meta_path):
+        try:
+            with open(meta_path, "r", encoding="utf-8") as f:
+                return json.load(f).get("ai_provider", "")
+        except (json.JSONDecodeError, OSError):
+            pass
+    return ""
+
+
 # ── MCP Tools ──
 
 @mcp.tool()
@@ -161,22 +173,33 @@ def cl_analyze_project(project_path: str) -> str:
       -> Report progress to user every ~20 files
       -> Only then fill in compliance_answers
 
-    Step 3: Fill in compliance_answers based on COMPLETE code reading:
-      {
-        "ai_model": "<REQUIRED — your model ID, e.g. claude-sonnet-4-6>",
-        "art5": {
-          "is_realtime_processing": true | false | null,
-          "prohibited_practices": [
-            {"practice": "biometric_surveillance", "detected": false,
-             "evidence": "read all X files, found no biometric code",
-             "evidence_paths": [], "confidence": "high"},
-            ...
-          ]
-        },
-        "art9": { "has_risk_docs": true, "risk_doc_paths": ["docs/risk.md"], ... },
-        "art12": { "has_logging": true, "logging_description": "structlog", ... },
-        ... (see context.py for full schema)
-      }
+    Step 3: Fill in _scope FIRST, then compliance_answers.
+
+      A. Fill _scope (REQUIRED — determines which articles apply):
+         "_scope": {
+           "risk_classification": "high-risk" | "limited-risk" | "not high-risk",
+           "risk_classification_confidence": "high" | "medium" | "low",
+           "is_ai_system": true,
+           "territorial_scope_applies": true,
+           ... (other _scope fields from template)
+         }
+
+      B. Fill compliance_answers for ALL articles in the template.
+         The scanner determines which articles are applicable based on _scope.
+         Non-applicable articles will be auto-skipped (NOT_APPLICABLE).
+         But you MUST fill all articles — the scanner enforces this.
+
+      ╔═══════════════════════════════════════════════════════════════╗
+      ║  CRITICAL RULES:                                            ║
+      ║                                                             ║
+      ║  1. Use template keys EXACTLY: "art50" not "art50_transparency"  ║
+      ║  2. Values must be: true, false, or null — NEVER strings    ║
+      ║  3. Fill ALL articles in the template, not just relevant ones║
+      ║  4. _scope.risk_classification is REQUIRED                  ║
+      ╚═══════════════════════════════════════════════════════════════╝
+
+      Also include:
+        "ai_model": "<REQUIRED — your model ID, e.g. claude-sonnet-4-6>"
 
     ⚠️  IMPORTANT: Always include "ai_model" in project_context. It is recorded
         in the compliance report as the model that performed the assessment.
@@ -291,7 +314,7 @@ def cl_scan(
         project_context: JSON string with AI-enriched project context.
             Call cl_analyze() first, read the codebase, then pass your answers.
         regulation: Which regulation to scan against. Currently supported:
-            - "eu-ai-act" (default) — EU AI Act (Regulation 2024/1689)
+            - "eu-ai-act" (default) — EU AI Act (Regulation (EU) 2024/1689)
             Future: "gdpr", "nist-ai-rmf", etc.
         articles: Which articles to scan. Options:
             - "all" (default) — scan all articles (returns summary)
@@ -306,8 +329,8 @@ def cl_scan(
     if regulation != "eu-ai-act":
         return json.dumps({
             "error": f"Regulation '{regulation}' is not yet supported.",
-            "supported": ["eu-ai-act"],
-            "coming_soon": ["gdpr", "nist-ai-rmf", "iso-42001"],
+            "fix": "Use regulation='eu-ai-act'.",
+            "details": f"Supported: ['eu-ai-act']. Additional regulations are on the roadmap.",
         })
 
     # Parse project context
@@ -317,6 +340,33 @@ def cl_scan(
             ctx = ProjectContext.from_json(project_context)
         except (json.JSONDecodeError, TypeError) as e:
             return json.dumps({"error": f"Invalid project_context JSON: {e}"})
+
+        # ── Validation Gate for per-article scan ──
+        from core.validation_gate import run_gate
+        gate = run_gate(ctx.compliance_answers)
+        if gate.coerce_log:
+            logger.info("cl_scan — validation gate auto-fixed %d issues", len(gate.coerce_log))
+            ctx.compliance_answers = gate.coerced_answers
+
+        # Hard reject on validation failures (same as cl_scan_all)
+        if gate.scope_errors:
+            return json.dumps({
+                "error": "Cannot scan: system classification is missing or incomplete in compliance_answers.",
+                "scope_errors": gate.scope_errors,
+                "fix": "Fill in risk_classification (e.g., 'high-risk' or 'limited-risk') in the _scope section of compliance_answers.",
+            })
+        if gate.missing_articles:
+            return json.dumps({
+                "error": f"Cannot scan: {len(gate.missing_articles)} applicable articles are missing.",
+                "missing_articles": sorted(gate.missing_articles),
+                "fix": "Fill ALL applicable articles in the compliance_answers_template.",
+            })
+        if not gate.all_valid:
+            return json.dumps({
+                "error": f"Cannot scan: {len(gate.invalid_articles)} articles have format errors.",
+                "invalid_articles": gate.to_error_response()["errors"],
+                "fix": "Fix format errors: boolean fields must be true, false, or null.",
+            })
 
     # Parse articles parameter
     if articles == "all":
@@ -342,7 +392,7 @@ def cl_scan(
     if not article_numbers:
         return json.dumps({
             "error": f"Invalid articles parameter: '{articles}'",
-            "hint": "Use 'all', a single number (e.g. '12'), comma-separated (e.g. '9,12,14'), or JSON array (e.g. '[9,12,14]')",
+            "fix": "Use 'all', a single number (e.g. '12'), comma-separated (e.g. '9,12,14'), or JSON array (e.g. '[9,12,14]')",
         })
 
     # Save AI provider metadata if provided
@@ -360,19 +410,45 @@ def cl_scan(
                 sync_data = json.loads(sync_result)
                 if sync_data.get("status") == "synced":
                     output += "\n\n--- Results synced to dashboard ---"
-            except Exception:
-                pass
+            except Exception as e:
+                logger.debug("Auto-sync after scan failed: %s", e)
         else:
             output += _build_post_scan_hint(project_path)
         return output
 
-    # Multiple articles → scan each and return combined result
+    # Multiple articles → scan each, persist full results to state,
+    # but return compact summaries to stay within MCP response limits.
     results = {}
     for art_num in article_numbers:
+        # Full scan + persist to state.json (complete data saved locally)
         result_json = _scan_single_article(art_num, project_path, context=ctx, regulation=regulation)
+        # Build compact summary for MCP response
         try:
             result_data = json.loads(result_json)
-            results[f"article_{art_num}"] = result_data
+            findings = result_data.get("findings", [])
+            overall = result_data.get("compliance_summary", {}).get("overall", "unknown")
+
+            # Sort findings by severity, take top 5
+            _level_order = {"non_compliant": 0, "partial": 1, "unable_to_determine": 2,
+                            "not_applicable": 3, "compliant": 4}
+            if isinstance(findings, list):
+                sorted_f = sorted(findings, key=lambda f: _level_order.get(f.get("level", ""), 5))
+                top = [
+                    {"obligation_id": f.get("obligation_id", ""),
+                     "level": f.get("level", ""),
+                     "description": (f.get("description", "") or "")[:200]}
+                    for f in sorted_f[:5]
+                    if "[COVERAGE GAP" not in (f.get("description", "") or "")
+                ]
+            else:
+                top = []
+
+            results[f"article_{art_num}"] = {
+                "overall": overall,
+                "finding_count": len(findings) if isinstance(findings, list) else 0,
+                "top_findings": top,
+                "note": f"Full findings saved to state. Use cl_scan(articles=\"{art_num}\") for details.",
+            }
         except json.JSONDecodeError:
             results[f"article_{art_num}"] = {"error": "Failed to parse scan result"}
 
@@ -390,8 +466,8 @@ def cl_scan(
             sync_data = json.loads(sync_result)
             if sync_data.get("status") == "synced":
                 output += "\n\n--- Results synced to dashboard ---"
-        except Exception:
-            pass
+        except Exception as e:
+            logger.debug("Auto-sync after scan failed: %s", e)
     else:
         output += _build_post_scan_hint(project_path)
 
@@ -413,15 +489,16 @@ def cl_explain(regulation: str = "eu-ai-act", article: int = 0) -> str:
         article: Article number to explain (e.g. 12 for Article 12).
     """
     if regulation != "eu-ai-act":
-        return json.dumps({"error": f"Regulation '{regulation}' not yet supported.",
-                           "supported": ["eu-ai-act"]})
+        return json.dumps({"error": f"Regulation '{regulation}' is not yet supported.",
+                           "fix": "Use regulation='eu-ai-act'.",
+                           "details": "Supported: ['eu-ai-act']. Additional regulations are on the roadmap."})
     _ensure_module_loaded(article)
     if article in _modules:
         explanation = _modules[article].explain()
         return explanation.to_json()
     return json.dumps({
         "error": f"Article {article} explanation not yet available.",
-        "available_articles": sorted(_modules.keys()),
+        "fix": f"Available articles: {sorted(_modules.keys())}.",
     })
 
 
@@ -470,6 +547,14 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
     import concurrent.futures
 
     _ARTICLE_TIMEOUT_SECS = 30   # max seconds per article before giving up
+    _SUPPORTED_REGULATIONS = {"eu-ai-act"}
+
+    if regulation not in _SUPPORTED_REGULATIONS:
+        return json.dumps({
+            "error": f"Regulation '{regulation}' is not yet supported.",
+            "fix": "Use regulation='eu-ai-act'.",
+            "details": f"Supported: {sorted(_SUPPORTED_REGULATIONS)}. Additional regulations are on the roadmap.",
+        })
 
     if not os.path.isdir(project_path):
         return json.dumps({"error": f"Directory not found: {project_path}"})
@@ -486,12 +571,63 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
                 "project_context is required. Call cl_analyze_project() first, "
                 "read the output, add your own understanding, then pass the enriched "
                 "JSON to cl_scan_all()."
-            )
+            ),
+            "fix": "Call cl_analyze_project() first, then pass its output as project_context.",
         })
     try:
         ctx = ProjectContext.from_json(project_context)
     except (json.JSONDecodeError, TypeError) as e:
         return json.dumps({"error": f"Invalid project_context JSON: {e}"})
+
+    # ── Validation Gate: coerce + validate compliance_answers ──
+    from core.validation_gate import run_gate
+    gate = run_gate(ctx.compliance_answers)
+
+    if gate.coerce_log:
+        logger.info("cl_scan_all — validation gate auto-fixed %d issues", len(gate.coerce_log))
+        # Apply coerced answers back to context
+        ctx.compliance_answers = gate.coerced_answers
+
+    if gate.scope_errors:
+        # _scope is missing or incomplete — HARD REJECT.
+        # Cannot determine which articles apply without risk_classification.
+        logger.error("cl_scan_all — _scope validation failed, rejecting scan")
+        return json.dumps({
+            "error": "Cannot scan: system classification is missing or incomplete in compliance_answers.",
+            "scope_errors": gate.scope_errors,
+            "fix": (
+                "Fill in risk_classification (e.g., 'high-risk' or 'limited-risk') in the "
+                "_scope section of compliance_answers. Also set is_ai_system (true/false). "
+                "Use the compliance_answers_template from cl_analyze_project()."
+            ),
+        })
+
+    if gate.missing_articles:
+        # Applicable articles not filled — HARD REJECT.
+        logger.error("cl_scan_all — %d applicable articles missing: %s",
+                      len(gate.missing_articles), gate.missing_articles)
+        return json.dumps({
+            "error": f"Cannot scan: {len(gate.missing_articles)} applicable articles are missing from compliance_answers.",
+            "missing_articles": sorted(gate.missing_articles),
+            "fix": (
+                "Fill ALL applicable articles in the compliance_answers_template. "
+                "Copy the template from cl_analyze_project() response and fill "
+                "every boolean field with true, false, or null."
+            ),
+        })
+
+    if not gate.all_valid:
+        # Format errors in articles — HARD REJECT
+        logger.error("cl_scan_all — %d articles have format errors: %s",
+                     len(gate.invalid_articles), list(gate.invalid_articles.keys()))
+        return json.dumps({
+            "error": f"Cannot scan: {len(gate.invalid_articles)} articles have format errors in compliance_answers.",
+            "invalid_articles": gate.to_error_response()["errors"],
+            "fix": (
+                "Fix the format errors above and re-submit. Each boolean field must be "
+                "exactly true, false, or null — not a string. Use the compliance_answers_template."
+            ),
+        })
 
     # Lazy-load all modules now (deferred from startup)
     logger.info("cl_scan_all — loading all modules...")
@@ -616,9 +752,9 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
             except concurrent.futures.TimeoutError:
                 logger.error("Art. %d TIMEOUT", art_num)
                 return {
-                    "error": f"Scan timed out after {_ARTICLE_TIMEOUT_SECS}s",
+                    "error": f"Scan timed out after {_ARTICLE_TIMEOUT_SECS}s.",
+                    "fix": f"Use cl_scan(articles=\"{art_num}\") to retry.",
                     "overall": "unable_to_determine",
-                    "note": f"Use cl_scan(articles=\"{art_num}\") to retry.",
                 }
 
     for phase in _PHASE_ORDER:
@@ -662,6 +798,16 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
             "skip_articles": config.skip_articles,
         } if config.has_config else None,
         "context_warnings": [w.__dict__ for w in ctx_warnings] if ctx_warnings else [],
+        "validation_gate": {
+            "coerce_fixes": len(gate.coerce_log) if gate.coerce_log else 0,
+            "coerce_details": gate.coerce_log[:10] if gate.coerce_log else [],
+            "invalid_articles": gate.to_error_response()["errors"] if not gate.all_valid else [],
+            "note": (
+                "Your compliance_answers had format issues that were auto-corrected. "
+                "Next time, use the exact keys and types from compliance_answers_template. "
+                "Boolean fields must be true/false/null, not strings."
+            ) if gate.coerce_log else None,
+        } if gate else {},
         "results": results,
         "next_steps": (
             "IMPORTANT: Do not stop here. Your job is to help the user reach full compliance.\n\n"
@@ -691,6 +837,20 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
             "All findings require human review and legal counsel."
         ),
     }
+
+    # If validation gate found errors, prepend fix instructions to next_steps
+    if gate and not gate.all_valid:
+        invalid_keys = sorted(gate.invalid_articles.keys())
+        fix_instruction = (
+            f"VALIDATION GATE: {len(invalid_keys)} article(s) had format errors in "
+            f"compliance_answers and were scanned with incomplete data: {', '.join(invalid_keys)}.\n"
+            f"Fix the errors listed in validation_gate.invalid_articles and re-scan "
+            f"ONLY those articles using cl_scan(article=N, project_context=...) with corrected answers.\n"
+            f"Each boolean field must be exactly true, false, or null — not a string.\n"
+            f"Use the required_schema in each error entry as your template.\n\n"
+        )
+        report["next_steps"] = fix_instruction + report["next_steps"]
+
     output = json.dumps(report, indent=2, default=str)
 
     # ── Post-scan: auto-sync or contextual hint ──
@@ -703,8 +863,8 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
             sync_data = json.loads(sync_result)
             if sync_data.get("status") == "synced":
                 output += "\n\n--- Results synced to dashboard ---"
-        except Exception:
-            pass  # Non-blocking — silently skip on failure
+        except Exception as e:
+            logger.debug("Auto-sync after scan_all failed: %s", e)
     else:
         output += _build_post_scan_hint(project_path, nc_count=nc_total)
 
@@ -724,18 +884,39 @@ def cl_action_plan(project_path: str, regulation: str = "eu-ai-act", article: in
         article: Specific article number (0 = all articles).
     """
     if regulation != "eu-ai-act":
-        return json.dumps({"error": f"Regulation '{regulation}' not yet supported."})
+        return json.dumps({
+            "error": f"Regulation '{regulation}' is not yet supported.",
+            "fix": "Use regulation='eu-ai-act'.",
+            "details": "Additional regulations are on the roadmap.",
+        })
 
     if not os.path.isdir(project_path):
         return json.dumps({"error": f"Directory not found: {project_path}"})
 
     _ensure_all_modules_loaded()
 
+    # Check if project context is available (needed for scanning)
+    if not BaseArticleModule.get_context():
+        return json.dumps({
+            "error": "No project context available. Run a scan first (cl_scan or cl_scan_all) before generating an action plan.",
+            "fix": "Scan your project first (cl_scan or cl_scan_all), then request the action plan.",
+        })
+
     all_actions = []
     articles_covered = []
 
     target_articles = [article] if article > 0 else sorted(_modules.keys())
     for art_num in target_articles:
+        if art_num not in _modules:
+            all_actions.append({
+                "priority": "LOW",
+                "article": f"Art. {art_num}",
+                "action": f"Article {art_num} is not available in this version of ComplianceLint.",
+                "details": f"Available articles: {sorted(_modules.keys())}",
+                "effort": "N/A",
+                "action_type": "error",
+            })
+            continue
         mod = _modules[art_num]
         try:
             scan_result = mod.scan(project_path)
@@ -855,13 +1036,14 @@ def cl_interim_standard(article_number: int) -> str:  # Tool name kept for backw
             return json.dumps(standard, indent=2, ensure_ascii=False)
         return json.dumps({
             "error": f"No compliance checklist file found for Article {article_number}.",
-            "note": "The module exists but its interim-standard.json is missing.",
+            "fix": "This article's module exists but the checklist is not yet available.",
+            "details": "The module exists but its interim-standard.json is missing.",
         })
 
     return json.dumps({
         "error": f"No module available for Article {article_number}.",
-        "available": sorted(_modules.keys()),
-        "note": "More compliance checklist will be added as articles are decomposed.",
+        "fix": f"Available articles: {sorted(_modules.keys())}.",
+        "details": "More compliance checklists will be added as articles are decomposed.",
     })
 
 
@@ -875,6 +1057,10 @@ def cl_update_finding(
     justification: str = "",
 ) -> str:
     """Update a single compliance finding with evidence, rebuttal, or status change.
+
+    ⚠️  If you need to update more than 3 findings, use cl_update_finding_batch instead.
+    It accepts article-level evidence (one file covers all findings in an article)
+    and requires only one user approval for the entire batch.
 
     IMPORTANT — AI MUST VERIFY EVIDENCE BEFORE CALLING THIS TOOL:
 
@@ -919,6 +1105,24 @@ def cl_update_finding(
         evidence_value: The evidence content (file path, URL, or description).
         justification: Reason for rebuttal (for rebut action).
     """
+    import re as _re
+
+    # Validate obligation_id format: ART{N}-OBL-{N}, ART{N}-EXC-{N}, ART{N}-CLS-{N}, etc.
+    if not obligation_id or not _re.match(r"^ART\d+-[A-Z]+-\w+", obligation_id):
+        return json.dumps({
+            "error": f"Invalid finding ID format: '{obligation_id}'.",
+            "fix": "Run cl_report() to see all finding IDs for your project.",
+            "details": "Expected format: ART{N}-OBL-{N} (e.g. ART12-OBL-1, ART50-OBL-2).",
+        })
+
+    # Validate action
+    _VALID_ACTIONS = {"provide_evidence", "rebut", "acknowledge", "defer", "resolve"}
+    if action not in _VALID_ACTIONS:
+        return json.dumps({
+            "error": f"Invalid action: '{action}'.",
+            "fix": f"Use one of: {sorted(_VALID_ACTIONS)}.",
+        })
+
     # Read attester identity (config > git config > reject)
     from core.config import ProjectConfig
     config = ProjectConfig.load(project_path)
@@ -926,10 +1130,18 @@ def cl_update_finding(
 
     if attester is None:
         return json.dumps({
-            "error": "Cannot attest without identity. "
-                     "Set attester in .compliancelintrc: "
-                     '{"attester": {"name": "Your Name", "email": "you@company.com", "role": "CTO"}} '
-                     "or configure git user.name and user.email.",
+            "error": "Cannot submit evidence without your name and email (for the audit trail).",
+            "fix": (
+                "Add attester_name and attester_email to .compliancelintrc. "
+                "If the user already ran cl_connect(), their email should be in .compliancelintrc. "
+                "If not, ask the user: 'What name and email should I use for the compliance audit trail?' "
+                "Then write attester_name and attester_email to .compliancelintrc and retry."
+            ),
+            "example": {
+                "attester_name": "User's full name",
+                "attester_email": "user@company.com",
+                "attester_role": "Developer (optional)",
+            },
         })
 
     from core.state import update_finding
@@ -942,6 +1154,136 @@ def cl_update_finding(
         justification=justification,
         attester=attester,
     )
+    return json.dumps(result, indent=2, default=str)
+
+
+@mcp.tool()
+def cl_update_finding_batch(
+    project_path: str,
+    updates: str,
+) -> str:
+    """Update multiple compliance findings in one call.
+
+    Use this instead of calling cl_update_finding repeatedly. One approval from
+    the user covers the entire batch — no need to approve each finding separately.
+
+    IMPORTANT — same evidence quality rules as cl_update_finding apply:
+    AI MUST verify each piece of evidence is specific and sufficient.
+
+    ── Two modes ──
+
+    Mode 1: Per-obligation updates (explicit)
+    Each update targets a specific obligation_id:
+    [
+      {"obligation_id": "ART09-OBL-1", "action": "provide_evidence",
+       "evidence_type": "file", "evidence_value": "docs/risk-management.md"},
+      {"obligation_id": "ART50-EXC-1", "action": "rebut",
+       "justification": "System is not deployed in biometric context"}
+    ]
+
+    Mode 2: Article-level evidence (recommended for bulk evidence)
+    Use "article" instead of "obligation_id" — one piece of evidence auto-applies
+    to ALL open findings in that article:
+    [
+      {"article": "art9", "action": "provide_evidence",
+       "evidence_type": "file", "evidence_value": "docs/risk-management.md"},
+      {"article": "art12", "action": "provide_evidence",
+       "evidence_type": "file", "evidence_value": "src/logging_middleware.py"}
+    ]
+    This expands internally: art9 with 11 open findings → 11 updates, all pointing
+    to the same evidence file. Much more natural than listing each obligation.
+
+    You can mix both modes in one batch.
+
+    Args:
+        project_path: Absolute path to the project directory.
+        updates: JSON array of update objects (per-obligation or article-level).
+
+    Returns: JSON with updated count, errors, and per-item details.
+    """
+    import re as _re
+
+    # Parse updates JSON
+    try:
+        updates_list = json.loads(updates)
+    except (json.JSONDecodeError, TypeError) as e:
+        return json.dumps({"error": f"Invalid updates JSON: {e}"})
+
+    if not isinstance(updates_list, list):
+        return json.dumps({"error": "updates must be a JSON array"})
+
+    if len(updates_list) == 0:
+        return json.dumps({"error": "updates array is empty"})
+
+    # ── Separate article-level items from obligation-level items ──
+    article_items = []
+    obligation_items = []
+    for upd in updates_list:
+        if not isinstance(upd, dict):
+            continue
+        if upd.get("article") and not upd.get("obligation_id"):
+            article_items.append(upd)
+        else:
+            obligation_items.append(upd)
+
+    # Expand article-level evidence into per-obligation updates
+    expanded_from_articles = []
+    if article_items:
+        from core.state import expand_article_evidence
+        expanded_from_articles = expand_article_evidence(project_path, article_items)
+
+    # Validate obligation-level items
+    errors = []
+    valid_updates = []
+    _VALID_ACTIONS = {"provide_evidence", "rebut", "acknowledge", "defer", "resolve"}
+
+    for i, upd in enumerate(obligation_items):
+        if not isinstance(upd, dict):
+            errors.append({"index": i, "error": "Update must be an object"})
+            continue
+        obl_id = upd.get("obligation_id", "")
+        action = upd.get("action", "")
+        if not obl_id or not _re.match(r"^ART\d+-[A-Z]+-\w+", obl_id):
+            errors.append({"index": i, "obligation_id": obl_id, "error": "Invalid finding ID format"})
+            continue
+        if action not in _VALID_ACTIONS:
+            errors.append({"index": i, "obligation_id": obl_id, "error": f"Invalid action: {action}"})
+            continue
+        valid_updates.append(upd)
+
+    # Combine: expanded article-level + validated obligation-level
+    valid_updates = expanded_from_articles + valid_updates
+
+    if not valid_updates:
+        return json.dumps({"error": "No valid updates in batch", "validation_errors": errors})
+
+    # Resolve attester (once for entire batch)
+    from core.config import ProjectConfig
+    config = ProjectConfig.load(project_path)
+    attester = config.get_attester(project_path)
+
+    if attester is None:
+        return json.dumps({
+            "error": "Cannot submit evidence without your name and email (for the audit trail).",
+            "fix": "Add attester_name and attester_email to .compliancelintrc.",
+        })
+
+    # Execute batch update
+    from core.state import update_findings_batch
+    result = update_findings_batch(
+        project_path=project_path,
+        updates=valid_updates,
+        attester=attester,
+    )
+
+    if errors:
+        result["validation_errors"] = errors
+    if expanded_from_articles:
+        result["article_expansion"] = {
+            "article_items_received": len(article_items),
+            "obligations_expanded": len(expanded_from_articles),
+        }
+
     return json.dumps(result, indent=2, default=str)
 
 
@@ -980,18 +1322,18 @@ def cl_verify_evidence(project_path: str) -> str:
     if evidence.load_error:
         return json.dumps({
             "error": f"Failed to parse compliance-evidence.json: {evidence.load_error}",
-            "evidence_file": evidence.evidence_file,
+            "fix": "Check that compliance-evidence.json is valid JSON with the correct schema.",
+            "details": f"File: {evidence.evidence_file}",
         })
 
     if not evidence.has_evidence:
         return json.dumps({
             "evidence_file": evidence.evidence_file,
             "found": False,
-            "message": (
-                "No compliance-evidence.json found in project root. "
-                "Create this file to declare evidence for obligations that cannot be "
-                "detected from source code alone (e.g., external Terms of Service, "
-                "Privacy Policy URLs, configuration screenshots)."
+            "fix": (
+                "Create a compliance-evidence.json file in your project root to declare "
+                "evidence for obligations that cannot be detected from source code alone "
+                "(e.g., external Terms of Service, Privacy Policy URLs, configuration screenshots)."
             ),
             "schema_example": {
                 "evidence": {
@@ -1044,6 +1386,10 @@ def _scan_single_article(article_number: int, project_path: str, context=None, r
     if not os.path.isdir(project_path):
         return json.dumps({"error": f"Directory not found: {project_path}"})
 
+    from core.scanner_log import get_scanner_logger
+    slog = get_scanner_logger(project_path)
+    slog.info("scan: article %d started (regulation=%s)", article_number, regulation)
+
     # Lazy-load the module if not yet loaded
     logger.info("Art. %d — loading module...", article_number)
     _ensure_module_loaded(article_number)
@@ -1051,7 +1397,7 @@ def _scan_single_article(article_number: int, project_path: str, context=None, r
     if article_number not in _modules:
         return json.dumps({
             "error": f"Article {article_number} module not available.",
-            "available": sorted(_modules.keys()),
+            "fix": f"Available articles: {sorted(_modules.keys())}.",
         })
 
     logger.info("Art. %d — scanning %s...", article_number, project_path)
@@ -1067,7 +1413,8 @@ def _scan_single_article(article_number: int, project_path: str, context=None, r
                 "project_context is required. Call cl_analyze_project() first, "
                 "understand the project, then pass your enriched context JSON."
             ),
-            "article": article_number,
+            "fix": "Call cl_analyze_project() first, then pass its output as project_context.",
+            "details": f"Article {article_number} requires project context for scanning.",
         })
 
     BaseArticleModule.set_context(context)
@@ -1324,7 +1671,7 @@ def _build_evidence_requests(article_number: int, article_title: str,
 
 
 @mcp.tool()
-def cl_connect(project_path: str, email: str = "", switch_account: bool = False) -> str:
+async def cl_connect(project_path: str, email: str = "", switch_account: bool = False) -> str:
     """Connect to ComplianceLint Dashboard.
 
     Opens your browser to sign in with GitHub or Google. Once signed in,
@@ -1340,49 +1687,38 @@ def cl_connect(project_path: str, email: str = "", switch_account: bool = False)
 
     Returns: JSON with connection status and API key.
     """
+    import asyncio
     import webbrowser
+    import subprocess
+    import uuid
 
     if not os.path.isdir(project_path):
         return json.dumps({"error": f"Directory not found: {project_path}"})
 
+    from core.scanner_log import get_scanner_logger
+    slog = get_scanner_logger(project_path)
+
     config = ProjectConfig.load(project_path)
     saas_url = config.saas_url or "https://compliancelint.dev"
 
-    # Backfill repo_name/project_id if missing (upgrade from older cl_connect)
-    # Use a separate Python subprocess to avoid blocking MCP asyncio event loop
-    if not config.repo_name or not config.project_id:
-        try:
-            import subprocess as _sp_bf
-            _bf_script = (
-                f"import sys; sys.path.insert(0, {repr(os.path.dirname(os.path.abspath(__file__)))}); "
-                f"from core.config import ProjectConfig; "
-                f"c = ProjectConfig.load({repr(project_path)}); "
-                f"c.derive_git_identity({repr(project_path)}); "
-                f"c.save({repr(project_path)})"
-            )
-            _bf_flags = {"capture_output": True, "text": True, "timeout": 5}
-            if hasattr(_sp_bf, "CREATE_NO_WINDOW"):
-                _bf_flags["creationflags"] = _sp_bf.CREATE_NO_WINDOW
-            _bf_result = _sp_bf.run(["python", "-c", _bf_script], **_bf_flags)
-            if _bf_result.returncode == 0:
-                # Reload config to pick up backfilled values
-                config = ProjectConfig.load(project_path)
-            else:
-                logger.warning("Backfill subprocess failed (rc=%d): %s", _bf_result.returncode, _bf_result.stderr[:200])
-        except Exception as _bf_err:
-            logger.warning("Backfill subprocess error: %s", _bf_err)
+    def _run_curl(args_list, timeout=8):
+        """Run curl in a subprocess (blocking helper for asyncio.to_thread)."""
+        flags = {"capture_output": True, "text": True, "timeout": timeout}
+        if hasattr(subprocess, "CREATE_NO_WINDOW"):
+            flags["creationflags"] = subprocess.CREATE_NO_WINDOW
+        return subprocess.run(args_list, **flags)
 
+    slog.info("cl_connect: repo_name=%s project_id=%s has_key=%s", config.repo_name, config.project_id, bool(config.saas_api_key))
+
+    slog.info("cl_connect: checking existing key...")
     # If already connected (and not switching), check if key still works
     if config.saas_api_key and not switch_account:
         try:
-            import subprocess as _sp_chk
             check_url = f"{saas_url}/api/v1/auth/check"
-            _curl_flags = {}
-            if hasattr(_sp_chk, "CREATE_NO_WINDOW"):
-                _curl_flags["creationflags"] = _sp_chk.CREATE_NO_WINDOW
-            _chk = _sp_chk.run(
-                ["curl", "-s", "--max-time", "5", "-H", f"Authorization: Bearer {config.saas_api_key}", check_url],
-                capture_output=True, text=True, timeout=8, **_curl_flags,
+            _chk = await asyncio.to_thread(
+                _run_curl,
+                ["curl", "-s", "--max-time", "5", "-H",
+                 f"Authorization: Bearer {config.saas_api_key}", check_url],
             )
             if _chk.returncode == 0 and _chk.stdout.strip():
                 check_data = json.loads(_chk.stdout.strip())
@@ -1396,16 +1732,9 @@ def cl_connect(project_path: str, email: str = "", switch_account: bool = False)
         except Exception:
             pass  # Key invalid or server unreachable, proceed to reconnect
 
-    # ── Device flow (no local server needed) ──
-    # 1. Generate a connect token
-    # 2. Open browser to dashboard with token
-    # 3. User signs in with GitHub/Google
-    # 4. Dashboard stores API key server-side
-    # 5. Scanner polls dashboard API to get the key
-
-    import uuid
+    # ── Device flow ──
+    slog.info("cl_connect: starting device flow")
     connect_token = uuid.uuid4().hex
-
     connect_url = f"{saas_url}/api/v1/auth/connect?token={connect_token}"
     logger.info("Opening browser for authentication: %s", connect_url)
 
@@ -1413,57 +1742,66 @@ def cl_connect(project_path: str, email: str = "", switch_account: bool = False)
         webbrowser.open(connect_url)
     except Exception:
         return json.dumps({
-            "error": "Could not open browser.",
-            "hint": f"Open this URL manually: {connect_url}",
+            "error": "Could not open browser automatically.",
+            "fix": "Run cl_connect() again. If the browser still doesn't open, check your default browser settings.",
         })
 
-    # Poll dashboard every 3 seconds for up to 2 minutes
+    # Poll dashboard every 2 seconds for up to 90 seconds.
+    # Uses asyncio.sleep so the MCP event loop stays responsive.
     poll_url = f"{saas_url}/api/v1/auth/connect/poll?token={connect_token}"
-    logger.info("Polling for authentication completion...")
+    logger.info("Polling %s (token=%s...)", poll_url[:60], connect_token[:8])
 
-    import time
-    received_key = {"api_key": "", "email": ""}
-    max_attempts = 40  # 40 × 3s = 120s
-    for attempt in range(max_attempts):
-        time.sleep(3)
+    received_key = None
+    slog.info("cl_connect: polling started")
+    for attempt in range(45):  # 45 × 2s = 90s
+        await asyncio.sleep(2)
         try:
-            _curl_flags = {}
-            if hasattr(subprocess, "CREATE_NO_WINDOW"):
-                _curl_flags["creationflags"] = subprocess.CREATE_NO_WINDOW
-            poll_result = subprocess.run(
-                ["curl", "-s", "--max-time", "5", poll_url],
-                capture_output=True, text=True, timeout=8, **_curl_flags,
+            poll_result = await asyncio.to_thread(
+                _run_curl, ["curl", "-s", "--max-time", "5", poll_url],
             )
+            slog.debug("cl_connect poll %d/45: rc=%d", attempt + 1, poll_result.returncode)
             if poll_result.returncode == 0 and poll_result.stdout.strip():
                 poll_data = json.loads(poll_result.stdout.strip())
                 if poll_data.get("status") == "complete":
-                    received_key["api_key"] = poll_data.get("api_key", "")
-                    received_key["email"] = poll_data.get("email", "")
+                    received_key = {
+                        "api_key": poll_data.get("api_key", ""),
+                        "email": poll_data.get("email", ""),
+                    }
                     break
                 elif poll_data.get("status") == "expired":
                     return json.dumps({
-                        "error": "Connect token expired. Please try cl_connect again.",
+                        "error": "Connect token expired.",
+                        "fix": "Run cl_connect() again to start a new authentication flow.",
                     })
-                # status == "pending" → continue polling
         except Exception:
             pass  # Network error, keep polling
 
-    if not received_key["api_key"]:
+    if not received_key:
         return json.dumps({
             "error": "Timed out waiting for authentication.",
-            "hint": "Make sure you completed the sign-in in your browser.",
+            "fix": "Make sure you completed the sign-in in your browser, then run cl_connect() again.",
         })
 
-    # Save API key + repo identity to .compliancelintrc
+    # Save API key to .compliancelintrc
+    # repo_name/project_id are pre-derived by `npx compliancelint init` (runs in
+    # normal terminal, not MCP). We only set a fallback repo_name here.
+    # NEVER call derive_git_identity() or git subprocess in MCP context — it hangs.
+    slog.info("cl_connect: saving config")
     config.saas_api_key = received_key["api_key"]
     config.saas_url = saas_url
-
-    # Auto-derive repo_name + project_id so cl_sync never needs slow git lookups
-    config.derive_git_identity(project_path)
-
+    if not config.repo_name:
+        config.repo_name = os.path.basename(os.path.normpath(project_path))
+    # Pre-populate attester from OAuth email (so cl_update_finding works
+    # without needing npx init or manual config)
+    if not config.attester_email and received_key.get("email"):
+        config.attester_email = received_key["email"]
+        if not config.attester_name:
+            # Use email prefix as name placeholder
+            config.attester_name = received_key["email"].split("@")[0]
     config_path = config.save(project_path)
+    slog.info("cl_connect: config saved to %s", config_path)
 
-    # Auto-add .compliancelintrc to .gitignore (prevent API key leaks)
+    # Auto-add .compliancelintrc to .gitignore
     gitignore_path = os.path.join(project_path, ".gitignore")
     try:
         existing_gitignore = ""
@@ -1476,11 +1814,12 @@ def cl_connect(project_path: str, email: str = "", switch_account: bool = False)
                     _gi.write("\n")
                 _gi.write("# ComplianceLint credentials (auto-added by cl_connect)\n")
                 _gi.write(".compliancelintrc\n")
-    except Exception:
-        pass  # Non-fatal: user can add manually
+    except Exception as e:
+        logger.debug("Could not update .gitignore: %s", e)
 
     email_display = received_key["email"] or "your account"
 
+    slog.info("cl_connect: connected as %s", email_display)
     return json.dumps({
         "status": "connected",
         "email": email_display,
@@ -1506,33 +1845,27 @@ def cl_sync(project_path: str, regulation: str = "") -> str:
 
     Returns: JSON with sync status and dashboard URL.
     """
-    # Debug: trace every step to file
-    import sys
-    _log_path = "c:/AI/ComplianceLint/cl_upload_debug.log"
-    def _dbg_log(msg):
-        with open(_log_path, "a") as _f:
-            from datetime import datetime as _dt
-            _f.write(f"{_dt.now().isoformat()} {msg}\n")
-            _f.flush()
-    _dbg_log(f"STEP 1: ENTERED project_path={project_path}")
-
     if not os.path.isdir(project_path):
         return json.dumps({"error": f"Directory not found: {project_path}"})
 
+    from core.scanner_log import get_scanner_logger
+    slog = get_scanner_logger(project_path)
+    slog.info("cl_sync: started project_path=%s", project_path)
+
     # Load config for API key
-    _dbg_log("STEP 2: loading config")
+    slog.info("cl_sync: loading config")
     config = ProjectConfig.load(project_path)
-    _dbg_log(f"STEP 3: config loaded, api_key={config.saas_api_key[:10] if config.saas_api_key else 'NONE'}...")
+    slog.info(f"STEP 3: config loaded, api_key={config.saas_api_key[:10] if config.saas_api_key else 'NONE'}...")
     if not config.saas_api_key:
         return json.dumps({
             "error": "No API key configured. Run cl_connect() first to link your dashboard account.",
-            "hint": "Run cl_connect() — it opens your browser to sign in.",
+            "fix": "Run cl_connect() — it opens your browser to sign in.",
         })
 
     saas_url = config.saas_url or "https://compliancelint.dev"
 
     # Get project identity — reads config cache, never blocks on git in cl_sync
-    _dbg_log("STEP 3b: loading project_id")
+    slog.info("STEP 3b: loading project_id")
     from core.state import load_state
     # config.project_id is populated by cl_connect (cached in .compliancelintrc)
     # If not there, fall back to .compliancelint/project.json (UUID cache)
@@ -1546,49 +1879,30 @@ def cl_sync(project_path: str, regulation: str = "") -> str:
                     project_id = json.load(_f).get("project_id", "") or None
             except Exception:
                 pass
-    _dbg_log(f"STEP 3c: project_id={project_id}")
+    slog.info(f"STEP 3c: project_id={project_id}")
 
     # Load scan state
-    _dbg_log("STEP 4: loading state")
+    slog.info("STEP 4: loading state")
     state = load_state(project_path)
-    _dbg_log(f"STEP 5: state loaded, articles={list(state.get('articles',{}).keys())}")
+    slog.info(f"STEP 5: state loaded, articles={list(state.get('articles',{}).keys())}")
 
     if not state.get("articles"):
         return json.dumps({
             "error": "No scan results found. Run a scan first (e.g., cl_scan(articles='9')).",
-            "hint": "Scan at least one article before syncing to the dashboard.",
+            "fix": "Scan at least one article before syncing to the dashboard.",
         })
 
-    # Derive repo name: config > git remote > directory name
-    _dbg_log("STEP 6: deriving repo name")
+    # Derive repo name: config > directory name
+    # NEVER call git subprocess in MCP context — it hangs the event loop.
+    # repo_name/project_id are pre-derived by `npx compliancelint init`.
+    slog.info("STEP 6: deriving repo name")
     repo_name = config.repo_name
     if not repo_name:
-        # Try git remote origin URL → extract "org/repo"
-        try:
-            import subprocess
-            env = {**os.environ, "GIT_TERMINAL_PROMPT": "0"}
-            result = subprocess.run(
-                ["git", "remote", "get-url", "origin"],
-                capture_output=True, text=True, cwd=project_path, timeout=2,
-                env=env,
-                creationflags=subprocess.CREATE_NO_WINDOW if hasattr(subprocess, 'CREATE_NO_WINDOW') else 0,
-            )
-            if result.returncode == 0:
-                url = result.stdout.strip()
-                if ":" in url and "@" in url:
-                    repo_name = url.split(":")[-1].replace(".git", "")
-                elif "/" in url:
-                    parts = url.rstrip("/").replace(".git", "").split("/")
-                    if len(parts) >= 2:
-                        repo_name = f"{parts[-2]}/{parts[-1]}"
-        except Exception:
-            pass
-    if not repo_name:
         repo_name = os.path.basename(os.path.normpath(project_path))
-    _dbg_log(f"STEP 6b: repo_name={repo_name}")
+    slog.info(f"STEP 6b: repo_name={repo_name}")
 
     # Load attestation responses from state.json findings history/evidence
-    _dbg_log("STEP 7: loading attestation responses from state")
+    slog.info("STEP 7: loading attestation responses from state")
     response_items = []
     try:
         for _art_key, art_data in state.get("articles", {}).items():
@@ -1638,21 +1952,21 @@ def cl_sync(project_path: str, regulation: str = "") -> str:
                         "submitted_by_role": submitted_by.get("role", "") if isinstance(submitted_by, dict) else "",
                         "submitted_at": supp.get("date", ""),
                     })
-    except Exception:
-        pass
-    _dbg_log(f"STEP 7b: {len(response_items)} attestation responses loaded")
+    except Exception as _e:
+        slog.error(f"STEP 7: Failed to parse attestation responses from state: {_e}")
+    slog.info(f"STEP 7b: {len(response_items)} attestation responses loaded")
 
     # Load changes_summary if the AI wrote one (VCS-agnostic change tracking)
-    _dbg_log("STEP 7c: loading changes_summary")
+    slog.info("STEP 7c: loading changes_summary")
     changes_summary = ""
     changes_file = os.path.join(project_path, ".compliancelint", "changes_summary.txt")
     if os.path.isfile(changes_file):
         try:
             with open(changes_file, "r", encoding="utf-8") as _f:
                 changes_summary = _f.read().strip()
-            _dbg_log(f"STEP 7d: changes_summary loaded ({len(changes_summary)} chars)")
-        except Exception:
-            pass
+            slog.info(f"STEP 7d: changes_summary loaded ({len(changes_summary)} chars)")
+        except Exception as _e:
+            slog.warning(f"STEP 7c: Could not read changes_summary.txt: {_e}")
 
     # Apply attestation overrides: rebutted → not_applicable, evidenced → compliant
     articles_data = json.loads(json.dumps(state.get("articles", {})))  # deep copy
@@ -1671,7 +1985,7 @@ def cl_sync(project_path: str, regulation: str = "") -> str:
         "scanned_at": state.get("last_scan", datetime.now(timezone.utc).isoformat()),
         "scanner_version": CL_VERSION,
         "regulation": state.get("regulation", "eu-ai-act"),
-        "ai_provider": state.get("ai_provider"),
+        "ai_provider": _read_ai_provider(project_path),
         "changes_summary": changes_summary or None,
         "articles": articles_data,
         "responses": response_items,  # Finding responses / attestations from state.json
@@ -1681,12 +1995,12 @@ def cl_sync(project_path: str, regulation: str = "") -> str:
     scans_url = f"{saas_url}/api/v1/scans"
     # ensure_ascii=True: prevent mojibake (â€") when Alpine Docker decodes UTF-8 bytes
     data = json.dumps(payload, default=str, ensure_ascii=True).encode("utf-8")
-    _dbg_log(f"STEP 8: about to POST {len(data)} bytes to {scans_url}")
+    slog.info(f"STEP 8: about to POST {len(data)} bytes to {scans_url}")
 
     resp_data = {}
 
     try:
-        _dbg_log("STEP 9: sending HTTP request via subprocess...")
+        slog.info("STEP 9: sending HTTP request via subprocess...")
         import subprocess as _sp
         import tempfile as _tf
 
@@ -1719,27 +2033,32 @@ def cl_sync(project_path: str, regulation: str = "") -> str:
         body_str = lines[0] if len(lines) > 1 else ""
         http_code = int(lines[-1]) if lines[-1].isdigit() else 0
 
-        _dbg_log(f"STEP 10: HTTP done, code={http_code}, body={body_str[:200]}")
+        slog.info(f"STEP 10: HTTP done, code={http_code}, body={body_str[:200]}")
 
         if http_code == 401:
             return json.dumps({
                 "error": "API key is invalid or expired.",
-                "hint": "Run cl_connect again to generate a new API key.",
+                "fix": "Run cl_connect() again to generate a new API key.",
             })
         if http_code == 403:
             detail = ""
+            upgrade_url = ""
             try:
-                detail = json.loads(body_str).get("error", body_str)
+                resp_json = json.loads(body_str)
+                detail = resp_json.get("error", body_str)
+                upgrade_url = resp_json.get("upgrade_url", "")
             except Exception:
                 detail = body_str
+            settings_url = f"{saas_url}/dashboard/settings"
             return json.dumps({
                 "error": f"Dashboard returned HTTP 403: {detail}",
-                "hint": "You may have reached your plan's repo limit. Check your dashboard settings.",
+                "fix": f"Upgrade your plan at {settings_url}",
             })
         if http_code >= 400:
             return json.dumps({
-                "error": f"Dashboard returned HTTP {http_code}",
-                "detail": body_str[:500],
+                "error": f"Dashboard returned HTTP {http_code}.",
+                "fix": "Check the dashboard status at compliancelint.dev or try again later.",
+                "details": body_str[:500],
             })
         if body_str:
             resp_data = json.loads(body_str)
@@ -1747,11 +2066,11 @@ def cl_sync(project_path: str, regulation: str = "") -> str:
     except _sp.TimeoutExpired:
         return json.dumps({
             "error": f"Request to {saas_url} timed out after 15 seconds.",
-            "hint": "Check your internet connection or try again.",
+            "fix": "Check your internet connection or try again.",
         })
     except Exception as e:
-        _dbg_log(f"STEP 10-ERR: {e}")
-        return json.dumps({"error": f"Sync failed: {e}"})
+        slog.info(f"STEP 10-ERR: {e}")
+        return json.dumps({"error": f"Sync failed: {e}", "fix": "Check your internet connection or try again."})
 
     dashboard_url = resp_data.get("dashboard_url", f"{saas_url}/dashboard")
     scan_id = resp_data.get("scan_id", "")
@@ -1763,7 +2082,7 @@ def cl_sync(project_path: str, regulation: str = "") -> str:
         "articles_synced": list(state.get("articles", {}).keys()),
         "message": f"Scan results uploaded. View at: {dashboard_url}",
     })
-    _dbg_log(f"STEP 11: returning result ({len(result)} bytes)")
+    slog.info(f"STEP 11: returning result ({len(result)} bytes)")
     return result
 
 
@@ -1791,9 +2110,155 @@ def _check_latest_version() -> dict:
 
 
 @mcp.tool()
+def cl_delete(project_path: str, target: str = "local", confirm: bool = False) -> str:
+    """Delete compliance scan data.
+
+    Args:
+        project_path: Project directory path.
+        target: What to delete:
+            - "local": Delete .compliancelint/ directory (local scan data)
+            - "remote": Delete scan data from ComplianceLint Dashboard (requires API key)
+            - "all": Delete both local and remote data
+        confirm: Must be set to true to actually delete. First call without confirm
+            returns a warning message.
+    """
+    import shutil
+
+    if not os.path.isdir(project_path):
+        return json.dumps({"error": f"Directory not found: {project_path}"})
+
+    if target not in ("local", "remote", "all"):
+        return json.dumps({"error": f"Invalid target: '{target}'. Must be 'local', 'remote', or 'all'."})
+
+    from core.scanner_log import get_scanner_logger
+    slog = get_scanner_logger(project_path)
+
+    cl_dir = os.path.join(project_path, ".compliancelint")
+    config = ProjectConfig.load(project_path)
+
+    # Confirmation gate
+    if not confirm:
+        warning_parts = []
+        if target in ("local", "all"):
+            has_local = os.path.isdir(cl_dir)
+            warning_parts.append(
+                f"LOCAL: Will delete .compliancelint/ directory ({'exists' if has_local else 'not found'}). "
+                "This removes all local scan data, baselines, and evidence."
+            )
+        if target in ("remote", "all"):
+            has_key = bool(config.saas_api_key)
+            warning_parts.append(
+                f"REMOTE: Will delete scan data from dashboard ({'API key configured' if has_key else 'no API key — will fail'}). "
+                "This removes all scans, findings, and history from the server."
+            )
+        return json.dumps({
+            "status": "confirmation_required",
+            "warning": " | ".join(warning_parts),
+            "action": f"Call cl_delete(project_path, target='{target}', confirm=true) to proceed.",
+        })
+
+    results = {}
+
+    # Delete local data
+    if target in ("local", "all"):
+        if os.path.isdir(cl_dir):
+            shutil.rmtree(cl_dir)
+            results["local"] = "deleted"
+            slog.info("cl_delete: removed .compliancelint/ directory")
+        else:
+            results["local"] = "not_found"
+
+    # Delete remote data
+    if target in ("remote", "all"):
+        if not config.saas_api_key:
+            results["remote"] = "error: no API key configured. Run cl_connect() first."
+        else:
+            saas_url = config.saas_url or "https://compliancelint.dev"
+            # Derive repo identity for the DELETE call
+            config.derive_git_identity(project_path)
+            repo_name = config.repo_name or os.path.basename(os.path.normpath(project_path))
+            project_id = config.project_id or ""
+
+            import subprocess
+            try:
+                delete_url = f"{saas_url}/api/v1/repos/delete"
+                payload = json.dumps({"repo_name": repo_name, "project_id": project_id})
+                curl_flags = {"capture_output": True, "text": True, "timeout": 10}
+                if hasattr(subprocess, "CREATE_NO_WINDOW"):
+                    curl_flags["creationflags"] = subprocess.CREATE_NO_WINDOW
+                r = subprocess.run(
+                    ["curl", "-s", "--max-time", "8", "-X", "DELETE",
+                     "-H", f"Authorization: Bearer {config.saas_api_key}",
+                     "-H", "Content-Type: application/json",
+                     "-d", payload, delete_url],
+                    **curl_flags,
+                )
+                if r.returncode == 0 and r.stdout.strip():
+                    resp = json.loads(r.stdout.strip())
+                    results["remote"] = resp.get("status", "unknown")
+                else:
+                    results["remote"] = f"error: request failed (exit {r.returncode})"
+            except Exception as e:
+                results["remote"] = f"error: {e}"
+            slog.info("cl_delete: remote delete result=%s", results.get("remote"))
+
+    return json.dumps({"status": "deleted", "results": results})
+
+
+@mcp.tool()
+def cl_disconnect(project_path: str) -> str:
+    """Disconnect from ComplianceLint Dashboard.
+
+    Removes API key and connection config from .compliancelintrc.
+    Local scan data in .compliancelint/ is preserved.
+
+    Args:
+        project_path: Project directory path.
+    """
+    if not os.path.isdir(project_path):
+        return json.dumps({"error": f"Directory not found: {project_path}"})
+
+    from core.scanner_log import get_scanner_logger
+    slog = get_scanner_logger(project_path)
+
+    config_path = os.path.join(project_path, ".compliancelintrc")
+    if not os.path.isfile(config_path):
+        return json.dumps({"status": "not_connected", "message": "No .compliancelintrc found."})
+
+    try:
+        with open(config_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    except (json.JSONDecodeError, OSError):
+        return json.dumps({"error": "Could not read .compliancelintrc.", "fix": "Check that .compliancelintrc is valid JSON."})
+
+    # Remove connection fields, keep local config
+    removed = []
+    for field in ("saas_api_key", "saas_url", "auto_sync"):
+        if field in data:
+            del data[field]
+            removed.append(field)
+
+    if not removed:
+        return json.dumps({"status": "not_connected", "message": "No dashboard connection found in .compliancelintrc."})
+
+    with open(config_path, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, ensure_ascii=True)
+        f.write("\n")
+
+    slog.info("cl_disconnect: removed fields=%s", removed)
+
+    return json.dumps({
+        "status": "disconnected",
+        "removed_fields": removed,
+        "preserved": [k for k in data.keys()],
+        "message": "Disconnected from dashboard. Local scan data in .compliancelint/ is preserved.",
+    })
+
+
+@mcp.tool()
 def cl_version() -> str:
     """Return ComplianceLint scanner version and check for updates."""
-    result = {"version": CL_VERSION, "tools": 24}
+    result = {"version": CL_VERSION, "tools": 16}
     update_info = _check_latest_version()
     if update_info:
         result.update(update_info)

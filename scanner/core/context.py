@@ -40,11 +40,34 @@ _LIST_FIELDS: dict = {
     "art17": ["qms_evidence"],
     "art18": [],
     "art19": [],
+    "art20": [],
+    "art21": [],
     "art43": [],
     "art47": [],
     "art50": ["disclosure_evidence", "emotion_biometric_evidence", "deep_fake_evidence"],
+    "art4":  ["literacy_evidence"],
+    "art16": [],
+    "art22": [],
     "art23": [],
     "art24": [],
+    "art25": [],
+    "art26": [],
+    "art27": [],
+    "art41": [],
+    "art49": [],
+    "art51": [],
+    "art52": [],
+    "art53": ["documentation_evidence", "downstream_doc_evidence"],
+    "art54": ["representative_evidence"],
+    "art55": ["evaluation_evidence"],
+    "art60": [],
+    "art61": [],
+    "art71": [],
+    "art72": [],
+    "art73": [],
+    "art80": [],
+    "art82": [],
+    "art86": [],
     "art91": [],
     "art92": [],
     "art111": [],
@@ -90,10 +113,28 @@ _BOOL_FIELDS: dict = {
     "art91": ["has_information_supply_readiness"],
     "art92": ["has_evaluation_cooperation_readiness"],
     "art111": ["has_transition_plan", "has_significant_change_tracking", "has_gpai_compliance_timeline"],
+    "art4":  ["has_ai_literacy_measures"],
+    "art16": ["has_section_2_compliance", "has_provider_identification", "has_qms"],
+    "art22": ["is_eu_established_provider", "has_authorised_representative", "has_representative_enablement"],
+    "art25": ["has_rebranding_or_modification", "has_provider_cooperation_documentation", "is_safety_component_annex_i"],
+    "art26": ["has_deployment_documentation", "has_human_oversight_assignment", "has_operational_monitoring"],
+    "art27": ["has_fria_documentation", "has_fria_versioning"],
+    "art41": ["follows_common_specifications", "has_alternative_justification"],
+    "art49": ["has_eu_database_registration"],
+    "art51": ["is_gpai_model", "has_high_impact_capabilities", "training_compute_exceeds_threshold"],
+    "art52": ["has_commission_notification"],
+    "art53": ["has_technical_documentation", "has_downstream_documentation"],
+    "art54": ["is_third_country_provider", "has_authorised_representative", "has_written_mandate"],
+    "art55": ["has_systemic_risk", "has_model_evaluation", "has_adversarial_testing"],
+    "art60": ["has_testing_plan", "has_incident_reporting_for_testing", "has_authority_notification_procedure"],
+    "art61": ["has_informed_consent_procedure", "has_consent_documentation"],
+    "art71": ["has_provider_database_entry"],
+    "art80": ["has_compliance_remediation_plan", "has_corrective_action_for_all_systems", "has_classification_rationale"],
+    "art82": ["has_corrective_action_procedure"],
     "_scope": ["is_ai_system", "territorial_scope_applies", "is_open_source",
                "is_military_defense", "is_research_only",
                "is_biometric_system", "is_financial_institution", "is_distributor",
-               "is_importer"],
+               "is_importer", "is_gpai_provider"],
 }
 
 
@@ -319,6 +360,35 @@ class ProjectContext:
         return result
 
 
+def _build_answers_template() -> dict:
+    """Build a complete empty compliance_answers template from _BOOL_FIELDS and _LIST_FIELDS.
+
+    Every article key with all its fields pre-set to null (bools) or [] (lists).
+    The AI fills in values; unfilled fields remain null → UNABLE_TO_DETERMINE.
+
+    This is returned by cl_analyze_project() so the AI has an exact template
+    to fill rather than inventing its own keys.
+    """
+    template = {}
+    all_articles = sorted(set(_BOOL_FIELDS.keys()) | set(_LIST_FIELDS.keys()))
+    for art_key in all_articles:
+        if art_key.startswith("_"):
+            continue  # _scope is handled separately
+        fields = {}
+        for field_name in _BOOL_FIELDS.get(art_key, []):
+            fields[field_name] = None
+        for field_name in _LIST_FIELDS.get(art_key, []):
+            fields[field_name] = []
+        template[art_key] = fields
+
+    # Add _scope separately
+    template["_scope"] = {}
+    for field_name in _BOOL_FIELDS.get("_scope", []):
+        template["_scope"][field_name] = None
+
+    return template
+
+
 def _build_scanning_strategy() -> dict:
     """Build per-article scanning guidance from obligation JSONs.
 
@@ -520,6 +590,29 @@ def analyze_project_metadata(project_path: str) -> dict:
     # ── 7. Scanning strategy (dynamic from obligation JSONs) ──
     scanning_strategy = _build_scanning_strategy()
 
+    # ── 8. Empty compliance_answers template ──
+    # Provide a pre-built template with ALL article keys and their fields set to null/[].
+    # This forces the AI to fill every field — not just the ones it thinks are relevant.
+    answers_template = _build_answers_template()
+
+    # ── 9. Configuration status check ──
+    # Detect missing setup so AI can guide user proactively.
+    from core.config import ProjectConfig
+    config = ProjectConfig.load(project_path)
+    setup_warnings = []
+    if not config.saas_api_key:
+        setup_warnings.append(
+            "No dashboard connection. Run cl_connect() to link your project "
+            "to the ComplianceLint dashboard for tracking and reporting."
+        )
+    if not config.attester_name or not config.attester_email:
+        setup_warnings.append(
+            "No attester identity configured. This is needed for submitting "
+            "evidence (cl_update_finding). It will be auto-set when you run "
+            "cl_connect(), or you can add attester_name and attester_email "
+            "to .compliancelintrc manually."
+        )
+
     return {
         "project_path": project_path,
         "directory_tree": {"directories": top_dirs, "root_files": top_files},
@@ -530,21 +623,26 @@ def analyze_project_metadata(project_path: str) -> dict:
         "source_samples": source_samples,
         "ci_configs": ci_configs,
         "scanning_strategy": scanning_strategy,
+        "compliance_answers_template": answers_template,
+        "setup_warnings": setup_warnings if setup_warnings else None,
     }
 
 
 # ── compliance_answers Schema Reference ──
 #
-# ComplianceLint is MCP-only. There is no CLI or API-based mode.
-# In MCP mode, the AI (Claude) reads the full codebase directly using its own
-# file-reading tools, then fills in compliance_answers following this schema.
+# The schema is NOT hardcoded here. It is dynamically generated from
+# _BOOL_FIELDS and _LIST_FIELDS by _build_answers_template().
 #
-# This constant serves as the canonical schema reference and is used in:
-#   - cl_analyze_project() docstring (tells Claude what to fill in)
-#   - Tests (as the ground-truth schema)
-#   - Documentation generation
+# cl_analyze_project() returns the template in its response as
+# "compliance_answers_template". The AI copies this template and fills
+# in values. The validation gate enforces correctness.
 #
-# It is NOT sent as an API prompt. Claude reads it as part of the tool definition.
+# Single source of truth: _BOOL_FIELDS + _LIST_FIELDS (above).
+# Everything else derives from them automatically.
+#
+# DEPRECATED: COMPLIANCE_ANSWERS_SCHEMA below is kept for backward
+# compatibility but is NOT the source of truth. Do not update it —
+# update _BOOL_FIELDS/_LIST_FIELDS instead.
 
 COMPLIANCE_ANSWERS_SCHEMA = """You are analyzing a software project for EU AI Act compliance scanning.
 
@@ -724,7 +822,13 @@ Respond with ONLY a JSON object (no markdown, no explanation) with this structur
       "is_military_defense": false,
       "is_research_only": false,
       "is_biometric_system": null,
-      "is_financial_institution": null
+      "is_financial_institution": null,
+      "is_distributor": null,
+      "is_importer": null,
+      "is_gpai_provider": null,
+      "risk_classification": "high-risk | limited-risk | not high-risk",
+      "risk_classification_confidence": "high | medium | low",
+      "risk_reasoning": "one sentence explanation"
     }},
     "_scan_metadata": {{
       "files_read": ["list every file path you actually read, e.g. src/app.py"],

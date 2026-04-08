@@ -15,10 +15,25 @@ const dim = (s) => `\x1b[2m${s}\x1b[0m`;
 const yellow = (s) => `\x1b[33m${s}\x1b[0m`;
 
 /**
+ * Detect the correct python command ("python" or "python3").
+ * Never returns a full path — full paths break in bash shells used by AI IDEs.
+ */
+function detectPythonCommand() {
+  for (const cmd of ["python", "python3"]) {
+    try {
+      execSync(`${cmd} --version`, { stdio: "ignore", timeout: 3000 });
+      return cmd;
+    } catch {}
+  }
+  return "python"; // Best guess
+}
+
+/**
  * Detect the best way to run the MCP server on this machine.
  * Priority: uvx > pip-installed > python module
  */
 function detectServerConfig() {
+  const pythonCmd = detectPythonCommand();
   // Option 1: uvx (best — auto-downloads, no pre-install needed)
   try {
     execSync("uvx --version", { stdio: "ignore" });
@@ -40,22 +55,36 @@ function detectServerConfig() {
   } catch {}
 
   // Option 3: python -m (if package is installed but script not in PATH)
+  // Use `pip show` instead of `import` — import can succeed with stale .pyc files
+  // even after pip uninstall, causing false positives.
   try {
-    execSync("python -c \"import scanner.server\"", { stdio: "ignore", timeout: 3000 });
+    execSync("pip show compliancelint", { stdio: "ignore", timeout: 3000 });
     return {
-      command: "python",
+      command: pythonCmd,
       args: ["-m", "scanner.server"],
-      method: "python -m",
+      method: `${pythonCmd} -m`,
     };
   } catch {}
 
-  // Default: pip install compliancelint, then use compliancelint-server
+  // Default: pip install compliancelint, then find best way to run
   try {
     console.log(`${dim("Installing compliancelint via pip...")}`);
     execSync("pip install compliancelint", { stdio: "inherit", timeout: 60000 });
+
+    // After install, check if compliancelint-server is now on PATH
+    try {
+      execSync("compliancelint-server --help", { stdio: "ignore", timeout: 3000 });
+      return {
+        command: "compliancelint-server",
+        args: [],
+        method: "pip (auto-installed)",
+      };
+    } catch {}
+
+    // Script not on PATH (common on Windows user-install) — use python -m
     return {
-      command: "compliancelint-server",
-      args: [],
+      command: pythonCmd,
+      args: ["-m", "scanner.server"],
       method: "pip (auto-installed)",
     };
   } catch {}
@@ -137,6 +166,53 @@ ${bold("Next steps:")}
 
   // Write config
   fs.writeFileSync(configPath, JSON.stringify(config, null, 2) + "\n", "utf-8");
+
+  // Pre-derive git identity and save to .compliancelintrc
+  // This runs in a normal terminal (not MCP), so git subprocess is safe.
+  try {
+    const rcPath = path.join(process.cwd(), ".compliancelintrc");
+    let rc = {};
+    if (fs.existsSync(rcPath)) {
+      try { rc = JSON.parse(fs.readFileSync(rcPath, "utf-8")); } catch {}
+    }
+    if (!rc.repo_name || !rc.project_id) {
+      // Get repo_name from git remote
+      try {
+        const url = execSync("git remote get-url origin", { stdio: ["pipe", "pipe", "pipe"], timeout: 3000 }).toString().trim();
+        if (url) {
+          if (url.includes(":") && url.includes("@")) {
+            rc.repo_name = url.split(":").pop().replace(".git", "");
+          } else if (url.includes("/")) {
+            const parts = url.replace(/\/$/, "").replace(".git", "").split("/");
+            if (parts.length >= 2) rc.repo_name = `${parts[parts.length - 2]}/${parts[parts.length - 1]}`;
+          }
+        }
+      } catch {}
+      if (!rc.repo_name) {
+        rc.repo_name = path.basename(process.cwd());
+      }
+      // Get project_id from SHA256(remote_url:root_commit)
+      try {
+        const url = execSync("git remote get-url origin", { stdio: ["pipe", "pipe", "pipe"], timeout: 3000 }).toString().trim();
+        const root = execSync("git rev-list --max-parents=0 HEAD", { stdio: ["pipe", "pipe", "pipe"], timeout: 3000 }).toString().trim().split("\n")[0];
+        if (url && root) {
+          const crypto = require("crypto");
+          rc.project_id = `git-${crypto.createHash("sha256").update(`${url}:${root}`).digest("hex").slice(0, 16)}`;
+        }
+      } catch {}
+      // Pre-derive attester from git config (name + email)
+      if (!rc.attester_name || !rc.attester_email) {
+        try {
+          const name = execSync("git config user.name", { stdio: ["pipe", "pipe", "pipe"], timeout: 3000 }).toString().trim();
+          const email = execSync("git config user.email", { stdio: ["pipe", "pipe", "pipe"], timeout: 3000 }).toString().trim();
+          if (name) rc.attester_name = name;
+          if (email) rc.attester_email = email;
+        } catch {}
+      }
+
+      fs.writeFileSync(rcPath, JSON.stringify(rc, null, 2) + "\n", "utf-8");
+    }
+  } catch {}
 
   const action = existed ? "updated" : "created";
 

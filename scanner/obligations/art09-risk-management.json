@@ -2,6 +2,7 @@
   "_metadata": {
     "article": 9,
     "title": "Risk Management System",
+    "regulation": "eu-ai-act",
     "prerequisites": [
       {
         "type": "risk_classification",

@@ -1,50 +1,42 @@
-"""Tests for project identity — zero-friction git fingerprint + UUID fallback."""
+"""Tests for project identity — config-cached project_id + UUID fallback.
+
+project_id is pre-derived by `npx compliancelint init` (normal terminal)
+and cached in .compliancelintrc. get_project_id() reads this cache.
+It does NOT call git subprocess (hangs in MCP context).
+"""
 import json
 import os
-import subprocess
-import tempfile
 
 import pytest
 
 from core.state import get_project_id
 
 
-class TestGitFingerprint:
-    """Git-based fingerprint: deterministic, zero config."""
+class TestConfigCachedId:
+    """project_id from .compliancelintrc (pre-derived by npx init)."""
 
-    @pytest.fixture
-    def git_repo(self, tmp_path):
-        """Create a minimal git repo with one commit."""
-        subprocess.run(["git", "init"], cwd=str(tmp_path), capture_output=True)
-        subprocess.run(["git", "config", "user.email", "test@test.com"], cwd=str(tmp_path), capture_output=True)
-        subprocess.run(["git", "config", "user.name", "Test"], cwd=str(tmp_path), capture_output=True)
-        (tmp_path / "README.md").write_text("hello")
-        subprocess.run(["git", "add", "."], cwd=str(tmp_path), capture_output=True)
-        subprocess.run(["git", "commit", "-m", "init"], cwd=str(tmp_path), capture_output=True)
-        subprocess.run(["git", "remote", "add", "origin", "git@github.com:test/my-project.git"], cwd=str(tmp_path), capture_output=True)
-        return tmp_path
+    def test_reads_from_compliancelintrc(self, tmp_path):
+        rc = tmp_path / ".compliancelintrc"
+        rc.write_text(json.dumps({"project_id": "git-abcdef1234567890"}))
+        pid = get_project_id(str(tmp_path))
+        assert pid == "git-abcdef1234567890"
 
-    def test_returns_git_prefixed_id(self, git_repo):
-        pid = get_project_id(str(git_repo))
-        assert pid.startswith("git-")
-        assert len(pid) == 20  # "git-" + 16 hex chars
+    def test_no_git_subprocess_called(self, tmp_path):
+        """get_project_id must NOT call git — it hangs in MCP context."""
+        # No .compliancelintrc, no .compliancelint/ — should fall back to UUID
+        pid = get_project_id(str(tmp_path))
+        # Should be a UUID, not a git-prefixed id
+        assert not pid.startswith("git-")
+        assert len(pid) == 36  # UUID format
 
-    def test_same_repo_same_id(self, git_repo):
-        pid1 = get_project_id(str(git_repo))
-        pid2 = get_project_id(str(git_repo))
-        assert pid1 == pid2
-
-    def test_no_project_json_created(self, git_repo):
-        """Git repos should NOT create project.json — zero friction."""
-        get_project_id(str(git_repo))
-        project_file = git_repo / ".compliancelint" / "project.json"
-        assert not project_file.exists()
-
-    def test_different_remote_different_id(self, git_repo):
-        pid1 = get_project_id(str(git_repo))
-        subprocess.run(["git", "remote", "set-url", "origin", "git@github.com:other/repo.git"], cwd=str(git_repo), capture_output=True)
-        pid2 = get_project_id(str(git_repo))
-        assert pid1 != pid2
+    def test_config_takes_priority_over_project_json(self, tmp_path):
+        rc = tmp_path / ".compliancelintrc"
+        rc.write_text(json.dumps({"project_id": "git-fromconfig12345"}))
+        cl = tmp_path / ".compliancelint"
+        cl.mkdir()
+        (cl / "project.json").write_text(json.dumps({"project_id": "uuid-from-json"}))
+        pid = get_project_id(str(tmp_path))
+        assert pid == "git-fromconfig12345"
 
 
 class TestNonGitFallback:

@@ -242,7 +242,7 @@ class TestClScanArticle71:
         ctx = ProjectContext.from_json(json.dumps({
             "art71": {"has_provider_database_entry": True}
         }))
-        result_json = _scan_single_article(71, "/nonexistent/path", context=ctx)
+        result_json = _scan_single_article(71, "C:/nonexistent_cl_test_path_12345", context=ctx)
         result = json.loads(result_json)
         assert "error" in result
 

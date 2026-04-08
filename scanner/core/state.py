@@ -40,11 +40,12 @@ def get_project_id(project_path: str) -> str:
     """Derive a stable project identity — zero friction, no config files.
 
     Strategy (zero user action needed):
-      1. Try .compliancelintrc (cached by cl_connect — fastest, no git needed)
-      2. Compute git fingerprint via ProjectConfig.derive_git_identity()
-      3. If not a git repo: fall back to UUID cached in .compliancelint/project.json
+      1. Try .compliancelintrc (cached by cl_connect or npx init — fastest)
+      2. Fall back to UUID cached in .compliancelint/project.json
 
-    Uses the same formula as cl_connect: SHA256(remote_url:root_commit)[:16]
+    IMPORTANT: Does NOT call git subprocess. In MCP context, git hangs
+    the event loop. project_id must be pre-computed by `npx compliancelint init`
+    and saved to .compliancelintrc.
     """
     from core.config import ProjectConfig
 
@@ -53,10 +54,8 @@ def get_project_id(project_path: str) -> str:
     if config.project_id:
         return config.project_id
 
-    # 2. Derive from git (shared method — same formula everywhere)
-    config.derive_git_identity(project_path)
-    if config.project_id:
-        return config.project_id
+    # 2. NO git fallback — derive_git_identity() hangs in MCP context.
+    # project_id is pre-derived by `npx compliancelint init`.
 
     # Fallback for non-git projects: cached UUID in project.json
     sd = _state_dir(project_path)
@@ -315,6 +314,207 @@ def _save_baseline(project_path: str) -> None:
             json.dump(state, f, indent=2, ensure_ascii=False)
     except OSError:
         pass
+
+
+def _load_article_index(project_path: str) -> tuple[dict, dict]:
+    """Load all article files and build obligation index.
+
+    Returns:
+        (file_cache, obl_index) where:
+        - file_cache: {fname: (fpath, data)}
+        - obl_index: {obligation_id: (fname, finding_dict)}
+    """
+    articles_dir = _articles_dir(project_path)
+    file_cache: dict[str, tuple[str, dict]] = {}
+    obl_index: dict[str, tuple[str, dict]] = {}
+
+    if not os.path.isdir(articles_dir):
+        return file_cache, obl_index
+
+    for fname in os.listdir(articles_dir):
+        if not fname.endswith(".json"):
+            continue
+        fpath = os.path.join(articles_dir, fname)
+        try:
+            with open(fpath, "r", encoding="utf-8") as f:
+                data = json.load(f)
+        except (json.JSONDecodeError, OSError):
+            continue
+        file_cache[fname] = (fpath, data)
+        for obl_id in data.get("findings", {}):
+            obl_index[obl_id] = (fname, data["findings"][obl_id])
+
+    return file_cache, obl_index
+
+
+def expand_article_evidence(
+    project_path: str,
+    evidence_items: list[dict],
+) -> list[dict]:
+    """Expand article-level evidence into per-obligation updates.
+
+    Takes evidence like:
+        [{"article": "art9", "action": "provide_evidence",
+          "evidence_type": "file", "evidence_value": "docs/risk-management.md"}]
+
+    Expands to one update per open finding in that article:
+        [{"obligation_id": "ART09-OBL-1", "action": "provide_evidence", ...},
+         {"obligation_id": "ART09-OBL-2", "action": "provide_evidence", ...},
+         ...]
+
+    Only expands to findings with status in ("open", "evidence_provided") and
+    level in ("unable_to_determine", "partial", "non_compliant").
+
+    Args:
+        evidence_items: List of dicts with "article" key (e.g. "art9") instead of "obligation_id".
+
+    Returns: Expanded list of per-obligation updates ready for update_findings_batch().
+    """
+    _, obl_index = _load_article_index(project_path)
+    _ACTIONABLE_LEVELS = {"unable_to_determine", "partial", "non_compliant"}
+    _ACTIONABLE_STATUSES = {"open", "evidence_provided"}
+
+    expanded = []
+    for item in evidence_items:
+        article = item.get("article", "")  # e.g. "art9"
+        action = item.get("action", "provide_evidence")
+        evidence_type = item.get("evidence_type", "")
+        evidence_value = item.get("evidence_value", "")
+        justification = item.get("justification", "")
+
+        # Find matching prefix: art9 → ART09-, art12 → ART12-
+        art_num = article.replace("art", "").replace("Art", "")
+        # Zero-pad single digits to match obligation IDs (ART09-, not ART9-)
+        if art_num.isdigit():
+            art_num = str(int(art_num))  # normalize "09" → "9"
+            prefix = f"ART{int(art_num):02d}-"  # "9" → "ART09-"
+        else:
+            prefix = f"ART{art_num}-"
+
+        for obl_id, (fname, finding) in obl_index.items():
+            if not obl_id.startswith(prefix):
+                continue
+            level = finding.get("level", "")
+            status = finding.get("status", "open")
+            if level not in _ACTIONABLE_LEVELS:
+                continue
+            if status not in _ACTIONABLE_STATUSES:
+                continue
+            expanded.append({
+                "obligation_id": obl_id,
+                "action": action,
+                "evidence_type": evidence_type,
+                "evidence_value": evidence_value,
+                "justification": justification,
+            })
+
+    return expanded
+
+
+def update_findings_batch(
+    project_path: str,
+    updates: list[dict],
+    attester: dict | None = None,
+) -> dict:
+    """Update multiple findings in one operation.
+
+    Loads each article file at most once, applies all updates, writes once per file,
+    and regenerates merged state only at the end.
+
+    Args:
+        updates: List of dicts, each with keys:
+            obligation_id, action, evidence_type (opt), evidence_value (opt), justification (opt)
+        attester: Shared attester identity for all updates.
+
+    Returns: {"updated": N, "errors": [...], "details": [...]}
+    """
+    now = datetime.now(timezone.utc).isoformat()
+    articles_dir = _articles_dir(project_path)
+    if not os.path.isdir(articles_dir):
+        return {"error": "No scan data found. Run a scan first."}
+
+    by_info = attester if attester else {"name": "unknown", "email": "", "role": "", "source": "none"}
+
+    # Load all article files once → build obligation→(file, data, finding) index
+    file_cache, obl_index = _load_article_index(project_path)
+
+    updated_count = 0
+    errors = []
+    details = []
+    dirty_files: set[str] = set()  # fnames that need saving
+
+    _VALID_ACTIONS = {"provide_evidence", "rebut", "acknowledge", "defer", "resolve"}
+
+    for upd in updates:
+        obl_id = upd.get("obligation_id", "")
+        action = upd.get("action", "")
+        evidence_type = upd.get("evidence_type", "")
+        evidence_value = upd.get("evidence_value", "")
+        justification = upd.get("justification", "")
+
+        if action not in _VALID_ACTIONS:
+            errors.append({"obligation_id": obl_id, "error": f"Invalid action: {action}"})
+            continue
+        if obl_id not in obl_index:
+            errors.append({"obligation_id": obl_id, "error": "Finding not found"})
+            continue
+
+        fname, finding = obl_index[obl_id]
+        history_entry = {"date": now, "action": action, "by": by_info}
+
+        if action == "provide_evidence":
+            finding.setdefault("evidence", []).append({
+                "type": evidence_type,
+                "value": evidence_value,
+                "date": now,
+                "provided_by": by_info,
+            })
+            finding["status"] = "evidence_provided"
+            history_entry["evidence_type"] = evidence_type
+            history_entry["evidence_value"] = evidence_value
+        elif action == "rebut":
+            finding["suppression"] = {
+                "kind": "external",
+                "status": "underReview",
+                "justification": justification,
+                "date": now,
+                "submitted_by": by_info,
+            }
+            finding["status"] = "rebutted"
+            history_entry["justification"] = justification
+        elif action == "acknowledge":
+            finding["status"] = "acknowledged"
+        elif action == "defer":
+            finding["status"] = "deferred"
+        elif action == "resolve":
+            finding["status"] = "resolved"
+            if evidence_value:
+                history_entry["note"] = evidence_value
+
+        finding.setdefault("history", []).append(history_entry)
+        file_cache[fname][1]["last_updated"] = now
+        dirty_files.add(fname)
+        updated_count += 1
+        details.append({"obligation_id": obl_id, "action": action, "status": "updated"})
+
+    # Write only modified files
+    write_errors = []
+    for fname in dirty_files:
+        fpath, data = file_cache[fname]
+        try:
+            with open(fpath, "w", encoding="utf-8") as f:
+                json.dump(data, f, indent=2, ensure_ascii=False)
+        except OSError as e:
+            write_errors.append(f"{fname}: {e}")
+
+    # Regenerate merged state once
+    if dirty_files:
+        _save_merged_state(project_path)
+
+    result = {"updated": updated_count, "errors": errors, "total_requested": len(updates)}
+    if write_errors:
+        result["write_errors"] = write_errors
+    return result
 
 
 def update_finding(

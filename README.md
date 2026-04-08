@@ -28,59 +28,24 @@ If your software uses AI and you serve EU customers, the EU AI Act applies to yo
 
 ## Quick Start
 
-### Option A: One command (recommended)
+**Prerequisites:** Python 3.10+ is required.
+
+### Option A: npx (recommended)
 
 ```bash
 npx compliancelint init
 ```
 
-This auto-detects your environment, installs dependencies if needed, and adds ComplianceLint to your project's MCP config. Then restart your AI IDE.
+Auto-detects your environment, installs dependencies, and configures everything. Then reload your IDE window (VS Code: Ctrl+Shift+P → "Developer: Reload Window").
 
-**Option B: pip install**
+### Option B: pip install
 
 ```bash
 pip install compliancelint
+python -m scanner.cli init
 ```
 
-Then add to your `.mcp.json`:
-
-```json
-{
-  "mcpServers": {
-    "compliancelint": {
-      "command": "python",
-      "args": ["-m", "scanner.server"],
-      "env": { "PYTHONUNBUFFERED": "1" }
-    }
-  }
-}
-```
-
-**Option C: Manual setup**
-
-Add to your `.mcp.json`:
-
-```json
-{
-  "mcpServers": {
-    "compliancelint": {
-      "command": "python",
-      "args": ["/path/to/scanner/server.py"],
-      "env": { "PYTHONUNBUFFERED": "1" }
-    }
-  }
-}
-```
-
-| IDE | Config location |
-|-----|----------------|
-| Claude Code | `.mcp.json` in project root |
-| Cursor | Settings → MCP → Add Server |
-| Windsurf | `.mcp.json` in project root |
-| Codex | MCP settings |
-| Zed | MCP settings |
-
-After installing, restart your AI IDE so it picks up the new MCP server, then ask:
+After setup, reload your IDE window (VS Code: Ctrl+Shift+P → "Developer: Reload Window") so it picks up the new MCP server, then ask:
 
 > "Scan my project for EU AI Act compliance."
 
@@ -260,10 +225,14 @@ All obligations verified against EUR-Lex source text.
 | `cl_explain` | Plain-language explanation of any article |
 | `cl_action_plan` | Prioritized remediation plan with effort estimates |
 | `cl_update_finding` | Submit evidence, rebuttals, acknowledgements |
+| `cl_update_finding_batch` | Batch-update multiple findings at once |
 | `cl_verify_evidence` | Verify submitted evidence |
+| `cl_interim_standard` | Generate interim compliance standard for an article |
 | `cl_report` | Export Markdown or JSON compliance report |
 | `cl_connect` | Link to dashboard (browser OAuth) |
 | `cl_sync` | Upload scan results to dashboard |
+| `cl_disconnect` | Remove dashboard connection (preserves local data) |
+| `cl_delete` | Delete local or remote scan data |
 | `cl_check_updates` | Enforcement deadlines and regulation status |
 | `cl_version` | Show ComplianceLint version |
 
@@ -333,7 +302,7 @@ The scanner is **free and open source** (Apache 2.0). The dashboard is freemium:
 | Metric | Value |
 |--------|-------|
 | Legal obligations covered | 247 (from 44 EU AI Act articles) |
-| Unit tests | 2100+ (scanner + dashboard) |
+| Unit tests | 2500+ (scanner + dashboard) |
 | Archetype test fixtures | Biometric systems to CRUD apps |
 | Test pass rate | 100% |
 | Obligation engine | Deterministic — same code, same result, every time |

@@ -105,9 +105,13 @@ class ProjectConfig:
                     or self.saas_api_key)
 
     def get_attester(self, project_path: str = "") -> dict | None:
-        """Get attester identity. Priority: config > git config > None.
+        """Get attester identity from .compliancelintrc config.
 
         Returns dict with name/email/role/source, or None if no identity found.
+
+        IMPORTANT: Does NOT call git subprocess. In MCP context, git hangs
+        the event loop. Attester must be set in .compliancelintrc by
+        `npx compliancelint init` (which runs in normal terminal, not MCP).
         """
         if self.attester_name and self.attester_email:
             return {
@@ -116,21 +120,8 @@ class ProjectConfig:
                 "role": self.attester_role,
                 "source": "compliancelintrc",
             }
-        # Fallback: git config
-        try:
-            import subprocess
-            name = subprocess.run(
-                ["git", "config", "user.name"],
-                capture_output=True, text=True, cwd=project_path or ".", timeout=2,
-            ).stdout.strip()
-            email = subprocess.run(
-                ["git", "config", "user.email"],
-                capture_output=True, text=True, cwd=project_path or ".", timeout=2,
-            ).stdout.strip()
-            if name and email:
-                return {"name": name, "email": email, "role": "", "source": "git_config"}
-        except Exception:
-            pass
+        # No git fallback — git subprocess hangs in MCP context.
+        # npx compliancelint init should pre-populate attester in .compliancelintrc.
         return None
 
     def derive_git_identity(self, project_path: str) -> None:
@@ -201,6 +192,11 @@ class ProjectConfig:
             existing['repo_name'] = self.repo_name
         if self.project_id:
             existing['project_id'] = self.project_id
+        if self.attester_name or self.attester_email:
+            existing['attester_name'] = self.attester_name
+            existing['attester_email'] = self.attester_email
+            if self.attester_role:
+                existing['attester_role'] = self.attester_role
 
         with open(config_path, 'w', encoding='utf-8') as f:
             json.dump(existing, f, indent=2, ensure_ascii=False)

@@ -118,19 +118,31 @@ class ProjectEvidence:
         """Items accepted on human declaration only."""
         return [i for i in self.items if not i.requires_ai_verification]
 
+    @staticmethod
+    def _normalize_art_prefix(s: str) -> str:
+        """Normalize ART prefix to zero-padded form: ART9 → ART09, ART12 → ART12."""
+        import re
+        m = re.match(r"^(ART)(\d+)(.*)", s, re.IGNORECASE)
+        if m:
+            return f"ART{int(m.group(2)):02d}{m.group(3)}"
+        return s
+
     def get_for_obligation(self, obligation_id: str) -> Optional[EvidenceItem]:
         """
         Match evidence to an obligation ID.
         Supports both exact match (ART13-OBL-1) and article-level match (ART13).
+        Handles zero-padding: ART9 matches ART09-OBL-1.
         """
+        norm_obl = self._normalize_art_prefix(obligation_id).upper()
         for item in self.items:
-            if item.obligation_id == obligation_id:
+            norm_item = self._normalize_art_prefix(item.obligation_id).upper()
+            if norm_item == norm_obl:
                 return item
-            # Article-level: "ART13" matches "ART13-OBL-1", "ART13-OBL-2a", etc.
-            if obligation_id.upper().startswith(item.obligation_id.upper() + "-"):
+            # Article-level: "ART09" matches "ART09-OBL-1", "ART09-OBL-2a", etc.
+            if norm_obl.startswith(norm_item + "-"):
                 return item
-            # Also match article number only: "ART13" matches obligation_id "ART13-OBL-1"
-            if item.obligation_id.upper().startswith(obligation_id.upper() + "-"):
+            # Reverse: evidence "ART09-OBL-1" matches query "ART09"
+            if norm_item.startswith(norm_obl + "-"):
                 return item
         return None
 

@@ -1,6 +1,6 @@
 {
   "name": "compliancelint",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "EU AI Act compliance scanner for your codebase. ESLint for legal compliance.",
   "bin": {
     "compliancelint": "bin/init.js"

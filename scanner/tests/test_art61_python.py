@@ -282,9 +282,10 @@ class TestClScanArticle61:
         result = json.loads(result_json)
         assert "error" in result
 
-    def test_invalid_directory_returns_error(self):
+    def test_invalid_directory_returns_error(self, tmp_path):
         ctx = ProjectContext.from_json('{"art61": {"has_informed_consent_procedure": false}}')
-        result_json = _scan_single_article(61, "/nonexistent/path", context=ctx)
+        invalid_path = str(tmp_path / "truly_nonexistent_dir_12345")
+        result_json = _scan_single_article(61, invalid_path, context=ctx)
         result = json.loads(result_json)
         assert "error" in result
 
