@@ -43,14 +43,14 @@ You see activity at every step.
 ## What You'll See in Step-by-Step Mode
 
 ```
-▶ Art. 5 — Prohibited Practices (1/25)
+▶ Art. 5 — Prohibited Practices (1/44)
   📖 Reading: app/api/chat/route.ts
   📖 Reading: components/chat.tsx
   💬 "Found no emotional manipulation patterns. No social scoring features..."
   ⚙️ [scanner tool runs — ~5 seconds]
   ✅ Result: COMPLIANT — No prohibited practices detected
 
-▶ Art. 6 — Risk Classification (2/25)
+▶ Art. 6 — Risk Classification (2/44)
   💬 "This is a general-purpose chatbot. Not in Annex III high-risk categories..."
   ⚙️ [scanner tool runs — ~5 seconds]
   ✅ Result: COMPLIANT — Low-risk classification confirmed
@@ -106,6 +106,6 @@ when Claude calls a tool, it cannot output text simultaneously.
 Mode 2 minimizes silent periods by having Claude read files directly
 (using Read/Grep tools, which show filenames) before calling scanner tools.
 
-The unified `cl_scan` tool accepts an `article` parameter for per-article scanning
-(e.g. `cl_scan(article=12)`). Per-article shortcuts like `cl_scan_article_5` are also
-available for convenience. Restart your IDE after updating the MCP server to load new tools.
+The unified `cl_scan` tool accepts an `articles` parameter for per-article scanning
+(e.g. `cl_scan(articles="12")` or `cl_scan(articles="9,10,11")`).
+Restart your IDE after updating the MCP server to load new tools.

@@ -36,7 +36,7 @@ If your software uses AI and you serve EU customers, the EU AI Act applies to yo
 npx compliancelint init
 ```
 
-Auto-detects your environment, installs dependencies, and configures everything. Then reload your IDE window (VS Code: Ctrl+Shift+P → "Developer: Reload Window").
+Auto-detects your environment, installs dependencies, and configures everything. Then reload your IDE window.
 
 ### Option B: pip install
 
@@ -45,7 +45,7 @@ pip install compliancelint
 python -m scanner.cli init
 ```
 
-After setup, reload your IDE window (VS Code: Ctrl+Shift+P → "Developer: Reload Window") so it picks up the new MCP server, then ask:
+After setup, reload your IDE window so it picks up the new MCP server, then ask:
 
 > "Scan my project for EU AI Act compliance."
 
@@ -240,16 +240,6 @@ All scanning tools accept a `regulation` parameter (default: `"eu-ai-act"`), des
 
 ---
 
-## Compliance Badge
-
-Add a real-time compliance badge to your README:
-
-```markdown
-![EU AI Act](https://compliancelint.dev/api/v1/badge/YOUR_REPO_ID)
-```
-
----
-
 ## Project Structure
 
 ```
@@ -288,7 +278,6 @@ The scanner is **free and open source** (Apache 2.0). The dashboard is freemium:
 - [x] SaaS Dashboard with Compliance Journey tracking
 - [x] PDF exports (Scan Report, Journey, Declaration, Tasks)
 - [x] Attestation system (evidence, rebuttals, acknowledgements)
-- [x] Compliance Badge for README
 - [x] Zero-friction project identity (git fingerprint)
 - [x] `npx compliancelint init` — one-line setup
 - [ ] GitHub PR Bot (auto-scan PRs for compliance changes, like Codecov)
