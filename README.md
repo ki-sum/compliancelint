@@ -13,6 +13,22 @@ Scan your code and docs against 247 legal obligations from the EU AI Act. Find c
 
 > **Note:** ComplianceLint is a compliance engineering tool, not a law firm. It gives you a structured, evidence-based path toward compliance — but final legal decisions should always involve qualified legal counsel.
 
+### See it in action
+
+**Demo: scanning an AI chatbot** (limited risk → 100% compliant):
+
+https://github.com/user-attachments/assets/0816cc3c-e848-4080-a863-8ed4dffef487
+
+Watch a full compliance scan: from non-compliant to 100% in under 2 minutes.
+
+> **More demos:** <a href="https://github.com/user-attachments/assets/591ca74c-e2c5-450a-9055-7a827c21ad42" target="_blank">AI Finance (high-risk)</a> · <a href="https://github.com/user-attachments/assets/e74e2613-2f82-4d43-96e3-94279e6f68dd" target="_blank">AI Medical (high-risk)</a>
+
+### Dashboard
+
+![ComplianceLint Dashboard](docs/media/dashboard.png)
+
+Track compliance across all your AI systems. Export audit-ready PDF reports. [Try the live demo →](https://compliancelint.dev/demo)
+
 ---
 
 ## Who Needs This
@@ -55,7 +71,11 @@ No extra API key needed — uses your existing AI subscription.
 
 > "Connect to ComplianceLint dashboard."
 
-Opens browser, links your dashboard at [compliancelint.dev](https://compliancelint.dev). Code never leaves your machine — only compliance findings, evidence submissions, remediation progress, and attestation records are synced. This builds an auditable compliance trail that demonstrates your ongoing compliance efforts to regulators and legal counsel.
+Opens browser, links your dashboard at [compliancelint.dev](https://compliancelint.dev).
+
+> "Sync my compliance results."
+
+Uploads findings to your dashboard. Code never leaves your machine — only compliance findings, evidence submissions, remediation progress, and attestation records are synced. This builds an auditable compliance trail that demonstrates your ongoing compliance efforts to regulators and legal counsel.
 
 ---
 
