@@ -160,6 +160,7 @@ class ObligationEngine:
                     ),
                     source_quote=obl.source_quote,
                     gap_type=GapType.PROCESS,
+                    human_gate_hint="Complete this Human Gate at compliancelint.dev/dashboard \u2192 Human Gates",
                 ))
                 continue
 
@@ -449,6 +450,7 @@ class ObligationEngine:
                             source_quote=obl.source_quote,
                             gap_type=GapType.PROCESS,
                             is_informational=True,
+                            human_gate_hint="Complete this Human Gate at compliancelint.dev/dashboard \u2192 Human Gates" if obl.automation_level == "manual" else None,
                         ))
                         continue
 
@@ -488,6 +490,7 @@ class ObligationEngine:
                 )
                 level = ComplianceLevel.UNABLE_TO_DETERMINE
                 gap_type = GapType.PROCESS
+                human_gate_hint = "Complete this Human Gate at compliancelint.dev/dashboard \u2192 Human Gates"
             else:
                 description = (
                     f"[COVERAGE GAP] {obl.source}: "
@@ -495,6 +498,7 @@ class ObligationEngine:
                     f"Detection method: {obl.detection_method}"
                 )
                 level = ComplianceLevel.UNABLE_TO_DETERMINE
+                human_gate_hint = None
                 scan_types = set(obl.what_to_scan)
                 if "documentation" in scan_types or "docs" in scan_types:
                     gap_type = GapType.PROCESS
@@ -513,6 +517,7 @@ class ObligationEngine:
                 source_quote=obl.source_quote,
                 gap_type=gap_type,
                 is_informational=True,
+                human_gate_hint=human_gate_hint,
             ))
 
         return findings

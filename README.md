@@ -1,13 +1,13 @@
 # ComplianceLint
 
-[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![License](https://img.shields.io/badge/License-BSL_1.1-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.10+-green.svg)](https://www.python.org/)
 [![MCP](https://img.shields.io/badge/MCP-Compatible-purple.svg)](https://modelcontextprotocol.io/)
 [![EU AI Act](https://img.shields.io/badge/EU_AI_Act-247_obligations-emerald.svg)](https://compliancelint.dev)
 
 **From non-compliant to audit-ready. Automatically.**
 
-Scan your code and docs against 247 legal obligations from the EU AI Act. Find compliance gaps, fix them with AI-guided remediation, and track your journey to fully compliant. Your code never leaves your machine.
+Scan your code and docs against up to 247 legal obligations from the EU AI Act. Find compliance gaps, fix them with AI-guided remediation, and track your journey to fully compliant. Your code never leaves your machine.
 
 > **2026-08-02** — EU AI Act high-risk requirements become enforceable. ComplianceLint helps you prepare now.
 
@@ -141,6 +141,8 @@ Track compliance over time at **[compliancelint.dev](https://compliancelint.dev)
 - **Scan History** — full audit trail of every scan, with diff between consecutive scans
 - **PDF reports** — export audit-ready reports with legal citations
 - **Attestation** — record human review decisions with evidence (cl_update_finding)
+- **Human Gates** — guided questionnaires for obligations that require human verification (DPIA, oversight assignments, worker notifications)
+- **Role selection** — filter obligations by your EU AI Act role (Provider, Deployer, Importer, Distributor) for accurate scoring
 
 ```
 "Connect to ComplianceLint dashboard and sync my scan results."
@@ -233,6 +235,8 @@ All obligations verified against EUR-Lex source text.
 
 **Why 44 of 113 articles?** The EU AI Act contains 113 articles. ComplianceLint covers the 44 that impose technical or organizational obligations on AI providers, deployers, and distributors. The remaining articles define terminology (Art. 1–3), establish governance bodies (Art. 28–40, 56–59, 64–70), set penalties (Art. 83–85, 99), and contain procedural/transitional provisions — none of which create scannable compliance requirements for software teams.
 
+Not all 44 articles apply to every project. The applicable obligations depend on your role (provider, deployer, importer, distributor) and risk classification. Configure your role in the [dashboard](https://compliancelint.dev) for accurate scoring.
+
 ---
 
 ## MCP Tools
@@ -252,6 +256,7 @@ All obligations verified against EUR-Lex source text.
 | `cl_sync` | Upload scan results to dashboard |
 | `cl_disconnect` | Remove dashboard connection (preserves local data) |
 | `cl_delete` | Delete local or remote scan data |
+| `cl_action_guide` | Get guidance for Human Gate obligations (directs to dashboard) |
 | `cl_check_updates` | Enforcement deadlines and regulation status |
 | `cl_version` | Show ComplianceLint version |
 
@@ -278,7 +283,7 @@ scanner/
 
 ## Pricing
 
-The scanner is **free and open source** (Apache 2.0). The dashboard is freemium:
+The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard is freemium:
 
 | | Free | Solo (€19/mo) | Pro (€49/mo) | Team (€149/mo) | Enterprise |
 |-|------|---------------|--------------|----------------|------------|
@@ -299,7 +304,9 @@ The scanner is **free and open source** (Apache 2.0). The dashboard is freemium:
 - [x] Attestation system (evidence, rebuttals, acknowledgements)
 - [x] Zero-friction project identity (git fingerprint)
 - [x] `npx compliancelint init` — one-line setup
-- [ ] GitHub PR Bot (auto-scan PRs for compliance changes, like Codecov)
+- [x] Role-based obligation filtering (Provider, Deployer, Importer, Distributor)
+- [x] Human Gates — guided questionnaires for manual obligations
+- [x] Settings audit trail — track who changed compliance settings
 - [ ] GitHub Marketplace App
 - [ ] Additional regulations (expanding beyond EU AI Act based on user demand)
 
@@ -347,7 +354,7 @@ The user can stop any MCP tool call at any time by pressing Stop in their IDE.
 
 ## License
 
-Apache License 2.0 — see [LICENSE](LICENSE)
+[Business Source License 1.1](LICENSE) — free to use for your own projects. Cannot be used to build a competing hosted compliance scanning service. Converts to Apache 2.0 on 2030-04-11.
 
 ---
 

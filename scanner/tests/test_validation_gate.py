@@ -471,6 +471,7 @@ class TestComputeApplicableArticles:
             "is_gpai_provider": False,
             "is_importer": False,
             "is_distributor": False,
+            "_saas_settings_active": True,
         }
         applicable, skipped = compute_applicable_articles(scope)
 
@@ -500,6 +501,7 @@ class TestComputeApplicableArticles:
             "is_gpai_provider": False,
             "is_importer": False,
             "is_distributor": False,
+            "_saas_settings_active": True,
         }
         applicable, skipped = compute_applicable_articles(scope)
 
@@ -521,6 +523,7 @@ class TestComputeApplicableArticles:
             "is_gpai_provider": True,
             "is_importer": False,
             "is_distributor": False,
+            "_saas_settings_active": True,
         }
         applicable, skipped = compute_applicable_articles(scope)
 
@@ -535,6 +538,7 @@ class TestComputeApplicableArticles:
             "is_ai_system": True,
             "is_importer": True,
             "is_distributor": False,
+            "_saas_settings_active": True,
         }
         applicable, skipped = compute_applicable_articles(scope)
         assert "art23" in applicable
@@ -545,6 +549,7 @@ class TestComputeApplicableArticles:
             "risk_classification": "limited-risk",
             "risk_classification_confidence": "low",
             "is_ai_system": True,
+            "_saas_settings_active": True,
         }
         applicable, skipped = compute_applicable_articles(scope)
         # Low confidence → don't skip high-risk articles (conservative)
@@ -577,6 +582,7 @@ class TestRunGateWithScope:
             "is_gpai_provider": False,
             "is_importer": False,
             "is_distributor": False,
+            "_saas_settings_active": True,
         }
         # Build answers for all applicable articles
         answers = {"_scope": scope}
@@ -628,6 +634,7 @@ class TestRunGateWithScope:
                 "is_gpai_provider": False,
                 "is_importer": False,
                 "is_distributor": False,
+                "_saas_settings_active": True,
             },
         }
         # Fill ALL applicable articles
@@ -676,6 +683,7 @@ class TestRunGateWithScope:
             "is_gpai_provider": False,
             "is_importer": False,
             "is_distributor": False,
+            "_saas_settings_active": True,
         }
         applicable, skipped = compute_applicable_articles(scope)
         # Should still skip high-risk articles (confidence defaults to medium)
@@ -691,11 +699,91 @@ class TestRunGateWithScope:
             "is_gpai_provider": False,
             "is_importer": False,
             "is_distributor": False,
+            "_saas_settings_active": True,
         }
         applicable, skipped = compute_applicable_articles(scope)
         assert "art51" in skipped
         assert "art53" in skipped
         assert "art55" in skipped
+
+
+# ═══════════════════════════════════════════════════════════════
+# SaaS Settings Active — no-SaaS scenario
+# ═══════════════════════════════════════════════════════════════
+
+
+class TestSaasSettingsActive:
+
+    def test_no_saas_active_skips_nothing(self):
+        """Without _saas_settings_active, no articles are filtered out."""
+        scope = {
+            "risk_classification": "limited-risk",
+            "risk_classification_confidence": "high",
+            "is_ai_system": True,
+            "is_gpai_provider": False,
+            "is_importer": False,
+            "is_distributor": False,
+            # _saas_settings_active NOT set (defaults to False)
+        }
+        applicable, skipped = compute_applicable_articles(scope)
+        # All articles should be applicable — no filtering
+        assert "art9" in applicable
+        assert "art12" in applicable
+        assert "art23" in applicable
+        assert "art24" in applicable
+        assert "art51" in applicable
+        assert len(skipped) == 0
+
+    def test_saas_active_false_explicit(self):
+        """Explicit _saas_settings_active=False → no filtering."""
+        scope = {
+            "risk_classification": "limited-risk",
+            "risk_classification_confidence": "high",
+            "is_ai_system": True,
+            "is_gpai_provider": False,
+            "is_importer": True,
+            "is_distributor": True,
+            "_saas_settings_active": False,
+        }
+        applicable, skipped = compute_applicable_articles(scope)
+        # Despite is_importer/is_distributor being True, no filtering happens
+        assert "art9" in applicable
+        assert "art23" in applicable
+        assert "art24" in applicable
+        assert len(skipped) == 0
+
+    def test_saas_active_true_enables_filtering(self):
+        """_saas_settings_active=True → normal filtering behavior."""
+        scope = {
+            "risk_classification": "limited-risk",
+            "risk_classification_confidence": "high",
+            "is_ai_system": True,
+            "is_gpai_provider": False,
+            "is_importer": False,
+            "is_distributor": False,
+            "_saas_settings_active": True,
+        }
+        applicable, skipped = compute_applicable_articles(scope)
+        # High-risk articles skipped for limited-risk
+        assert "art9" in skipped
+        assert "art12" in skipped
+        # Importer/distributor skipped
+        assert "art23" in skipped
+        assert "art24" in skipped
+
+    def test_saas_active_importer_not_skipped(self):
+        """_saas_settings_active=True + is_importer=True → Art. 23 NOT skipped."""
+        scope = {
+            "risk_classification": "high-risk",
+            "risk_classification_confidence": "high",
+            "is_ai_system": True,
+            "is_importer": True,
+            "is_distributor": False,
+            "_saas_settings_active": True,
+        }
+        applicable, skipped = compute_applicable_articles(scope)
+        assert "art23" in applicable
+        assert "art24" in skipped
 
 
 # ═══════════════════════════════════════════════════════════════

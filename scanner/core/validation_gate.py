@@ -90,6 +90,11 @@ def compute_applicable_articles(scope: dict) -> tuple[set[str], dict[str, str]]:
     """
     all_article_nums = _all_article_nums()
 
+    # _saas_settings_active: only filter articles when SaaS-confirmed settings exist.
+    # When False (default), AI-provided role/risk values are IGNORED for filtering —
+    # all articles are scanned. This prevents AI mistakes from hiding obligations.
+    saas_active = scope.get("_saas_settings_active") is True
+
     risk = (scope.get("risk_classification") or "").lower().strip()
     risk_conf = (scope.get("risk_classification_confidence") or "").lower().strip()
     # Default: if risk_classification is provided but confidence is missing,
@@ -108,26 +113,26 @@ def compute_applicable_articles(scope: dict) -> tuple[set[str], dict[str, str]]:
     for art_num in sorted(all_article_nums):
         art_key = f"art{art_num}"
 
-        # High-risk only articles
-        if art_num in _HIGH_RISK_ONLY:
+        # High-risk only articles (only filter when SaaS settings confirm)
+        if saas_active and art_num in _HIGH_RISK_ONLY:
             if is_not_high_risk:
                 skipped[art_key] = f"Art. {art_num} applies only to high-risk AI systems. Scope: '{risk}'"
                 continue
 
-        # GPAI only articles
-        if art_num in _GPAI_ONLY:
+        # GPAI only articles (only filter when SaaS settings confirm)
+        if saas_active and art_num in _GPAI_ONLY:
             if not is_gpai_provider:
                 skipped[art_key] = f"Art. {art_num} applies only to GPAI model providers"
                 continue
 
-        # Importer only
-        if art_num in _IMPORTER_ONLY:
+        # Importer only (only filter when SaaS settings confirm)
+        if saas_active and art_num in _IMPORTER_ONLY:
             if not is_importer:
                 skipped[art_key] = f"Art. {art_num} applies only to importers"
                 continue
 
-        # Distributor only
-        if art_num in _DISTRIBUTOR_ONLY:
+        # Distributor only (only filter when SaaS settings confirm)
+        if saas_active and art_num in _DISTRIBUTOR_ONLY:
             if not is_distributor:
                 skipped[art_key] = f"Art. {art_num} applies only to distributors"
                 continue

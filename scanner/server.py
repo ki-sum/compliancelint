@@ -251,6 +251,48 @@ def cl_analyze_project(project_path: str) -> str:
 # Smart, contextual suggestions after scan/fix operations.
 # Rules: value-driven (explain WHY), conditional (don't repeat), non-pushy.
 
+def _fetch_saas_scan_settings(config) -> dict | None:
+    """Fetch scan settings (roles, riskClassification) from SaaS API.
+
+    Returns None on any error (network, auth, timeout) — scanner silently
+    falls back to full 247-obligation scan.
+    """
+    import urllib.request
+    import urllib.error
+
+    if not config.saas_api_key:
+        return None
+
+    # We need repo_id — read from .compliancelint/metadata.json
+    try:
+        import os
+        meta_path = os.path.join(config._project_path if hasattr(config, '_project_path') else ".", ".compliancelint", "metadata.json")
+        if not os.path.isfile(meta_path):
+            return None
+        with open(meta_path, "r", encoding="utf-8") as f:
+            meta = json.load(f)
+        repo_id = meta.get("repo_id")
+        if not repo_id:
+            return None
+    except (OSError, json.JSONDecodeError):
+        return None
+
+    url = f"{config.saas_url}/api/v1/repos/{repo_id}/scan-settings"
+    req = urllib.request.Request(url, headers={
+        "Authorization": f"Bearer {config.saas_api_key}",
+        "Accept": "application/json",
+    })
+
+    try:
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            if resp.status == 200:
+                return json.loads(resp.read().decode("utf-8"))
+    except (urllib.error.URLError, urllib.error.HTTPError, OSError, json.JSONDecodeError) as e:
+        logger.debug("SaaS scan-settings fetch failed (silent fallback): %s", e)
+
+    return None
+
+
 def _build_post_scan_hint(project_path: str, nc_count: int = 0, score_pct: int = -1) -> str:
     """Build contextual post-scan guidance.
 
@@ -576,6 +618,23 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
     except (json.JSONDecodeError, TypeError) as e:
         return json.dumps({"error": f"Invalid project_context JSON: {e}"})
 
+    # ── SaaS Source of Truth: fetch role/risk settings if connected ──
+    config = ProjectConfig.load(project_path)
+    if config.saas_api_key:
+        saas_settings = _fetch_saas_scan_settings(config)
+        if saas_settings:
+            scope = ctx.compliance_answers.get("_scope", {})
+            scope["_saas_settings_active"] = True
+            roles = saas_settings.get("roles", [])
+            scope["is_importer"] = "importer" in roles
+            scope["is_distributor"] = "distributor" in roles
+            risk = saas_settings.get("riskClassification")
+            if risk:
+                scope["risk_classification"] = risk
+                scope["risk_classification_confidence"] = "high"
+            ctx.compliance_answers["_scope"] = scope
+            logger.info("cl_scan_all — SaaS settings applied: roles=%s, risk=%s", roles, risk)
+
     # ── Validation Gate: coerce + validate compliance_answers ──
     from core.validation_gate import run_gate
     gate = run_gate(ctx.compliance_answers)
@@ -631,8 +690,7 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
     _ensure_all_modules_loaded()
     logger.info("cl_scan_all — %d modules loaded, starting scan...", len(_modules))
 
-    # Load project config (.compliancelintrc) and make available to all modules
-    config = ProjectConfig.load(project_path)
+    # config already loaded above (before SaaS settings fetch)
     BaseArticleModule.set_config(config)
     BaseArticleModule.set_context(ctx)
 
@@ -850,6 +908,22 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
 
     output = json.dumps(report, indent=2, default=str)
 
+    # ── Post-scan: role configuration hint ──
+    scope = gate.coerced_answers.get("_scope", {}) if gate else {}
+    if not scope.get("_saas_settings_active"):
+        output_lines = [output]
+        output_lines.append(
+            "\n\n--- Role & Risk Configuration ---\n"
+            "This scan checked all 247 obligations across all roles.\n"
+            "For accurate scoring, configure your role and risk classification at:\n"
+            "  compliancelint.dev/dashboard \u2192 [repo] \u2192 Settings\n\n"
+            "With settings configured:\n"
+            "  \u2713 Only applicable articles scanned (faster, more accurate)\n"
+            "  \u2713 Compliance score reflects your actual obligations\n"
+            "  \u2713 Human Gates show only your required actions"
+        )
+        output = "".join(output_lines)
+
     # ── Post-scan: auto-sync or contextual hint ──
     nc_total = sum(
         1 for r in results.values() if isinstance(r, dict) and r.get("overall") == "non_compliant"
@@ -866,6 +940,60 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
         output += _build_post_scan_hint(project_path, nc_count=nc_total)
 
     return output
+
+
+@mcp.tool()
+def cl_action_guide(obligation_id: str) -> str:
+    """Get guidance for completing a Human Gate obligation.
+
+    Human Gates are compliance obligations that require human verification —
+    they cannot be determined from code scanning alone. This tool returns
+    guidance on where to complete the Human Gate questionnaire.
+
+    IMPORTANT: This tool does NOT return questionnaire content or accept answers.
+    Human Gates must be completed at the ComplianceLint dashboard.
+
+    Args:
+        obligation_id: The obligation ID (e.g., "ART26-OBL-2").
+    """
+    import re
+
+    # Validate obligation ID format
+    if not re.match(r"^ART\d+-OBL-\d+", obligation_id.upper()):
+        return json.dumps({
+            "error": f"Invalid obligation ID format: {obligation_id}",
+            "fix": "Use format like ART26-OBL-2",
+        })
+
+    obl_id = obligation_id.upper()
+
+    # Known Human Gate obligations (manual obligations from deployer/importer/distributor)
+    HUMAN_GATES = {
+        "ART26-OBL-2": "Human Oversight Assignment",
+        "ART26-OBL-6": "Log Retention Policy",
+        "ART26-OBL-7": "Worker Notification",
+        "ART26-OBL-9": "Data Protection Impact Assessment (DPIA)",
+        "ART27-OBL-1": "Fundamental Rights Impact Assessment (FRIA)",
+    }
+
+    title = HUMAN_GATES.get(obl_id, f"Obligation {obl_id}")
+    is_known_gate = obl_id in HUMAN_GATES
+
+    return json.dumps({
+        "obligation_id": obl_id,
+        "title": title,
+        "is_human_gate": is_known_gate,
+        "status": "pending",
+        "message": (
+            "This Human Gate requires structured questionnaire completion. "
+            "Complete it at your ComplianceLint dashboard."
+            if is_known_gate else
+            f"Obligation {obl_id} may require manual verification. "
+            "Check your ComplianceLint dashboard for guidance."
+        ),
+        "dashboard_url": "https://compliancelint.dev/dashboard",
+        "note": "Human Gates cannot be completed from the IDE. The dashboard provides guided forms for each obligation.",
+    })
 
 
 @mcp.tool()
@@ -2179,39 +2307,59 @@ def cl_delete(project_path: str, target: str = "local", confirm: bool = False) -
         else:
             results["local"] = "not_found"
 
-    # Delete remote data
+    # Delete remote data (permanent purge — owner only)
     if target in ("remote", "all"):
         if not config.saas_api_key:
             results["remote"] = "error: no API key configured. Run cl_connect() first."
         else:
             saas_url = config.saas_url or "https://compliancelint.dev"
-            # Derive repo identity for the DELETE call
             config.derive_git_identity(project_path)
             repo_name = config.repo_name or os.path.basename(os.path.normpath(project_path))
-            project_id = config.project_id or ""
 
             import subprocess
+            curl_flags: dict = {"capture_output": True, "text": True, "timeout": 15}
+            if hasattr(subprocess, "CREATE_NO_WINDOW"):
+                curl_flags["creationflags"] = subprocess.CREATE_NO_WINDOW
+
             try:
-                delete_url = f"{saas_url}/api/v1/repos/delete"
-                payload = json.dumps({"repo_name": repo_name, "project_id": project_id})
-                curl_flags = {"capture_output": True, "text": True, "timeout": 10}
-                if hasattr(subprocess, "CREATE_NO_WINDOW"):
-                    curl_flags["creationflags"] = subprocess.CREATE_NO_WINDOW
+                # Step 1: Find the repo ID via repos list API
+                list_url = f"{saas_url}/api/v1/repos"
                 r = subprocess.run(
-                    ["curl", "-s", "--max-time", "8", "-X", "DELETE",
+                    ["curl", "-s", "--max-time", "8",
                      "-H", f"Authorization: Bearer {config.saas_api_key}",
-                     "-H", "Content-Type: application/json",
-                     "-d", payload, delete_url],
+                     list_url],
                     **curl_flags,
                 )
-                if r.returncode == 0 and r.stdout.strip():
-                    resp = json.loads(r.stdout.strip())
-                    results["remote"] = resp.get("status", "unknown")
+                if r.returncode != 0 or not r.stdout.strip():
+                    results["remote"] = f"error: failed to list repos (exit {r.returncode})"
                 else:
-                    results["remote"] = f"error: request failed (exit {r.returncode})"
+                    repos_list = json.loads(r.stdout.strip())
+                    # Match by repo name
+                    matched = [rp for rp in repos_list if rp.get("name") == repo_name]
+                    if not matched:
+                        results["remote"] = f"not_found: repo '{repo_name}' not found on dashboard"
+                    else:
+                        repo_id = matched[0]["id"]
+                        # Step 2: Call purge endpoint
+                        purge_url = f"{saas_url}/api/v1/repos/{repo_id}/purge"
+                        payload = json.dumps({"confirmName": repo_name})
+                        r2 = subprocess.run(
+                            ["curl", "-s", "--max-time", "8", "-X", "DELETE",
+                             "-H", f"Authorization: Bearer {config.saas_api_key}",
+                             "-H", "Content-Type: application/json",
+                             "-d", payload, purge_url],
+                            **curl_flags,
+                        )
+                        if r2.returncode == 0 and r2.stdout.strip():
+                            resp = json.loads(r2.stdout.strip())
+                            results["remote"] = resp.get("status", "unknown")
+                            if resp.get("error"):
+                                results["remote"] = f"error: {resp['error']}"
+                        else:
+                            results["remote"] = f"error: purge request failed (exit {r2.returncode})"
             except Exception as e:
                 results["remote"] = f"error: {e}"
-            slog.info("cl_delete: remote delete result=%s", results.get("remote"))
+            slog.info("cl_delete: remote purge result=%s", results.get("remote"))
 
     return json.dumps({"status": "deleted", "results": results})
 

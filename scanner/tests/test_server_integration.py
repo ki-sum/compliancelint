@@ -5153,3 +5153,56 @@ class TestClScanArticle111:
         finding_ids = {f["obligation_id"] for f in result.get("findings", [])}
         for obl_id in ["ART111-OBL-1", "ART111-OBL-2", "ART111-OBL-3"]:
             assert obl_id in finding_ids, f"{obl_id} not in findings. Found: {sorted(finding_ids)}"
+
+
+# ═══════════════════════════════════════════════════════════════
+# cl_action_guide — signpost-only Human Gate tool
+# ═══════════════════════════════════════════════════════════════
+
+
+class TestClActionGuide:
+
+    def test_known_human_gate(self):
+        """Known Human Gate obligation returns correct structure."""
+        from server import cl_action_guide
+        result = json.loads(cl_action_guide("ART26-OBL-2"))
+        assert result["obligation_id"] == "ART26-OBL-2"
+        assert result["title"] == "Human Oversight Assignment"
+        assert result["is_human_gate"] is True
+        assert "dashboard_url" in result
+        assert "questionnaire" not in json.dumps(result).lower() or "questionnaire completion" in result["message"]
+
+    def test_unknown_obligation(self):
+        """Unknown obligation still returns guidance, not an error."""
+        from server import cl_action_guide
+        result = json.loads(cl_action_guide("ART9-OBL-1"))
+        assert result["obligation_id"] == "ART9-OBL-1"
+        assert result["is_human_gate"] is False
+        assert "dashboard_url" in result
+
+    def test_invalid_format(self):
+        """Invalid obligation format returns error."""
+        from server import cl_action_guide
+        result = json.loads(cl_action_guide("invalid"))
+        assert "error" in result
+
+    def test_does_not_return_questions(self):
+        """CRITICAL: cl_action_guide must NEVER return questionnaire content."""
+        from server import cl_action_guide
+        result_str = cl_action_guide("ART26-OBL-2")
+        result = json.loads(result_str)
+        assert "questions" not in result
+        assert "questionnaire" not in result
+        # The word "questionnaire" may appear in the message (as in "questionnaire completion")
+        # but must not appear as a key in the result
+        for key in result:
+            assert key != "questions"
+            assert key != "questionnaire"
+
+    def test_all_known_gates(self):
+        """All 5 Batch 1 Human Gates are recognized."""
+        from server import cl_action_guide
+        known_ids = ["ART26-OBL-2", "ART26-OBL-6", "ART26-OBL-7", "ART26-OBL-9", "ART27-OBL-1"]
+        for obl_id in known_ids:
+            result = json.loads(cl_action_guide(obl_id))
+            assert result["is_human_gate"] is True, f"{obl_id} should be a known Human Gate"

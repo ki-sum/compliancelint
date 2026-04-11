@@ -4,7 +4,42 @@ All notable changes to ComplianceLint will be documented in this file.
 
 This project adheres to [Semantic Versioning](https://semver.org/).
 
-## [1.1.0] — 2026-04-10
+## [1.1.0] — 2026-04-11
+
+### Added — Human Gates
+- **Human Gates system** — guided questionnaires for manual compliance obligations (DPIA, FRIA, human oversight, worker notification, log retention, and 66 more)
+- **QuestionnaireRenderer** — schema-driven form component renders any questionnaire from JSON definition
+- **Golden template script** — systematic generation of 71 questionnaire schemas from obligation JSONs
+- **Human Gates hub page** — `/dashboard/human-gates` with progress bars, per-repo grouping, and inline questionnaire modal
+- **`cl_action_guide` MCP tool** — signpost for Human Gate obligations, directs users to dashboard (tool count: 16)
+- **`human_gate_hint`** field on manual obligation findings — scanner output includes dashboard link
+
+### Added — Role Selection & Score Isolation
+- **Role selection** in repo settings — Provider, Deployer, Importer, Distributor checkboxes
+- **Score isolation** — compliance score calculated only for selected roles' obligations
+- **Role filtering** applied consistently across: dashboard overview, repo dashboard, PDF reports, declaration PDF, badge, dashboard API, trend charts, article breakdown
+- **`roles.ts`** — role-to-article mapping with `filterByRoles()`, `parseRoles()` utilities
+- **`_saas_settings_active`** flag in validation gate — article filtering only when SaaS-confirmed settings exist
+- **`scan-settings` API** — scanner fetches role/risk settings from SaaS at scan start
+- **Post-scan hint** — prompts users to configure roles when no SaaS settings active
+
+### Added — Compliance Infrastructure
+- **Settings audit trail** — `settings_audit_log` table tracks who changed roles, risk classification, and export settings
+- **Audit trail UI** — collapsible change history in repo settings page
+- **`finding_responses.answers`** column — structured JSON storage for questionnaire responses
+
+### Changed — License
+- **BSL 1.1** replaces Apache 2.0 — free to use for your own projects, cannot build competing hosted scanning service. Auto-converts to Apache 2.0 on 2030-04-11.
+
+### Changed — PDF
+- **Human Gate CTA** in PDF — UNABLE_TO_DETERMINE findings show "Complete this Human Gate at compliancelint.dev" block
+- **Role note** in PDF header — "This report covers Provider and Deployer obligations"
+- **Role filtering** in PDF — only selected roles' findings appear in exported PDFs
+
+### Changed — Navigation
+- Sidebar: "Guidance" renamed to **"Human Gates"**
+- Old `/dashboard/guidance` URL redirects to `/dashboard/human-gates`
+- ProviderCheckWizard preserved inside Human Gates page as role determination tool
 
 ### Removed
 - `cl_report` MCP tool — compliance reports are now exclusively generated as PDF from the dashboard. This prevents free-tier feature leakage. Tool count: 16 → 15.

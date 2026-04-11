@@ -111,6 +111,7 @@ class Finding:
     source_quote: Optional[str] = None  # Verbatim legal text from obligation engine
     gap_type: GapType = GapType.CODE  # default: code-level finding
     is_informational: bool = False  # True for coverage gaps, meta warnings — excluded from overall level
+    human_gate_hint: Optional[str] = None  # Hint for Human Gate — directs user to SaaS dashboard
 
     def to_dict(self):
         d = asdict(self)

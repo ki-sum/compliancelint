@@ -355,6 +355,18 @@ class TestArt23Structural:
                 f"{obl_id} should be UTD (manual), got {obl[0].level}"
             )
 
+    def test_manual_obligations_have_human_gate_hint(self, art23_module, tmp_path):
+        """Manual obligation gap findings include human_gate_hint."""
+        BaseArticleModule.set_context(_importer_true_ctx())
+        result = art23_module.scan(str(tmp_path))
+        for obl_id in ["ART23-OBL-4", "ART23-OBL-2b", "ART23-OBL-7"]:
+            obl = _find(result, obl_id)
+            assert len(obl) > 0, f"{obl_id} not in findings"
+            assert obl[0].human_gate_hint is not None, (
+                f"{obl_id} should have human_gate_hint"
+            )
+            assert "compliancelint.dev" in obl[0].human_gate_hint
+
     def test_summary_present(self, art23_module, tmp_path):
         """ScanResult must include article_number and article_title."""
         result = art23_module.scan(str(tmp_path))
