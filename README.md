@@ -15,11 +15,11 @@ Scan your code and docs against 247 legal obligations from the EU AI Act. Find c
 
 ### See it in action
 
-**Demo: scanning an AI chatbot** (limited risk → 100% compliant):
+**Demo: scanning an AI chatbot** (limited risk — all applicable obligations verified):
 
 https://github.com/user-attachments/assets/0816cc3c-e848-4080-a863-8ed4dffef487
 
-Watch a full compliance scan: from non-compliant to 100% in under 2 minutes.
+Watch a full compliance scan: from non-compliant to fully verified in under 2 minutes.
 
 > **More demos:** <a href="https://github.com/user-attachments/assets/591ca74c-e2c5-450a-9055-7a827c21ad42" target="_blank">AI Finance (high-risk)</a> · <a href="https://github.com/user-attachments/assets/e74e2613-2f82-4d43-96e3-94279e6f68dd" target="_blank">AI Medical (high-risk)</a>
 
@@ -248,7 +248,6 @@ All obligations verified against EUR-Lex source text.
 | `cl_update_finding_batch` | Batch-update multiple findings at once |
 | `cl_verify_evidence` | Verify submitted evidence |
 | `cl_interim_standard` | Generate interim compliance standard for an article |
-| `cl_report` | Export Markdown or JSON compliance report |
 | `cl_connect` | Link to dashboard (browser OAuth) |
 | `cl_sync` | Upload scan results to dashboard |
 | `cl_disconnect` | Remove dashboard connection (preserves local data) |

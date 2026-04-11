@@ -198,6 +198,27 @@ def cl_analyze_project(project_path: str) -> str:
       ║  4. _scope.risk_classification is REQUIRED                  ║
       ╚═══════════════════════════════════════════════════════════════╝
 
+      ╔═══════════════════════════════════════════════════════════════╗
+      ║  EVIDENCE QUALITY RULES:                                    ║
+      ║                                                             ║
+      ║  For every _evidence array, each entry MUST include:        ║
+      ║  1. The specific FILE PATH where evidence was found         ║
+      ║     e.g. "src/logging.py: structlog configured with JSON"   ║
+      ║  2. WHAT was found (not just "found" or "detected")         ║
+      ║     e.g. "structlog.configure() with JSONRenderer on L21"   ║
+      ║  3. If NOT found: say what was searched and where            ║
+      ║     e.g. "Searched all .py/.ts files — no logging imports"  ║
+      ║                                                             ║
+      ║  NEVER write vague evidence like:                           ║
+      ║    ❌ "Logging found"                                       ║
+      ║    ❌ "Technical documentation detected"                    ║
+      ║    ❌ "No evidence found"                                   ║
+      ║  Instead:                                                   ║
+      ║    ✅ "src/logging.py:21 — structlog.configure(JSONRenderer)"║
+      ║    ✅ "README.md — 18 lines, covers purpose + risk class"   ║
+      ║    ✅ "No *.md docs found in docs/ or project root"         ║
+      ╚═══════════════════════════════════════════════════════════════╝
+
       Also include:
         "ai_model": "<REQUIRED — your model ID, e.g. claude-sonnet-4-6>"
 
@@ -501,30 +522,6 @@ def cl_explain(regulation: str = "eu-ai-act", article: int = 0) -> str:
         "fix": f"Available articles: {sorted(_modules.keys())}.",
     })
 
-
-@mcp.tool()
-def cl_report(
-    project_path: str,
-    regulation: str = "eu-ai-act",
-    format: str = "md",
-) -> str:
-    """Export a compliance report.
-
-    Reads .compliancelint/state.json and generates a report file.
-    Requires a previous scan (state.json must exist).
-
-    Supported formats:
-      - md: Markdown report with tables
-      - json: Raw JSON state dump
-
-    Args:
-        project_path: Absolute path to the project directory.
-        regulation: Which regulation to report on (default: "eu-ai-act").
-        format: Report format — "md" or "json".
-    """
-    from core.state import export_report
-    result = export_report(project_path, fmt=format)
-    return json.dumps(result, indent=2, default=str)
 
 
 
@@ -1111,7 +1108,7 @@ def cl_update_finding(
     if not obligation_id or not _re.match(r"^ART\d+-[A-Z]+-\w+", obligation_id):
         return json.dumps({
             "error": f"Invalid finding ID format: '{obligation_id}'.",
-            "fix": "Run cl_report() to see all finding IDs for your project.",
+            "fix": "Check your findings on the ComplianceLint dashboard, or run cl_scan to see obligation IDs.",
             "details": "Expected format: ART{N}-OBL-{N} (e.g. ART12-OBL-1, ART50-OBL-2).",
         })
 
@@ -1956,7 +1953,7 @@ def cl_sync(project_path: str, regulation: str = "") -> str:
         slog.error(f"STEP 7: Failed to parse attestation responses from state: {_e}")
     slog.info(f"STEP 7b: {len(response_items)} attestation responses loaded")
 
-    # Load changes_summary if the AI wrote one (VCS-agnostic change tracking)
+    # Load changes_summary: AI-written file > auto-generated git summary
     slog.info("STEP 7c: loading changes_summary")
     changes_summary = ""
     changes_file = os.path.join(project_path, ".compliancelint", "changes_summary.txt")
@@ -1967,6 +1964,20 @@ def cl_sync(project_path: str, regulation: str = "") -> str:
             slog.info(f"STEP 7d: changes_summary loaded ({len(changes_summary)} chars)")
         except Exception as _e:
             slog.warning(f"STEP 7c: Could not read changes_summary.txt: {_e}")
+
+    # Auto-generate git diff summary if no manual summary exists
+    if not changes_summary:
+        try:
+            import subprocess
+            result = subprocess.run(
+                ["git", "log", "--oneline", "-10", "--no-decorate"],
+                cwd=project_path, capture_output=True, text=True, timeout=5
+            )
+            if result.returncode == 0 and result.stdout.strip():
+                changes_summary = f"Recent commits:\n{result.stdout.strip()}"
+                slog.info(f"STEP 7d: auto-generated git summary ({len(changes_summary)} chars)")
+        except Exception:
+            pass  # Not a git repo or git not available
 
     # Apply attestation overrides: rebutted → not_applicable, evidenced → compliant
     articles_data = json.loads(json.dumps(state.get("articles", {})))  # deep copy

@@ -31,7 +31,7 @@ Requirements:
 - Before each article, tell me which files you are reading
 - Describe what you found in natural language
 - After each article, give me a brief summary (compliant/partial/non-compliant)
-- After all 44 articles, call cl_report to generate a compliance report
+- After all 44 articles, use cl_sync to upload results to your ComplianceLint dashboard
 ```
 
 **Why this works**: Claude reads files using Read/Grep tools (visible to you),
@@ -57,7 +57,7 @@ You see activity at every step.
 
 ... (continues for all 44 articles)
 
-📋 [cl_report generates Markdown/JSON compliance report]
+📋 [cl_sync uploads results to ComplianceLint dashboard for PDF export]
 ```
 
 ---
@@ -73,14 +73,15 @@ You see activity at every step.
 
 ---
 
-## Exporting a Report
+## Exporting Reports
 
-After scanning, ask Claude:
-```
-Please export a compliance report for this project.
-```
+After scanning and syncing, export professional PDF reports from your ComplianceLint dashboard at [compliancelint.dev](https://compliancelint.dev):
 
-Claude will call `cl_report` and save a Markdown report to `.compliancelint/reports/`.
+- **Declaration of Conformity** — formal compliance declaration per EU AI Act
+- **Scan Findings** — detailed per-obligation findings with evidence
+- **Compliance Journey** — scan-over-scan progress timeline
+- **Remediation Tasks** — prioritized fix list with legal references
+- **Technical Documentation** — Annex IV structured document
 
 > **Note:** ComplianceLint produces AI-assisted compliance assessments, not legal opinions.
 > All findings require human review and legal counsel before use in regulatory submissions.

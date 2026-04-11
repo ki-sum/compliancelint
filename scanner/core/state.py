@@ -238,11 +238,25 @@ def save_article_result(
                 # Classification confirmations: NC means "detected, needs confirmation"
                 effective_level = "compliant"
 
+        # Evidence quality check: if compliant but description lacks file path,
+        # downgrade confidence to low (flag for human review)
+        description = finding.get("description") or ""
+        confidence = finding.get("confidence", "low")
+        if effective_level == "compliant" and description:
+            # Check if evidence mentions a specific file path
+            import re as _re
+            has_file_ref = bool(_re.search(
+                r'[a-zA-Z0-9_/\\-]+\.\w{1,5}[\s:,]|\.py|\.ts|\.js|\.md|\.json|\.yaml|\.yml|line \d|L\d',
+                description
+            ))
+            if not has_file_ref and confidence in ("high", "medium"):
+                confidence = "low"  # Downgrade: no specific file evidence
+
         new_findings[obl_id] = {
             "status": prev_status,
             "level": effective_level,
-            "confidence": finding.get("confidence", "low"),
-            "description": finding.get("description") or "",
+            "confidence": confidence,
+            "description": description,
             "source_quote": finding.get("source_quote") or prev.get("source_quote") or "",
             "remediation": finding.get("remediation"),
             "baselineState": baseline_state,
@@ -617,137 +631,5 @@ def update_finding(
         return {"error": f"Cannot write: {e}"}
 
 
-def export_report(project_path: str, fmt: str = "md") -> dict:
-    """Export compliance state as a formatted report.
-
-    Args:
-        fmt: "md" (markdown) or "json"
-
-    Returns: {"path": str, "content": str} or {"error": str}
-    """
-    state = load_state(project_path)
-    if not state.get("articles"):
-        return {"error": "No scan data found. Run a scan first."}
-
-    if fmt == "json":
-        content = json.dumps(state, indent=2, ensure_ascii=False)
-    elif fmt == "md":
-        content = _render_markdown(state)
-    else:
-        return {"error": f"Unknown format: {fmt}. Use: md, json"}
-
-    try:
-        reports_dir = os.path.join(_state_dir(project_path), "reports")
-        os.makedirs(reports_dir, exist_ok=True)
-        ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H%M%S")
-        ext = "md" if fmt == "md" else "json"
-        path = os.path.join(reports_dir, f"report-{ts}.{ext}")
-        with open(path, "w", encoding="utf-8") as f:
-            f.write(content)
-        return {"path": path, "content": content}
-    except OSError as e:
-        return {"error": f"Cannot write report: {e}", "content": content}
 
 
-def _render_markdown(state: dict) -> str:
-    """Render state as a detailed Markdown compliance report."""
-    overall = state.get("overall_compliance", "no_data")
-
-    # Collect assessed_by across all articles (pick first non-empty value)
-    articles = state.get("articles", {})
-    assessed_by_values = [
-        a.get("assessed_by", "") for a in articles.values()
-        if a.get("assessed_by", "")
-    ]
-    assessed_by = assessed_by_values[0] if assessed_by_values else ""
-    assessed_by_display = assessed_by if assessed_by else "⚠️ not recorded — set `ai_model` in project_context"
-
-    lines = [
-        "# EU AI Act Compliance Report",
-        "",
-        f"**Project:** `{state.get('project_path', 'unknown')}`",
-        f"**Overall compliance:** {overall.upper()}",
-        f"**Last scan:** {state.get('last_scan', 'never')}",
-        f"**Regulation:** EU AI Act (Regulation (EU) 2024/1689)",
-        f"**Assessed by:** {assessed_by_display}",
-        f"**Scan tool:** ComplianceLint MCP Server (github.com/ki-sum/compliancelint)",
-        "",
-        "---",
-        "",
-    ]
-
-    # Sort articles numerically (art5 < art6 < art9 < art10 ... < art50)
-    def _art_sort_key(item):
-        key = item[0]  # e.g. "art12"
-        try:
-            return int(key.replace("art", ""))
-        except ValueError:
-            return 999
-
-    for art_key, art_data in sorted(articles.items(), key=_art_sort_key):
-        art_num = art_key.replace("art", "")
-        art_overall = art_data.get("overall_level", "unknown")
-        lines.append(f"## Art. {art_num} — {art_overall.upper()}")
-        lines.append("")
-        lines.append(f"- **Overall:** {art_overall}")
-        lines.append(f"- **Confidence:** {art_data.get('overall_confidence', 'unknown')}")
-        lines.append(f"- **Assessed by:** {art_data.get('assessed_by', 'unknown')}")
-        lines.append(f"- **Scan date:** {art_data.get('scan_date', 'unknown')}")
-        lines.append("")
-
-        findings = art_data.get("findings", {})
-        if not findings:
-            lines.append("*No findings.*")
-            lines.append("")
-            continue
-
-        # Summary table
-        lines.append("| Obligation | Level | Status | Baseline | Evidence |")
-        lines.append("|-----------|-------|--------|----------|----------|")
-        for obl_id, f in sorted(findings.items()):
-            level = f.get("level", "?")
-            status = f.get("status", "open")
-            baseline = f.get("baselineState", "?")
-            ev_count = len(f.get("evidence", []))
-            lines.append(f"| {obl_id} | {level} | {status} | {baseline} | {ev_count} items |")
-        lines.append("")
-
-        # Detailed findings (non-compliant and partial only)
-        actionable = [(k, v) for k, v in sorted(findings.items())
-                      if v.get("level") in ("non_compliant", "partial")]
-        if actionable:
-            lines.append("### Details")
-            lines.append("")
-            for obl_id, f in actionable:
-                level = f.get("level", "?")
-                lines.append(f"**{obl_id}** — {level.upper()}")
-                lines.append("")
-                desc = f.get("description", "")
-                if desc:
-                    lines.append(f"> {desc[:300]}")
-                    lines.append("")
-                remediation = f.get("remediation")
-                if remediation:
-                    lines.append(f"**Remediation:** {remediation[:300]}")
-                    lines.append("")
-                evidence = f.get("evidence", [])
-                if evidence:
-                    lines.append("**Evidence provided:**")
-                    for ev in evidence:
-                        lines.append(f"- [{ev.get('type', '?')}] {ev.get('value', '')}")
-                    lines.append("")
-                supp = f.get("suppression")
-                if supp:
-                    lines.append(f"**Suppression:** {supp.get('status', '?')} — {supp.get('justification', '')}")
-                    lines.append("")
-
-    lines.extend([
-        "---",
-        "",
-        "*This report is an AI-assisted compliance assessment, not a legal opinion.*",
-        "*All findings require human review and legal counsel before use in regulatory submissions.*",
-        "",
-        f"*Generated: {datetime.now(timezone.utc).isoformat()}*",
-    ])
-
-    return "\n".join(lines)

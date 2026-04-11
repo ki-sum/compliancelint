@@ -7,7 +7,7 @@ import pytest
 SCANNER_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, SCANNER_ROOT)
 
-from core.state import load_state, save_article_result, update_finding, export_report
+from core.state import load_state, save_article_result, update_finding
 
 
 @pytest.fixture
@@ -241,46 +241,52 @@ class TestUpdateFinding:
         assert len(history) >= 3
 
 
-class TestExportReport:
-    def test_markdown_export(self, project_dir, scan_result):
-        save_article_result(project_dir, 12, scan_result)
-        result = export_report(project_dir, fmt="md")
-        assert "path" in result
-        assert "# EU AI Act Compliance Report" in result["content"]
-        assert "ART12-OBL-1" in result["content"]
-        assert "NON_COMPLIANT" in result["content"]
+class TestEvidenceQualityValidation:
+    """Evidence quality validation: compliant findings without file paths get low confidence."""
 
-    def test_markdown_includes_details(self, project_dir, scan_result):
-        """Markdown report includes descriptions and remediation."""
-        save_article_result(project_dir, 12, scan_result)
-        result = export_report(project_dir, fmt="md")
-        assert "No logging found" in result["content"]
-        assert "Install structlog" in result["content"]
+    def test_compliant_with_file_path_keeps_confidence(self, project_dir):
+        result = {
+            "overall_level": "compliant",
+            "overall_confidence": "high",
+            "findings": [{
+                "obligation_id": "ART12-OBL-1",
+                "level": "compliant",
+                "confidence": "high",
+                "description": "src/logging.py: structlog configured with JSON output",
+            }],
+        }
+        save_article_result(project_dir, 12, result)
+        state = load_state(project_dir)
+        assert state["articles"]["art12"]["findings"]["ART12-OBL-1"]["confidence"] == "high"
 
-    def test_markdown_includes_evidence(self, project_dir, scan_result):
-        save_article_result(project_dir, 12, scan_result)
-        update_finding(project_dir, "ART12-OBL-1", "provide_evidence",
-                      evidence_type="url", evidence_value="https://example.com")
-        result = export_report(project_dir, fmt="md")
-        assert "https://example.com" in result["content"]
+    def test_compliant_without_file_path_downgrades_confidence(self, project_dir):
+        result = {
+            "overall_level": "compliant",
+            "overall_confidence": "high",
+            "findings": [{
+                "obligation_id": "ART12-OBL-1",
+                "level": "compliant",
+                "confidence": "high",
+                "description": "Logging found in the project",
+            }],
+        }
+        save_article_result(project_dir, 12, result)
+        state = load_state(project_dir)
+        assert state["articles"]["art12"]["findings"]["ART12-OBL-1"]["confidence"] == "low"
 
-    def test_markdown_includes_overall(self, project_dir, scan_result):
-        save_article_result(project_dir, 12, scan_result)
-        result = export_report(project_dir, fmt="md")
-        assert "NON_COMPLIANT" in result["content"]
+    def test_non_compliant_not_affected(self, project_dir):
+        result = {
+            "overall_level": "non_compliant",
+            "findings": [{
+                "obligation_id": "ART12-OBL-1",
+                "level": "non_compliant",
+                "confidence": "high",
+                "description": "No logging found",
+            }],
+        }
+        save_article_result(project_dir, 12, result)
+        state = load_state(project_dir)
+        # Non-compliant should keep high confidence even without file path
+        assert state["articles"]["art12"]["findings"]["ART12-OBL-1"]["confidence"] == "high"
 
-    def test_json_export(self, project_dir, scan_result):
-        save_article_result(project_dir, 12, scan_result)
-        result = export_report(project_dir, fmt="json")
-        data = json.loads(result["content"])
-        assert "articles" in data
-        assert "overall_compliance" in data
 
-    def test_no_state_returns_error(self, project_dir):
-        result = export_report(project_dir, fmt="md")
-        assert "error" in result
-
-    def test_unknown_format_returns_error(self, project_dir, scan_result):
-        save_article_result(project_dir, 12, scan_result)
-        result = export_report(project_dir, fmt="pdf")
-        assert "error" in result
