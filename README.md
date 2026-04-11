@@ -184,52 +184,52 @@ You can ask any AI to review your code. But here's the difference:
 
 **EU AI Act** (Regulation (EU) 2024/1689) — 44 articles, 247 obligations:
 
-| Article | Topic | Obligations |
-|---------|-------|:-----------:|
-| Art. 4 | AI literacy | 1 |
-| Art. 5 | Prohibited AI practices | 8 |
-| Art. 6 | Risk classification | 8 |
-| Art. 8 | Compliance with requirements | 2 |
-| Art. 9 | Risk management system | 19 |
-| Art. 10 | Data governance | 11 |
-| Art. 11 | Technical documentation | 9 |
-| Art. 12 | Record-keeping (logging) | 11 |
-| Art. 13 | Transparency | 4 |
-| Art. 14 | Human oversight | 6 |
-| Art. 15 | Accuracy & robustness | 8 |
-| Art. 16 | Provider obligations | 12 |
-| Art. 17 | Quality management system | 16 |
-| Art. 18 | Documentation keeping | 2 |
-| Art. 19 | Automatically generated logs | 3 |
-| Art. 20 | Corrective actions | 3 |
-| Art. 21 | Cooperation with authorities | 2 |
-| Art. 22 | Authorised representatives | 4 |
-| Art. 23 | Obligations of importers | 8 |
-| Art. 24 | Obligations of distributors | 8 |
-| Art. 25 | Value chain responsibilities | 7 |
-| Art. 26 | Deployer obligations | 11 |
-| Art. 27 | Fundamental rights impact assessment | 4 |
-| Art. 41 | Common specifications | 1 |
-| Art. 43 | Conformity assessment | 4 |
-| Art. 47 | EU declaration of conformity | 4 |
-| Art. 49 | Registration | 3 |
-| Art. 50 | Transparency obligations | 10 |
-| Art. 51 | GPAI classification (systemic risk) | 3 |
-| Art. 52 | Classification notification procedure | 5 |
-| Art. 53 | GPAI provider obligations | 8 |
-| Art. 54 | GPAI authorised representatives | 6 |
-| Art. 55 | GPAI systemic risk obligations | 6 |
-| Art. 60 | Real-world testing | 4 |
-| Art. 61 | Informed consent for testing | 2 |
-| Art. 71 | EU database | 2 |
-| Art. 72 | Post-market monitoring | 4 |
-| Art. 73 | Serious incident reporting | 6 |
-| Art. 80 | Non-high-risk misclassification | 3 |
-| Art. 82 | Compliant AI presenting risk | 1 |
-| Art. 86 | Right to explanation | 3 |
-| Art. 91 | Documentation duty | 1 |
-| Art. 92 | Cooperation with evaluations | 1 |
-| Art. 111 | Transitional provisions | 3 |
+| Article | Topic | Obligations | Applies to |
+|---------|-------|:-----------:|------------|
+| Art. 4 | AI literacy | 1 | All roles |
+| Art. 5 | Prohibited AI practices | 8 | All roles |
+| Art. 6 | Risk classification | 8 | Provider |
+| Art. 8 | Compliance with requirements | 2 | Provider |
+| Art. 9 | Risk management system | 19 | Provider |
+| Art. 10 | Data governance | 11 | Provider |
+| Art. 11 | Technical documentation | 9 | Provider |
+| Art. 12 | Record-keeping (logging) | 11 | Provider, Deployer |
+| Art. 13 | Transparency | 4 | Provider |
+| Art. 14 | Human oversight | 6 | Provider, Deployer |
+| Art. 15 | Accuracy & robustness | 8 | Provider |
+| Art. 16 | Provider obligations | 12 | Provider |
+| Art. 17 | Quality management system | 16 | Provider |
+| Art. 18 | Documentation keeping | 2 | Provider |
+| Art. 19 | Automatically generated logs | 3 | Provider |
+| Art. 20 | Corrective actions | 3 | Provider |
+| Art. 21 | Cooperation with authorities | 2 | Provider |
+| Art. 22 | Authorised representatives | 4 | Provider |
+| Art. 23 | Obligations of importers | 8 | Importer |
+| Art. 24 | Obligations of distributors | 8 | Distributor |
+| Art. 25 | Value chain responsibilities | 7 | Provider |
+| Art. 26 | Deployer obligations | 11 | Deployer |
+| Art. 27 | Fundamental rights impact assessment | 4 | Deployer |
+| Art. 41 | Common specifications | 1 | Provider |
+| Art. 43 | Conformity assessment | 4 | Provider |
+| Art. 47 | EU declaration of conformity | 4 | Provider |
+| Art. 49 | Registration | 3 | Provider, Deployer |
+| Art. 50 | Transparency obligations | 10 | Provider, Deployer |
+| Art. 51 | GPAI classification (systemic risk) | 3 | GPAI Provider |
+| Art. 52 | Classification notification procedure | 5 | GPAI Provider |
+| Art. 53 | GPAI provider obligations | 8 | GPAI Provider |
+| Art. 54 | GPAI authorised representatives | 6 | GPAI Provider |
+| Art. 55 | GPAI systemic risk obligations | 6 | GPAI Provider |
+| Art. 60 | Real-world testing | 4 | Provider |
+| Art. 61 | Informed consent for testing | 2 | Provider |
+| Art. 71 | EU database | 2 | Provider, Deployer |
+| Art. 72 | Post-market monitoring | 4 | Provider |
+| Art. 73 | Serious incident reporting | 6 | Provider |
+| Art. 80 | Non-high-risk misclassification | 3 | Provider |
+| Art. 82 | Compliant AI presenting risk | 1 | Provider |
+| Art. 86 | Right to explanation | 3 | Deployer |
+| Art. 91 | Documentation duty | 1 | Provider |
+| Art. 92 | Cooperation with evaluations | 1 | Provider |
+| Art. 111 | Transitional provisions | 3 | Provider |
 
 All obligations verified against EUR-Lex source text.
 
