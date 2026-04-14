@@ -920,7 +920,9 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
             "With settings configured:\n"
             "  \u2713 Only applicable articles scanned (faster, more accurate)\n"
             "  \u2713 Compliance score reflects your actual obligations\n"
-            "  \u2713 Human Gates show only your required actions"
+            "  \u2713 Human Gates show only your required actions\n\n"
+            "After syncing (cl_sync), review your AI-detected risk classification\n"
+            "in Settings to confirm it matches your assessment."
         )
         output = "".join(output_lines)
 

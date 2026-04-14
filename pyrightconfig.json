@@ -1,0 +1,10 @@
+{
+  "include": ["scanner"],
+  "exclude": [
+    "private",
+    "node_modules",
+    ".next",
+    ".git",
+    "**/__pycache__"
+  ]
+}

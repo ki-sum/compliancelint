@@ -80,25 +80,23 @@ class TestArt52Obl1:
         assert "2026-03-15" in obl[0].description
 
 
-# ── ART52-PERM-2: Rebuttal right (permission) ──
+# ── ART52-PERM-2: Rebuttal right (permission) — SKIPPED by gap_findings ──
 
 class TestArt52Perm2:
 
-    def test_always_utd(self, art52_module, tmp_path):
-        """ART52-PERM-2 → always UNABLE_TO_DETERMINE (permission, not obligation)."""
+    def test_permission_skipped(self, art52_module, tmp_path):
+        """ART52-PERM-2 is a permission (right, not obligation) → no finding generated."""
         BaseArticleModule.set_context(_full_true_ctx())
         result = art52_module.scan(str(tmp_path))
         obl = _find(result, "ART52-PERM-2")
-        assert len(obl) > 0
-        assert obl[0].level == ComplianceLevel.UNABLE_TO_DETERMINE
+        assert len(obl) == 0, "Permissions should not generate findings"
 
-    def test_utd_even_with_no_answers(self, art52_module, tmp_path):
-        """ART52-PERM-2 → UTD even with empty context."""
+    def test_permission_skipped_no_context(self, art52_module, tmp_path):
+        """ART52-PERM-2 → skipped even with empty context."""
         BaseArticleModule.set_context(_empty_ctx())
         result = art52_module.scan(str(tmp_path))
         obl = _find(result, "ART52-PERM-2")
-        assert len(obl) > 0
-        assert obl[0].level == ComplianceLevel.UNABLE_TO_DETERMINE
+        assert len(obl) == 0, "Permissions should not generate findings"
 
 
 # ── ART52-OBL-5: Reassessment request content (manual) ──
@@ -132,25 +130,23 @@ class TestArt52Obl5:
         )
 
 
-# ── ART52-PERM-5: Reassessment request right (permission) ──
+# ── ART52-PERM-5: Reassessment request right (permission) — SKIPPED by gap_findings ──
 
 class TestArt52Perm5:
 
-    def test_always_utd(self, art52_module, tmp_path):
-        """ART52-PERM-5 → always UNABLE_TO_DETERMINE (permission, not obligation)."""
+    def test_permission_skipped(self, art52_module, tmp_path):
+        """ART52-PERM-5 is a permission (right, not obligation) → no finding generated."""
         BaseArticleModule.set_context(_full_true_ctx())
         result = art52_module.scan(str(tmp_path))
         obl = _find(result, "ART52-PERM-5")
-        assert len(obl) > 0
-        assert obl[0].level == ComplianceLevel.UNABLE_TO_DETERMINE
+        assert len(obl) == 0, "Permissions should not generate findings"
 
-    def test_utd_even_with_no_answers(self, art52_module, tmp_path):
-        """ART52-PERM-5 → UTD even with empty context."""
+    def test_permission_skipped_no_context(self, art52_module, tmp_path):
+        """ART52-PERM-5 → skipped even with empty context."""
         BaseArticleModule.set_context(_empty_ctx())
         result = art52_module.scan(str(tmp_path))
         obl = _find(result, "ART52-PERM-5")
-        assert len(obl) > 0
-        assert obl[0].level == ComplianceLevel.UNABLE_TO_DETERMINE
+        assert len(obl) == 0, "Permissions should not generate findings"
 
 
 # ── ART52-OBL-6: Commission publishes list ──
@@ -193,7 +189,7 @@ class TestArt52Structural:
         """When AI provides no answers, all obligations → UNABLE_TO_DETERMINE."""
         BaseArticleModule.set_context(_empty_ctx())
         result = art52_module.scan(str(tmp_path))
-        all_ids = ["ART52-OBL-1", "ART52-PERM-2", "ART52-OBL-5", "ART52-PERM-5", "ART52-OBL-6"]
+        all_ids = ["ART52-OBL-1", "ART52-OBL-5", "ART52-OBL-6"]  # PERM-2/PERM-5 are permissions, skipped
         for obl_id in all_ids:
             findings = _find(result, obl_id)
             assert len(findings) > 0, f"{obl_id} not in findings"
@@ -220,7 +216,7 @@ class TestArt52Structural:
         BaseArticleModule.set_context(_full_true_ctx())
         result = art52_module.scan(str(tmp_path))
         found_ids = {f.obligation_id for f in result.findings}
-        expected_ids = {"ART52-OBL-1", "ART52-PERM-2", "ART52-OBL-5", "ART52-PERM-5", "ART52-OBL-6"}
+        expected_ids = {"ART52-OBL-1", "ART52-OBL-5", "ART52-OBL-6"}  # PERM-2/PERM-5 are permissions, skipped
         missing = expected_ids - found_ids
         assert not missing, f"Missing obligation IDs in findings: {missing}"
 

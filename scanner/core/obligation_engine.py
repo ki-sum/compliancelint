@@ -408,7 +408,19 @@ class ObligationEngine:
                 if isinstance(val, dict):
                     answers_flat.update(val)
 
+        # Types that never generate findings — even with scope_limitation.
+        # Permissions and empowerments are rights, not obligations.
+        # Not exercising a right is not a violation.
+        _permission_types = ("permission", "empowerment")
+
         for obl in gaps:
+            # Skip permissions/empowerments first — they are rights, not checkable
+            # obligations.  Even when they have a scope_limitation, asking the user
+            # "does this condition apply?" is noise because the answer doesn't
+            # change any compliance requirement.
+            if obl.deontic_type in _permission_types:
+                continue
+
             # Conditional obligations — check if context provides a skip signal
             if obl.scope_limitation is not None:
                 # If context_skip_field is set and context has a definitive answer,

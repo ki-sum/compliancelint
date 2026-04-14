@@ -132,16 +132,15 @@ class TestArt72Obl3:
 
 class TestArt72ConditionalObligations:
 
-    def test_per1_conditional_when_no_context(self, art72_module, tmp_path):
-        """PER-1 has scope_limitation → CONDITIONAL (UTD) when is_annex_i_product not provided."""
+    def test_per1_permission_skipped(self, art72_module, tmp_path):
+        """PER-1 is a permission (right, not obligation) → no finding generated."""
         BaseArticleModule.set_context(_full_true_ctx())
         result = art72_module.scan(str(tmp_path))
         obl = _find(result, "ART72-PER-1")
-        assert len(obl) > 0
-        assert obl[0].level == ComplianceLevel.UNABLE_TO_DETERMINE
+        assert len(obl) == 0, "Permissions should not generate findings"
 
-    def test_per1_not_applicable_when_not_annex_i(self, art72_module, tmp_path):
-        """PER-1 → NOT_APPLICABLE when is_annex_i_product=False."""
+    def test_per1_permission_skipped_even_with_context(self, art72_module, tmp_path):
+        """PER-1 → skipped even when context provides is_annex_i_product=False."""
         ctx = _ctx_with("art72", {
             "has_pmm_system": True,
             "has_active_data_collection": True,
@@ -151,8 +150,7 @@ class TestArt72ConditionalObligations:
         BaseArticleModule.set_context(ctx)
         result = art72_module.scan(str(tmp_path))
         obl = _find(result, "ART72-PER-1")
-        assert len(obl) > 0
-        assert obl[0].level == ComplianceLevel.NOT_APPLICABLE
+        assert len(obl) == 0, "Permissions should not generate findings"
 
 
 # ── Structural tests ──
@@ -222,6 +220,6 @@ class TestArt72Structural:
         BaseArticleModule.set_context(_full_true_ctx())
         result = art72_module.scan(str(tmp_path))
         found_ids = {f.obligation_id for f in result.findings}
-        expected_ids = {"ART72-OBL-1", "ART72-OBL-2", "ART72-OBL-3", "ART72-PER-1"}
+        expected_ids = {"ART72-OBL-1", "ART72-OBL-2", "ART72-OBL-3"}  # PER-1 is a permission, skipped
         missing = expected_ids - found_ids
         assert not missing, f"Missing obligation IDs in findings: {missing}"

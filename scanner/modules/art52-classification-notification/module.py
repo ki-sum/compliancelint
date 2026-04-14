@@ -117,23 +117,24 @@ class Art52Module(BaseArticleModule):
             gap_type=GapType.PROCESS,
         ))
 
-        # ── ART52-PERM-2: Rebuttal right (permission) ──
-        # Art. 52(2): Provider MAY present rebuttal arguments.
-        # Permission, not obligation — always UTD, informational only.
-        findings.append(Finding(
-            obligation_id="ART52-PERM-2",
-            file_path="project-wide",
-            line_number=None,
-            level=ComplianceLevel.UNABLE_TO_DETERMINE,
-            confidence=Confidence.LOW,
-            description=(
-                "Provider may present substantiated arguments that the model "
-                "does not present systemic risks despite meeting the threshold. "
-                "This is a permission (MAY), not an obligation — exercising this "
-                "right is a strategic/legal decision. No compliance action required."
-            ),
-            gap_type=GapType.PROCESS,
-        ))
+        # ART52-PERM-2: Rebuttal right — SKIPPED (permission, not obligation).
+        # Provider MAY present rebuttal arguments. Not exercising this right
+        # is not a violation. No finding generated.
+        # --- COMMENTED OUT 2026-04-12: permissions should not produce findings ---
+        # findings.append(Finding(
+        #     obligation_id="ART52-PERM-2",
+        #     file_path="project-wide",
+        #     line_number=None,
+        #     level=ComplianceLevel.UNABLE_TO_DETERMINE,
+        #     confidence=Confidence.LOW,
+        #     description=(
+        #         "Provider may present substantiated arguments that the model "
+        #         "does not present systemic risks despite meeting the threshold. "
+        #         "This is a permission (MAY), not an obligation — exercising this "
+        #         "right is a strategic/legal decision. No compliance action required."
+        #     ),
+        #     gap_type=GapType.PROCESS,
+        # ))
 
         # ── ART52-OBL-5: Reassessment request content (manual) ──
         # Art. 52(5): Reassessment request SHALL contain objective, detailed and
@@ -155,23 +156,24 @@ class Art52Module(BaseArticleModule):
             gap_type=GapType.PROCESS,
         ))
 
-        # ── ART52-PERM-5: Reassessment request right (permission) ──
-        # Art. 52(5): Provider MAY request reassessment at earliest 6 months.
-        # Permission, not obligation — always UTD, informational only.
-        findings.append(Finding(
-            obligation_id="ART52-PERM-5",
-            file_path="project-wide",
-            line_number=None,
-            level=ComplianceLevel.UNABLE_TO_DETERMINE,
-            confidence=Confidence.LOW,
-            description=(
-                "Provider may request reassessment of systemic risk designation "
-                "at the earliest six months after the designation decision. "
-                "This is a permission (MAY), not an obligation — exercising this "
-                "right is a strategic/legal decision. No compliance action required."
-            ),
-            gap_type=GapType.PROCESS,
-        ))
+        # ART52-PERM-5: Reassessment request right — SKIPPED (permission, not obligation).
+        # Provider MAY request reassessment. Not exercising this right
+        # is not a violation. No finding generated.
+        # --- COMMENTED OUT 2026-04-12: permissions should not produce findings ---
+        # findings.append(Finding(
+        #     obligation_id="ART52-PERM-5",
+        #     file_path="project-wide",
+        #     line_number=None,
+        #     level=ComplianceLevel.UNABLE_TO_DETERMINE,
+        #     confidence=Confidence.LOW,
+        #     description=(
+        #         "Provider may request reassessment of systemic risk designation "
+        #         "at the earliest six months after the designation decision. "
+        #         "This is a permission (MAY), not an obligation — exercising this "
+        #         "right is a strategic/legal decision. No compliance action required."
+        #     ),
+        #     gap_type=GapType.PROCESS,
+        # ))
 
         # ── ART52-OBL-6: Commission publishes systemic risk list ──
         # Art. 52(6): Commission obligation — not a provider obligation.

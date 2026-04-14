@@ -944,11 +944,12 @@ class TestClScanArticle10:
         }))
         result_json = _scan_single_article(10, project_dir, context=ctx)
         result = json.loads(result_json)
-        for obl_id in ["ART10-PERM-5", "ART10-OBL-6"]:
-            findings = [f for f in result["findings"] if f["obligation_id"] == obl_id]
-            assert len(findings) > 0, f"{obl_id} not in findings"
-            assert findings[0].get("is_informational", False) or \
-                   "[CONDITIONAL]" in findings[0].get("description", "")
+        # ART10-PERM-5 is a permission → skipped (no finding).
+        # ART10-OBL-6 is an obligation → should have a finding.
+        perm5 = [f for f in result["findings"] if f["obligation_id"] == "ART10-PERM-5"]
+        assert len(perm5) == 0, "ART10-PERM-5 is a permission, should not generate finding"
+        obl6 = [f for f in result["findings"] if f["obligation_id"] == "ART10-OBL-6"]
+        assert len(obl6) > 0, "ART10-OBL-6 not in findings"
 
 
 class TestClScanArticle11:
@@ -2314,8 +2315,9 @@ class TestClScanArticle72:
         result_json = _scan_single_article(72, project_dir, context=ctx)
         result = json.loads(result_json)
         finding_ids = {f["obligation_id"] for f in result.get("findings", [])}
-        for obl_id in ["ART72-OBL-1", "ART72-OBL-2", "ART72-OBL-3", "ART72-PER-1"]:
+        for obl_id in ["ART72-OBL-1", "ART72-OBL-2", "ART72-OBL-3"]:
             assert obl_id in finding_ids, f"{obl_id} not in findings. Found: {sorted(finding_ids)}"
+        assert "ART72-PER-1" not in finding_ids, "ART72-PER-1 is a permission, should not generate finding"
 
     def test_scope_gate_open_source(self, project_dir):
         ctx = ProjectContext.from_json(json.dumps({
@@ -2801,8 +2803,10 @@ class TestClScanArticle52:
         result_json = _scan_single_article(52, project_dir, context=ctx)
         result = json.loads(result_json)
         finding_ids = {f["obligation_id"] for f in result.get("findings", [])}
-        for obl_id in ["ART52-OBL-1", "ART52-PERM-2", "ART52-OBL-5", "ART52-PERM-5", "ART52-OBL-6"]:
+        for obl_id in ["ART52-OBL-1", "ART52-OBL-5", "ART52-OBL-6"]:
             assert obl_id in finding_ids, f"{obl_id} not in findings. Found: {sorted(finding_ids)}"
+        for perm_id in ["ART52-PERM-2", "ART52-PERM-5"]:
+            assert perm_id not in finding_ids, f"{perm_id} is a permission, should not generate finding"
 
     def test_scope_gate_not_ai_system(self, project_dir):
         """Non-AI system → not_applicable via scope gate."""
