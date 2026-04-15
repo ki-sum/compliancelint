@@ -49,3 +49,6 @@ test-results/
 docs/sources/*.pdf
 docs/sources/*.html
 docs/sources/*.zip
+
+# mcp-test-triangulator pilot output (not checked in)
+audit/
