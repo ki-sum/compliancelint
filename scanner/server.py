@@ -2083,31 +2083,12 @@ def cl_sync(project_path: str, regulation: str = "") -> str:
         slog.error(f"STEP 7: Failed to parse attestation responses from state: {_e}")
     slog.info(f"STEP 7b: {len(response_items)} attestation responses loaded")
 
-    # Load changes_summary: AI-written file > auto-generated git summary
-    slog.info("STEP 7c: loading changes_summary")
-    changes_summary = ""
-    changes_file = os.path.join(project_path, ".compliancelint", "changes_summary.txt")
-    if os.path.isfile(changes_file):
-        try:
-            with open(changes_file, "r", encoding="utf-8") as _f:
-                changes_summary = _f.read().strip()
-            slog.info(f"STEP 7d: changes_summary loaded ({len(changes_summary)} chars)")
-        except Exception as _e:
-            slog.warning(f"STEP 7c: Could not read changes_summary.txt: {_e}")
-
-    # Auto-generate git diff summary if no manual summary exists
-    if not changes_summary:
-        try:
-            import subprocess
-            result = subprocess.run(
-                ["git", "log", "--oneline", "-10", "--no-decorate"],
-                cwd=project_path, capture_output=True, text=True, timeout=5
-            )
-            if result.returncode == 0 and result.stdout.strip():
-                changes_summary = f"Recent commits:\n{result.stdout.strip()}"
-                slog.info(f"STEP 7d: auto-generated git summary ({len(changes_summary)} chars)")
-        except Exception:
-            pass  # Not a git repo or git not available
+    # changes_summary feature removed (2026-04-16):
+    # - Previously auto-generated from `git log` in cl_sync → caused MCP hangs
+    # - Assumed every user had git initialized; many don't
+    # - Only consumer was PDF "Code Changes" box (also removed)
+    # Always pass null — DB column preserved for backward compat.
+    changes_summary = None
 
     # Apply attestation overrides: rebutted → not_applicable, evidenced → compliant
     articles_data = json.loads(json.dumps(state.get("articles", {})))  # deep copy
