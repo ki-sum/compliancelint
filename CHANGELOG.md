@@ -6,6 +6,12 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [1.1.0] — 2026-04-11 (unreleased)
 
+### Changed — marketing copy + SEO metadata (2026-04-18)
+- Primary tagline: **"Compliance in your IDE. Not in a meeting."** (was "From non-compliant to audit-ready. Automatically.")
+- Landing page H1 now reads as two lines. Old tagline retained as sub-text in README.
+- SEO `<title>` and OpenGraph / Twitter card metadata updated to match new tagline.
+- **Fix**: `description` no longer claims "Open source" — corrected to "Source-available (BSL 1.1)" to match actual licensing.
+
 ### Changed — risk_classification schema aligned with EU AI Act canonical categories (2026-04-17)
 - AI prompt now requests one of 4 canonical values: `prohibited` / `high-risk` / `limited-risk` / `minimal-risk` (or empty when undetermined). Previously the prompt accepted free-form values like `"likely high-risk"`, `"not high-risk"`, `"unclear"`, which mixed "the classification" with "uncertainty about it" in a single field.
 - AI uncertainty now goes solely in the existing `risk_classification_confidence` field (`high` | `medium` | `low`).

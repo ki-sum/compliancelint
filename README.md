@@ -5,7 +5,9 @@
 [![MCP](https://img.shields.io/badge/MCP-Compatible-purple.svg)](https://modelcontextprotocol.io/)
 [![EU AI Act](https://img.shields.io/badge/EU_AI_Act-247_obligations-emerald.svg)](https://compliancelint.dev)
 
-**From non-compliant to audit-ready. Automatically.**
+**Compliance in your IDE. Not in a meeting.**
+
+From non-compliant to audit-ready — automatically, inside the tools you already use.
 
 Scan your code and docs against up to 247 legal obligations from the EU AI Act. Find compliance gaps, fix them with AI-guided remediation, and track your journey to fully compliant. Your code never leaves your machine.
 
