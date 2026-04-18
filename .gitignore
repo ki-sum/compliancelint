@@ -28,8 +28,11 @@ CLAUDE.md
 CLAUDE.local.md
 .compliancelintrc
 
-# Claude Code (local dev config)
-.claude/
+# Claude Code (local dev config — hooks, settings, worktrees, scheduled_tasks.lock)
+.claude/*
+# ...but routines are shared team config for scheduled remote agents
+!.claude/routines/
+!.claude/routines/**
 
 # Node.js / Next.js (should not appear in public repo but guard against ad-hoc builds)
 node_modules/
