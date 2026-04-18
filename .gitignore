@@ -28,8 +28,10 @@ CLAUDE.md
 CLAUDE.local.md
 .compliancelintrc
 
-# Claude Code (local dev config)
-.claude/
+# Claude Code (local dev config — hooks, worktrees, scheduled_tasks.lock, etc.)
+.claude/*
+# ...but settings.json (MCP pre-approval for cloud routines) IS shared team config
+!.claude/settings.json
 
 # Node.js / Next.js (should not appear in public repo but guard against ad-hoc builds)
 node_modules/
