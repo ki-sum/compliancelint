@@ -9,11 +9,11 @@ class ProjectConfig:
     """User-defined project configuration for ComplianceLint.
 
     Create .compliancelintrc in your project root to override AI classifications.
-    Use overrides when AI confidence is low or classification is "unclear".
+    Use overrides when AI confidence is low.
 
     Example .compliancelintrc:
     {
-        "risk_classification_override": "not high-risk",
+        "risk_classification_override": "minimal-risk",
         "risk_classification_reasoning": "CRUD app, no AI decision-making",
         "primary_language_override": "typescript",
         "logging_framework_override": "winston",
@@ -39,8 +39,15 @@ class ProjectConfig:
     scan_mode: str = "ask"   # "ask" | "automation"
 
     # ── AI classification overrides ──
-    # Use these when AI confidence is "low" or risk_classification is "unclear"
-    risk_classification_override: str = ""        # "likely high-risk" | "not high-risk"
+    # Use these when AI confidence is "low" or you disagree with the AI.
+    # risk_classification_override accepts the 4 canonical EU AI Act categories
+    # (matching the dashboard RISK_OPTIONS):
+    #   prohibited | high-risk | limited-risk | minimal-risk
+    # Backward-compat: legacy strings ("not high-risk", "likely high-risk", "low-risk",
+    # "limited risk", "minimal risk") are still accepted by `_NOT_HIGH_RISK_VALUES` in
+    # protocol.py for the article-skip path, but NEW configs should use canonical
+    # values to avoid amber-mismatch banners in the SaaS dashboard.
+    risk_classification_override: str = ""        # canonical: "minimal-risk" | "limited-risk" | "high-risk" | "prohibited"
     risk_classification_reasoning: str = ""       # Your reasoning (included in report)
     primary_language_override: str = ""           # e.g. "typescript", "python"
     logging_framework_override: str = ""          # e.g. "winston", "structlog"

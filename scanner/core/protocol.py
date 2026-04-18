@@ -625,7 +625,18 @@ class BaseArticleModule:
     _OPEN_SOURCE_APPLICABLE = frozenset({4, 5, 50, 51, 52, 53, 54, 55})
 
     # Risk classification strings that clearly mean "not high-risk"
+    # (i.e. AI Act articles 9-15 do NOT apply, scan can be skipped).
+    #
+    # Includes BOTH canonical dashboard values (hyphenated: "minimal-risk", "limited-risk")
+    # AND legacy/free-text variants ("not high-risk", "minimal risk" with space, etc.)
+    # for backward-compat with older .compliancelintrc files and AI outputs that
+    # didn't follow the canonical schema. New AI prompts (post 2026-04-17) emit
+    # canonical hyphenated values; legacy strings are kept here so users with
+    # older configs don't see behaviour change.
     _NOT_HIGH_RISK_VALUES = frozenset({
+        # Canonical (matches dashboard RISK_OPTIONS — what the new prompts emit)
+        "minimal-risk", "limited-risk",
+        # Legacy variants (older AI outputs, older .compliancelintrc files)
         "not high-risk", "not_high_risk", "not high risk",
         "no", "not applicable", "n/a", "low-risk", "low risk",
         "minimal risk", "limited risk",

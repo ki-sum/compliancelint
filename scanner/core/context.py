@@ -236,8 +236,18 @@ class ProjectContext:
     project_type: str = ""               # e.g. "web app", "ML training pipeline", "CLI tool"
 
     # ── AI classification ──
-    risk_classification: str = ""        # AI's assessment: "likely high-risk", "not high-risk", "unclear"
-    risk_reasoning: str = ""             # Why the AI thinks so
+    # risk_classification holds the EU AI Act legal category. The 4 canonical
+    # values map 1:1 to dashboard RISK_OPTIONS and to the law itself:
+    #   - prohibited (Art. 5)
+    #   - high-risk (Art. 6 + Annex III)
+    #   - limited-risk (Art. 50 transparency obligations)
+    #   - minimal-risk (no specific obligations)
+    # AI uncertainty about WHICH category applies goes in the separate
+    # `risk_classification_confidence` field, NOT mixed into the value (i.e.
+    # "likely high-risk" is no longer accepted — use risk_classification="high-risk"
+    # plus risk_classification_confidence="medium" instead).
+    risk_classification: str = ""        # one of: prohibited | high-risk | limited-risk | minimal-risk | "" (empty when AI cannot determine)
+    risk_reasoning: str = ""             # Why the AI thinks so (free text)
     risk_classification_confidence: str = ""  # "high" | "medium" | "low"
     ai_libraries: list = field(default_factory=list)  # e.g. ["openai", "transformers"]
 
@@ -668,8 +678,8 @@ Respond with ONLY a JSON object (no markdown, no explanation) with this structur
   "languages": ["all languages found"],
   "framework": "web/app framework used",
   "project_type": "what kind of project this is",
-  "risk_classification": "likely high-risk | not high-risk | unclear",
-  "risk_reasoning": "one sentence explanation",
+  "risk_classification": "prohibited | high-risk | limited-risk | minimal-risk | \"\" (empty if you cannot determine yet)",
+  "risk_reasoning": "one sentence explanation. Use this to express uncertainty (e.g. 'leaning high-risk because Annex III §1 may apply, but need confirmation of the deployment context'). Do NOT put 'likely' / 'unclear' inside risk_classification itself — use confidence instead.",
   "risk_classification_confidence": "high | medium | low",
   "ai_libraries": ["AI/ML libraries found in dependencies"],
   "source_dirs": ["directories with production code"],
@@ -826,9 +836,9 @@ Respond with ONLY a JSON object (no markdown, no explanation) with this structur
       "is_distributor": null,
       "is_importer": null,
       "is_gpai_provider": null,
-      "risk_classification": "high-risk | limited-risk | not high-risk",
+      "risk_classification": "prohibited | high-risk | limited-risk | minimal-risk | \"\" (empty if you cannot determine)",
       "risk_classification_confidence": "high | medium | low",
-      "risk_reasoning": "one sentence explanation"
+      "risk_reasoning": "one sentence explanation. Use this for uncertainty (e.g. 'leaning high-risk pending confirmation'). Do NOT put 'likely' / 'unclear' inside risk_classification itself."
     }},
     "_scan_metadata": {{
       "files_read": ["list every file path you actually read, e.g. src/app.py"],

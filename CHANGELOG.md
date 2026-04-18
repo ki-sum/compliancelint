@@ -4,7 +4,14 @@ All notable changes to ComplianceLint will be documented in this file.
 
 This project adheres to [Semantic Versioning](https://semver.org/).
 
-## [1.1.0] — 2026-04-11
+## [1.1.0] — 2026-04-11 (unreleased)
+
+### Changed — risk_classification schema aligned with EU AI Act canonical categories (2026-04-17)
+- AI prompt now requests one of 4 canonical values: `prohibited` / `high-risk` / `limited-risk` / `minimal-risk` (or empty when undetermined). Previously the prompt accepted free-form values like `"likely high-risk"`, `"not high-risk"`, `"unclear"`, which mixed "the classification" with "uncertainty about it" in a single field.
+- AI uncertainty now goes solely in the existing `risk_classification_confidence` field (`high` | `medium` | `low`).
+- This eliminates a known false-positive in the SaaS dashboard's settings-mismatch banner: previously, an AI-emitted `"likely high-risk"` never matched the user-set `"high-risk"` despite semantic equivalence, triggering an amber warning. With canonical values both sides compare identically.
+- **Backward compatibility**: legacy values (`"not high-risk"`, `"likely high-risk"`, `"limited risk"`, `"minimal risk"`, etc.) are still accepted by `_NOT_HIGH_RISK_VALUES` in `protocol.py` for the article-skip path. Existing `.compliancelintrc` files with `risk_classification_override` set to legacy strings continue to work.
+- **Recommended action for users**: when next editing your `.compliancelintrc`, switch `risk_classification_override` to a canonical value (`minimal-risk` / `limited-risk` / `high-risk` / `prohibited`) to match the SaaS dashboard.
 
 ### Added — Human Gates
 - **Human Gates system** — guided questionnaires for manual compliance obligations (DPIA, FRIA, human oversight, worker notification, log retention, and 66 more)
