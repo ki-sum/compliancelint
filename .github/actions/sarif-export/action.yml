@@ -1,0 +1,139 @@
+name: ComplianceLint SARIF Export
+description: >
+  Download a ComplianceLint compliance scan as SARIF 2.1.0 and (optionally)
+  upload it to GitHub Code Scanning so EU AI Act findings appear inline on PRs
+  and in the Security tab — no extra ComplianceLint dashboard login needed for
+  reviewers.
+branding:
+  icon: shield-off
+  color: blue
+
+inputs:
+  api-key:
+    description: ComplianceLint API key (starts with cl_). Store as a GitHub secret.
+    required: true
+  scan-id:
+    description: >
+      Scan UUID to export. If omitted, the action will use the latest scan
+      synced for the current GitHub repository (matched by repo name).
+    required: false
+  repo-name:
+    description: >
+      ComplianceLint repo name to look up the latest scan for, when scan-id is
+      not supplied. Defaults to the GITHUB_REPOSITORY env var (owner/name)
+      auto-set by the runner. Note: GitHub disallows expression contexts in
+      composite-action input defaults, so this default is applied in the bash
+      step instead of via `default:`.
+    required: false
+  level:
+    description: >
+      SARIF granularity. One of:
+        - status-summary  — 1 result per scan (good for "is this PR compliant?" gate)
+        - scan            — 1 result per article (~30 results, recommended default)
+        - full            — 1 result per obligation (~247 results, for deep audit)
+    required: false
+    default: scan
+  output-file:
+    description: Path to write the .sarif file. Default compliancelint.sarif in workspace root.
+    required: false
+    default: compliancelint.sarif
+  dashboard-url:
+    description: ComplianceLint dashboard base URL.
+    required: false
+    default: https://compliancelint.dev
+
+outputs:
+  sarif-file:
+    description: Absolute path to the downloaded SARIF file.
+    value: ${{ steps.export.outputs.sarif-file }}
+  result-count:
+    description: Number of result entries in the SARIF file.
+    value: ${{ steps.export.outputs.result-count }}
+
+runs:
+  using: composite
+  steps:
+    - id: export
+      shell: bash
+      env:
+        CL_API_KEY: ${{ inputs.api-key }}
+        CL_SCAN_ID: ${{ inputs.scan-id }}
+        CL_REPO_NAME: ${{ inputs.repo-name }}
+        CL_LEVEL: ${{ inputs.level }}
+        CL_OUTPUT: ${{ inputs.output-file }}
+        CL_DASHBOARD: ${{ inputs.dashboard-url }}
+      run: |
+        set -e
+
+        # 0. Default repo-name to $GITHUB_REPOSITORY (input default cannot use
+        #    ${{ github.repository }} because composite actions disallow
+        #    expression contexts in input defaults).
+        : "${CL_REPO_NAME:=$GITHUB_REPOSITORY}"
+
+        # 1. Resolve scan-id if not supplied — find latest scan for this repo
+        if [ -z "$CL_SCAN_ID" ]; then
+          echo "scan-id not provided; looking up latest scan for repo '$CL_REPO_NAME'..."
+          SCAN_ID=$(
+            curl -fsS \
+              -H "Authorization: Bearer $CL_API_KEY" \
+              "$CL_DASHBOARD/api/v1/scans?repo=$(printf '%s' "$CL_REPO_NAME" | jq -sRr @uri)&limit=1" \
+              | jq -r '.scans[0].id // empty'
+          )
+          if [ -z "$SCAN_ID" ]; then
+            echo "::error::No scans found for repo '$CL_REPO_NAME'. Run 'cl_sync' from your IDE or compliancelint-action first." >&2
+            exit 1
+          fi
+          echo "Resolved scan-id: $SCAN_ID"
+        else
+          SCAN_ID="$CL_SCAN_ID"
+        fi
+
+        # 2. Validate level input
+        case "$CL_LEVEL" in
+          status-summary|scan|full) ;;
+          *)
+            echo "::error::Invalid 'level' input: '$CL_LEVEL' (expected status-summary | scan | full)" >&2
+            exit 1
+            ;;
+        esac
+
+        # 3. Download SARIF
+        echo "Downloading SARIF (level=$CL_LEVEL) for scan $SCAN_ID..."
+        HTTP_CODE=$(
+          curl -sS -w '%{http_code}' -o "$CL_OUTPUT" \
+            -H "Authorization: Bearer $CL_API_KEY" \
+            "$CL_DASHBOARD/api/v1/sarif/$SCAN_ID?level=$CL_LEVEL"
+        )
+
+        if [ "$HTTP_CODE" != "200" ]; then
+          echo "::error::SARIF export failed with HTTP $HTTP_CODE" >&2
+          cat "$CL_OUTPUT" >&2 || true
+          exit 1
+        fi
+
+        # 4. Validate the downloaded file is real SARIF (not an HTML error page)
+        VERSION=$(jq -r '.version // empty' "$CL_OUTPUT" 2>/dev/null || true)
+        if [ "$VERSION" != "2.1.0" ]; then
+          echo "::error::Downloaded file is not a valid SARIF 2.1.0 document (got version='$VERSION')" >&2
+          head -c 500 "$CL_OUTPUT" >&2
+          exit 1
+        fi
+
+        # 5. Count results
+        RESULT_COUNT=$(jq '[.runs[].results[]] | length' "$CL_OUTPUT")
+        echo "Wrote $CL_OUTPUT ($RESULT_COUNT result(s))"
+
+        # 6. Surface outputs
+        ABS=$(realpath "$CL_OUTPUT" 2>/dev/null || readlink -f "$CL_OUTPUT" 2>/dev/null || echo "$CL_OUTPUT")
+        echo "sarif-file=$ABS"   >> "$GITHUB_OUTPUT"
+        echo "result-count=$RESULT_COUNT" >> "$GITHUB_OUTPUT"
+
+        # 7. Step summary
+        {
+          echo "## ComplianceLint SARIF export"
+          echo
+          echo "- Scan: \`$SCAN_ID\`"
+          echo "- Level: \`$CL_LEVEL\`"
+          echo "- Results: **$RESULT_COUNT**"
+          echo "- File: \`$CL_OUTPUT\`"
+        } >> "$GITHUB_STEP_SUMMARY"

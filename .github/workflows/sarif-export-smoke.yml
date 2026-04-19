@@ -1,0 +1,56 @@
+name: SARIF Export — Dogfood
+
+# Pulls the latest ComplianceLint scan for THIS repo from production
+# compliancelint.dev and pushes it to GitHub Code Scanning, so EU AI Act
+# findings appear inline in PRs and the Security tab — without leaving
+# ki-sum/compliancelint at all (real dogfood: scanner scans itself).
+#
+# Triggered manually via workflow_dispatch. The daily-self-scan Claude
+# Code routine populates the dashboard with a fresh scan; this workflow
+# is the surface that consumes it.
+#
+# Required secret: COMPLIANCELINT_API_KEY (read-only sub-account
+# ci@compliancelint.dev — scoped to this repo via owner-pays member
+# inheritance, see /api/v1/sarif endpoint's getEffectiveTierForRepo
+# refactor 2026-04-19).
+
+on:
+  workflow_dispatch:
+    inputs:
+      level:
+        description: SARIF granularity (status-summary | scan | full)
+        required: false
+        default: full
+
+permissions:
+  contents: read
+  actions: read           # upload-sarif reads workflow-run metadata
+  security-events: write  # required for upload-sarif
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: sarif
+        uses: ./.github/actions/sarif-export
+        with:
+          api-key: ${{ secrets.COMPLIANCELINT_API_KEY }}
+          level: ${{ inputs.level }}
+
+      - name: Echo result count
+        run: |
+          echo "SARIF results: ${{ steps.sarif.outputs.result-count }}"
+          echo "SARIF file:    ${{ steps.sarif.outputs.sarif-file }}"
+
+      - uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: ${{ steps.sarif.outputs.sarif-file }}
+          category: compliancelint
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sarif-output
+          path: ${{ steps.sarif.outputs.sarif-file }}
+          retention-days: 7
