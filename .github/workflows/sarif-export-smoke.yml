@@ -21,6 +21,11 @@ on:
         description: SARIF granularity (status-summary | scan | full)
         required: false
         default: full
+  # Auto-run 15 min after the daily self-scan Claude Code routine (05:30 UTC)
+  # finishes so a fresh scan exists in compliancelint.dev before this workflow
+  # tries to download SARIF for it.
+  schedule:
+    - cron: '45 5 * * *'
 
 permissions:
   contents: read
