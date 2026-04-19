@@ -70,17 +70,31 @@ runs:
         #    expression contexts in input defaults).
         : "${CL_REPO_NAME:=$GITHUB_REPOSITORY}"
 
-        # 1. Resolve scan-id if not supplied — find latest scan for this repo
+        # 1. Resolve scan-id if not supplied — find latest scan for this repo.
+        #    Two-call chain: list repos by name → fetch repo detail with scans.
+        #    (GET /api/v1/scans is POST-only; repo detail is the read path.)
         if [ -z "$CL_SCAN_ID" ]; then
           echo "scan-id not provided; looking up latest scan for repo '$CL_REPO_NAME'..."
+          REPO_QUERY=$(printf '%s' "$CL_REPO_NAME" | jq -sRr @uri)
+          REPO_ID=$(
+            curl -fsS \
+              -H "Authorization: Bearer $CL_API_KEY" \
+              "$CL_DASHBOARD/api/v1/repos?q=$REPO_QUERY" \
+              | jq -r --arg name "$CL_REPO_NAME" '.[] | select(.name == $name) | .id' \
+              | head -n1
+          )
+          if [ -z "$REPO_ID" ]; then
+            echo "::error::No repo named '$CL_REPO_NAME' found in dashboard. Run 'cl_sync' from your IDE first." >&2
+            exit 1
+          fi
           SCAN_ID=$(
             curl -fsS \
               -H "Authorization: Bearer $CL_API_KEY" \
-              "$CL_DASHBOARD/api/v1/scans?repo=$(printf '%s' "$CL_REPO_NAME" | jq -sRr @uri)&limit=1" \
+              "$CL_DASHBOARD/api/v1/repos/$REPO_ID" \
               | jq -r '.scans[0].id // empty'
           )
           if [ -z "$SCAN_ID" ]; then
-            echo "::error::No scans found for repo '$CL_REPO_NAME'. Run 'cl_sync' from your IDE or compliancelint-action first." >&2
+            echo "::error::Repo '$CL_REPO_NAME' has no scans yet. Run 'cl_sync' first." >&2
             exit 1
           fi
           echo "Resolved scan-id: $SCAN_ID"
