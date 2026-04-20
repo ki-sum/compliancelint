@@ -143,6 +143,7 @@ Track compliance over time at **[compliancelint.dev](https://compliancelint.dev)
 - **Scan History** — full audit trail of every scan, with diff between consecutive scans
 - **PDF reports** — export audit-ready reports with legal citations
 - **Attestation** — record human review decisions with evidence (cl_update_finding)
+- **Evidence stays in your repo** — upload files from the dashboard; bytes commit to `.compliancelint/evidence/` in your git repo. We relay transiently, never hold your files.
 - **Human Gates** — guided questionnaires for obligations that require human verification (DPIA, oversight assignments, worker notifications)
 - **Role selection** — filter obligations by your EU AI Act role (Provider, Deployer, Importer, Distributor) for accurate scoring
 
@@ -319,7 +320,7 @@ The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard
 | Metric | Value |
 |--------|-------|
 | Legal obligations covered | 247 (from 44 EU AI Act articles) |
-| Unit tests | 2500+ (scanner + dashboard) |
+| Test coverage | Unit + integration + e2e (scanner pytest, dashboard Vitest, Playwright) |
 | Archetype test fixtures | Biometric systems to CRUD apps |
 | Test pass rate | 100% |
 | Obligation engine | Deterministic — same code, same result, every time |
