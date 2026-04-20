@@ -2100,6 +2100,11 @@ def cl_sync(project_path: str, regulation: str = "") -> str:
                 elif finding.get("evidence") and len(finding["evidence"]) > 0:
                     finding["level"] = "compliant"
 
+    # Derive current git HEAD sha for stale-detection anchor (Track 4a).
+    # Read-only git call, safe in MCP. None if not a git repo or git missing.
+    head_commit_sha = _derive_head_commit_sha(project_path)
+    slog.info(f"STEP 7c: HEAD commit sha = {head_commit_sha[:12] if head_commit_sha else 'none'}")
+
     # Build payload matching the API schema
     payload = {
         "project_id": project_id,
@@ -2111,6 +2116,7 @@ def cl_sync(project_path: str, regulation: str = "") -> str:
         "changes_summary": changes_summary or None,
         "articles": articles_data,
         "responses": response_items,  # Finding responses / attestations from state.json
+        "commit_sha": head_commit_sha,  # v4 Track 4a: stale-detection anchor per-finding + snapshot ledger
     }
 
     # POST to dashboard
@@ -2252,6 +2258,35 @@ def cl_sync(project_path: str, regulation: str = "") -> str:
     result = json.dumps(result_payload)
     slog.info(f"STEP 11: returning result ({len(result)} bytes)")
     return result
+
+
+def _derive_head_commit_sha(project_path: str) -> str | None:
+    """Return current git HEAD SHA (40-char lowercase hex), or None.
+
+    Used as the stale-detection anchor (Track 4a). Safe in MCP: timeout=2,
+    GIT_TERMINAL_PROMPT=0, CREATE_NO_WINDOW. Returns None on any error so
+    cl_sync still proceeds when the project isn't a git repo.
+    """
+    import subprocess
+    try:
+        flags = {
+            "capture_output": True,
+            "text": True,
+            "cwd": project_path,
+            "timeout": 2,
+            "env": {**os.environ, "GIT_TERMINAL_PROMPT": "0"},
+        }
+        if hasattr(subprocess, "CREATE_NO_WINDOW"):
+            flags["creationflags"] = subprocess.CREATE_NO_WINDOW
+        r = subprocess.run(["git", "rev-parse", "HEAD"], **flags)
+        if r.returncode != 0:
+            return None
+        sha = r.stdout.strip()
+        if len(sha) == 40 and all(c in "0123456789abcdef" for c in sha):
+            return sha
+        return None
+    except (subprocess.TimeoutExpired, FileNotFoundError, OSError):
+        return None
 
 
 def _curl_json(method: str, url: str, api_key: str, *, body: bytes | None = None,
