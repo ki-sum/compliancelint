@@ -2236,6 +2236,33 @@ def cl_sync(project_path: str, regulation: str = "") -> str:
         slog.error(f"STEP 11-ERR: pending evidence pull failed: {e}")
         pending_summary = {"error": f"pending evidence pull failed: {e}"}
 
+    # ── Evidence v4 Track 4c-2: broken_link health sweep ──
+    # Only runs when we successfully resolved a repo_id in the block above —
+    # no repo_id means we can't hit the evidence-health endpoint anyway.
+    # Uses the same HEAD commit sha we already derived earlier in this
+    # function for the scan_commit_sha anchor (Track 4a).
+    broken_link_summary: dict = {}
+    if resolved_repo_id:
+        slog.info("STEP 11c: running broken_link health sweep for git_path evidence")
+        try:
+            broken_link_summary = _run_broken_link_check(
+                project_path=project_path,
+                saas_url=saas_url,
+                api_key=config.saas_api_key,
+                repo_id=resolved_repo_id,
+                checked_at_sha=head_commit_sha,
+                slog=slog,
+            )
+            slog.info(
+                "STEP 11d: broken_link sweep done "
+                f"checked={broken_link_summary.get('checked', 0)} "
+                f"broken={broken_link_summary.get('broken', 0)} "
+                f"transitioned={broken_link_summary.get('transitioned', 0)}"
+            )
+        except Exception as e:
+            slog.error(f"STEP 11d-ERR: broken_link sweep failed: {e}")
+            broken_link_summary = {"error": f"broken_link sweep failed: {e}"}
+
     result_payload = {
         "status": "synced",
         "scan_id": scan_id,
@@ -2246,6 +2273,8 @@ def cl_sync(project_path: str, regulation: str = "") -> str:
     }
     if pending_summary:
         result_payload["pending_evidence"] = pending_summary
+    if broken_link_summary:
+        result_payload["broken_link_check"] = broken_link_summary
     if human_prompt:
         # Surface the prompt at top-level so MCP clients (Claude Code,
         # Cursor) can show it without drilling into nested objects.
@@ -2539,6 +2568,60 @@ def _run_pending_evidence_pull(project_path: str, saas_url: str, api_key: str,
                     "Evidence sync skipped: repo not found on dashboard.", repo_id)
 
     return summary.to_dict(), build_human_prompt(summary), repo_id
+
+
+def _run_broken_link_check(project_path: str, saas_url: str, api_key: str,
+                           repo_id: str, checked_at_sha: str | None,
+                           slog) -> dict:
+    """Glue between cl_sync and core.broken_link.
+
+    Wires curl-based HTTP into the broken_link sweep orchestrator.
+    Returns a dict summary suitable for the cl_sync result payload.
+    """
+    from core.broken_link import run_broken_link_check
+
+    def http_get_json(url: str) -> dict | None:
+        code, body = _curl_json("GET", url, api_key, timeout=15)
+        if code == 200 and body:
+            try:
+                return json.loads(body)
+            except json.JSONDecodeError as e:
+                slog.error(f"broken_link GET {url}: invalid JSON: {e}")
+                return None
+        if code == 404:
+            slog.info(f"broken_link GET {url}: 404 (no rows or repo gone)")
+            return None
+        if code == 0:
+            slog.error(f"broken_link GET {url}: curl failed (no response)")
+            return None
+        slog.error(f"broken_link GET {url}: HTTP {code} body={body[:200]}")
+        return None
+
+    def http_post_json(url: str, payload: dict) -> dict | None:
+        data = json.dumps(payload, default=str, ensure_ascii=True).encode("utf-8")
+        code, body = _curl_json("POST", url, api_key, body=data, timeout=30)
+        if code == 200 and body:
+            try:
+                return json.loads(body)
+            except json.JSONDecodeError as e:
+                slog.error(f"broken_link POST: invalid JSON: {e}")
+                return None
+        if code == 0:
+            slog.error("broken_link POST: curl failed (no response)")
+            return None
+        slog.error(f"broken_link POST: HTTP {code} body={body[:200]}")
+        return None
+
+    summary = run_broken_link_check(
+        project_path=project_path,
+        saas_url=saas_url,
+        repo_id=repo_id,
+        http_get_json=http_get_json,
+        http_post_json=http_post_json,
+        checked_at_sha=checked_at_sha,
+        logger=slog,
+    )
+    return summary.to_dict()
 
 
 def _check_latest_version() -> dict:
