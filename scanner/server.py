@@ -2197,15 +2197,313 @@ def cl_sync(project_path: str, regulation: str = "") -> str:
     dashboard_url = resp_data.get("dashboard_url", f"{saas_url}/dashboard")
     scan_id = resp_data.get("scan_id", "")
 
-    result = json.dumps({
+    # ── Evidence v4 deferred-path pull (sub-3b) ──
+    # After scan state is uploaded, fetch any pending evidence bytes the
+    # team has uploaded via the dashboard and write them to the working
+    # tree for the human to git-commit. MCP never runs git writes itself.
+    #
+    # repo_id resolution: cache → list → match-by-name. Cache lives in
+    # .compliancelint/metadata.json under key `repo_id`. On 404 from the
+    # pending-evidence list endpoint, cache is invalidated and we retry
+    # once with a fresh list+match.
+    pending_summary: dict = {}
+    human_prompt: str = ""
+    resolved_repo_id: str = ""
+    slog.info("STEP 11a: resolving SaaS repo_id for pending evidence pull")
+    try:
+        pending_summary, human_prompt, resolved_repo_id = _run_pending_evidence_pull(
+            project_path=project_path,
+            saas_url=saas_url,
+            api_key=config.saas_api_key,
+            repo_name=repo_name,
+            slog=slog,
+        )
+        slog.info(
+            "STEP 11b: pending pull done "
+            f"repo_id={resolved_repo_id or 'unresolved'} "
+            f"pulled={pending_summary.get('pulled', 0)} "
+            f"confirmed={pending_summary.get('confirmed', 0)} "
+            f"conflicts={pending_summary.get('conflicts', 0)} "
+            f"errors={pending_summary.get('errors', 0)}"
+        )
+    except Exception as e:
+        slog.error(f"STEP 11-ERR: pending evidence pull failed: {e}")
+        pending_summary = {"error": f"pending evidence pull failed: {e}"}
+
+    result_payload = {
         "status": "synced",
         "scan_id": scan_id,
+        "repo_id": resolved_repo_id,
         "dashboard_url": dashboard_url,
         "articles_synced": list(state.get("articles", {}).keys()),
         "message": f"Scan results uploaded. View at: {dashboard_url}",
-    })
+    }
+    if pending_summary:
+        result_payload["pending_evidence"] = pending_summary
+    if human_prompt:
+        # Surface the prompt at top-level so MCP clients (Claude Code,
+        # Cursor) can show it without drilling into nested objects.
+        result_payload["action_required"] = human_prompt
+        # And append to the human-readable message for one-line UIs.
+        result_payload["message"] = (
+            f"{result_payload['message']}\n\n{human_prompt}"
+        )
+
+    result = json.dumps(result_payload)
     slog.info(f"STEP 11: returning result ({len(result)} bytes)")
     return result
+
+
+def _curl_json(method: str, url: str, api_key: str, *, body: bytes | None = None,
+               timeout: int = 20) -> tuple[int, str]:
+    """Invoke curl via subprocess (same pattern as cl_sync POST /scans).
+
+    Returns (http_code, body_string). Raises subprocess errors to caller.
+    Matches existing cl_sync HTTP style — no new dependencies.
+    """
+    import subprocess as _sp
+    import tempfile as _tf
+
+    cmd: list[str] = [
+        "curl", "-s", "-S", "--max-time", str(timeout),
+        "-X", method, url,
+        "-H", f"Authorization: Bearer {api_key}",
+        "-H", "Accept: application/json",
+        "-w", "\n%{http_code}",
+    ]
+    tmp_path: str | None = None
+    if body is not None:
+        cmd += ["-H", "Content-Type: application/json; charset=utf-8"]
+        with _tf.NamedTemporaryFile(mode="wb", suffix=".json", delete=False) as tmp:
+            tmp.write(body)
+            tmp_path = tmp.name
+        cmd += ["-d", f"@{tmp_path}"]
+
+    curl_flags: dict = {}
+    if hasattr(_sp, "CREATE_NO_WINDOW"):
+        curl_flags["creationflags"] = _sp.CREATE_NO_WINDOW
+
+    try:
+        r = _sp.run(cmd, capture_output=True, text=True, timeout=timeout + 5, **curl_flags)
+    finally:
+        if tmp_path:
+            try:
+                os.unlink(tmp_path)
+            except OSError:
+                pass
+
+    stdout = r.stdout or ""
+    lines = stdout.rsplit("\n", 1)
+    body_str = lines[0] if len(lines) > 1 else ""
+    code = int(lines[-1]) if lines[-1].isdigit() else 0
+    return code, body_str
+
+
+def _resolve_saas_repo_id(project_path: str, saas_url: str, api_key: str,
+                           repo_name: str, slog,
+                           force_refresh: bool = False) -> tuple[str, str, str]:
+    """Resolve SaaS repo_id: cache → list /api/v1/repos → match by repo_name.
+
+    Returns (repo_id, source, error_reason):
+      - ("uuid...", "cache", "")       — read from metadata.json
+      - ("uuid...", "list", "")        — resolved by listing + matching name;
+                                         cache refreshed as side-effect
+      - ("", "", "list_repos_http_NNN") — /repos call failed at transport
+      - ("", "", "no_matching_repo")   — name not present in SaaS repos list;
+                                         user-facing skip reason
+      - ("", "", "list_repos_invalid_json") — malformed response
+    """
+    from core.pending_evidence import read_cached_repo_id, write_cached_repo_id
+
+    if not force_refresh:
+        cached = read_cached_repo_id(project_path)
+        if cached:
+            slog.info(f"resolve_repo_id: cache hit ({cached})")
+            return cached, "cache", ""
+
+    slog.info(f"resolve_repo_id: listing /api/v1/repos (repo_name={repo_name})")
+    list_url = f"{saas_url.rstrip('/')}/api/v1/repos"
+    try:
+        code, body = _curl_json("GET", list_url, api_key, timeout=10)
+    except Exception as e:
+        slog.error(f"resolve_repo_id: curl failed: {e}")
+        return "", "", "list_repos_network_error"
+
+    if code != 200:
+        slog.error(f"resolve_repo_id: list /repos HTTP {code}")
+        return "", "", f"list_repos_http_{code}"
+
+    try:
+        repos_list = json.loads(body) if body else []
+    except json.JSONDecodeError as e:
+        slog.error(f"resolve_repo_id: invalid JSON from /repos: {e}")
+        return "", "", "list_repos_invalid_json"
+
+    if not isinstance(repos_list, list):
+        return "", "", "list_repos_invalid_json"
+
+    matched = [r for r in repos_list if isinstance(r, dict) and r.get("name") == repo_name]
+    if not matched:
+        slog.warning(f"resolve_repo_id: no match for repo_name='{repo_name}' "
+                     f"in {len(repos_list)} SaaS repos")
+        return "", "", "no_matching_repo"
+
+    repo_id = matched[0].get("id", "")
+    if not repo_id:
+        return "", "", "list_repos_invalid_json"
+
+    # Cache for next invocation. Failure is non-fatal — next sync just
+    # pays one extra HTTP roundtrip.
+    try:
+        write_cached_repo_id(project_path, repo_id)
+        slog.info(f"resolve_repo_id: cached {repo_id} in metadata.json")
+    except Exception as e:
+        slog.warning(f"resolve_repo_id: cache write failed: {e}")
+
+    return repo_id, "list", ""
+
+
+def _skip_message_for_reason(reason: str, repo_name: str, saas_url: str) -> str:
+    """User-facing explanation when pending-evidence pull is skipped."""
+    if reason == "no_matching_repo":
+        return (
+            f"Evidence sync skipped: repo '{repo_name}' not found on "
+            f"{saas_url.rstrip('/')}/dashboard. If you renamed the repo or "
+            "changed 'git remote', open the dashboard and confirm the repo "
+            "entry matches, then re-run cl_sync."
+        )
+    if reason == "list_repos_network_error":
+        return (
+            "Evidence sync skipped: could not reach dashboard to look up "
+            "repo ID. Scan upload succeeded; retry cl_sync to pull evidence."
+        )
+    if reason.startswith("list_repos_http_"):
+        code = reason.rsplit("_", 1)[-1]
+        return (
+            f"Evidence sync skipped: dashboard returned HTTP {code} on "
+            "/api/v1/repos. Scan upload succeeded; check dashboard status and "
+            "retry cl_sync."
+        )
+    if reason == "list_repos_invalid_json":
+        return ("Evidence sync skipped: dashboard /repos response was malformed. "
+                "Scan upload succeeded; report to support if this persists.")
+    return f"Evidence sync skipped: {reason}"
+
+
+def _run_pending_evidence_pull(project_path: str, saas_url: str, api_key: str,
+                               repo_name: str, slog) -> tuple[dict, str, str]:
+    """Glue between cl_sync and core.pending_evidence.
+
+    Resolves repo_id (cache → list+match with cache invalidation on 404),
+    then wires curl-based HTTP into the pull orchestrator.
+
+    Returns (summary_dict, human_prompt_string, resolved_repo_id).
+    On unresolvable errors, summary_dict has {"skipped": True, "reason": ...}
+    and human_prompt_string explains to the user what to do.
+    """
+    from core.pending_evidence import (
+        pull_pending_evidence,
+        build_human_prompt,
+        clear_cached_repo_id,
+        RepoNotFoundError,
+    )
+
+    # Resolve repo_id (cache or list+match)
+    repo_id, source, reason = _resolve_saas_repo_id(
+        project_path, saas_url, api_key, repo_name, slog,
+    )
+    if not repo_id:
+        msg = _skip_message_for_reason(reason, repo_name, saas_url)
+        return ({"skipped": True, "reason": reason}, msg, "")
+
+    def _build_http_get_json(rid: str):
+        # list URL for THIS repo_id — a 404 against this exact URL signals
+        # "cached repo_id is stale" (or repo was deleted dashboard-side).
+        list_url_for_rid = f"{saas_url.rstrip('/')}/api/v1/repos/{rid}/pending-evidence"
+
+        def http_get_json(url: str) -> dict | None:
+            code, body = _curl_json("GET", url, api_key, timeout=15)
+            if code == 200 and body:
+                try:
+                    return json.loads(body)
+                except json.JSONDecodeError as e:
+                    slog.error(f"pull GET {url}: invalid JSON: {e}")
+                    return None
+            if code == 404:
+                if url == list_url_for_rid:
+                    # Stale cache signal — caller decides whether to retry
+                    raise RepoNotFoundError(url)
+                slog.info(f"pull GET {url}: 404 (non-list; item gone)")
+                return None
+            if code == 410:
+                slog.warning(f"pull GET {url}: 410 expired")
+                return None
+            if code == 0:
+                slog.error(f"pull GET {url}: curl failed (no response)")
+                return None
+            slog.error(f"pull GET {url}: HTTP {code} body={body[:200]}")
+            return None
+
+        return http_get_json
+
+    def http_post_json(url: str, payload: dict) -> dict | None:
+        data = json.dumps(payload, default=str, ensure_ascii=True).encode("utf-8")
+        code, body = _curl_json("POST", url, api_key, body=data, timeout=15)
+        if code == 200 and body:
+            try:
+                return json.loads(body)
+            except json.JSONDecodeError as e:
+                slog.error(f"sync-confirm: invalid JSON: {e}")
+                return None
+        if code == 0:
+            slog.error(f"sync-confirm: curl failed (no response)")
+            return None
+        slog.error(f"sync-confirm: HTTP {code} body={body[:200]}")
+        return None
+
+    try:
+        summary = pull_pending_evidence(
+            project_path=project_path,
+            saas_url=saas_url,
+            repo_id=repo_id,
+            http_get_json=_build_http_get_json(repo_id),
+            http_post_json=http_post_json,
+            logger=slog,
+        )
+    except RepoNotFoundError:
+        # Cached repo_id was stale (or repo deleted). Invalidate + re-resolve
+        # once. Do NOT retry indefinitely — if a fresh list+match still 404s,
+        # the repo really is gone.
+        if source != "cache":
+            slog.error("repo_id from fresh list returned 404 — repo disappeared mid-sync")
+            return ({"error": "repo_disappeared_mid_sync"},
+                    "Evidence sync skipped: repo disappeared during sync. Retry cl_sync.",
+                    repo_id)
+        slog.warning(f"cached repo_id {repo_id} is stale — invalidating and retrying")
+        clear_cached_repo_id(project_path)
+        repo_id, source, reason = _resolve_saas_repo_id(
+            project_path, saas_url, api_key, repo_name, slog, force_refresh=True,
+        )
+        if not repo_id:
+            msg = _skip_message_for_reason(reason, repo_name, saas_url)
+            # Annotate that we already invalidated a stale cache
+            return ({"skipped": True, "reason": reason, "note": "cache_invalidated"},
+                    msg, "")
+        try:
+            summary = pull_pending_evidence(
+                project_path=project_path,
+                saas_url=saas_url,
+                repo_id=repo_id,
+                http_get_json=_build_http_get_json(repo_id),
+                http_post_json=http_post_json,
+                logger=slog,
+            )
+        except RepoNotFoundError:
+            slog.error("fresh repo_id also returned 404 — aborting")
+            return ({"error": "repo_not_found_after_refresh"},
+                    "Evidence sync skipped: repo not found on dashboard.", repo_id)
+
+    return summary.to_dict(), build_human_prompt(summary), repo_id
 
 
 def _check_latest_version() -> dict:
