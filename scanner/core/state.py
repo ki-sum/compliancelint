@@ -31,6 +31,46 @@ _BASELINES_DIR = "baselines"
 _MAX_BASELINES = 20
 _PROJECT_FILE = "project.json"
 
+# D1: exception derogation map.
+# Populated on first use from scanner/obligations/*.json linked_obligation
+# fields. Key = EXC obligation id; value = list of main obligation ids that
+# become not_applicable when the EXC is attested.
+_DEROGATION_MAP: Optional[dict] = None
+
+
+def _load_derogation_map() -> dict:
+    """Load linked_obligation data from scanner/obligations/*.json.
+
+    Returns dict[exc_obligation_id, list[main_obligation_id]].
+    Memoised at module level — scanner obligations are static per release.
+    """
+    global _DEROGATION_MAP
+    if _DEROGATION_MAP is not None:
+        return _DEROGATION_MAP
+
+    obligations_dir = os.path.join(os.path.dirname(__file__), "..", "obligations")
+    result: dict = {}
+    if not os.path.isdir(obligations_dir):
+        _DEROGATION_MAP = result
+        return result
+
+    for fname in sorted(os.listdir(obligations_dir)):
+        if not fname.endswith(".json"):
+            continue
+        try:
+            with open(os.path.join(obligations_dir, fname), "r", encoding="utf-8") as f:
+                data = json.load(f)
+        except (json.JSONDecodeError, OSError):
+            continue
+        for obl in data.get("obligations", []):
+            oid = obl.get("id")
+            linked = obl.get("linked_obligation")
+            if oid and isinstance(linked, list) and linked:
+                result[oid] = list(linked)
+
+    _DEROGATION_MAP = result
+    return result
+
 
 def _state_dir(project_path: str) -> str:
     return os.path.join(project_path, _STATE_DIR)
@@ -206,6 +246,20 @@ def save_article_result(
 
     existing_findings = existing.get("findings", {})
 
+    # D1: Build exception-derogation overlay.
+    # An EXCEPTION obligation with prev_status="evidence_provided" derogates
+    # its linked_obligation main obligations — they become not_applicable by
+    # legal carve-out, regardless of what the scanner says about the code.
+    # Example: ART53-EXC-2 (FOSS GPAI) attested → ART53-OBL-1a/1b legally
+    # do not apply.
+    derogation_map = _load_derogation_map()
+    derogation_overlay: dict = {}  # main_obl_id -> list[exc_obl_id] that derogate it
+    for exc_oid, linked_mains in derogation_map.items():
+        exc_prev = existing_findings.get(exc_oid, {})
+        if exc_prev.get("status") == "evidence_provided":
+            for main_oid in linked_mains:
+                derogation_overlay.setdefault(main_oid, []).append(exc_oid)
+
     # Build new findings dict, preserving user-provided data
     new_findings = {}
     for finding in scan_result_dict.get("findings", []):
@@ -238,6 +292,15 @@ def save_article_result(
                 # Classification confirmations: NC means "detected, needs confirmation"
                 effective_level = "compliant"
 
+        # D1: If this obligation is derogated by any attested EXCEPTION,
+        # overlay effective_level to not_applicable. The derogation is a
+        # legal carve-out — the scanner's finding about the code remains
+        # in description/source_quote for audit, but the compliance status
+        # reflects the legal reality.
+        derogated_by = derogation_overlay.get(obl_id, [])
+        if derogated_by:
+            effective_level = "not_applicable"
+
         # Evidence quality check: if compliant but description lacks file path,
         # downgrade confidence to low (flag for human review)
         description = finding.get("description") or ""
@@ -252,7 +315,7 @@ def save_article_result(
             if not has_file_ref and confidence in ("high", "medium"):
                 confidence = "low"  # Downgrade: no specific file evidence
 
-        new_findings[obl_id] = {
+        record = {
             "status": prev_status,
             "level": effective_level,
             "confidence": confidence,
@@ -266,6 +329,10 @@ def save_article_result(
                 {"date": now, "action": "scanned", "level": effective_level, "by": "scanner"}
             ],
         }
+        # D1: record which EXCs drove the derogation, for audit trail
+        if derogated_by:
+            record["derogated_by"] = sorted(derogated_by)
+        new_findings[obl_id] = record
 
     # Mark absent findings
     for obl_id, prev_finding in existing_findings.items():

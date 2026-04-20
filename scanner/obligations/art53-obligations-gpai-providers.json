@@ -10,7 +10,10 @@
       "celex": "32024R1689",
       "oj_citation": "OJ L 2024/1689, 12.7.2024"
     },
-    "pdf_pages": [83, 84],
+    "pdf_pages": [
+      83,
+      84
+    ],
     "related_standards": {
       "published": [
         "ISO/IEC 42001:2023 -- AI management system"
@@ -55,7 +58,10 @@
         "level": "partial",
         "confidence": "medium",
         "detection_method": "Check for model cards, technical documentation, training documentation, evaluation results, and Annex XI coverage",
-        "what_to_scan": ["documentation", "config"],
+        "what_to_scan": [
+          "documentation",
+          "config"
+        ],
         "human_judgment_needed": "Whether documentation meets Annex XI minimum requirements"
       }
     },
@@ -87,7 +93,9 @@
         "level": "partial",
         "confidence": "medium",
         "detection_method": "Check for model cards, API documentation, integration guides, capability/limitation documentation, and Annex XII elements",
-        "what_to_scan": ["documentation"],
+        "what_to_scan": [
+          "documentation"
+        ],
         "human_judgment_needed": "Whether downstream documentation is complete and enables understanding"
       }
     },
@@ -114,7 +122,10 @@
         "level": "partial",
         "confidence": "low",
         "detection_method": "Check for copyright policy documentation, robots.txt compliance, opt-out mechanisms, and training data documentation",
-        "what_to_scan": ["documentation", "config"],
+        "what_to_scan": [
+          "documentation",
+          "config"
+        ],
         "human_judgment_needed": "Whether the copyright policy is adequate and actually implemented"
       }
     },
@@ -141,7 +152,9 @@
         "level": "partial",
         "confidence": "medium",
         "detection_method": "Check for public training data summaries, data cards, or documentation describing training data sources",
-        "what_to_scan": ["documentation"],
+        "what_to_scan": [
+          "documentation"
+        ],
         "human_judgment_needed": "Whether the summary is 'sufficiently detailed'"
       }
     },
@@ -166,9 +179,16 @@
         "level": "partial",
         "confidence": "medium",
         "detection_method": "Check license type, model weight availability, and systemic risk classification",
-        "what_to_scan": ["documentation", "config"],
+        "what_to_scan": [
+          "documentation",
+          "config"
+        ],
         "human_judgment_needed": "Whether the model truly qualifies for open-source exception"
-      }
+      },
+      "linked_obligation": [
+        "ART53-OBL-1a",
+        "ART53-OBL-1b"
+      ]
     },
     {
       "id": "ART53-OBL-3",
@@ -188,11 +208,12 @@
         "level": "manual",
         "confidence": "low",
         "detection_method": "Check for authority liaison procedures",
-        "what_to_scan": ["documentation"],
+        "what_to_scan": [
+          "documentation"
+        ],
         "human_judgment_needed": "Organizational process requirement"
       }
-    }
-    ,
+    },
     {
       "id": "ART53-PERM-4",
       "source": "Art. 53(4)",
@@ -211,10 +232,17 @@
         "level": "manual",
         "confidence": "low",
         "detection_method": "Check for adherence to approved codes of practice or harmonised standards",
-        "what_to_scan": ["documentation"],
+        "what_to_scan": [
+          "documentation"
+        ],
         "human_judgment_needed": "Whether the provider follows an approved code of practice"
       },
-      "cross_references": [{"article": 56, "context": "Codes of practice"}]
+      "cross_references": [
+        {
+          "article": 56,
+          "context": "Codes of practice"
+        }
+      ]
     },
     {
       "id": "ART53-OBL-4",
@@ -235,7 +263,9 @@
         "level": "manual",
         "confidence": "low",
         "detection_method": "Check for alternative compliance documentation submitted to Commission",
-        "what_to_scan": ["documentation"],
+        "what_to_scan": [
+          "documentation"
+        ],
         "human_judgment_needed": "Whether alternative means are adequate"
       }
     }

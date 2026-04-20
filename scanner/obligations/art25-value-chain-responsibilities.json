@@ -45,7 +45,10 @@
         "what_to_scan": "Project metadata for rebranding indicators, modification history, intended purpose documentation, upstream AI system integration details",
         "human_judgment_needed": true
       },
-      "cross_references": ["Art. 6", "Art. 16"]
+      "cross_references": [
+        "Art. 6",
+        "Art. 16"
+      ]
     },
     {
       "id": "ART25-OBL-2",
@@ -96,7 +99,10 @@
         "detection_method": "documentation_search",
         "what_to_scan": "License terms, usage restrictions, upstream provider documentation for opt-out clauses",
         "human_judgment_needed": true
-      }
+      },
+      "linked_obligation": [
+        "ART25-OBL-4"
+      ]
     },
     {
       "id": "ART25-CLS-3",
@@ -125,7 +131,10 @@
         "what_to_scan": "Product packaging metadata, brand/trademark usage, Annex I product classification",
         "human_judgment_needed": true
       },
-      "cross_references": ["Art. 16", "Annex I Section A"],
+      "cross_references": [
+        "Art. 16",
+        "Annex I Section A"
+      ],
       "scope_limitation": "Only applies to high-risk AI systems that are safety components of products covered by Annex I",
       "context_skip_field": "is_safety_component_annex_i"
     },
@@ -178,7 +187,10 @@
         "detection_method": "code_pattern_search",
         "what_to_scan": "License files, dependency manifests, open-source declarations for third-party AI components",
         "human_judgment_needed": false
-      }
+      },
+      "linked_obligation": [
+        "ART25-OBL-4"
+      ]
     },
     {
       "id": "ART25-SAV-5",

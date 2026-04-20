@@ -10,7 +10,9 @@
       "celex": "32024R1689",
       "oj_citation": "OJ L 2024/1689, 12.7.2024"
     },
-    "pdf_pages": [85],
+    "pdf_pages": [
+      85
+    ],
     "related_standards": {
       "published": [],
       "upcoming": []
@@ -38,7 +40,9 @@
         "level": "partial",
         "confidence": "low",
         "detection_method": "Check for authorised representative documentation, mandate records",
-        "what_to_scan": ["documentation"],
+        "what_to_scan": [
+          "documentation"
+        ],
         "human_judgment_needed": "Whether the provider is a third-country provider and whether appointment is valid"
       }
     },
@@ -63,7 +67,9 @@
         "level": "manual",
         "confidence": "low",
         "detection_method": "Check for evidence that representative has necessary access, resources and information",
-        "what_to_scan": ["documentation"],
+        "what_to_scan": [
+          "documentation"
+        ],
         "human_judgment_needed": "Whether the provider has adequately enabled the representative"
       }
     },
@@ -98,7 +104,9 @@
         "level": "manual",
         "confidence": "low",
         "detection_method": "Check for mandate documentation",
-        "what_to_scan": ["documentation"],
+        "what_to_scan": [
+          "documentation"
+        ],
         "human_judgment_needed": "Whether mandate covers all required tasks"
       }
     },
@@ -123,7 +131,9 @@
         "level": "manual",
         "confidence": "low",
         "detection_method": "Check mandate documentation for addressability clause",
-        "what_to_scan": ["documentation"],
+        "what_to_scan": [
+          "documentation"
+        ],
         "human_judgment_needed": "Whether the mandate adequately empowers the representative"
       }
     },
@@ -173,9 +183,18 @@
         "level": "partial",
         "confidence": "medium",
         "detection_method": "Check license type and systemic risk classification",
-        "what_to_scan": ["documentation"],
+        "what_to_scan": [
+          "documentation"
+        ],
         "human_judgment_needed": "Whether open-source exception applies"
-      }
+      },
+      "linked_obligation": [
+        "ART54-OBL-1",
+        "ART54-OBL-2",
+        "ART54-OBL-3",
+        "ART54-OBL-4",
+        "ART54-OBL-5"
+      ]
     }
   ],
   "summary": {

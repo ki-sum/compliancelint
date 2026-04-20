@@ -233,7 +233,10 @@
         "what_to_scan": [],
         "human_judgment_needed": "Whether system is used for law enforcement/migration/border/asylum AND applicable law deems dual verification disproportionate",
         "rationale": "Proportionality assessment under applicable Union/national law requires legal expertise"
-      }
+      },
+      "linked_obligation": [
+        "ART14-OBL-5"
+      ]
     }
   ],
   "summary": {
