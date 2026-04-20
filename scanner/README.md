@@ -1,6 +1,6 @@
 # ComplianceLint — EU AI Act Compliance Engine
 
-Open-source, MCP-native compliance engine that decomposes EU AI Act requirements into machine-readable obligations and maps them to automated code checks.
+Open-source, MCP-native compliance engine that decomposes EU AI Act requirements into machine-readable obligations. Each obligation is classified into one of three layers: code-verifiable (direct scanner detection), hybrid (AI-assisted evidence collection), or human-only (structured attestation). The scanner handles the first layer directly and feeds evidence into the latter two.
 
 ## Architecture
 

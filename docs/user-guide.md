@@ -1,9 +1,11 @@
 # ComplianceLint — User Guide
 
-## How to Run a Compliance Scan
+## How to Run a Compliance Workflow
 
-ComplianceLint runs inside Claude Code (VS Code), Cursor, or any MCP-enabled AI client.
-You ask Claude in natural language — Claude calls the scanner tools.
+ComplianceLint runs inside any MCP-enabled AI client (Claude Code, Cursor,
+VS Code, and others).
+You ask your AI assistant in natural language — the assistant calls the
+scanner tools.
 
 ---
 
@@ -11,19 +13,19 @@ You ask Claude in natural language — Claude calls the scanner tools.
 
 ### Mode 1 — Fast Scan (black box, may run silently for 10–20 minutes)
 
-Ask Claude:
+Ask your AI assistant:
 ```
 Please scan my project at /path/to/project for EU AI Act compliance.
 ```
 
-Claude will call `cl_scan_all` once and return a report.
-**Downside**: No visible progress. You won't know if Claude is working or stuck.
+Your AI assistant will call `cl_scan_all` once and return a report.
+**Downside**: No visible progress. You won't know if the scan is working or stuck.
 
 ---
 
 ### Mode 2 — Step-by-Step Scan (recommended, progress visible throughout)
 
-Ask Claude:
+Ask your AI assistant:
 ```
 Please scan my project at /path/to/project for EU AI Act compliance, article by article.
 
@@ -34,9 +36,29 @@ Requirements:
 - After all 44 articles, use cl_sync to upload results to your ComplianceLint dashboard
 ```
 
-**Why this works**: Claude reads files using Read/Grep tools (visible to you),
+**Why this works**: the AI reads files using Read/Grep tools (visible to you),
 narrates its analysis (visible), then calls the scanner tool (brief silent moment).
 You see activity at every step.
+
+---
+
+### Mode 3 — Attest Human Gates (after scanning, in the dashboard)
+
+After scanning, many obligations still need structured attestation in the
+dashboard. Ask your AI assistant:
+
+```
+Open the dashboard and guide me through Human Gates for this project.
+```
+
+Your AI client will:
+1. Open the Human Gates page for your repo
+2. Walk through each applicable article
+3. Pre-fill attestation fields from code evidence where possible
+4. Flag sections that need your written confirmation
+
+All attestations are saved with timestamp, author, and source — the audit
+trail regulators expect.
 
 ---
 

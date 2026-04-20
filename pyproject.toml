@@ -5,14 +5,14 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "compliancelint"
 version = "1.1.0"
-description = "Compliance linter for code — scan your project against EU AI Act requirements"
+description = "EU AI Act compliance: scan, attest, document — from your IDE. Source-available, MCP-native, AI-assisted."
 readme = "README.md"
 license = {text = "BSL-1.1"}
 requires-python = ">=3.10"
 authors = [
     {name = "ki-sum", email = "info@ki-sum.ai"},
 ]
-keywords = ["compliance", "eu-ai-act", "linter", "regulation", "ai", "mcp"]
+keywords = ["compliance", "eu-ai-act", "attestation", "evidence-collection", "regulation", "ai", "mcp"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",

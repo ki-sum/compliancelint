@@ -7,9 +7,9 @@
 
 **Compliance in your IDE. Not in a meeting.**
 
-From non-compliant to audit-ready — automatically, inside the tools you already use.
+From EU AI Act code to audit-ready evidence — in one workflow, inside the tools you already use.
 
-Scan your code and docs against up to 247 legal obligations from the EU AI Act. Find compliance gaps, fix them with AI-guided remediation, and track your journey to fully compliant. Your code never leaves your machine.
+Scan, attest, and document EU AI Act compliance without leaving your IDE. The scanner catches code-verifiable violations, AI collects evidence for hybrid obligations, and structured Human Gates capture pure attestations — all with audit trail. Your code never leaves your machine.
 
 > **2026-08-02** — EU AI Act high-risk requirements become enforceable. ComplianceLint helps you prepare now.
 

@@ -1,7 +1,7 @@
 {
   "name": "compliancelint",
   "version": "1.0.3",
-  "description": "EU AI Act compliance scanner for your codebase. ESLint for legal compliance.",
+  "description": "EU AI Act compliance: scan, attest, document — from your IDE. Source-available, MCP-native, AI-assisted.",
   "bin": {
     "compliancelint": "bin/init.js"
   },
@@ -11,7 +11,8 @@
     "mcp",
     "ai-act",
     "gdpr",
-    "linter",
+    "attestation",
+    "evidence-collection",
     "legal"
   ],
   "author": "ki-sum",
