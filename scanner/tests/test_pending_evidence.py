@@ -217,6 +217,60 @@ class TestAtomicWrite:
         atomic_write_bytes(target, blob, sha256_bytes(blob))
         assert open(target, "rb").read() == blob
 
+    def test_os_replace_failure_preserves_existing_target(self, tmp_project, monkeypatch):
+        """Simulates mid-write interruption: os.replace raises (server crash /
+        OOM kill / disk full at the atomic-rename step). Target must still
+        hold its original content — the atomic guarantee. Tmp must be cleaned.
+
+        Why this test matters: the design relies on os.replace being the
+        only moment the target changes. A future refactor that writes in-
+        place or renames before verify would silently break this guarantee.
+        """
+        target = os.path.join(tmp_project, "ev", "out.bin")
+        os.makedirs(os.path.dirname(target))
+        original = b"ORIGINAL - must survive crash"
+        with open(target, "wb") as f:
+            f.write(original)
+
+        def boom(_src, _dst):
+            raise OSError("simulated crash during atomic rename")
+
+        monkeypatch.setattr(pe.os, "replace", boom)
+
+        blob = b"incoming content"
+        with pytest.raises(OSError, match="simulated crash"):
+            atomic_write_bytes(target, blob, sha256_bytes(blob))
+
+        # Invariant 1: target file unchanged (byte-identical to original)
+        assert open(target, "rb").read() == original
+        # Invariant 2: no .tmp leftover (cleanup handler ran)
+        leftovers = [f for f in os.listdir(os.path.dirname(target))
+                     if f.endswith(".tmp")]
+        assert leftovers == []
+
+    def test_os_replace_failure_leaves_no_file_when_target_absent(self, tmp_project, monkeypatch):
+        """Same guarantee for the new-file case: target didn't exist before,
+        os.replace fails, target still doesn't exist, tmp cleaned.
+        """
+        target = os.path.join(tmp_project, "ev", "new.bin")
+        os.makedirs(os.path.dirname(target))
+
+        def boom(_src, _dst):
+            raise OSError("simulated crash during atomic rename")
+
+        monkeypatch.setattr(pe.os, "replace", boom)
+
+        blob = b"incoming content"
+        with pytest.raises(OSError, match="simulated crash"):
+            atomic_write_bytes(target, blob, sha256_bytes(blob))
+
+        # Invariant 1: target never materialised
+        assert not os.path.exists(target)
+        # Invariant 2: tmp cleaned
+        leftovers = [f for f in os.listdir(os.path.dirname(target))
+                     if f.endswith(".tmp")]
+        assert leftovers == []
+
 
 # ── Cache helpers ───────────────────────────────────────────────────────────
 
