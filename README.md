@@ -288,13 +288,25 @@ scanner/
 
 The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard is freemium:
 
-| | Free | Solo (€19/mo) | Pro (€49/mo) | Team (€149/mo) | Enterprise |
-|-|------|---------------|--------------|----------------|------------|
-| Developers | 1 | 1 | 5 | 25 | Unlimited |
-| Projects | 1 | Unlimited | Unlimited | Unlimited | Unlimited |
+| | Free | Starter (€19/mo) | Pro (€99/mo) | Business (€199/mo) | Enterprise |
+|-|------|------------------|--------------|--------------------|------------|
+| Projects | 1 | 2 | 10 | Unlimited | Unlimited |
 | Scan history | 7 days | Unlimited | Unlimited | Unlimited | Unlimited |
-| PDF reports | Watermarked | Full | Full | Full | Custom |
-| Invite others | — | ✓ | ✓ | ✓ | ✓ |
+| PDF reports | Watermarked | Clean | Clean | Clean | Clean |
+| Penalty display (worst-case) | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Penalty configuration (precise) | — | ✓ | ✓ | ✓ | ✓ |
+| Risk mapping | — | ✓ | ✓ | ✓ | ✓ |
+| Evidence references (URL, text) | — | — | ✓ | ✓ | ✓ |
+| Human Gates questionnaires | — | — | ✓ | ✓ | ✓ |
+| Evidence file upload to your repo | — | — | ✓ | ✓ | ✓ |
+| SARIF export | — | — | ✓ | ✓ | ✓ |
+| CI/CD quality gate | — | — | ✓ | ✓ | ✓ |
+| Multi-framework mapping (ISO 42001, NIST AI RMF) | — | — | — | ✓ | ✓ |
+| Regulation updates | — | — | — | ✓ | ✓ |
+| SSO / SAML / on-prem | — | — | — | — | ✓ |
+| Team members | Unlimited | Unlimited | Unlimited | Unlimited | Unlimited |
+
+**Evidence stays in your repo.** Upload files from the dashboard — bytes commit to `.compliancelint/evidence/` in your git repo. We relay transiently. We never hold your files.
 
 ---
 
