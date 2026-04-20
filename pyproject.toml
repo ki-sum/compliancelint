@@ -12,7 +12,7 @@ requires-python = ">=3.10"
 authors = [
     {name = "ki-sum", email = "info@ki-sum.ai"},
 ]
-keywords = ["compliance", "eu-ai-act", "attestation", "evidence-collection", "regulation", "ai", "mcp"]
+keywords = ["compliance", "eu-ai-act", "linter", "attestation", "evidence-collection", "regulation", "ai", "mcp"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
