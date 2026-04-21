@@ -24,6 +24,7 @@ import shutil
 import sqlite3
 import subprocess
 import sys
+import tempfile
 import uuid
 from pathlib import Path
 
@@ -299,6 +300,35 @@ def cleanup_pending(discovered):
     return _cleanup
 
 
+def _assert_safe_to_force_push(project: str) -> None:
+    """Hard fail if PROJECT ever points at a real repo.
+
+    The reset fixture runs `git reset --hard` + `git push --force origin`
+    on whatever path PROJECT resolves to. If a future contributor
+    accidentally repoints PROJECT at a real working tree (or someone's
+    personal clone of compliancelint), force-push would silently destroy
+    the remote. This guard makes the destruction impossible: the path
+    must either be under the system tempdir, under c:/tmp, or contain
+    "/tmp/" — all test-only conventions. The `or "tmp" in PROJECT`
+    fallback exists because Windows `tempfile.gettempdir()` is typically
+    `C:\\Users\\...\\AppData\\Local\\Temp` which doesn't match our
+    historical test path `c:/tmp/cl-sub3b-e2e`.
+    """
+    tmp = tempfile.gettempdir().replace("\\", "/").lower()
+    norm = project.replace("\\", "/").lower()
+    if norm.startswith(tmp):
+        return
+    if "/tmp/" in norm or norm.startswith("/tmp/") or norm.startswith("c:/tmp/"):
+        return
+    raise RuntimeError(
+        f"reset_working_tree refusing to force-push: PROJECT={project!r} "
+        f"is not under a recognised temp dir. This fixture runs "
+        f"`git push --force origin` — running it on a real repo would "
+        f"destroy remote history. Point PROJECT at a dedicated test "
+        f"worktree (e.g. c:/tmp/cl-sub3b-e2e) before running."
+    )
+
+
 @pytest.fixture
 def reset_working_tree(run_in_project):
     """Remove pulled evidence files + metadata.json + git reset to root commit.
@@ -306,9 +336,11 @@ def reset_working_tree(run_in_project):
     If a remote is configured (see `with_remote` fixture), force-sync the
     remote back to the local root so subsequent tests that push start from
     a clean state. Force-push is safe here — the bare remote is a test
-    fixture with no other readers.
+    fixture with no other readers, and `_assert_safe_to_force_push` hard-
+    fails if PROJECT ever points outside a temp dir.
     """
     def _reset():
+        _assert_safe_to_force_push(PROJECT)
         ev_dir = os.path.join(PROJECT, ".compliancelint", "evidence")
         if os.path.isdir(ev_dir):
             shutil.rmtree(ev_dir)

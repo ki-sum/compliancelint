@@ -157,3 +157,62 @@ class TestFormatFingerprintWarning:
         assert msg is not None
         assert "http://localhost:3000/dashboard/repos" in msg
         assert "http://localhost:3000//dashboard" not in msg
+
+
+class TestClSyncFingerprintWiringSource:
+    """Source-level contract test catching silent-drop bugs in cl_sync's
+    fingerprint glue code. The round-trip e2e test covers HTTP contract +
+    parser correctness; this test covers the *glue between them* — the
+    code that extracts warnings from the response and writes them into
+    result_payload. A typo in the result_payload dict key would be a
+    silent-drop bug (MCP clients would never see the warning), and a
+    typo is exactly the kind of issue that doesn't fail unit tests.
+    """
+
+    @pytest.fixture(scope="class")
+    def server_source(self):
+        server_py = os.path.join(SCANNER_ROOT, "server.py")
+        with open(server_py, "r", encoding="utf-8") as f:
+            return f.read()
+
+    def test_cl_sync_extracts_warnings_from_scan_response(self, server_source):
+        assert 'resp_data.get("warnings")' in server_source, (
+            "cl_sync must read the 'warnings' field from the POST /scans "
+            "response. If renamed, the fingerprint warning is silent-dropped."
+        )
+
+    def test_cl_sync_calls_format_fingerprint_warning(self, server_source):
+        assert "_format_fingerprint_warning(" in server_source, (
+            "cl_sync must call _format_fingerprint_warning to format the "
+            "parsed warnings. Missing call = silent drop."
+        )
+
+    def test_cl_sync_writes_fingerprint_warning_to_result_payload(self, server_source):
+        # Exact-key match — any typo like 'fingerprintWarning' or
+        # 'fingerprint-warning' would be a silent drop because MCP clients
+        # look for this specific key. Keep test brittle ON PURPOSE.
+        assert 'result_payload["fingerprint_warning"] = fingerprint_msg' in server_source, (
+            "cl_sync must write the formatted message under the exact key "
+            "'fingerprint_warning' in result_payload. ANY typo here is a "
+            "silent-drop bug — MCP clients (Claude Code, Cursor) render "
+            "this key and will show no warning if it's renamed."
+        )
+
+    def test_cl_sync_appends_fingerprint_to_top_level_message(self, server_source):
+        # Matches the one-line-UI pattern already in cl_sync for human_prompt
+        # (line 2283). Without this, terminal-style MCP clients that only
+        # render `message` would miss the warning.
+        assert "fingerprint_msg" in server_source and \
+               "result_payload['message']" in server_source, (
+            "cl_sync must append fingerprint_msg to result_payload['message'] "
+            "so one-line MCP UIs render the warning. Pattern must match "
+            "human_prompt appending (line ~2283)."
+        )
+
+    def test_first_commit_sha_in_scan_payload(self, server_source):
+        # Guards against the payload builder forgetting to send the field.
+        assert '"first_commit_sha": first_commit_sha' in server_source, (
+            "cl_sync must include first_commit_sha in POST /scans payload. "
+            "Without it the dashboard has no basis for comparison and the "
+            "fingerprint check silently no-ops on every sync."
+        )

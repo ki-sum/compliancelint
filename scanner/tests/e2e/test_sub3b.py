@@ -15,10 +15,13 @@ from __future__ import annotations
 
 import json
 import os
+import sqlite3
+import subprocess
+import time
 
 import pytest
 
-from _e2e_consts import API_KEY, PROJECT, REPO_NAME, SAAS
+from _e2e_consts import API_KEY, DB_PATH, PROJECT, REPO_NAME, SAAS
 
 
 pytestmark = pytest.mark.live_dashboard
@@ -344,3 +347,150 @@ def test_46_commit_without_push_blocks_sync_confirm(
     assert rows_post[0][1] == sha, (
         f"after push: committed_at_sha must equal local git sha {sha!r}, got {rows_post!r}"
     )
+
+
+def test_12_13_fingerprint_round_trip_surfaces_warning_in_result_payload(
+    discovered, db_query, server_module,
+):
+    """§1.2/§1.3 cross-layer round-trip — Problem 2 part B silent-drop guard.
+
+    Unit tests cover `_format_fingerprint_warning` with synthetic input. But
+    only a real HTTP round-trip proves the dashboard actually returns the
+    shape the scanner's parser expects. This test seeds a mismatched
+    `repos.first_commit_sha`, sends a POST /scans with a different value,
+    and verifies the full chain: dashboard compares + returns 200 with
+    warnings[], parser extracts + formats, and audit log is written.
+
+    Silent-drop scenarios this catches:
+      - dashboard renames a warning field → parser's .get() returns None
+      - dashboard moves `warnings` to a different response location
+      - dashboard issues a different audit action string
+      - response shape is wrong in a way unit tests cannot see
+    """
+    repo_id = discovered["repo_id"]
+    bogus_first = "b" * 40
+    reported_first = "c" * 40
+
+    def _set_fingerprint(prev_sha, pending_sha):
+        conn = sqlite3.connect(DB_PATH)
+        try:
+            conn.execute(
+                "UPDATE repos SET first_commit_sha = ?, "
+                "fingerprint_pending_sha = ? WHERE id = ?",
+                (prev_sha, pending_sha, repo_id),
+            )
+            conn.commit()
+        finally:
+            conn.close()
+
+    # Seed mismatch state: DB has bogus sha, we'll report a different one.
+    _set_fingerprint(bogus_first, None)
+
+    try:
+        # Match cl_sync's payload shape (scanner/server.py line 2109).
+        # `articles: {}` is the minimum that passes the /scans validator
+        # without creating a scan with findings (keeps DB noise low).
+        payload = {
+            "project_id": "git-e2e-fingerprint-rt",
+            "repo": REPO_NAME,
+            "scanned_at": "2026-04-21T00:00:00Z",
+            "scanner_version": "test-fingerprint-rt",
+            "regulation": "eu-ai-act",
+            "ai_provider": None,
+            "changes_summary": None,
+            "articles": {},
+            "responses": [],
+            "commit_sha": "a" * 40,
+            "first_commit_sha": reported_first,
+        }
+        body = json.dumps(payload, ensure_ascii=True).encode("utf-8")
+        r = subprocess.run(
+            [
+                "curl", "-sS", "--max-time", "20",
+                "-X", "POST", f"{SAAS}/api/v1/scans",
+                "-H", "Content-Type: application/json; charset=utf-8",
+                "-H", f"Authorization: Bearer {API_KEY}",
+                "--data-binary", "@-",
+                "-w", "\n%{http_code}",
+            ],
+            input=body, capture_output=True, timeout=25,
+        )
+        raw = r.stdout.decode("utf-8", errors="replace")
+        parts = raw.strip().rsplit("\n", 1)
+        body_str = parts[0] if len(parts) > 1 else ""
+        http_code = int(parts[-1]) if parts[-1].isdigit() else 0
+
+        # POST /scans returns 201 Created (RESTful resource creation). The
+        # fingerprint check is ADVISORY — mismatch must not return 4xx/5xx.
+        # cl_sync production code accepts anything < 400 (server.py:2185).
+        assert http_code in (200, 201), (
+            f"POST /scans fingerprint mismatch MUST be advisory (200/201), "
+            f"not block — got {http_code}: body={body_str[:300]!r}"
+        )
+
+        resp = json.loads(body_str)
+        warnings = resp.get("warnings")
+        assert isinstance(warnings, list), (
+            f"scan response must have top-level warnings list for mismatch, "
+            f"got keys: {list(resp.keys()) if isinstance(resp, dict) else type(resp).__name__}"
+        )
+        assert len(warnings) >= 1, (
+            f"mismatch must produce at least one warning entry, got {warnings!r}"
+        )
+
+        fp = next(
+            (w for w in warnings
+             if isinstance(w, dict) and w.get("type") == "fingerprint_changed"),
+            None,
+        )
+        assert fp is not None, (
+            f"expected warnings[] entry with type='fingerprint_changed'; "
+            f"got types: "
+            f"{[w.get('type') for w in warnings if isinstance(w, dict)]}"
+        )
+        # Silent-drop guard: parser reads these exact field names. If dashboard
+        # renamed (e.g., to prev_sha / new_sha), parser returns None silently.
+        assert fp.get("previous_first_commit_sha") == bogus_first, (
+            f"previous_first_commit_sha: expected DB value {bogus_first!r}, "
+            f"got {fp!r}"
+        )
+        assert fp.get("current_first_commit_sha") == reported_first, (
+            f"current_first_commit_sha: expected reported value "
+            f"{reported_first!r}, got {fp!r}"
+        )
+
+        # Pass the REAL response through the scanner's parser. This is the
+        # assertion that catches shape drift between the two layers.
+        msg = server_module._format_fingerprint_warning(warnings, SAAS, repo_id)
+        assert msg is not None, (
+            "Parser returned None on real dashboard response — this is the "
+            "exact silent-drop the test was added to catch. Either the "
+            "dashboard renamed a field or the parser is reading the wrong one."
+        )
+        assert "Fingerprint changed" in msg
+        assert bogus_first[:12] in msg, \
+            f"message must include previous sha, got:\n{msg}"
+        assert reported_first[:12] in msg, \
+            f"message must include current sha, got:\n{msg}"
+        assert f"dashboard/repos/{repo_id}" in msg, \
+            f"message must include acknowledge URL with repo_id, got:\n{msg}"
+
+        # Audit log — proves dashboard committed the comparison to DB.
+        # Tiny delay accommodates async write commit. Scope by resource so
+        # parallel test runs / residual rows from other repos don't pollute
+        # the assertion (defense-in-depth per cross-review 2026-04-21).
+        time.sleep(0.2)
+        audit = db_query(
+            "SELECT action FROM audit_logs "
+            "WHERE action = 'repo_fingerprint_change' "
+            "AND resource = ? "
+            "ORDER BY created_at DESC LIMIT 1",
+            (f"repos/{repo_id}",),
+        )
+        assert len(audit) == 1 and audit[0][0] == "repo_fingerprint_change", (
+            f"audit_logs must have repo_fingerprint_change row scoped to "
+            f"resource='repos/{repo_id}' after mismatch POST; got {audit!r}"
+        )
+    finally:
+        # Restore clean state so subsequent runs don't inherit the mismatch.
+        _set_fingerprint(None, None)
