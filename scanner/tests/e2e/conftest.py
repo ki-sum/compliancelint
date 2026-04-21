@@ -78,15 +78,31 @@ def _project_ready(project: str = PROJECT) -> bool:
     return p.is_dir() and (p / ".git").exists() and (p / ".compliancelintrc").is_file()
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture(scope="session", autouse=True)
 def _live_env_check():
-    if not _server_reachable():
-        pytest.skip(f"Dashboard dev server not reachable at {SAAS}")
+    """Confirm prereqs once per session and pre-warm the entry route.
+
+    Next.js Turbopack JIT-compiles routes on first hit (5-10 s on cold
+    start). A short-timeout reachability check races the compile and
+    would falsely skip the first test. Two attempts at 15 s each gives
+    the server up to 30 s; then we pre-hit `/api/v1/repos` (the route
+    `discovered` fixture depends on) so the first real call is fast.
+    """
     if not _project_ready():
         pytest.skip(
             f"Project dir not initialised at {PROJECT} "
             "(needs git + .compliancelintrc)"
         )
+    if not _server_reachable(timeout_s=15) and not _server_reachable(timeout_s=15):
+        pytest.skip(f"Dashboard dev server not reachable at {SAAS}")
+    subprocess.run(
+        [
+            "curl", "-sS", "-o", os.devnull, "--max-time", "30",
+            "-H", f"Authorization: Bearer {API_KEY}",
+            f"{SAAS}/api/v1/repos",
+        ],
+        capture_output=True, timeout=35,
+    )
 
 
 # ── Module-scoped imports (after sys.path is set) ─────────────────────────
@@ -150,28 +166,37 @@ def discovered():
             f"discovery: repo {repo_id} ({REPO_NAME}) has no scans. "
             f"seed-demo.ts should produce at least one scan. Re-seed."
         )
-    scan_id = scans[0]["id"]
 
-    scan = _curl_json(
-        "GET", f"{SAAS}/api/v1/repos/{repo_id}/scans/{scan_id}",
-    ) or {}
-    findings = scan.get("findings") or []
-    finding = next(
-        (x for x in findings if x.get("article") == "art09"), None,
-    )
-    if not finding:
-        articles = sorted({x.get("article") for x in findings if x.get("article")})
-        pytest.fail(
-            f"discovery: scan {scan_id} has no art09 finding. "
-            f"Articles present: {articles}. Verify seed-demo.ts art09 path."
+    # Walk scans newest-to-oldest and pick the first one that has an art09
+    # finding. `scans[0]` alone is brittle — other sessions or tests may
+    # have appended scans with no findings (or with a different article set)
+    # which would fail discovery even when a usable scan exists elsewhere.
+    checked_articles: dict[str, list[str]] = {}
+    for s in scans:
+        scan_id = s["id"]
+        scan = _curl_json(
+            "GET", f"{SAAS}/api/v1/repos/{repo_id}/scans/{scan_id}",
+        ) or {}
+        findings = scan.get("findings") or []
+        finding = next(
+            (x for x in findings if x.get("article") == "art09"), None,
+        )
+        if finding:
+            return {
+                "repo_id": repo_id,
+                "repo_name": repo.get("name", REPO_NAME),
+                "scan_id": scan_id,
+                "finding_id": finding["id"],
+            }
+        checked_articles[scan_id] = sorted(
+            {x.get("article") for x in findings if x.get("article")}
         )
 
-    return {
-        "repo_id": repo_id,
-        "repo_name": repo.get("name", REPO_NAME),
-        "scan_id": scan_id,
-        "finding_id": finding["id"],
-    }
+    pytest.fail(
+        f"discovery: none of {len(scans)} scan(s) on repo {repo_id} have "
+        f"an art09 finding. Articles per scan: {checked_articles}. "
+        f"Verify seed-demo.ts emits art09 findings for test-pro."
+    )
 
 
 @pytest.fixture

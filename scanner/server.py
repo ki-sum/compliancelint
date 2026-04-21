@@ -2105,6 +2105,14 @@ def cl_sync(project_path: str, regulation: str = "") -> str:
     head_commit_sha = _derive_head_commit_sha(project_path)
     slog.info(f"STEP 7c: HEAD commit sha = {head_commit_sha[:12] if head_commit_sha else 'none'}")
 
+    # Derive project-identity fingerprint (oldest root commit) for v4
+    # §1.2/§1.3 force-push / repo-rewrite detection. Dashboard stores this
+    # on first sync and compares on subsequent syncs; mismatch surfaces a
+    # warning in the response body (no blocking, no auto-update — owner
+    # acknowledges via dashboard UI).
+    first_commit_sha = _derive_first_commit_sha(project_path)
+    slog.info(f"STEP 7d: first commit sha = {first_commit_sha[:12] if first_commit_sha else 'none'}")
+
     # Build payload matching the API schema
     payload = {
         "project_id": project_id,
@@ -2117,6 +2125,7 @@ def cl_sync(project_path: str, regulation: str = "") -> str:
         "articles": articles_data,
         "responses": response_items,  # Finding responses / attestations from state.json
         "commit_sha": head_commit_sha,  # v4 Track 4a: stale-detection anchor per-finding + snapshot ledger
+        "first_commit_sha": first_commit_sha,  # v4 §1.2/§1.3: project-identity fingerprint
     }
 
     # POST to dashboard
@@ -2203,6 +2212,18 @@ def cl_sync(project_path: str, regulation: str = "") -> str:
     dashboard_url = resp_data.get("dashboard_url", f"{saas_url}/dashboard")
     scan_id = resp_data.get("scan_id", "")
 
+    # v4 §1.2/§1.3 — fingerprint mismatch warning piggy-backs on scan response.
+    # Captured raw here; formatted with resolved_repo_id once the pending-
+    # evidence block has resolved it (acknowledge URL needs repo_id).
+    fingerprint_warnings_raw = (
+        resp_data.get("warnings") if isinstance(resp_data, dict) else None
+    )
+    if fingerprint_warnings_raw:
+        slog.info(
+            f"STEP 10b: scan response carried {len(fingerprint_warnings_raw)} "
+            f"warning(s); will surface after repo_id resolution"
+        )
+
     # ── Evidence v4 deferred-path pull (sub-3b) ──
     # After scan state is uploaded, fetch any pending evidence bytes the
     # team has uploaded via the dashboard and write them to the working
@@ -2263,6 +2284,15 @@ def cl_sync(project_path: str, regulation: str = "") -> str:
             slog.error(f"STEP 11d-ERR: broken_link sweep failed: {e}")
             broken_link_summary = {"error": f"broken_link sweep failed: {e}"}
 
+    # Format the fingerprint warning now that resolved_repo_id is known.
+    # If repo_id is missing (pending-evidence resolution failed), fall back
+    # to the dashboard root — user still gets the signal, just a generic URL.
+    fingerprint_msg = _format_fingerprint_warning(
+        fingerprint_warnings_raw, saas_url, resolved_repo_id or "",
+    )
+    if fingerprint_msg:
+        slog.info("STEP 11e: fingerprint_changed warning surfaced to user")
+
     result_payload = {
         "status": "synced",
         "scan_id": scan_id,
@@ -2275,6 +2305,11 @@ def cl_sync(project_path: str, regulation: str = "") -> str:
         result_payload["pending_evidence"] = pending_summary
     if broken_link_summary:
         result_payload["broken_link_check"] = broken_link_summary
+    if fingerprint_msg:
+        result_payload["fingerprint_warning"] = fingerprint_msg
+        result_payload["message"] = (
+            f"{result_payload['message']}\n\n{fingerprint_msg}"
+        )
     if human_prompt:
         # Surface the prompt at top-level so MCP clients (Claude Code,
         # Cursor) can show it without drilling into nested objects.
@@ -2316,6 +2351,73 @@ def _derive_head_commit_sha(project_path: str) -> str | None:
         return None
     except (subprocess.TimeoutExpired, FileNotFoundError, OSError):
         return None
+
+
+def _derive_first_commit_sha(project_path: str) -> str | None:
+    """Return the oldest root commit SHA (40-char lowercase hex), or None.
+
+    Used as the project-identity fingerprint (v4 §1.2/§1.3). `git rev-list
+    --max-parents=0 HEAD` lists root commits; for the single-root case
+    (typical), that's one line. For multi-root repos (grafted, unrelated
+    histories merged), we take the first line for determinism — any stable
+    selector works since the dashboard compares reported-vs-stored, not
+    across scanners.
+    """
+    import subprocess
+    try:
+        flags = {
+            "capture_output": True,
+            "text": True,
+            "cwd": project_path,
+            "timeout": 2,
+            "env": {**os.environ, "GIT_TERMINAL_PROMPT": "0"},
+        }
+        if hasattr(subprocess, "CREATE_NO_WINDOW"):
+            flags["creationflags"] = subprocess.CREATE_NO_WINDOW
+        r = subprocess.run(
+            ["git", "rev-list", "--max-parents=0", "HEAD"], **flags,
+        )
+        if r.returncode != 0:
+            return None
+        lines = [ln for ln in r.stdout.splitlines() if ln.strip()]
+        if not lines:
+            return None
+        sha = lines[0].strip()
+        if len(sha) == 40 and all(c in "0123456789abcdef" for c in sha):
+            return sha
+        return None
+    except (subprocess.TimeoutExpired, FileNotFoundError, OSError):
+        return None
+
+
+def _format_fingerprint_warning(
+    warnings: list | None, saas_url: str, repo_id: str,
+) -> str | None:
+    """Build a user-facing message from a fingerprint_changed warning in the
+    POST /scans response, or None if no such warning is present.
+
+    Returns None for empty list, non-list input, or no matching type. Owner
+    acknowledges via dashboard UI — this message just surfaces the signal
+    into cl_sync output so the user sees it even when they don't check the
+    dashboard immediately.
+    """
+    if not isinstance(warnings, list):
+        return None
+    for w in warnings:
+        if not isinstance(w, dict) or w.get("type") != "fingerprint_changed":
+            continue
+        prev = str(w.get("previous_first_commit_sha") or "")
+        curr = str(w.get("current_first_commit_sha") or "")
+        note = str(w.get("note") or "Repo fingerprint changed")
+        ack_url = f"{saas_url.rstrip('/')}/dashboard/repos/{repo_id}"
+        return (
+            "Fingerprint changed\n"
+            f"  Previous: {prev[:12]}...\n"
+            f"  Current:  {curr[:12]}...\n"
+            f"  {note}\n"
+            f"  Owner can acknowledge at: {ack_url}"
+        )
+    return None
 
 
 def _curl_json(method: str, url: str, api_key: str, *, body: bytes | None = None,
