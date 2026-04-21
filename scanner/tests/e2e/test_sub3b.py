@@ -25,12 +25,15 @@ pytestmark = pytest.mark.live_dashboard
 
 
 def test_full_pull_workflow(
-    discovered, cleanup_pending, reset_working_tree, curl_upload, call_pull,
-    sha256_file_fn, run_in_project, db_query,
+    discovered, with_remote, cleanup_pending, reset_working_tree, curl_upload,
+    call_pull, sha256_file_fn, run_in_project, db_query,
 ):
-    """§3.1 basic pull → §4.4 idempotent resume → §3.3 commit + transition.
+    """§3.1 basic pull → §4.4 idempotent resume → §3.3 commit+push + transition.
 
     Three phases share working-tree state, so they run as one ordered scenario.
+    Phase C now does `git push` after `git commit` because the §4.6 fix
+    requires the sha to be on a remote branch before sync-confirm fires.
+    See test_46_commit_without_push for the unpushed-commit assertion.
     """
     repo_id = discovered["repo_id"]
     finding_id = discovered["finding_id"]
@@ -90,12 +93,16 @@ def test_full_pull_workflow(
     assert summary2.get("errors") == 0, \
         f"resume: errors=0 expected, got {summary2!r}"
 
-    # ── Phase C: §3.3 PM commits → next sync transitions ────────────────
+    # ── Phase C: §3.3 PM commits + pushes → next sync transitions ───────
+    # Push is REQUIRED post-Problem-1-fix: get_committed_sha returns None
+    # for local-only commits so sync-confirm wouldn't fire without push.
     run_in_project(["git", "add", ".compliancelint/evidence"])
     commit = run_in_project([
         "git", "commit", "-m", "[ComplianceLint] Evidence sync (pytest)",
     ])
     assert commit.returncode == 0, f"git commit failed: {commit.stderr!r}"
+    push = run_in_project(["git", "push", "origin"])
+    assert push.returncode == 0, f"git push failed: {push.stderr!r}"
     sha = run_in_project(
         ["git", "log", "-1", "--pretty=format:%H"]
     ).stdout.strip()
@@ -258,3 +265,82 @@ def test_stale_cache_invalidation(
         cache = json.load(f)
     assert cache.get("repo_id") == repo_id, \
         f"metadata.json cache refreshed to correct rid, got {cache!r}"
+
+
+def test_46_commit_without_push_blocks_sync_confirm(
+    discovered, with_remote, cleanup_pending, reset_working_tree, curl_upload,
+    call_pull, run_in_project, db_query,
+):
+    """§4.6 — Problem 1 / sha-on-remote audit-correctness fix.
+
+    User pulls evidence + commits locally but does NOT push. cl_sync must
+    NOT send sync-confirm (sha is local-only, not on remote → audit would
+    record a sha that never existed remotely = false-committed). After
+    `git push`, cl_sync must then fire sync-confirm normally.
+    """
+    finding_id = discovered["finding_id"]
+    repo_id = discovered["repo_id"]
+
+    cleanup_pending()
+    reset_working_tree()
+
+    upload_file = os.path.join(PROJECT, "fixture-46.txt")
+    with open(upload_file, "w") as f:
+        f.write("§4.6 fixture — commit-no-push then push\n")
+    seed = curl_upload(finding_id, upload_file)
+    summary, _, _ = call_pull()
+    assert summary.get("pulled") == 1, f"initial pull, got {summary!r}"
+
+    # ── Phase 1 — commit but DO NOT push ─────────────────────────────────
+    run_in_project(["git", "add", ".compliancelint/evidence"])
+    commit = run_in_project([
+        "git", "commit", "-m", "[ComplianceLint] §4.6 local-only test",
+    ])
+    assert commit.returncode == 0, f"git commit failed: {commit.stderr!r}"
+
+    summary2, _, _ = call_pull()
+    assert summary2.get("confirmed", 0) == 0, (
+        "§4.6: sync-confirm must NOT fire for unpushed commits. "
+        f"Got {summary2!r} — local-only sha would write false committed_at_sha to DB."
+    )
+
+    rows = db_query(
+        "SELECT commit_status, committed_at_sha FROM evidence_items WHERE id = ?",
+        (seed["evidence_item_id"],),
+    )
+    assert rows[0][0] == "pending_commit", (
+        f"§4.6: DB commit_status must remain pending_commit pre-push, got {rows!r}"
+    )
+    assert rows[0][1] is None, (
+        f"§4.6: committed_at_sha must remain NULL pre-push, got {rows!r}"
+    )
+
+    pending_pre = db_query(
+        "SELECT COUNT(*) FROM pending_evidence WHERE repo_id = ?", (repo_id,),
+    )
+    assert pending_pre[0][0] == 1, (
+        "§4.6: pending_evidence row must still exist pre-push (not yet committed-and-pushed)"
+    )
+
+    # ── Phase 2 — push, sync-confirm fires normally ──────────────────────
+    push = run_in_project(["git", "push", "origin"])
+    assert push.returncode == 0, f"git push failed: {push.stderr!r}"
+    sha = run_in_project(
+        ["git", "log", "-1", "--pretty=format:%H"]
+    ).stdout.strip()
+
+    summary3, _, _ = call_pull()
+    assert summary3.get("confirmed") == 1, (
+        f"after push: sync-confirm must fire, got {summary3!r}"
+    )
+
+    rows_post = db_query(
+        "SELECT commit_status, committed_at_sha FROM evidence_items WHERE id = ?",
+        (seed["evidence_item_id"],),
+    )
+    assert rows_post[0][0] == "committed", (
+        f"after push: DB commit_status must be 'committed', got {rows_post!r}"
+    )
+    assert rows_post[0][1] == sha, (
+        f"after push: committed_at_sha must equal local git sha {sha!r}, got {rows_post!r}"
+    )

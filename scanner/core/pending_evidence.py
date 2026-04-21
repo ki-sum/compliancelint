@@ -164,12 +164,58 @@ def is_valid_git_sha(sha: str) -> bool:
     return sha == sha.lower()
 
 
-def get_committed_sha(project_path: str, repo_path: str, timeout: float = 3.0) -> Optional[str]:
-    """Return the sha of the most recent commit that touched `repo_path`, or None.
+def is_sha_on_remote(project_path: str, sha: str, timeout: float = 3.0) -> bool:
+    """Return True if `sha` is reachable from any remote-tracking branch.
 
-    Uses `git log -1 --pretty=format:%H -- <path>`. Read-only git operation,
-    safe in MCP context. Returns None on any error (no repo, path never
-    committed, git timeout, etc).
+    Uses `git branch -r --contains <sha>` — read-only, no network access
+    (queries local refs/remotes/* only). Returns False if the commit exists
+    locally but no remote-tracking branch contains it (i.e. user committed
+    but did not `git push` yet), or on any git error.
+
+    Why this exists (Problem 1 / §4.6 fix 2026-04-21): SaaS cannot verify
+    a commit reached the remote (no third-party OAuth tokens — hard rule
+    #1). cl_sync runs in the user's working tree with their git creds, so
+    it CAN check via `git branch -r --contains`. Without this guard,
+    sync-confirm would fire for local-only commits and SaaS would record
+    `committed_at_sha` for shas that never reached the remote, breaking
+    audit trail (regulator audit cannot reproduce, laptop loss = evidence
+    gone but dashboard says committed).
+    """
+    if not is_valid_git_sha(sha):
+        return False
+    try:
+        flags: dict = {
+            "capture_output": True,
+            "text": True,
+            "cwd": project_path,
+            "timeout": timeout,
+            "env": {**os.environ, "GIT_TERMINAL_PROMPT": "0"},
+        }
+        if hasattr(subprocess, "CREATE_NO_WINDOW"):
+            flags["creationflags"] = subprocess.CREATE_NO_WINDOW
+        r = subprocess.run(
+            ["git", "branch", "-r", "--contains", sha],
+            **flags,
+        )
+        if r.returncode != 0:
+            return False
+        return bool(r.stdout.strip())
+    except (subprocess.TimeoutExpired, FileNotFoundError, OSError):
+        return False
+
+
+def get_committed_sha(project_path: str, repo_path: str, timeout: float = 3.0) -> Optional[str]:
+    """Return the sha of the most recent commit that touched `repo_path`
+    AND is reachable from at least one remote-tracking branch, or None.
+
+    Two checks (both read-only git):
+      1. `git log -1 --pretty=format:%H -- <path>` — find the local commit.
+      2. `is_sha_on_remote(...)` — verify the commit was pushed to a remote.
+
+    Returns None when: path never committed, commit exists locally but not
+    on remote (commit-but-no-push, see §4.6), git timeout, or any error.
+    The remote-on-push gate is the §4.6 audit-correctness fix — see
+    `is_sha_on_remote` docstring for the full rationale.
     """
     try:
         flags: dict = {
@@ -188,7 +234,11 @@ def get_committed_sha(project_path: str, repo_path: str, timeout: float = 3.0) -
         if r.returncode != 0:
             return None
         sha = r.stdout.strip()
-        return sha if is_valid_git_sha(sha) else None
+        if not is_valid_git_sha(sha):
+            return None
+        if not is_sha_on_remote(project_path, sha, timeout=timeout):
+            return None
+        return sha
     except (subprocess.TimeoutExpired, FileNotFoundError, OSError):
         return None
 

@@ -39,6 +39,8 @@ from core.pending_evidence import (  # noqa: E402
     build_conflict_path,
     build_human_prompt,
     clear_cached_repo_id,
+    get_committed_sha,
+    is_sha_on_remote,
     is_valid_git_sha,
     pull_pending_evidence,
     read_cached_repo_id,
@@ -47,6 +49,7 @@ from core.pending_evidence import (  # noqa: E402
     sha256_file,
     write_cached_repo_id,
 )
+import subprocess  # noqa: E402  (after path injection so order doesn't matter)
 
 
 # ── Fixtures ────────────────────────────────────────────────────────────────
@@ -659,3 +662,119 @@ class TestHumanPrompt:
         out = build_human_prompt(s)
         assert "different content" in out
         assert "conflict-20260420T120000Z" in out
+
+
+# ── Problem 1 / §4.6 fix — sha-on-remote check ───────────────────────────────
+
+
+def _git_run(cwd: str, *args: str) -> str:
+    """subprocess.run(['git', *args]) in cwd; returns stdout, raises on error."""
+    r = subprocess.run(
+        ["git", *args], cwd=cwd, check=True, capture_output=True, text=True,
+    )
+    return r.stdout
+
+
+def _init_repo_with_remote(repo_dir: str) -> str:
+    """Init `repo_dir` + a sibling bare remote + initial commit pushed.
+    Returns the remote path. Branch is forced to `master` regardless of
+    the host machine's `init.defaultBranch` setting so tests are stable.
+    """
+    os.makedirs(repo_dir, exist_ok=True)
+    remote_path = repo_dir + "-remote.git"
+    _git_run(repo_dir, "init")
+    _git_run(repo_dir, "symbolic-ref", "HEAD", "refs/heads/master")
+    _git_run(repo_dir, "config", "user.email", "test@example.com")
+    _git_run(repo_dir, "config", "user.name", "Test")
+    subprocess.run(
+        ["git", "init", "--bare", "-b", "master", remote_path],
+        check=True, capture_output=True,
+    )
+    _git_run(repo_dir, "remote", "add", "origin", remote_path)
+    with open(os.path.join(repo_dir, "README"), "w") as f:
+        f.write("init\n")
+    _git_run(repo_dir, "add", "README")
+    _git_run(repo_dir, "commit", "-m", "init")
+    _git_run(repo_dir, "push", "-u", "origin", "master")
+    return remote_path
+
+
+class TestIsShaOnRemote:
+    def test_returns_false_for_invalid_sha(self, tmp_project):
+        # No git call needed — function short-circuits on syntactic invalidity
+        assert is_sha_on_remote(tmp_project, "not-a-sha") is False
+        assert is_sha_on_remote(tmp_project, "abc") is False
+        assert is_sha_on_remote(tmp_project, "A" * 40) is False  # uppercase
+
+    def test_returns_false_when_no_git_repo(self, tmp_project):
+        # tmp_project is empty — git command exits non-zero → False
+        assert is_sha_on_remote(tmp_project, "a" * 40) is False
+
+    def test_returns_false_when_no_remote_configured(self, tmp_project):
+        # Local repo with commits but no `origin` — branch -r returns nothing
+        _git_run(tmp_project, "init")
+        _git_run(tmp_project, "symbolic-ref", "HEAD", "refs/heads/master")
+        _git_run(tmp_project, "config", "user.email", "test@example.com")
+        _git_run(tmp_project, "config", "user.name", "Test")
+        with open(os.path.join(tmp_project, "f"), "w") as f:
+            f.write("x")
+        _git_run(tmp_project, "add", "f")
+        _git_run(tmp_project, "commit", "-m", "no-remote")
+        sha = _git_run(tmp_project, "log", "-1", "--pretty=format:%H").strip()
+        assert is_sha_on_remote(tmp_project, sha) is False
+
+    def test_returns_true_when_sha_pushed_to_remote(self, tmp_project):
+        _init_repo_with_remote(tmp_project)
+        sha = _git_run(tmp_project, "log", "-1", "--pretty=format:%H").strip()
+        assert is_sha_on_remote(tmp_project, sha) is True
+
+    def test_returns_false_when_commit_local_only(self, tmp_project):
+        # The §4.6 scenario — commit exists locally, never pushed
+        _init_repo_with_remote(tmp_project)
+        with open(os.path.join(tmp_project, "new.txt"), "w") as f:
+            f.write("local-only content\n")
+        _git_run(tmp_project, "add", "new.txt")
+        _git_run(tmp_project, "commit", "-m", "local-only no push")
+        local_sha = _git_run(tmp_project, "log", "-1", "--pretty=format:%H").strip()
+        # Confirm sha differs from initial pushed commit
+        initial = _git_run(
+            tmp_project, "rev-list", "--max-parents=0", "HEAD",
+        ).strip()
+        assert local_sha != initial, "sanity: new commit must have different sha"
+        assert is_sha_on_remote(tmp_project, local_sha) is False, \
+            "§4.6 fix: local-only commit must NOT report as on-remote"
+
+
+class TestGetCommittedShaProblem1:
+    """get_committed_sha now returns None for committed-but-unpushed shas
+    (Problem 1 / §4.6 audit-correctness fix). These tests pin that behaviour."""
+
+    def test_returns_sha_when_path_committed_and_pushed(self, tmp_project):
+        _init_repo_with_remote(tmp_project)
+        with open(os.path.join(tmp_project, "evidence.txt"), "w") as f:
+            f.write("v1\n")
+        _git_run(tmp_project, "add", "evidence.txt")
+        _git_run(tmp_project, "commit", "-m", "add evidence")
+        _git_run(tmp_project, "push")
+        sha = get_committed_sha(tmp_project, "evidence.txt")
+        assert sha is not None
+        assert is_valid_git_sha(sha)
+
+    def test_returns_none_when_committed_but_not_pushed(self, tmp_project):
+        # The Problem 1 / §4.6 bug-fix scenario.
+        _init_repo_with_remote(tmp_project)
+        with open(os.path.join(tmp_project, "evidence.txt"), "w") as f:
+            f.write("v1\n")
+        _git_run(tmp_project, "add", "evidence.txt")
+        _git_run(tmp_project, "commit", "-m", "add evidence (no push)")
+        # Pre-fix this returned a sha and cl_sync sent sync-confirm even
+        # though the commit was local-only — false-committed audit trail.
+        # Post-fix this must return None so cl_sync skips sync-confirm
+        # until the user pushes.
+        assert get_committed_sha(tmp_project, "evidence.txt") is None
+
+    def test_returns_none_when_path_never_committed(self, tmp_project):
+        _init_repo_with_remote(tmp_project)
+        with open(os.path.join(tmp_project, "untracked.txt"), "w") as f:
+            f.write("never committed\n")
+        assert get_committed_sha(tmp_project, "untracked.txt") is None

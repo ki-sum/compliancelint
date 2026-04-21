@@ -276,7 +276,13 @@ def cleanup_pending(discovered):
 
 @pytest.fixture
 def reset_working_tree(run_in_project):
-    """Remove pulled evidence files + metadata.json + git reset to root commit."""
+    """Remove pulled evidence files + metadata.json + git reset to root commit.
+
+    If a remote is configured (see `with_remote` fixture), force-sync the
+    remote back to the local root so subsequent tests that push start from
+    a clean state. Force-push is safe here — the bare remote is a test
+    fixture with no other readers.
+    """
     def _reset():
         ev_dir = os.path.join(PROJECT, ".compliancelint", "evidence")
         if os.path.isdir(ev_dir):
@@ -291,7 +297,46 @@ def reset_working_tree(run_in_project):
                 ["git", "rev-list", "--max-parents=0", "HEAD"]
             ).stdout.strip()
             run_in_project(["git", "reset", "--hard", root])
+        if run_in_project(["git", "remote"]).stdout.strip():
+            branch = run_in_project(
+                ["git", "branch", "--show-current"]
+            ).stdout.strip()
+            if branch:
+                run_in_project(["git", "push", "--force", "origin", branch])
     return _reset
+
+
+@pytest.fixture(scope="session")
+def with_remote():
+    """Ensure the test project has an `origin` remote configured.
+
+    Idempotent: returns early if origin already exists. Otherwise creates a
+    sibling bare repo at PROJECT + '-remote.git', adds it as origin, and
+    pushes the current branch so remote-tracking is established.
+
+    Required by tests that depend on the §4.6 fix: cl_sync's get_committed_sha
+    only returns a sha when `git branch -r --contains <sha>` is non-empty,
+    which requires a remote that contains the commit. Session-scoped (so it
+    cannot depend on function-scoped fixtures like run_in_project — uses
+    bare subprocess.run with cwd=PROJECT instead).
+    """
+    def _git(*args):
+        return subprocess.run(
+            ["git", *args], cwd=PROJECT, capture_output=True, text=True, timeout=30,
+        )
+
+    if _git("remote").stdout.strip():
+        return
+
+    remote_path = PROJECT + "-remote.git"
+    if not os.path.isdir(remote_path):
+        subprocess.run(
+            ["git", "init", "--bare", remote_path],
+            check=True, capture_output=True,
+        )
+    _git("remote", "add", "origin", remote_path)
+    branch = _git("branch", "--show-current").stdout.strip() or "master"
+    _git("push", "-u", "origin", branch)
 
 
 @pytest.fixture
