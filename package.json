@@ -1,6 +1,6 @@
 {
   "name": "compliancelint",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": "EU AI Act compliance: scan, attest, document — from your IDE. Source-available, MCP-native, AI-assisted.",
   "bin": {
     "compliancelint": "bin/init.js"

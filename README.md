@@ -284,6 +284,37 @@ scanner/
 
 ---
 
+## Git-native by design
+
+ComplianceLint treats your git repository as the primary evidence store,
+not our SaaS. Five architectural commitments:
+
+1. **Evidence commits to your repo.** Bytes land at
+   `.compliancelint/evidence/{finding_id}/{filename}` — you own them,
+   you can grep them, they survive if we vanish.
+
+2. **MCP never runs git on your behalf.** No auto-commit, no auto-push,
+   no auto-revert. Every commit is your decision. If you commit locally
+   without pushing, `cl_sync` waits until you push.
+
+3. **Git-host neutral.** Works with GitHub, GitLab, Bitbucket, Gitea,
+   Azure DevOps, self-hosted, or a purely local repo. No GitHub App,
+   no OAuth tokens, no vendor lock-in.
+
+4. **Force-push aware.** If you rewrite history and erase an evidence
+   commit, the next `cl_sync` detects the missing file and flags it on
+   the dashboard (`health_status='broken_link'`). The forensic record
+   stays — who uploaded, when, at which sha — even after the bytes
+   are gone from git.
+
+5. **Snapshot ledger is your integrity anchor.** Every scan writes a
+   deterministic hash (`sort_keys` + UTC ISO + fixed-precision floats)
+   of findings + evidence state. Reproduce on any machine; compare to
+   catch silent mutations. Git history is *not* the audit trail —
+   the snapshot ledger is.
+
+---
+
 ## Pricing
 
 The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard is freemium:
@@ -317,11 +348,15 @@ The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard
 - [x] SaaS Dashboard with Compliance Journey tracking
 - [x] PDF exports (Scan Report, Journey, Declaration, Tasks)
 - [x] Attestation system (evidence, rebuttals, acknowledgements)
-- [x] Zero-friction project identity (git fingerprint)
 - [x] `npx compliancelint init` — one-line setup
 - [x] Role-based obligation filtering (Provider, Deployer, Importer, Distributor)
 - [x] Human Gates — guided questionnaires for manual obligations
 - [x] Settings audit trail — track who changed compliance settings
+- [x] Evidence v4 deferred-path (browser upload → `.compliancelint/evidence/` → cl_sync pulls → user commits)
+- [x] Project fingerprint detection (first_commit_sha mismatch → owner acknowledge)
+- [x] Force-push broken_link detection (evidence health sweep on every cl_sync)
+- [x] Stale-evidence banners (finding + repo level)
+- [x] Snapshot ledger (deterministic state hash on every scan)
 - [ ] GitHub Marketplace App
 - [ ] Additional regulations (expanding beyond EU AI Act based on user demand)
 
