@@ -1,21 +1,26 @@
 """Cross-system flows 3 + 4.
 
-From private/docs/memory/project_cross_system_test_design.md:
+From project_cross_system_test_design.md:
   3. "SaaS invite member → member runs cl_scan on shared repo → findings
       visible to both"
   4. "SaaS badge toggle → cl_sync updates badge status"
 
-Flow 3 uses seed-demo's pre-seeded invite: test-pro-invited has
-`member` role on test-pro/demo-highrisk-provider (via repo_access). We
-don't exercise the invite-creation UI here — that's a web-only flow. We
-verify the DATA-visibility cross-system contract: both owner and member
-API keys see the same scan/findings via /api/v1/repos/{id}/scans/{sid}.
+Flow 3 verifies the DATA-visibility cross-system contract: after owner
+syncs a scan, a user with `member` role on that specific repo sees the
+same findings, while a non-member gets 403/404. We grant member role
+via repo_access INSERT (not via the invite UI — that's a web flow
+already covered by dashboard e2e).
 
-Flow 4 toggles public_badge via PUT /api/v1/repos/{id} and verifies the
-public badge endpoint /api/v1/badge/{id} respects it (status +
-Cache-Control + content). No auth on the badge route — that's the
-public-embed design point; the whole cross-system claim is that owner
-action on SaaS propagates to the anonymous badge consumer.
+Flow 4 toggles public_badge on the repos row and verifies the public
+badge endpoint /api/v1/badge/{id} respects it. No auth on the badge
+route — that's the public-embed design point. The cross-system claim
+is that owner action on SaaS propagates to the anonymous badge consumer.
+
+Isolation (v6 reviewer B4, 2026-04-23): uses `isolated_project` fixture
+so each test creates a brand-new repo via cl_sync. Canonical test-pro
+repo is never touched. Test 1 adds a repo_access row for the test-pro-
+invited member on the isolated repo (cleaned up by the fixture's
+cascade-delete on repos.id).
 """
 from __future__ import annotations
 
@@ -24,14 +29,16 @@ import os
 import sqlite3
 import subprocess
 import uuid
+from pathlib import Path
 
 import pytest
 
-from _e2e_consts import API_KEY, DB_PATH, PROJECT, REPO_NAME, SAAS
+from _e2e_consts import API_KEY, DB_PATH, PROJECT, SAAS
 
 pytestmark = pytest.mark.live_dashboard
 
 MEMBER_API_KEY = "cl_test_pro_invited_key_for_development"
+MEMBER_EMAIL = "test-pro-invited@compliancelint.dev"
 
 
 def _curl(
@@ -77,27 +84,25 @@ def _curl(
     return code, body_str
 
 
-def _delete_specific_scan(scan_id: str) -> None:
+def _grant_member_access(repo_id: str, member_email: str) -> None:
+    """INSERT a repo_access row granting `member_email` member role on repo.
+
+    Cleanup piggybacks on isolated_project's cascade (DELETE FROM repo_access
+    WHERE repo_id = ?) — no explicit revoke needed here.
+    """
     conn = sqlite3.connect(DB_PATH)
     try:
-        conn.execute("DELETE FROM findings WHERE scan_id = ?", (scan_id,))
-        conn.execute("DELETE FROM scans WHERE id = ?", (scan_id,))
-        conn.commit()
-    finally:
-        conn.close()
-
-
-def _reset_fingerprint(repo_id: str) -> None:
-    # Also resets project_id to NULL — see test_scan_to_dashboard_flow note;
-    # leaving it populated with cl_sync's project_id breaks test_sub3b's
-    # fingerprint round-trip test by forcing it onto a suffixed repo.
-    conn = sqlite3.connect(DB_PATH)
-    try:
+        user_row = conn.execute(
+            "SELECT id FROM users WHERE email = ?", (member_email,)
+        ).fetchone()
+        if not user_row:
+            raise AssertionError(
+                f"seed-demo should provide {member_email}; re-run seed-demo.ts"
+            )
         conn.execute(
-            "UPDATE repos SET first_commit_sha = NULL, "
-            "fingerprint_pending_sha = NULL, project_id = NULL "
-            "WHERE id = ?",
-            (repo_id,),
+            "INSERT INTO repo_access (id, repo_id, user_id, role) "
+            "VALUES (?, ?, ?, 'member')",
+            (str(uuid.uuid4()), repo_id, user_row[0]),
         )
         conn.commit()
     finally:
@@ -124,8 +129,6 @@ def _set_public_badge(repo_id: str, enabled: bool) -> None:
 
 
 def _write_synthetic_art9(project_path: str, findings: list[dict]) -> None:
-    from pathlib import Path
-
     art_dir = os.path.join(project_path, ".compliancelint", "articles")
     Path(art_dir).mkdir(parents=True, exist_ok=True)
     findings_dict = {
@@ -153,47 +156,17 @@ def _write_synthetic_art9(project_path: str, findings: list[dict]) -> None:
         )
 
 
-def _reset_article_files(project_path: str) -> None:
-    art_dir = os.path.join(project_path, ".compliancelint", "articles")
-    if os.path.isdir(art_dir):
-        for name in os.listdir(art_dir):
-            if name.endswith(".json"):
-                os.unlink(os.path.join(art_dir, name))
-
-
 # ═════════════════════════════════════════════════════════════════════
 # Flow 3 — member sees the same scan + findings the owner synced
 # ═════════════════════════════════════════════════════════════════════
 
 
 def test_invited_member_sees_same_scan_findings_as_owner(
-    server_module, discovered, with_remote, log
+    server_module, isolated_project, with_remote, log
 ):
-    """Owner cl_syncs a scan; member GET /scans/{id} sees identical findings."""
-    repo_id = discovered["repo_id"]
-    _reset_article_files(PROJECT)
-    _reset_fingerprint(repo_id)
-
-    # Precondition: test-pro-invited is an active (non-revoked) member.
-    conn = sqlite3.connect(DB_PATH)
-    try:
-        row = conn.execute(
-            "SELECT role, revoked_at FROM repo_access ra "
-            "JOIN users u ON u.id = ra.user_id "
-            "WHERE ra.repo_id = ? AND u.email = ?",
-            (repo_id, "test-pro-invited@compliancelint.dev"),
-        ).fetchone()
-    finally:
-        conn.close()
-    assert row is not None, (
-        "seed-demo should grant test-pro-invited membership on test-pro repo"
-    )
-    assert row[0] == "member", f"expected role=member, got {row[0]}"
-    assert row[1] is None, (
-        f"test-pro-invited should NOT be revoked; revoked_at={row[1]}"
-    )
-
-    # Owner pushes a synthetic scan.
+    """Owner cl_syncs a scan on isolated repo; granted member GET /scans/{id}
+    sees identical findings."""
+    # Owner pushes a synthetic scan onto the isolated repo.
     marker = uuid.uuid4().hex[:8]
     _write_synthetic_art9(
         PROJECT,
@@ -210,6 +183,13 @@ def test_invited_member_sees_same_scan_findings_as_owner(
     assert "error" not in sync_result, sync_result
     scan_id = sync_result.get("scan_id") or sync_result.get("scanId")
     assert scan_id
+
+    repo_id = isolated_project["repo_id_getter"]()
+    assert repo_id
+
+    # Grant member role on this isolated repo to test-pro-invited. Fixture
+    # teardown's cascade-delete on repo_access WHERE repo_id = ? cleans up.
+    _grant_member_access(repo_id, MEMBER_EMAIL)
 
     # Owner view.
     owner_code, owner_body = _curl(
@@ -253,9 +233,11 @@ def test_invited_member_sees_same_scan_findings_as_owner(
         f"non-member got {non_member_code} — should be 403/404"
     )
 
-    # Cleanup
-    _delete_specific_scan(scan_id)
-    _reset_fingerprint(repo_id)
+    log.info(
+        "invited member flow OK: owner=%d, member=%d, non-member=%d on isolated repo %s",
+        owner_code, member_code, non_member_code, repo_id,
+    )
+    # isolated_project teardown cascades repo + repo_access + scans + findings.
 
 
 # ═════════════════════════════════════════════════════════════════════
@@ -264,33 +246,11 @@ def test_invited_member_sees_same_scan_findings_as_owner(
 
 
 def test_badge_endpoint_respects_public_badge_toggle_after_cl_sync(
-    server_module, discovered, with_remote, log
+    server_module, isolated_project, with_remote, log
 ):
-    """public_badge off → 404 'not found'; on → 200 SVG referencing scan result."""
-    repo_id = discovered["repo_id"]
-    _reset_article_files(PROJECT)
-    _reset_fingerprint(repo_id)
-
-    badge_url = f"{SAAS}/api/v1/badge/{repo_id}"
-
-    # Disabled → 404 "not found"
-    _set_public_badge(repo_id, enabled=False)
-    code_off, svg_off = _curl("GET", badge_url)
-    assert code_off == 404, f"expected 404 when badge disabled, got {code_off}"
-    assert "not found" in svg_off, (
-        f"disabled-badge SVG should contain 'not found' literal, got {svg_off[:300]!r}"
-    )
-
-    # Enabled without scan update → 200 SVG based on existing scan state
-    _set_public_badge(repo_id, enabled=True)
-    code_on_1, svg_on_1 = _curl("GET", badge_url)
-    assert code_on_1 == 200, (
-        f"expected 200 when badge enabled + repo has scans, got {code_on_1}"
-    )
-    assert "<svg" in svg_on_1, "enabled-badge payload should be an SVG"
-
-    # Sync a new all-compliant synthetic scan via cl_sync; badge should
-    # reflect the updated latest-scan computation (compliant / % / not).
+    """public_badge off → 404 'not found'; on + scan → 200 SVG;
+    back to off → 404 again."""
+    # Create the isolated repo by syncing an all-compliant scan first.
     marker = uuid.uuid4().hex[:8]
     _write_synthetic_art9(
         PROJECT,
@@ -307,33 +267,41 @@ def test_badge_endpoint_respects_public_badge_toggle_after_cl_sync(
     assert "error" not in sync_result, sync_result
     scan_id = sync_result.get("scan_id") or sync_result.get("scanId")
     assert scan_id
+    repo_id = isolated_project["repo_id_getter"]()
+    assert repo_id
 
-    code_on_2, svg_on_2 = _curl("GET", badge_url)
-    assert code_on_2 == 200, (
-        f"badge GET after cl_sync expected 200, got {code_on_2}"
-    )
-    assert "<svg" in svg_on_2
-    # The badge encodes the scan state in its `value` text node. With
-    # exactly one compliant finding and zero NC / needs_review, the
-    # route emits `value="compliant"` (see route.ts branch at line 102).
-    # Other test personas and seed scans may inflate the tree, but this
-    # repo's LATEST scan is the one we just synced — just-compliant.
-    #
-    # Note: the existing seed scan findings also count in the rollup
-    # since `latestScan` is `repos/{id} latest` by created_at. Rather
-    # than assert the exact value (brittle against seed changes), assert
-    # the SVG is markedly different from the "not found" fallback — the
-    # role here is "toggle + sync → data changes flowed through".
-    assert "not found" not in svg_on_2, (
-        "enabled-badge SVG should not contain 'not found' text after a successful sync"
-    )
+    badge_url = f"{SAAS}/api/v1/badge/{repo_id}"
 
-    # Cleanup: disable badge (leave as seed default), delete synthetic scan.
+    # Default (just-created): public_badge defaults to 0 per schema.
+    # Verify 404 "not found" SVG before any toggle.
     _set_public_badge(repo_id, enabled=False)
-    _delete_specific_scan(scan_id)
-    _reset_fingerprint(repo_id)
+    code_off, svg_off = _curl("GET", badge_url)
+    assert code_off == 404, f"expected 404 when badge disabled, got {code_off}"
+    assert "not found" in svg_off, (
+        f"disabled-badge SVG should contain 'not found' literal, got {svg_off[:300]!r}"
+    )
 
-    # After disable, badge must go back to 404 — proves toggle really gates.
+    # Enable → 200 SVG reflecting the synced scan.
+    _set_public_badge(repo_id, enabled=True)
+    code_on, svg_on = _curl("GET", badge_url)
+    assert code_on == 200, (
+        f"expected 200 when badge enabled + repo has scans, got {code_on}: {svg_on[:200]!r}"
+    )
+    assert "<svg" in svg_on, "enabled-badge payload should be an SVG"
+    assert "not found" not in svg_on, (
+        "enabled-badge must not render the 'not found' fallback"
+    )
+
+    # Disable again → back to 404 — proves the toggle truly gates.
+    _set_public_badge(repo_id, enabled=False)
     code_off_2, svg_off_2 = _curl("GET", badge_url)
-    assert code_off_2 == 404
+    assert code_off_2 == 404, (
+        f"expected 404 after disabling, got {code_off_2}"
+    )
     assert "not found" in svg_off_2
+
+    log.info(
+        "badge toggle flow OK on isolated repo %s: off=%d → on=%d → off=%d",
+        repo_id, code_off, code_on, code_off_2,
+    )
+    # isolated_project teardown cascades.

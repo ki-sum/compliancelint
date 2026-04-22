@@ -43,14 +43,18 @@ pytestmark = pytest.mark.live_dashboard
 
 
 def _fingerprint_reset(repo_id: str) -> None:
-    # See test_scan_to_dashboard_flow note: also clear project_id so a
-    # later test (e.g. test_sub3b) that uses a different project_id isn't
-    # forced onto a suffixed repo by findRepoForCaller.
+    """Clear only fingerprint_pending_sha on the canonical repo.
+
+    Unlike test_scan_to_dashboard_flow.py, this test does NOT call
+    server_module.cl_sync — it exercises the pull/commit/confirm path via
+    call_pull (→ _run_pending_evidence_pull) which reads the repos row
+    but does not bind project_id. So touching project_id here is
+    unnecessary.
+    """
     conn = sqlite3.connect(DB_PATH)
     try:
         conn.execute(
-            "UPDATE repos SET fingerprint_pending_sha = NULL, project_id = NULL "
-            "WHERE id = ?",
+            "UPDATE repos SET fingerprint_pending_sha = NULL WHERE id = ?",
             (repo_id,),
         )
         conn.commit()

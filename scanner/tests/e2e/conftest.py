@@ -396,6 +396,181 @@ def with_remote():
     _git("push", "-u", "origin", branch)
 
 
+# ── Per-test project isolation (cross-system tests) ──────────────────────
+#
+# Background (v6 reviewer B4, 2026-04-23): the scans route binds
+# `.compliancelintrc.project_id` to the canonical repo row via
+# findRepoForCaller's adoption branch. Without isolation, every test that
+# calls `server_module.cl_sync(PROJECT)` mutates the shared repo row and
+# breaks later tests (seen: test_sub3b::test_12_13 started failing after
+# test_scan_to_dashboard_flow landed). Resetting project_id=NULL in test
+# cleanup "works" but forces each new cross-system test author to
+# remember to replicate the reset — fragile by construction.
+#
+# This fixture gives each test its own project_id + repo_name so the /scans
+# route creates a brand-new repo for it (suffix-renaming on collision is
+# handled by the route). Teardown deletes the created repo and cascades
+# through scans / findings / audit / repo_access / repo_profiles. The
+# canonical repo the `discovered` fixture points at is never touched.
+
+@pytest.fixture
+def isolated_project():
+    """Unique project_id + repo_name per test; auto-cleanup on teardown.
+
+    Yields: {"project_id": str, "repo_name": str, "repo_id_getter": callable}
+      - `project_id`: UUID-ish marker unique per test
+      - `repo_name`: e2e-isolated/<marker> — unlikely to collide with any
+        persona's repo namespace
+      - `repo_id_getter`: lazy lookup of the SaaS-side repo UUID AFTER the
+        first cl_sync runs (repo_id isn't known pre-sync)
+
+    Usage: decorate a test with `isolated_project` instead of `discovered`
+    when the test's subject is cl_sync. Inside the test:
+        result = json.loads(server_module.cl_sync(PROJECT, ...))
+        repo_id = isolated_project["repo_id_getter"]()
+    """
+    marker = uuid.uuid4().hex[:12]
+    unique_project_id = f"e2e-iso-{marker}"
+    unique_repo_name = f"e2e-isolated/{marker}"
+    rc_path = os.path.join(PROJECT, ".compliancelintrc")
+    meta_path = os.path.join(PROJECT, ".compliancelint", "metadata.json")
+
+    # Backup .compliancelintrc + metadata.json.
+    with open(rc_path, "r", encoding="utf-8") as fh:
+        rc_backup = fh.read()
+    rc_data = json.loads(rc_backup)
+
+    meta_backup = None
+    if os.path.isfile(meta_path):
+        with open(meta_path, "r", encoding="utf-8") as fh:
+            meta_backup = fh.read()
+        # Clear cached repo_id resolution so cl_sync re-discovers under
+        # the new name rather than targeting whatever was cached.
+        os.unlink(meta_path)
+
+    # Write the unique config.
+    new_rc = dict(rc_data)
+    new_rc["project_id"] = unique_project_id
+    new_rc["repo_name"] = unique_repo_name
+    with open(rc_path, "w", encoding="utf-8") as fh:
+        json.dump(new_rc, fh, indent=2)
+
+    def repo_id_getter() -> str | None:
+        conn = sqlite3.connect(DB_PATH)
+        try:
+            row = conn.execute(
+                "SELECT id FROM repos WHERE project_id = ? LIMIT 1",
+                (unique_project_id,),
+            ).fetchone()
+            return row[0] if row else None
+        finally:
+            conn.close()
+
+    yield {
+        "project_id": unique_project_id,
+        "repo_name": unique_repo_name,
+        "repo_id_getter": repo_id_getter,
+    }
+
+    # Teardown: restore config then delete artifacts scoped by project_id.
+    with open(rc_path, "w", encoding="utf-8") as fh:
+        fh.write(rc_backup)
+    if meta_backup is not None:
+        with open(meta_path, "w", encoding="utf-8") as fh:
+            fh.write(meta_backup)
+    elif os.path.isfile(meta_path):
+        os.unlink(meta_path)
+
+    # Clear the scanner-side state.json + article files so the next test
+    # doesn't inherit this test's synthetic scan shape.
+    art_dir = os.path.join(PROJECT, ".compliancelint", "articles")
+    if os.path.isdir(art_dir):
+        for name in os.listdir(art_dir):
+            if name.endswith(".json"):
+                try:
+                    os.unlink(os.path.join(art_dir, name))
+                except OSError:
+                    pass
+
+    conn = sqlite3.connect(DB_PATH)
+    try:
+        repo_ids = [
+            r[0]
+            for r in conn.execute(
+                "SELECT id FROM repos WHERE project_id = ?",
+                (unique_project_id,),
+            ).fetchall()
+        ]
+        for rid in repo_ids:
+            scan_ids = [
+                r[0]
+                for r in conn.execute(
+                    "SELECT id FROM scans WHERE repo_id = ?", (rid,)
+                ).fetchall()
+            ]
+            if scan_ids:
+                finding_ids = [
+                    r[0]
+                    for r in conn.execute(
+                        f"SELECT id FROM findings WHERE scan_id IN "
+                        f"({','.join('?' * len(scan_ids))})",
+                        scan_ids,
+                    ).fetchall()
+                ]
+                if finding_ids:
+                    fph = ",".join("?" * len(finding_ids))
+                    # Cascade evidence_items → pending_evidence chain.
+                    fr_ids = [
+                        r[0]
+                        for r in conn.execute(
+                            f"SELECT id FROM finding_responses WHERE finding_id "
+                            f"IN ({fph})",
+                            finding_ids,
+                        ).fetchall()
+                    ]
+                    if fr_ids:
+                        frph = ",".join("?" * len(fr_ids))
+                        ei_ids = [
+                            r[0]
+                            for r in conn.execute(
+                                f"SELECT id FROM evidence_items WHERE "
+                                f"finding_response_id IN ({frph})",
+                                fr_ids,
+                            ).fetchall()
+                        ]
+                        if ei_ids:
+                            eph = ",".join("?" * len(ei_ids))
+                            conn.execute(
+                                f"DELETE FROM pending_evidence WHERE "
+                                f"evidence_item_id IN ({eph})",
+                                ei_ids,
+                            )
+                            conn.execute(
+                                f"DELETE FROM evidence_items WHERE id IN ({eph})",
+                                ei_ids,
+                            )
+                        conn.execute(
+                            f"DELETE FROM finding_responses WHERE id IN ({frph})",
+                            fr_ids,
+                        )
+                    conn.execute(
+                        f"DELETE FROM findings WHERE id IN ({fph})", finding_ids
+                    )
+                sph = ",".join("?" * len(scan_ids))
+                conn.execute(f"DELETE FROM scans WHERE id IN ({sph})", scan_ids)
+            conn.execute(
+                "DELETE FROM audit_logs WHERE resource = ?", (f"repos/{rid}",)
+            )
+            conn.execute("DELETE FROM repo_access WHERE repo_id = ?", (rid,))
+            conn.execute("DELETE FROM repo_profiles WHERE repo_id = ?", (rid,))
+        if repo_ids:
+            rph = ",".join("?" * len(repo_ids))
+            conn.execute(f"DELETE FROM repos WHERE id IN ({rph})", repo_ids)
+        conn.commit()
+    finally:
+        conn.close()
+
+
 @pytest.fixture
 def call_pull(server_module, log, discovered):
     repo_name = discovered["repo_name"]
