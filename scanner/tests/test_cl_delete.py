@@ -45,8 +45,9 @@ def test_delete_without_confirm_is_safety_abort(tmp_path):
     raw = server.cl_delete(str(tmp_path), target="local", confirm=False)
     parsed = json.loads(raw)
 
-    assert parsed["status"] == "confirmation_required", f"expected safety gate, got: {parsed}"
-    assert "confirm=true" in parsed["action"]
+    assert parsed["status"] == "aborted", f"expected safety gate, got: {parsed}"
+    assert "will_delete" in parsed
+    assert "will_keep" in parsed
     assert os.path.isdir(cl_dir), "safety gate must NOT delete data"
 
 
@@ -105,7 +106,12 @@ def test_delete_all_removes_everything(tmp_path):
     rc_file = tmp_path / ".compliancelintrc"
     rc_file.write_text(json.dumps({"project_id": "git-fakefake12345678"}), encoding="utf-8")
 
-    raw = server.cl_delete(str(tmp_path), target="all", confirm=True)
+    raw = server.cl_delete(
+        str(tmp_path),
+        target="all",
+        confirm=True,
+        confirm_phrase="I understand this is irreversible",
+    )
     parsed = json.loads(raw)
 
     assert parsed["status"] == "deleted"
@@ -185,3 +191,145 @@ def test_scanner_log_lives_outside_project_tree(tmp_path):
         assert ".compliancelint" in bf.parts, (
             f"log file {bf} must live under a .compliancelint directory"
         )
+
+
+# ── Delete safety hardening (2026-04-24) ─────────────────────────────────────
+# Three-layer defense against LLM misinterpreting destructive intent:
+#   L1. Abort response lists concrete paths (will_delete / will_keep).
+#   L2. target="all" demands a magic phrase — boolean confirm is not enough.
+#   L3. Docstring instructs LLM to disambiguate ambiguous "delete" requests.
+
+def test_abort_message_lists_concrete_paths_for_local(tmp_path):
+    """L1: target=local abort must list the local/ path as will_delete and
+    explicitly preserve evidence/ + .compliancelintrc in will_keep so the LLM
+    can echo concrete consequences back to the user."""
+    _seed_cl_dir(str(tmp_path))
+    (tmp_path / ".compliancelint" / "evidence" / "f-art09").mkdir(parents=True)
+    (tmp_path / ".compliancelintrc").write_text("{}", encoding="utf-8")
+
+    raw = server.cl_delete(str(tmp_path), target="local", confirm=False)
+    parsed = json.loads(raw)
+
+    assert parsed["status"] == "aborted"
+    assert parsed["target"] == "local"
+    assert "will_delete" in parsed and isinstance(parsed["will_delete"], list)
+    assert "will_keep" in parsed and isinstance(parsed["will_keep"], list)
+    assert "reversibility" in parsed
+    assert "action_to_proceed" in parsed
+    assert any(
+        ".compliancelint/local" in item or ".compliancelint\\local" in item
+        for item in parsed["will_delete"]
+    ), f"will_delete must name the local dir, got: {parsed['will_delete']}"
+    assert any("evidence" in item.lower() for item in parsed["will_keep"]), (
+        f"will_keep must mention evidence/, got: {parsed['will_keep']}"
+    )
+    assert any(".compliancelintrc" in item for item in parsed["will_keep"]), (
+        f"will_keep must mention .compliancelintrc, got: {parsed['will_keep']}"
+    )
+
+
+def test_abort_message_lists_concrete_paths_for_all(tmp_path):
+    """L1: target=all abort must warn about the git-committed audit trail
+    being destroyed, and label reversibility as IRREVERSIBLE."""
+    _seed_cl_dir(str(tmp_path))
+    ev_dir = tmp_path / ".compliancelint" / "evidence" / "f-art09"
+    ev_dir.mkdir(parents=True)
+    (ev_dir / "report.pdf").write_bytes(b"%PDF-1.4 fake")
+    (tmp_path / ".compliancelintrc").write_text("{}", encoding="utf-8")
+
+    raw = server.cl_delete(str(tmp_path), target="all", confirm=False)
+    parsed = json.loads(raw)
+
+    assert parsed["status"] == "aborted"
+    assert parsed["target"] == "all"
+    assert "will_delete" in parsed
+    assert any("audit trail" in item for item in parsed["will_delete"]), (
+        f"target=all must flag audit trail loss, got: {parsed['will_delete']}"
+    )
+    assert any(".compliancelintrc" in item for item in parsed["will_delete"])
+    assert "IRREVERSIBLE" in parsed["reversibility"].upper(), (
+        f"target=all reversibility must scream irreversibility, got: {parsed['reversibility']}"
+    )
+
+
+def test_abort_message_lists_concrete_paths_for_dashboard(tmp_path):
+    """L1: target=dashboard abort must mention server-side repo row + say
+    local/ and evidence/ are preserved."""
+    _seed_cl_dir(str(tmp_path))
+
+    raw = server.cl_delete(str(tmp_path), target="dashboard", confirm=False)
+    parsed = json.loads(raw)
+
+    assert parsed["status"] == "aborted"
+    assert parsed["target"] == "dashboard"
+    assert any("dashboard repo row" in item.lower() for item in parsed["will_delete"]), (
+        f"dashboard abort must list the repo row, got: {parsed['will_delete']}"
+    )
+    assert any("local" in item.lower() for item in parsed["will_keep"])
+
+
+def test_target_all_rejects_boolean_confirm(tmp_path):
+    """L2: boolean confirm=True is NOT sufficient for target='all'. Must
+    still require the magic phrase or nothing is destroyed."""
+    _seed_cl_dir(str(tmp_path))
+    ev_dir = tmp_path / ".compliancelint" / "evidence" / "f-art09"
+    ev_dir.mkdir(parents=True)
+    (ev_dir / "report.pdf").write_bytes(b"%PDF-1.4 fake")
+    rc = tmp_path / ".compliancelintrc"
+    rc.write_text("{}", encoding="utf-8")
+
+    raw = server.cl_delete(str(tmp_path), target="all", confirm=True, confirm_phrase="")
+    parsed = json.loads(raw)
+
+    assert parsed["status"] == "aborted", (
+        f"target='all' must reject boolean-only confirmation, got: {parsed}"
+    )
+    assert (tmp_path / ".compliancelint").exists(), "no deletion must have occurred"
+    assert rc.exists()
+
+
+def test_target_all_requires_exact_phrase(tmp_path):
+    """L2: close-but-not-exact phrase must still abort. Prevents typo/
+    paraphrase from nuking the audit trail."""
+    _seed_cl_dir(str(tmp_path))
+    rc = tmp_path / ".compliancelintrc"
+    rc.write_text("{}", encoding="utf-8")
+
+    raw = server.cl_delete(
+        str(tmp_path),
+        target="all",
+        confirm=True,
+        confirm_phrase="I understand",  # close, but not exact
+    )
+    parsed = json.loads(raw)
+
+    assert parsed["status"] == "aborted", (
+        f"inexact phrase must not trigger deletion, got: {parsed}"
+    )
+    assert (tmp_path / ".compliancelint").exists()
+    assert rc.exists()
+
+
+def test_target_all_accepts_exact_phrase(tmp_path):
+    """L2: exact magic phrase is the only way to execute target='all'."""
+    _seed_cl_dir(str(tmp_path))
+    ev_dir = tmp_path / ".compliancelint" / "evidence" / "f-art09"
+    ev_dir.mkdir(parents=True)
+    (ev_dir / "report.pdf").write_bytes(b"%PDF-1.4 fake")
+    rc = tmp_path / ".compliancelintrc"
+    rc.write_text("{}", encoding="utf-8")
+
+    raw = server.cl_delete(
+        str(tmp_path),
+        target="all",
+        confirm=True,
+        confirm_phrase="I understand this is irreversible",
+    )
+    parsed = json.loads(raw)
+
+    assert parsed["status"] == "deleted", (
+        f"exact phrase must trigger deletion, got: {parsed}"
+    )
+    assert parsed["results"]["root"] == "deleted"
+    assert not (tmp_path / ".compliancelint").exists()
+    assert not rc.exists()

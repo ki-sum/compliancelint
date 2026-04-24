@@ -2754,31 +2754,52 @@ def _check_latest_version() -> dict:
 
 
 @mcp.tool()
-def cl_delete(project_path: str, target: str = "local", confirm: bool = False) -> str:
-    """Delete compliance scan data.
+def cl_delete(
+    project_path: str,
+    target: str = "local",
+    confirm: bool = False,
+    confirm_phrase: str = "",
+) -> str:
+    """Remove ComplianceLint data with scoped targets.
 
-    Directory v2 semantics (2026-04-24 breaking change):
-        target="local" (default):
-            Removes .compliancelint/local/ (ephemeral scan cache — state.json,
-            articles/, baselines/, metadata.json, project.json, reports/)
-            AND ~/.compliancelint/logs/{project_hash}/ (home-side log dir).
-            PRESERVES .compliancelint/evidence/ (committed audit trail — only
-            the dashboard UI may remove individual evidence) and
-            .compliancelintrc (project↔dashboard binding).
-        target="all":
-            Everything "local" removes, PLUS .compliancelint/evidence/ and
-            .compliancelintrc. Use when tearing a project down fully. Does
-            NOT touch the dashboard server-side — for that call target=
-            "dashboard" explicitly.
-        target="dashboard":
-            Calls the dashboard purge endpoint (server-side data, requires
-            saas_api_key). Leaves the working tree alone.
+    ⚠️ IF USER INTENT IS AMBIGUOUS, ASK THEM TO CLARIFY TARGET.
+    Do NOT assume "delete this repo" means target="all". The three targets
+    look similar but have very different blast radii. When unsure, surface
+    the abort response's will_delete / will_keep lists to the user and let
+    them pick.
+
+    Targets:
+      local (default, reversible):
+        Removes: .compliancelint/local/ (scan cache) + ~/.compliancelint/logs/{hash}/.
+        Preserves: .compliancelint/evidence/ (git-committed audit trail) + .compliancelintrc.
+        Use when: user wants to force a clean rescan or clear cache corruption.
+        Safety: confirm=True required.
+
+      dashboard (partially reversible):
+        Removes: dashboard repo row + cascaded findings + evidence_items (server-side).
+        Preserves: everything on disk (.compliancelint/local/, evidence/, rc).
+        Use when: user wants to disconnect from SaaS but keep local scan data.
+        Safety: confirm=True required.
+
+      all (IRREVERSIBLE — irrecoverable data loss):
+        Removes: EVERYTHING on disk — local cache + git-committed evidence + .compliancelintrc.
+        Removes the git audit trail permanently; next scan starts from zero.
+        Use ONLY when user explicitly says "wipe everything, including git evidence".
+        Safety: confirm_phrase="I understand this is irreversible" (exact string) required.
+        Boolean confirm=True is NOT SUFFICIENT for target='all'.
+
+    Disambiguation heuristics for LLM:
+      - "forget this repo" / "remove from my account" → likely target='dashboard'
+      - "clear cache" / "force rescan" → target='local'
+      - "wipe everything" / "start over" → ASK user whether to keep evidence
+      - "nuke this" → ASK user, do not assume
 
     Args:
-        project_path: Project directory path.
-        target: "local" | "all" | "dashboard".
-        confirm: Must be set to true to actually delete. First call without
-            confirm returns a confirmation_required warning.
+        project_path: Absolute path to the project directory.
+        target: "local" | "dashboard" | "all".
+        confirm: Must be True for target in {"local", "dashboard"}.
+        confirm_phrase: Must be literal "I understand this is irreversible"
+            when target="all". Case + whitespace exact.
     """
     import shutil
 
@@ -2794,7 +2815,7 @@ def cl_delete(project_path: str, target: str = "local", confirm: bool = False) -
             )
         })
 
-    from core.scanner_log import get_scanner_logger
+    from core.scanner_log import get_scanner_logger, _resolve_log_dir, _project_hash
     from core import paths as cl_paths
     slog = get_scanner_logger(project_path)
 
@@ -2804,34 +2825,95 @@ def cl_delete(project_path: str, target: str = "local", confirm: bool = False) -
     rc_file = os.path.join(project_path, ".compliancelintrc")
     config = ProjectConfig.load(project_path)
 
-    # Confirmation gate
-    if not confirm:
-        warning_parts = []
+    MAGIC_PHRASE = "I understand this is irreversible"
+
+    def _build_abort_payload() -> dict:
+        """Compute will_delete / will_keep / reversibility for current target.
+
+        No filesystem mutation — only inspection. Sizes come from
+        cl_paths.human_size so the LLM can echo concrete footprints back to
+        the user instead of opaque 'exists'/'not found' strings.
+        """
+        will_delete: list[str] = []
+        will_keep: list[str] = []
+        local_path = cl_paths.local_dir(project_path)
+        evidence_path = cl_paths.evidence_dir(project_path)
+        log_dir = _resolve_log_dir(project_path)
+
         if target == "local":
-            has_local = os.path.isdir(local_dir)
-            warning_parts.append(
-                f"LOCAL: Will delete .compliancelint/local/ ({'exists' if has_local else 'not found'}) "
-                "and ~/.compliancelint/logs/{hash}/. Preserves evidence/ and .compliancelintrc."
-            )
+            if local_path.exists():
+                will_delete.append(
+                    f".compliancelint/local/ ({cl_paths.human_size(local_path)})"
+                )
+            if log_dir.exists():
+                will_delete.append(
+                    f"~/.compliancelint/logs/{_project_hash(project_path)}/ "
+                    f"({cl_paths.human_size(log_dir)})"
+                )
+            will_keep.append(".compliancelint/evidence/ (audit trail preserved)")
+            will_keep.append(".compliancelintrc (dashboard binding preserved)")
+
         elif target == "all":
-            has_root = os.path.isdir(root_dir)
-            has_rc = os.path.isfile(rc_file)
-            warning_parts.append(
-                f"ALL: Will delete the entire .compliancelint/ ({'exists' if has_root else 'not found'}) "
-                f"including evidence/, plus .compliancelintrc ({'exists' if has_rc else 'not found'}). "
-                "Audit trail will be lost from the working tree."
-            )
+            if local_path.exists():
+                will_delete.append(
+                    f".compliancelint/local/ ({cl_paths.human_size(local_path)})"
+                )
+            if evidence_path.exists():
+                will_delete.append(
+                    f".compliancelint/evidence/ "
+                    f"({cl_paths.human_size(evidence_path)}) "
+                    "⚠️ git-committed audit trail"
+                )
+            if os.path.isfile(rc_file):
+                will_delete.append(".compliancelintrc (dashboard binding)")
+            if log_dir.exists():
+                will_delete.append(
+                    f"~/.compliancelint/logs/{_project_hash(project_path)}/ "
+                    f"({cl_paths.human_size(log_dir)})"
+                )
+
         elif target == "dashboard":
-            has_key = bool(config.saas_api_key)
-            warning_parts.append(
-                f"DASHBOARD: Will delete server-side scan data ({'API key configured' if has_key else 'no API key — will fail'}). "
-                "Local files are preserved."
+            will_delete.append("dashboard repo row (server-side)")
+            will_delete.append(
+                "dashboard findings + evidence_items (server-side cascade)"
             )
-        return json.dumps({
-            "status": "confirmation_required",
-            "warning": " | ".join(warning_parts),
-            "action": f"Call cl_delete(project_path, target='{target}', confirm=true) to proceed.",
-        })
+            will_keep.append(".compliancelint/local/ (local cache preserved)")
+            will_keep.append(".compliancelint/evidence/ (git committed preserved)")
+            will_keep.append(".compliancelintrc (binding preserved)")
+
+        reversibility = {
+            "local": "Reversible — next cl_scan rebuilds local cache from dashboard state.",
+            "all": "IRREVERSIBLE — git-committed evidence is removed, dashboard binding is lost. Cannot be undone.",
+            "dashboard": "Partially reversible — cl_connect + cl_sync can reconstruct dashboard state from local data.",
+        }.get(target, "Unknown target.")
+
+        if target == "all":
+            action_to_proceed = (
+                f"target='all' requires confirm_phrase='{MAGIC_PHRASE}' "
+                "(exact string match — case + whitespace). Boolean confirm=True "
+                "is NOT sufficient. Copy the phrase literally; do not paraphrase."
+            )
+        else:
+            action_to_proceed = (
+                f"Call cl_delete(project_path, target='{target}', confirm=True) to proceed."
+            )
+
+        return {
+            "status": "aborted",
+            "target": target,
+            "will_delete": will_delete,
+            "will_keep": will_keep,
+            "reversibility": reversibility,
+            "action_to_proceed": action_to_proceed,
+        }
+
+    # target='all' is gated by magic phrase, not boolean. Check this BEFORE
+    # the boolean gate so confirm=True cannot accidentally bypass it.
+    if target == "all":
+        if confirm_phrase != MAGIC_PHRASE:
+            return json.dumps(_build_abort_payload())
+    elif not confirm:
+        return json.dumps(_build_abort_payload())
 
     results: dict = {}
 

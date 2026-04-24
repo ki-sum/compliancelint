@@ -128,3 +128,30 @@ def ensure_evidence_dir(project_path: str) -> str:
     path = evidence_dir(project_path)
     path.mkdir(parents=True, exist_ok=True)
     return str(path)
+
+
+def human_size(path: Path) -> str:
+    """Approximate on-disk size of `path`'s subtree as a short human string.
+
+    Returns "0 B" for missing paths, file size for single files, or the
+    walked-subtree total for directories. Used by cl_delete's abort preview
+    so the LLM can surface concrete consequences (e.g. "512 KB") rather
+    than opaque "existing" / "not found" booleans.
+    """
+    if not path.exists():
+        return "0 B"
+    if path.is_file():
+        total = float(path.stat().st_size)
+    else:
+        total = 0.0
+        for f in path.rglob("*"):
+            try:
+                if f.is_file():
+                    total += f.stat().st_size
+            except OSError:
+                continue
+    for unit in ("B", "KB", "MB", "GB"):
+        if total < 1024:
+            return f"{total:.0f} {unit}"
+        total /= 1024
+    return f"{total:.1f} TB"
