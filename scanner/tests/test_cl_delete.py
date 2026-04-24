@@ -1,8 +1,16 @@
-"""Coverage for MCP tool cl_delete (server.py:2753).
+"""Coverage for MCP tool cl_delete.
+
+Directory v2 (2026-04-24) semantics:
+  - target="local" (default): only .compliancelint/local/ + home log dir.
+    Evidence/ and .compliancelintrc are preserved.
+  - target="all": full working-tree wipe (local/, evidence/, .compliancelintrc).
+  - target="dashboard": server-side purge only.
 
 Covers:
   - safety gate: confirm=False does NOT delete, returns confirmation_required
-  - happy path: confirm=True, target="local" removes .compliancelint/ dir
+  - target="local" removes .compliancelint/local/ but preserves
+    .compliancelint/evidence/ and .compliancelintrc (v2 regression)
+  - target="all" removes local/, evidence/, and .compliancelintrc
   - error path: invalid target returns error listing legal values
   - BUG-1 regression: cl_delete after a real cl_scan-style logger attach
     must succeed (no WinError 32 sharing violation on Windows)
@@ -44,13 +52,67 @@ def test_delete_without_confirm_is_safety_abort(tmp_path):
 
 def test_delete_local_with_confirm_removes_state(tmp_path):
     cl_dir = _seed_cl_dir(str(tmp_path))
+    local_dir = os.path.join(cl_dir, "local")
 
     raw = server.cl_delete(str(tmp_path), target="local", confirm=True)
     parsed = json.loads(raw)
 
     assert parsed["status"] == "deleted", f"unexpected status: {parsed}"
     assert parsed["results"]["local"] == "deleted"
-    assert not os.path.exists(cl_dir), ".compliancelint/ must be removed after confirmed delete"
+    assert not os.path.exists(local_dir), (
+        ".compliancelint/local/ must be removed after confirmed target=local delete"
+    )
+
+
+def test_delete_local_preserves_evidence_and_rc(tmp_path):
+    """v2 regression (§3): target=local must NOT touch audit-trail evidence/
+    or the .compliancelintrc dashboard binding. Removing those requires the
+    explicit target=all (working-tree wipe) or the dashboard UI's own delete.
+    """
+    _seed_cl_dir(str(tmp_path))
+
+    # Seed a committed-side evidence payload + rc file
+    evidence_dir = tmp_path / ".compliancelint" / "evidence" / "f-art09-bias"
+    evidence_dir.mkdir(parents=True)
+    ev_file = evidence_dir / "bias-report.pdf"
+    ev_file.write_bytes(b"%PDF-1.4 fake evidence")
+    rc_file = tmp_path / ".compliancelintrc"
+    rc_file.write_text(json.dumps({"project_id": "git-fakefake12345678"}), encoding="utf-8")
+
+    raw = server.cl_delete(str(tmp_path), target="local", confirm=True)
+    parsed = json.loads(raw)
+
+    assert parsed["status"] == "deleted"
+    assert parsed["results"]["local"] == "deleted"
+    assert ev_file.exists(), (
+        "target=local must preserve .compliancelint/evidence/ — removing it "
+        "destroys the audit trail (only the dashboard UI may delete evidence)"
+    )
+    assert rc_file.exists(), (
+        "target=local must preserve .compliancelintrc — removing it orphans "
+        "the dashboard row; use cl_disconnect or target=all for full wipe"
+    )
+
+
+def test_delete_all_removes_everything(tmp_path):
+    """v2 regression (§3): target=all wipes the entire .compliancelint/ tree
+    plus .compliancelintrc. Dashboard server state is untouched."""
+    _seed_cl_dir(str(tmp_path))
+    evidence_dir = tmp_path / ".compliancelint" / "evidence" / "f-art09-bias"
+    evidence_dir.mkdir(parents=True)
+    ev_file = evidence_dir / "bias-report.pdf"
+    ev_file.write_bytes(b"%PDF-1.4 fake evidence")
+    rc_file = tmp_path / ".compliancelintrc"
+    rc_file.write_text(json.dumps({"project_id": "git-fakefake12345678"}), encoding="utf-8")
+
+    raw = server.cl_delete(str(tmp_path), target="all", confirm=True)
+    parsed = json.loads(raw)
+
+    assert parsed["status"] == "deleted"
+    assert parsed["results"]["root"] == "deleted"
+    assert parsed["results"]["rc"] == "deleted"
+    assert not (tmp_path / ".compliancelint").exists()
+    assert not rc_file.exists()
 
 
 def test_delete_invalid_target_returns_error(tmp_path):
@@ -61,7 +123,7 @@ def test_delete_invalid_target_returns_error(tmp_path):
 
     assert "error" in parsed, f"expected error, got: {parsed}"
     assert "invalid" in parsed["error"].lower()
-    for legal in ("local", "remote", "all"):
+    for legal in ("local", "all", "dashboard"):
         assert legal in parsed["error"], f"error must list legal target '{legal}'"
 
 
@@ -87,8 +149,8 @@ def test_delete_works_after_real_cl_scan_without_monkeypatch(tmp_path):
 
     assert parsed["status"] == "deleted", f"cl_delete failed post-scan: {parsed}"
     assert parsed["results"]["local"] == "deleted"
-    assert not (tmp_path / ".compliancelint").exists(), (
-        "project .compliancelint/ must be gone after confirmed delete"
+    assert not (tmp_path / ".compliancelint" / "local").exists(), (
+        "project .compliancelint/local/ must be gone after confirmed target=local delete"
     )
 
 

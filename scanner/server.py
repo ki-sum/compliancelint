@@ -2757,43 +2757,75 @@ def _check_latest_version() -> dict:
 def cl_delete(project_path: str, target: str = "local", confirm: bool = False) -> str:
     """Delete compliance scan data.
 
+    Directory v2 semantics (2026-04-24 breaking change):
+        target="local" (default):
+            Removes .compliancelint/local/ (ephemeral scan cache — state.json,
+            articles/, baselines/, metadata.json, project.json, reports/)
+            AND ~/.compliancelint/logs/{project_hash}/ (home-side log dir).
+            PRESERVES .compliancelint/evidence/ (committed audit trail — only
+            the dashboard UI may remove individual evidence) and
+            .compliancelintrc (project↔dashboard binding).
+        target="all":
+            Everything "local" removes, PLUS .compliancelint/evidence/ and
+            .compliancelintrc. Use when tearing a project down fully. Does
+            NOT touch the dashboard server-side — for that call target=
+            "dashboard" explicitly.
+        target="dashboard":
+            Calls the dashboard purge endpoint (server-side data, requires
+            saas_api_key). Leaves the working tree alone.
+
     Args:
         project_path: Project directory path.
-        target: What to delete:
-            - "local": Delete .compliancelint/ directory (local scan data)
-            - "remote": Delete scan data from ComplianceLint Dashboard (requires API key)
-            - "all": Delete both local and remote data
-        confirm: Must be set to true to actually delete. First call without confirm
-            returns a warning message.
+        target: "local" | "all" | "dashboard".
+        confirm: Must be set to true to actually delete. First call without
+            confirm returns a confirmation_required warning.
     """
     import shutil
 
     if not os.path.isdir(project_path):
         return json.dumps({"error": f"Directory not found: {project_path}"})
 
-    if target not in ("local", "remote", "all"):
-        return json.dumps({"error": f"Invalid target: '{target}'. Must be 'local', 'remote', or 'all'."})
+    _VALID_TARGETS = ("local", "all", "dashboard")
+    if target not in _VALID_TARGETS:
+        return json.dumps({
+            "error": (
+                f"Invalid target: '{target}'. Must be "
+                f"{', '.join(repr(t) for t in _VALID_TARGETS)}."
+            )
+        })
 
     from core.scanner_log import get_scanner_logger
+    from core import paths as cl_paths
     slog = get_scanner_logger(project_path)
 
-    cl_dir = os.path.join(project_path, ".compliancelint")
+    root_dir = str(cl_paths.root_dir(project_path))
+    local_dir = str(cl_paths.local_dir(project_path))
+    evidence_dir = str(cl_paths.evidence_dir(project_path))
+    rc_file = os.path.join(project_path, ".compliancelintrc")
     config = ProjectConfig.load(project_path)
 
     # Confirmation gate
     if not confirm:
         warning_parts = []
-        if target in ("local", "all"):
-            has_local = os.path.isdir(cl_dir)
+        if target == "local":
+            has_local = os.path.isdir(local_dir)
             warning_parts.append(
-                f"LOCAL: Will delete .compliancelint/ directory ({'exists' if has_local else 'not found'}). "
-                "This removes all local scan data, baselines, and evidence."
+                f"LOCAL: Will delete .compliancelint/local/ ({'exists' if has_local else 'not found'}) "
+                "and ~/.compliancelint/logs/{hash}/. Preserves evidence/ and .compliancelintrc."
             )
-        if target in ("remote", "all"):
+        elif target == "all":
+            has_root = os.path.isdir(root_dir)
+            has_rc = os.path.isfile(rc_file)
+            warning_parts.append(
+                f"ALL: Will delete the entire .compliancelint/ ({'exists' if has_root else 'not found'}) "
+                f"including evidence/, plus .compliancelintrc ({'exists' if has_rc else 'not found'}). "
+                "Audit trail will be lost from the working tree."
+            )
+        elif target == "dashboard":
             has_key = bool(config.saas_api_key)
             warning_parts.append(
-                f"REMOTE: Will delete scan data from dashboard ({'API key configured' if has_key else 'no API key — will fail'}). "
-                "This removes all scans, findings, and history from the server."
+                f"DASHBOARD: Will delete server-side scan data ({'API key configured' if has_key else 'no API key — will fail'}). "
+                "Local files are preserved."
             )
         return json.dumps({
             "status": "confirmation_required",
@@ -2801,34 +2833,54 @@ def cl_delete(project_path: str, target: str = "local", confirm: bool = False) -
             "action": f"Call cl_delete(project_path, target='{target}', confirm=true) to proceed.",
         })
 
-    results = {}
+    results: dict = {}
 
-    # Delete local data
-    if target in ("local", "all"):
-        # BUG-1 fix: release the scanner.log handle before rmtree. Log now
-        # lives in ~/.compliancelint/logs/{hash}/, outside the project tree,
-        # but we still close the handler to keep the home-side log cleanup
-        # below reliable on Windows.
-        slog.info("cl_delete: removing .compliancelint/ directory")
+    # ── target=local — ephemeral-only delete ────────────────────────────────
+    if target == "local":
+        slog.info("cl_delete: removing .compliancelint/local/ + home log dir")
         from core.scanner_log import close_scanner_logger, _resolve_log_dir
         close_scanner_logger(project_path)
-        if os.path.isdir(cl_dir):
-            shutil.rmtree(cl_dir)
+        if os.path.isdir(local_dir):
+            shutil.rmtree(local_dir)
             results["local"] = "deleted"
         else:
             results["local"] = "not_found"
-        # Also remove the home-side log directory for this project.
-        # ignore_errors: best-effort — missing dir is fine, a lingering
-        # handle (shouldn't happen after close_scanner_logger) shouldn't
-        # fail the local delete which already succeeded above.
         log_dir = _resolve_log_dir(project_path)
         if log_dir.exists():
             shutil.rmtree(log_dir, ignore_errors=True)
+            results["logs"] = "deleted"
+        else:
+            results["logs"] = "not_found"
 
-    # Delete remote data (permanent purge — owner only)
-    if target in ("remote", "all"):
+    # ── target=all — full working-tree wipe ─────────────────────────────────
+    elif target == "all":
+        slog.info("cl_delete: removing .compliancelint/ + .compliancelintrc + home log dir")
+        from core.scanner_log import close_scanner_logger, _resolve_log_dir
+        close_scanner_logger(project_path)
+        if os.path.isdir(root_dir):
+            shutil.rmtree(root_dir)
+            results["root"] = "deleted"
+        else:
+            results["root"] = "not_found"
+        if os.path.isfile(rc_file):
+            try:
+                os.unlink(rc_file)
+                results["rc"] = "deleted"
+            except OSError as e:
+                results["rc"] = f"error: {e}"
+        else:
+            results["rc"] = "not_found"
+        log_dir = _resolve_log_dir(project_path)
+        if log_dir.exists():
+            shutil.rmtree(log_dir, ignore_errors=True)
+            results["logs"] = "deleted"
+        else:
+            results["logs"] = "not_found"
+
+    # ── target=dashboard — server-side purge ────────────────────────────────
+    elif target == "dashboard":
         if not config.saas_api_key:
-            results["remote"] = "error: no API key configured. Run cl_connect() first."
+            results["dashboard"] = "error: no API key configured. Run cl_connect() first."
         else:
             saas_url = config.saas_url or "https://compliancelint.dev"
             config.derive_git_identity(project_path)
@@ -2840,7 +2892,6 @@ def cl_delete(project_path: str, target: str = "local", confirm: bool = False) -
                 curl_flags["creationflags"] = subprocess.CREATE_NO_WINDOW
 
             try:
-                # Step 1: Find the repo ID via repos list API
                 list_url = f"{saas_url}/api/v1/repos"
                 r = subprocess.run(
                     ["curl", "-s", "--max-time", "8",
@@ -2849,16 +2900,14 @@ def cl_delete(project_path: str, target: str = "local", confirm: bool = False) -
                     **curl_flags,
                 )
                 if r.returncode != 0 or not r.stdout.strip():
-                    results["remote"] = f"error: failed to list repos (exit {r.returncode})"
+                    results["dashboard"] = f"error: failed to list repos (exit {r.returncode})"
                 else:
                     repos_list = json.loads(r.stdout.strip())
-                    # Match by repo name
                     matched = [rp for rp in repos_list if rp.get("name") == repo_name]
                     if not matched:
-                        results["remote"] = f"not_found: repo '{repo_name}' not found on dashboard"
+                        results["dashboard"] = f"not_found: repo '{repo_name}' not found on dashboard"
                     else:
                         repo_id = matched[0]["id"]
-                        # Step 2: Call purge endpoint
                         purge_url = f"{saas_url}/api/v1/repos/{repo_id}/purge"
                         payload = json.dumps({"confirmName": repo_name})
                         r2 = subprocess.run(
@@ -2870,14 +2919,14 @@ def cl_delete(project_path: str, target: str = "local", confirm: bool = False) -
                         )
                         if r2.returncode == 0 and r2.stdout.strip():
                             resp = json.loads(r2.stdout.strip())
-                            results["remote"] = resp.get("status", "unknown")
+                            results["dashboard"] = resp.get("status", "unknown")
                             if resp.get("error"):
-                                results["remote"] = f"error: {resp['error']}"
+                                results["dashboard"] = f"error: {resp['error']}"
                         else:
-                            results["remote"] = f"error: purge request failed (exit {r2.returncode})"
+                            results["dashboard"] = f"error: purge request failed (exit {r2.returncode})"
             except Exception as e:
-                results["remote"] = f"error: {e}"
-            slog.info("cl_delete: remote purge result=%s", results.get("remote"))
+                results["dashboard"] = f"error: {e}"
+            slog.info("cl_delete: dashboard purge result=%s", results.get("dashboard"))
 
     return json.dumps({"status": "deleted", "results": results})
 
