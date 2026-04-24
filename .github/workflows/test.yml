@@ -11,7 +11,11 @@ on:
 jobs:
   # ── Scanner (Python) ──────────────────────────────────
   scanner-tests:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
     defaults:
       run:
         working-directory: scanner
