@@ -40,7 +40,9 @@ next-env.d.ts
 test-results/
 
 # Runtime
-.compliancelint/
+# v2 directory split: only local/ is ignored. evidence/ is the committed
+# audit trail; .compliancelintrc is ignored via the "Private" section above.
+.compliancelint/local/
 *.log
 *.db-shm
 *.db-wal

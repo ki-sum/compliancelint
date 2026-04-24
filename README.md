@@ -291,7 +291,12 @@ not our SaaS. Five architectural commitments:
 
 1. **Evidence commits to your repo.** Bytes land at
    `.compliancelint/evidence/{finding_id}/{filename}` — you own them,
-   you can grep them, they survive if we vanish.
+   you can grep them, they survive if we vanish. A sibling `manifest.json`
+   under the same directory records who uploaded what, when, and at which
+   sha — the audit-trail primary record. Scan cache (state.json, per-
+   article results, baselines) lives in `.compliancelint/local/` and is
+   gitignored; only evidence and the `.compliancelintrc` project binding
+   are committed.
 
 2. **MCP never runs git on your behalf.** No auto-commit, no auto-push,
    no auto-revert. Every commit is your decision. If you commit locally
