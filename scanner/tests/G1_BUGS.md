@@ -8,6 +8,8 @@ to work around these; instead they are documented here for the owning session.
 
 ## BUG-1 — cl_delete target=local can fail on Windows due to open log handle
 
+**Status**: FIXED 2026-04-24 — log directory relocated to `~/.compliancelint/logs/{project_hash}/`, outside the project tree; `cl_delete` now calls `close_scanner_logger` before `shutil.rmtree` and then cleans the home-side log dir. `scanner/tests/test_cl_delete.py::test_delete_works_after_real_cl_scan_without_monkeypatch` + `test_scanner_log_lives_outside_project_tree` guard the regression. See `BUG1_FIX_HANDOFF.md` for the design; commit sha recorded in `git log`.
+
 **Tool**: `cl_delete` (`scanner/server.py:2753`)
 **Platform**: Windows
 **Trigger**: `cl_delete(project_path, target="local", confirm=True)` in a process
