@@ -2801,12 +2801,25 @@ def cl_delete(project_path: str, target: str = "local", confirm: bool = False) -
 
     # Delete local data
     if target in ("local", "all"):
+        # BUG-1 fix: release the scanner.log handle before rmtree. Log now
+        # lives in ~/.compliancelint/logs/{hash}/, outside the project tree,
+        # but we still close the handler to keep the home-side log cleanup
+        # below reliable on Windows.
+        slog.info("cl_delete: removing .compliancelint/ directory")
+        from core.scanner_log import close_scanner_logger, _resolve_log_dir
+        close_scanner_logger(project_path)
         if os.path.isdir(cl_dir):
             shutil.rmtree(cl_dir)
             results["local"] = "deleted"
-            slog.info("cl_delete: removed .compliancelint/ directory")
         else:
             results["local"] = "not_found"
+        # Also remove the home-side log directory for this project.
+        # ignore_errors: best-effort — missing dir is fine, a lingering
+        # handle (shouldn't happen after close_scanner_logger) shouldn't
+        # fail the local delete which already succeeded above.
+        log_dir = _resolve_log_dir(project_path)
+        if log_dir.exists():
+            shutil.rmtree(log_dir, ignore_errors=True)
 
     # Delete remote data (permanent purge — owner only)
     if target in ("remote", "all"):
