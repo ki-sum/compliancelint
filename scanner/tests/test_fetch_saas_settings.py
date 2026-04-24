@@ -36,7 +36,7 @@ class TestFetchSaasSettings:
         from server import _fetch_saas_scan_settings
         # Create a temp dir with metadata
         with tempfile.TemporaryDirectory() as tmp:
-            cl_dir = os.path.join(tmp, ".compliancelint")
+            cl_dir = os.path.join(tmp, ".compliancelint", "local")
             os.makedirs(cl_dir)
             with open(os.path.join(cl_dir, "metadata.json"), "w") as f:
                 json.dump({"repo_id": "test-repo"}, f)
@@ -49,7 +49,7 @@ class TestFetchSaasSettings:
     def test_returns_none_without_repo_id_in_metadata(self):
         from server import _fetch_saas_scan_settings
         with tempfile.TemporaryDirectory() as tmp:
-            cl_dir = os.path.join(tmp, ".compliancelint")
+            cl_dir = os.path.join(tmp, ".compliancelint", "local")
             os.makedirs(cl_dir)
             with open(os.path.join(cl_dir, "metadata.json"), "w") as f:
                 json.dump({}, f)  # no repo_id

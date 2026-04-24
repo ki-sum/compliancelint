@@ -129,7 +129,7 @@ def _set_public_badge(repo_id: str, enabled: bool) -> None:
 
 
 def _write_synthetic_art9(project_path: str, findings: list[dict]) -> None:
-    art_dir = os.path.join(project_path, ".compliancelint", "articles")
+    art_dir = os.path.join(project_path, ".compliancelint", "local", "articles")
     Path(art_dir).mkdir(parents=True, exist_ok=True)
     findings_dict = {
         f["obligation_id"]: {

@@ -39,7 +39,7 @@ class RepoNotFoundError(Exception):
     """
 
 
-# ── Cache for SaaS repo_id (lives in .compliancelint/metadata.json) ───────────
+# ── Cache for SaaS repo_id (lives in .compliancelint/local/metadata.json) ────
 #
 # Why here and not in core/config.py: this is a SaaS-derived identifier, not
 # user configuration. metadata.json is already the file for SaaS-derived
@@ -53,12 +53,11 @@ class RepoNotFoundError(Exception):
 # the next cl_sync detects 404 and re-matches by repo_name.
 
 
-_METADATA_FILE = "metadata.json"
-_METADATA_DIR = ".compliancelint"
+from core import paths
 
 
 def _metadata_path(project_path: str) -> str:
-    return os.path.join(project_path, _METADATA_DIR, _METADATA_FILE)
+    return paths.metadata_file_str(project_path)
 
 
 def read_cached_repo_id(project_path: str) -> Optional[str]:
@@ -88,8 +87,7 @@ def write_cached_repo_id(project_path: str, repo_id: str) -> None:
     """
     if not repo_id:
         return
-    dir_path = os.path.join(project_path, _METADATA_DIR)
-    os.makedirs(dir_path, exist_ok=True)
+    paths.ensure_local_dir(project_path)
     path = _metadata_path(project_path)
     meta: dict = {}
     if os.path.isfile(path):

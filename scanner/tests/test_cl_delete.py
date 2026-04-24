@@ -24,8 +24,9 @@ import server  # noqa: E402
 
 def _seed_cl_dir(project_path):
     cl_dir = os.path.join(project_path, ".compliancelint")
-    os.makedirs(os.path.join(cl_dir, "articles"), exist_ok=True)
-    with open(os.path.join(cl_dir, "articles", "art12.json"), "w", encoding="utf-8") as f:
+    local_articles = os.path.join(cl_dir, "local", "articles")
+    os.makedirs(local_articles, exist_ok=True)
+    with open(os.path.join(local_articles, "art12.json"), "w", encoding="utf-8") as f:
         json.dump({"article": 12, "findings": {}}, f)
     return cl_dir
 

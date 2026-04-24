@@ -1,14 +1,18 @@
 """Compliance state persistence — per-article file architecture.
 
-Storage layout:
+Storage layout (Directory v2 — 2026-04-24):
   .compliancelint/
-    articles/
-      art5.json       ← each article scan saved independently (no write conflicts)
-      art9.json
-      art12.json
-    state.json        ← merged view (regenerated on load_state)
-    baselines/        ← timestamped snapshots (max 20, auto-cleanup)
-    reports/          ← exported reports
+    local/                 ← gitignored ephemeral cache + tool state
+      articles/
+        art5.json          ← each article scan saved independently (no write conflicts)
+        art9.json
+        art12.json
+      state.json           ← merged view (regenerated on load_state)
+      baselines/           ← timestamped snapshots (max 20, auto-cleanup)
+      reports/             ← exported reports
+      metadata.json        ← repo_id + ai_provider cache
+      project.json         ← UUID fallback for project_id
+    evidence/              ← committed audit trail (dashboard-uploaded files)
 
 Handles:
 - Saving scan results per-article (concurrent-safe: different files)
@@ -24,12 +28,10 @@ import uuid
 from datetime import datetime, timezone
 from typing import Optional
 
+from core import paths
 
-_STATE_DIR = ".compliancelint"
-_ARTICLES_DIR = "articles"
-_BASELINES_DIR = "baselines"
+
 _MAX_BASELINES = 20
-_PROJECT_FILE = "project.json"
 
 # D1: exception derogation map.
 # Populated on first use from scanner/obligations/*.json linked_obligation
@@ -72,16 +74,12 @@ def _load_derogation_map() -> dict:
     return result
 
 
-def _state_dir(project_path: str) -> str:
-    return os.path.join(project_path, _STATE_DIR)
-
-
 def get_project_id(project_path: str) -> str:
     """Derive a stable project identity — zero friction, no config files.
 
     Strategy (zero user action needed):
       1. Try .compliancelintrc (cached by cl_connect or npx init — fastest)
-      2. Fall back to UUID cached in .compliancelint/project.json
+      2. Fall back to UUID cached in .compliancelint/local/project.json
 
     IMPORTANT: Does NOT call git subprocess. In MCP context, git hangs
     the event loop. project_id must be pre-computed by `npx compliancelint init`
@@ -97,9 +95,8 @@ def get_project_id(project_path: str) -> str:
     # 2. NO git fallback — derive_git_identity() hangs in MCP context.
     # project_id is pre-derived by `npx compliancelint init`.
 
-    # Fallback for non-git projects: cached UUID in project.json
-    sd = _state_dir(project_path)
-    project_file = os.path.join(sd, _PROJECT_FILE)
+    # Fallback for non-git projects: cached UUID in local/project.json
+    project_file = paths.project_file_str(project_path)
 
     if os.path.isfile(project_file):
         try:
@@ -113,16 +110,16 @@ def get_project_id(project_path: str) -> str:
 
     # Generate and cache UUID
     pid = str(uuid.uuid4())
-    os.makedirs(sd, exist_ok=True)
+    paths.ensure_local_dir(project_path)
     with open(project_file, "w", encoding="utf-8") as f:
         json.dump({"project_id": pid, "created_at": datetime.now(timezone.utc).isoformat()}, f, indent=2)
     return pid
 
 
 def save_metadata(project_path: str, ai_provider: str = "") -> None:
-    """Save AI provider metadata to .compliancelint/metadata.json."""
-    meta_path = os.path.join(_state_dir(project_path), "metadata.json")
-    os.makedirs(_state_dir(project_path), exist_ok=True)
+    """Save AI provider metadata to .compliancelint/local/metadata.json."""
+    meta_path = paths.metadata_file_str(project_path)
+    paths.ensure_local_dir(project_path)
     meta = {}
     if os.path.isfile(meta_path):
         try:
@@ -137,11 +134,11 @@ def save_metadata(project_path: str, ai_provider: str = "") -> None:
 
 
 def _articles_dir(project_path: str) -> str:
-    return os.path.join(_state_dir(project_path), _ARTICLES_DIR)
+    return paths.articles_dir_str(project_path)
 
 
 def _article_path(project_path: str, article_number: int) -> str:
-    return os.path.join(_articles_dir(project_path), f"art{article_number}.json")
+    return str(paths.article_file(project_path, article_number))
 
 
 def load_state(project_path: str) -> dict:
@@ -369,7 +366,8 @@ def _save_merged_state(project_path: str) -> None:
     """Regenerate state.json from all article files."""
     try:
         state = load_state(project_path)
-        path = os.path.join(_state_dir(project_path), "state.json")
+        paths.ensure_local_dir(project_path)
+        path = paths.state_file_str(project_path)
         with open(path, "w", encoding="utf-8") as f:
             json.dump(state, f, indent=2, ensure_ascii=False)
     except OSError:
@@ -379,8 +377,9 @@ def _save_merged_state(project_path: str) -> None:
 def _save_baseline(project_path: str) -> None:
     """Save a timestamped snapshot. Keep max 20, delete oldest."""
     try:
-        baselines_dir = os.path.join(_state_dir(project_path), _BASELINES_DIR)
-        os.makedirs(baselines_dir, exist_ok=True)
+        baselines_path = paths.baselines_dir(project_path)
+        baselines_path.mkdir(parents=True, exist_ok=True)
+        baselines_dir = str(baselines_path)
 
         # Cleanup: keep only last _MAX_BASELINES
         existing = sorted(os.listdir(baselines_dir))

@@ -137,7 +137,7 @@ class TestSkippedArticleStateSaving:
     def test_state_json_file_created(self, project_dir):
         """state.json merged file should be created after saving."""
         save_article_result(project_dir, 12, _make_skip_result(12))
-        state_path = os.path.join(project_dir, ".compliancelint", "state.json")
+        state_path = os.path.join(project_dir, ".compliancelint", "local", "state.json")
         assert os.path.isfile(state_path)
 
         with open(state_path) as f:

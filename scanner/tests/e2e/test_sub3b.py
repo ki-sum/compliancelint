@@ -72,7 +72,7 @@ def test_full_pull_workflow(
     assert git_status.stdout.startswith("??"), \
         f"§3.2: git status must show Untracked, got: {git_status.stdout!r}"
 
-    cache_path = os.path.join(PROJECT, ".compliancelint", "metadata.json")
+    cache_path = os.path.join(PROJECT, ".compliancelint", "local", "metadata.json")
     with open(cache_path) as f:
         cache = json.load(f)
     assert cache.get("repo_id") == repo_id, \
@@ -213,7 +213,7 @@ def test_no_matching_repo(server_module, log):
     try:
         with open(cfg_path, "w") as f:
             f.write(original.replace(REPO_NAME, "nonexistent/fake-repo"))
-        meta = os.path.join(PROJECT, ".compliancelint", "metadata.json")
+        meta = os.path.join(PROJECT, ".compliancelint", "local", "metadata.json")
         if os.path.isfile(meta):
             os.unlink(meta)
 
@@ -247,7 +247,7 @@ def test_stale_cache_invalidation(
     cleanup_pending()
     reset_working_tree()
 
-    meta_dir = os.path.join(PROJECT, ".compliancelint")
+    meta_dir = os.path.join(PROJECT, ".compliancelint", "local")
     os.makedirs(meta_dir, exist_ok=True)
     meta_path = os.path.join(meta_dir, "metadata.json")
     with open(meta_path, "w") as f:

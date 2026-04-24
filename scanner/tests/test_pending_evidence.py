@@ -283,21 +283,21 @@ class TestCacheHelpers:
         assert read_cached_repo_id(tmp_project) is None
 
     def test_read_returns_none_when_key_missing(self, tmp_project):
-        meta_dir = os.path.join(tmp_project, ".compliancelint")
+        meta_dir = os.path.join(tmp_project, ".compliancelint", "local")
         os.makedirs(meta_dir)
         with open(os.path.join(meta_dir, "metadata.json"), "w") as f:
             json.dump({"ai_provider": "x"}, f)
         assert read_cached_repo_id(tmp_project) is None
 
     def test_read_returns_none_on_malformed_json(self, tmp_project):
-        meta_dir = os.path.join(tmp_project, ".compliancelint")
+        meta_dir = os.path.join(tmp_project, ".compliancelint", "local")
         os.makedirs(meta_dir)
         with open(os.path.join(meta_dir, "metadata.json"), "w") as f:
             f.write("{ not json ")
         assert read_cached_repo_id(tmp_project) is None
 
     def test_write_preserves_existing_keys(self, tmp_project):
-        meta_dir = os.path.join(tmp_project, ".compliancelint")
+        meta_dir = os.path.join(tmp_project, ".compliancelint", "local")
         os.makedirs(meta_dir)
         meta_path = os.path.join(meta_dir, "metadata.json")
         with open(meta_path, "w") as f:
@@ -323,7 +323,7 @@ class TestCacheHelpers:
         assert read_cached_repo_id(tmp_project) is None
 
     def test_clear_removes_only_repo_id(self, tmp_project):
-        meta_dir = os.path.join(tmp_project, ".compliancelint")
+        meta_dir = os.path.join(tmp_project, ".compliancelint", "local")
         os.makedirs(meta_dir)
         meta_path = os.path.join(meta_dir, "metadata.json")
         with open(meta_path, "w") as f:

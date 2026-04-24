@@ -12,7 +12,7 @@ import pytest
 def project_dir():
     """Create a temp project with realistic scan data for batch testing."""
     tmpdir = tempfile.mkdtemp(prefix="cl_batch_")
-    articles_dir = os.path.join(tmpdir, ".compliancelint", "articles")
+    articles_dir = os.path.join(tmpdir, ".compliancelint", "local", "articles")
     os.makedirs(articles_dir)
 
     # Art 9 — 3 findings (2 open UTD, 1 compliant)
@@ -115,7 +115,7 @@ def project_dir():
         json.dump(art82, f)
 
     # Metadata + state (for _save_merged_state)
-    with open(os.path.join(tmpdir, ".compliancelint", "metadata.json"), "w") as f:
+    with open(os.path.join(tmpdir, ".compliancelint", "local", "metadata.json"), "w") as f:
         json.dump({"regulation": "eu-ai-act"}, f)
 
     yield tmpdir
@@ -153,7 +153,7 @@ class TestUpdateFindingsBatch:
         update_findings_batch(project_dir, updates, attester=ATTESTER)
 
         # Read art9.json and verify
-        art9_path = os.path.join(project_dir, ".compliancelint", "articles", "art9.json")
+        art9_path = os.path.join(project_dir, ".compliancelint", "local", "articles", "art9.json")
         with open(art9_path) as f:
             data = json.load(f)
         finding = data["findings"]["ART09-OBL-1"]
@@ -172,7 +172,7 @@ class TestUpdateFindingsBatch:
         update_findings_batch(project_dir, updates, attester=ATTESTER)
 
         # Verify merged state.json exists and reflects the update
-        state_path = os.path.join(project_dir, ".compliancelint", "state.json")
+        state_path = os.path.join(project_dir, ".compliancelint", "local", "state.json")
         assert os.path.exists(state_path)
         with open(state_path) as f:
             state = json.load(f)
@@ -189,7 +189,7 @@ class TestUpdateFindingsBatch:
         result = update_findings_batch(project_dir, updates, attester=ATTESTER)
 
         assert result["updated"] == 1
-        art82_path = os.path.join(project_dir, ".compliancelint", "articles", "art82.json")
+        art82_path = os.path.join(project_dir, ".compliancelint", "local", "articles", "art82.json")
         with open(art82_path) as f:
             data = json.load(f)
         finding = data["findings"]["ART82-OBL-1"]
@@ -253,7 +253,7 @@ class TestUpdateFindingsBatch:
         ]
 
         # Record art12 mtime before
-        art12_path = os.path.join(project_dir, ".compliancelint", "articles", "art12.json")
+        art12_path = os.path.join(project_dir, ".compliancelint", "local", "articles", "art12.json")
         mtime_before = os.path.getmtime(art12_path)
 
         import time
@@ -274,7 +274,7 @@ class TestUpdateFindingsBatch:
         ]
         update_findings_batch(project_dir, updates, attester=ATTESTER)
 
-        art9_path = os.path.join(project_dir, ".compliancelint", "articles", "art9.json")
+        art9_path = os.path.join(project_dir, ".compliancelint", "local", "articles", "art9.json")
         with open(art9_path) as f:
             data = json.load(f)
         history = data["findings"]["ART09-OBL-1"]["history"]
@@ -392,7 +392,7 @@ class TestExpandThenBatch:
         assert len(result["errors"]) == 0
 
         # Step 3: Verify state
-        state_path = os.path.join(project_dir, ".compliancelint", "state.json")
+        state_path = os.path.join(project_dir, ".compliancelint", "local", "state.json")
         with open(state_path) as f:
             state = json.load(f)
 

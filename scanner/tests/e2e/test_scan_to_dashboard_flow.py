@@ -43,10 +43,10 @@ pytestmark = pytest.mark.live_dashboard
 
 
 def _write_synthetic_art9(project_path: str, scan_findings: list[dict]) -> None:
-    """Write .compliancelint/articles/art9.json in the exact shape that
+    """Write .compliancelint/local/articles/art9.json in the exact shape that
     save_article_result emits, skipping the derogation + evidence-preserve
     logic (we seed a fresh article file per test)."""
-    art_dir = os.path.join(project_path, ".compliancelint", "articles")
+    art_dir = os.path.join(project_path, ".compliancelint", "local", "articles")
     Path(art_dir).mkdir(parents=True, exist_ok=True)
 
     findings_dict: dict[str, dict] = {}

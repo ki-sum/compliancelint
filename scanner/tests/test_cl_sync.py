@@ -40,7 +40,7 @@ def _seed_rc_with_saas(project_path, api_key="test-key-xyz"):
 
 
 def _seed_article_state(project_path, article_num=12, obligation_id="ART12-OBL-1"):
-    art_dir = os.path.join(project_path, ".compliancelint", "articles")
+    art_dir = os.path.join(project_path, ".compliancelint", "local", "articles")
     os.makedirs(art_dir, exist_ok=True)
     art_file = os.path.join(art_dir, f"art{article_num}.json")
     with open(art_file, "w", encoding="utf-8") as f:

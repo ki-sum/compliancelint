@@ -129,7 +129,7 @@ class TestSaveArticleResult:
 
     def test_creates_baseline_snapshot(self, project_dir, scan_result):
         save_article_result(project_dir, 12, scan_result)
-        baselines_dir = os.path.join(project_dir, ".compliancelint", "baselines")
+        baselines_dir = os.path.join(project_dir, ".compliancelint", "local", "baselines")
         assert os.path.isdir(baselines_dir)
         assert len(os.listdir(baselines_dir)) >= 1
 
@@ -137,7 +137,7 @@ class TestSaveArticleResult:
         """Baseline snapshots capped at 20."""
         for _ in range(25):
             save_article_result(project_dir, 12, scan_result)
-        baselines_dir = os.path.join(project_dir, ".compliancelint", "baselines")
+        baselines_dir = os.path.join(project_dir, ".compliancelint", "local", "baselines")
         assert len(os.listdir(baselines_dir)) <= 20
 
     def test_concurrent_different_articles_safe(self, project_dir, scan_result):
@@ -158,7 +158,7 @@ class TestSaveArticleResult:
     def test_merged_state_json_created(self, project_dir, scan_result):
         """Merged state.json is created for convenience."""
         save_article_result(project_dir, 12, scan_result)
-        merged = os.path.join(project_dir, ".compliancelint", "state.json")
+        merged = os.path.join(project_dir, ".compliancelint", "local", "state.json")
         assert os.path.isfile(merged)
         with open(merged) as f:
             data = json.load(f)

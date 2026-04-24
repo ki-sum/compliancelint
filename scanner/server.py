@@ -114,8 +114,9 @@ _discover_modules()
 
 
 def _read_ai_provider(project_path: str) -> str:
-    """Read ai_provider from .compliancelint/metadata.json (written by save_metadata)."""
-    meta_path = os.path.join(project_path, ".compliancelint", "metadata.json")
+    """Read ai_provider from .compliancelint/local/metadata.json (written by save_metadata)."""
+    from core import paths as cl_paths
+    meta_path = cl_paths.metadata_file_str(project_path)
     if os.path.isfile(meta_path):
         try:
             with open(meta_path, "r", encoding="utf-8") as f:
@@ -263,10 +264,12 @@ def _fetch_saas_scan_settings(config) -> dict | None:
     if not config.saas_api_key:
         return None
 
-    # We need repo_id — read from .compliancelint/metadata.json
+    # We need repo_id — read from .compliancelint/local/metadata.json
     try:
         import os
-        meta_path = os.path.join(config._project_path if hasattr(config, '_project_path') else ".", ".compliancelint", "metadata.json")
+        from core import paths as cl_paths
+        _proj = config._project_path if hasattr(config, '_project_path') else "."
+        meta_path = cl_paths.metadata_file_str(_proj)
         if not os.path.isfile(meta_path):
             return None
         with open(meta_path, "r", encoding="utf-8") as f:
@@ -322,8 +325,8 @@ def _build_post_scan_hint(project_path: str, nc_count: int = 0, score_pct: int =
 
     # Has API key, manual sync mode: suggest sync with value reason
     # Check if they've synced before by looking for sync metadata
-    state_dir = os.path.join(project_path, ".compliancelint")
-    meta_path = os.path.join(state_dir, "metadata.json")
+    from core import paths as cl_paths
+    meta_path = cl_paths.metadata_file_str(project_path)
     has_synced = False
     if os.path.isfile(meta_path):
         try:
@@ -881,7 +884,7 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
             "(e.g., git, SVN, Mercurial, Perforce, or any other mechanism). "
             "Retrieve the history of changes since the last compliance scan. "
             "Summarize what was modified and why, focusing on changes relevant to "
-            "compliance findings. Save the summary to .compliancelint/changes_summary.txt "
+            "compliance findings. Save the summary to .compliancelint/local/changes_summary.txt "
             "so that cl_sync can include it in the dashboard upload.\n"
             "   Example: 'Added structured logging (src/logger.py), created risk management "
             "docs (docs/risk-management.md), implemented bias examination (src/fairness.py)'\n\n"
@@ -1961,7 +1964,7 @@ async def cl_connect(project_path: str, email: str = "", switch_account: bool = 
 def cl_sync(project_path: str, regulation: str = "") -> str:
     """Sync scan results to ComplianceLint Dashboard.
 
-    Reads the latest scan state from .compliancelint/state.json and uploads
+    Reads the latest scan state from .compliancelint/local/state.json and uploads
     it to the dashboard. Requires a prior cl_connect to set up API key.
 
     Only findings JSON is sent — source code never leaves the machine.
@@ -1995,11 +1998,12 @@ def cl_sync(project_path: str, regulation: str = "") -> str:
     slog.info("STEP 3b: loading project_id")
     from core.state import load_state
     # config.project_id is populated by cl_connect (cached in .compliancelintrc)
-    # If not there, fall back to .compliancelint/project.json (UUID cache)
+    # If not there, fall back to .compliancelint/local/project.json (UUID cache)
     # NEVER call derive_git_identity() here — git can hang in MCP context
     project_id = config.project_id or None
     if not project_id:
-        pj_file = os.path.join(project_path, ".compliancelint", "project.json")
+        from core import paths as cl_paths
+        pj_file = cl_paths.project_file_str(project_path)
         if os.path.isfile(pj_file):
             try:
                 with open(pj_file, "r", encoding="utf-8") as _f:
@@ -2230,7 +2234,7 @@ def cl_sync(project_path: str, regulation: str = "") -> str:
     # tree for the human to git-commit. MCP never runs git writes itself.
     #
     # repo_id resolution: cache → list → match-by-name. Cache lives in
-    # .compliancelint/metadata.json under key `repo_id`. On 404 from the
+    # .compliancelint/local/metadata.json under key `repo_id`. On 404 from the
     # pending-evidence list endpoint, cache is invalidated and we retry
     # once with a fresh list+match.
     pending_summary: dict = {}

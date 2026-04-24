@@ -32,8 +32,8 @@ class TestConfigCachedId:
     def test_config_takes_priority_over_project_json(self, tmp_path):
         rc = tmp_path / ".compliancelintrc"
         rc.write_text(json.dumps({"project_id": "git-fromconfig12345"}))
-        cl = tmp_path / ".compliancelint"
-        cl.mkdir()
+        cl = tmp_path / ".compliancelint" / "local"
+        cl.mkdir(parents=True)
         (cl / "project.json").write_text(json.dumps({"project_id": "uuid-from-json"}))
         pid = get_project_id(str(tmp_path))
         assert pid == "git-fromconfig12345"
@@ -50,7 +50,7 @@ class TestNonGitFallback:
 
     def test_caches_in_project_json(self, tmp_path):
         pid = get_project_id(str(tmp_path))
-        project_file = tmp_path / ".compliancelint" / "project.json"
+        project_file = tmp_path / ".compliancelint" / "local" / "project.json"
         assert project_file.exists()
         data = json.loads(project_file.read_text())
         assert data["project_id"] == pid
@@ -68,15 +68,15 @@ class TestNonGitFallback:
         assert get_project_id(str(a)) != get_project_id(str(b))
 
     def test_survives_corrupted_json(self, tmp_path):
-        cl = tmp_path / ".compliancelint"
-        cl.mkdir()
+        cl = tmp_path / ".compliancelint" / "local"
+        cl.mkdir(parents=True)
         (cl / "project.json").write_text("{bad json")
         pid = get_project_id(str(tmp_path))
         assert pid and len(pid) == 36
 
     def test_preserves_existing_uuid(self, tmp_path):
-        cl = tmp_path / ".compliancelint"
-        cl.mkdir()
+        cl = tmp_path / ".compliancelint" / "local"
+        cl.mkdir(parents=True)
         existing = "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
         (cl / "project.json").write_text(json.dumps({"project_id": existing}))
         assert get_project_id(str(tmp_path)) == existing

@@ -344,7 +344,7 @@ def reset_working_tree(run_in_project):
         ev_dir = os.path.join(PROJECT, ".compliancelint", "evidence")
         if os.path.isdir(ev_dir):
             shutil.rmtree(ev_dir)
-        meta = os.path.join(PROJECT, ".compliancelint", "metadata.json")
+        meta = os.path.join(PROJECT, ".compliancelint", "local", "metadata.json")
         if os.path.isfile(meta):
             os.unlink(meta)
         run_in_project(["git", "reset", "--hard", "HEAD"])
@@ -433,7 +433,7 @@ def isolated_project():
     unique_project_id = f"e2e-iso-{marker}"
     unique_repo_name = f"e2e-isolated/{marker}"
     rc_path = os.path.join(PROJECT, ".compliancelintrc")
-    meta_path = os.path.join(PROJECT, ".compliancelint", "metadata.json")
+    meta_path = os.path.join(PROJECT, ".compliancelint", "local", "metadata.json")
 
     # Backup .compliancelintrc + metadata.json.
     with open(rc_path, "r", encoding="utf-8") as fh:
@@ -483,7 +483,7 @@ def isolated_project():
 
     # Clear the scanner-side state.json + article files so the next test
     # doesn't inherit this test's synthetic scan shape.
-    art_dir = os.path.join(PROJECT, ".compliancelint", "articles")
+    art_dir = os.path.join(PROJECT, ".compliancelint", "local", "articles")
     if os.path.isdir(art_dir):
         for name in os.listdir(art_dir):
             if name.endswith(".json"):

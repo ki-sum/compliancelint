@@ -27,7 +27,7 @@ def _seed_rc_with_attester(project_path):
 
 
 def _seed_article_with_findings(project_path, article_num, obligation_ids):
-    art_dir = os.path.join(project_path, ".compliancelint", "articles")
+    art_dir = os.path.join(project_path, ".compliancelint", "local", "articles")
     os.makedirs(art_dir, exist_ok=True)
     art_file = os.path.join(art_dir, f"art{article_num}.json")
     findings = {
