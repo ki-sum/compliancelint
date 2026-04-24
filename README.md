@@ -258,7 +258,7 @@ Not all 44 articles apply to every project. The applicable obligations depend on
 | `cl_connect` | Link to dashboard (browser OAuth) |
 | `cl_sync` | Upload scan results to dashboard |
 | `cl_disconnect` | Remove dashboard connection (preserves local data) |
-| `cl_delete` | Delete local or remote scan data |
+| `cl_delete` | Delete with scope — `target="local"` (scan cache only, preserves evidence + rc), `target="all"` (local + evidence + rc), `target="dashboard"` (server-side purge) — all require explicit `confirm=true` |
 | `cl_action_guide` | Get guidance for Human Gate obligations (directs to dashboard) |
 | `cl_check_updates` | Enforcement deadlines and regulation status |
 | `cl_version` | Show ComplianceLint version |
@@ -303,8 +303,11 @@ not our SaaS. Five architectural commitments:
    without pushing, `cl_sync` waits until you push.
 
 3. **Git-host neutral.** Works with GitHub, GitLab, Bitbucket, Gitea,
-   Azure DevOps, self-hosted, or a purely local repo. No GitHub App,
-   no OAuth tokens, no vendor lock-in.
+   Azure DevOps, self-hosted, or a purely local repo. MCP commits
+   locally using your existing git config + SSH agent — no credentials
+   shared with our SaaS. Planned OAuth integration for GitHub and
+   GitLab (post-launch) will offer direct SaaS commits as an opt-in
+   convenience; the MCP path always remains supported.
 
 4. **Force-push aware.** If you rewrite history and erase an evidence
    commit, the next `cl_sync` detects the missing file and flags it on
@@ -348,11 +351,12 @@ The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard
 
 ## Roadmap
 
-- [x] MCP Server
-- [x] 44 EU AI Act articles, 247 obligations
+### Shipped
+
+- [x] MCP Server (16 tools) + 44 EU AI Act articles, 247 obligations
 - [x] SaaS Dashboard with Compliance Journey tracking
-- [x] PDF exports (Scan Report, Journey, Declaration, Tasks)
-- [x] Attestation system (evidence, rebuttals, acknowledgements)
+- [x] PDF exports (Scan Report, Journey, Declaration of Conformity, Technical Documentation, Tasks)
+- [x] Attestation system (evidence, rebuttals, acknowledgements, defer, questionnaire response)
 - [x] `npx compliancelint init` — one-line setup
 - [x] Role-based obligation filtering (Provider, Deployer, Importer, Distributor)
 - [x] Human Gates — guided questionnaires for manual obligations
@@ -362,8 +366,19 @@ The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard
 - [x] Force-push broken_link detection (evidence health sweep on every cl_sync)
 - [x] Stale-evidence banners (finding + repo level)
 - [x] Snapshot ledger (deterministic state hash on every scan)
-- [ ] GitHub Marketplace App
+- [x] Directory v2 — local cache (`.compliancelint/local/`, gitignored) vs committed evidence (`.compliancelint/evidence/` + `manifest.json`) split
+- [x] Cross-OS CI matrix (Ubuntu, macOS, Windows × Python 3.10–3.13)
+
+### Pre-launch
+
+- [ ] Compliance Time Capsule — calendar-pick historical snapshot + one-click export of all applicable article PDFs + Declaration of Conformity + Technical Documentation + evidence bundle + audit-trail CSV
+
+### Post-launch (v2+)
+
+- [ ] OAuth direct-commit integration — dashboard can commit evidence to cloud git without requiring MCP to be running (GitHub first, GitLab second; together they cover ~80% of cloud git users)
+- [ ] GitHub Marketplace App (discovery + one-click install)
 - [ ] Additional regulations (expanding beyond EU AI Act based on user demand)
+- [ ] OSCAL export format (Business+ tier) — structured compliance data for enterprise audit workflows
 
 ---
 
