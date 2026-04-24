@@ -208,6 +208,9 @@ def cmd_init():
   1. Restart your AI IDE (Claude Code, Cursor, Windsurf)
   2. Ask your AI: {_cyan('"Scan this project for EU AI Act compliance"')}
   3. {_dim("Optional:")} Run {_cyan("cl_connect()")} to link your dashboard
+
+{_dim(".compliancelint/local/ (ephemeral cache, gitignored) and .compliancelint/evidence/")}
+{_dim("(committed audit trail) will be created on your first scan.")}
 """)
 
 
