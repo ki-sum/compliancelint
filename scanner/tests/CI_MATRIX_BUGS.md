@@ -12,6 +12,12 @@ gets its own follow-up task.
 
 ## BUG-CI-1 — pytest collection breaks on ALL OSes due to conftest.py shadowing
 
+**Status**: FIXED 2026-04-24 via Option 1 (add `--ignore=tests/e2e` to both
+ci.yml and test.yml). e2e tests are cross-system flows requiring a deployed
+dashboard + MCP server, which CI runners don't have — `--ignore` is the
+semantically correct choice for CI scope, not a workaround.
+
+
 **Failing OS × Python**: ALL 12 combinations
 (ubuntu/windows/macos-latest × Python 3.10/3.11/3.12/3.13)
 

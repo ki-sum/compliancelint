@@ -25,4 +25,5 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install -r requirements.txt
-      - run: python -m pytest -x --tb=short
+      # --ignore=tests/e2e: cross-system flows, see CI_MATRIX_BUGS.md BUG-CI-1
+      - run: python -m pytest -x --tb=short --ignore=tests/e2e

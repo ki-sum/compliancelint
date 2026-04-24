@@ -30,7 +30,10 @@ jobs:
 
       - name: Run tests
         working-directory: scanner
-        run: python -m pytest tests/ -v --tb=short
+        # --ignore=tests/e2e: those are cross-system flows requiring a
+        # deployed dashboard + MCP server, out of scope for CI. See
+        # scanner/tests/CI_MATRIX_BUGS.md BUG-CI-1 for background.
+        run: python -m pytest tests/ -v --tb=short --ignore=tests/e2e
 
       - name: Verify all modules load
         working-directory: scanner
