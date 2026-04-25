@@ -379,6 +379,8 @@ The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard
 - [ ] GitHub Marketplace App (discovery + one-click install)
 - [ ] Additional regulations (expanding beyond EU AI Act based on user demand)
 - [ ] OSCAL export format (Business+ tier) — structured compliance data for enterprise audit workflows
+- [ ] **Incremental scanning** — only re-scan obligations whose underlying code changed since the last `cl_scan_all`, instead of running every article every time. Demand-driven: triggers when paid users exceed 3 scans/week or AI cost crosses €1/DAU. Design: `docs/INCREMENTAL_SCAN_ROADMAP.md`
+- [ ] **Human Gates evidence verifier** (`cl_verify_human_gates`) — AI cross-checks each questionnaire answer against the obligation's `source_quote` requirements; flags vague text, missing answers, and cross-obligation contradictions before re-scan promotes evidence to COMPLIANT. Design: `docs/HG_VERIFIER_ROADMAP.md`
 
 ---
 

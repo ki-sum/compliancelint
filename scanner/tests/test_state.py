@@ -111,7 +111,7 @@ class TestSaveArticleResult:
     def test_preserves_user_evidence(self, project_dir, scan_result):
         save_article_result(project_dir, 12, scan_result)
         update_finding(project_dir, "ART12-OBL-1", "provide_evidence",
-                      evidence_type="url", evidence_value="https://example.com/policy")
+                      evidence_type="url_reference", evidence_value="https://example.com/policy")
         save_article_result(project_dir, 12, scan_result)
         state = load_state(project_dir)
         ev = state["articles"]["art12"]["findings"]["ART12-OBL-1"]["evidence"]
@@ -194,7 +194,7 @@ class TestUpdateFinding:
     def test_provide_evidence(self, project_dir, scan_result):
         save_article_result(project_dir, 12, scan_result)
         result = update_finding(project_dir, "ART12-OBL-1", "provide_evidence",
-                               evidence_type="file", evidence_value="docs/risk.md")
+                               evidence_type="repo_file", evidence_value="docs/risk.md")
         assert result["status"] == "updated"
         state = load_state(project_dir)
         f = state["articles"]["art12"]["findings"]["ART12-OBL-1"]

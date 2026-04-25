@@ -1231,8 +1231,13 @@ def cl_update_finding(
         project_path: Absolute path to the project directory.
         obligation_id: The obligation to update (e.g. "ART12-OBL-1").
         action: One of: provide_evidence, rebut, acknowledge, defer, resolve.
-        evidence_type: Type of evidence: file, url, or text (for provide_evidence).
-        evidence_value: The evidence content (file path, URL, or description).
+        evidence_type: v4 storage kind for provide_evidence — one of:
+            text          — inline declaration (specific, not vague)
+            repo_file     — file path in the repo
+            git_path      — repo path[:line], e.g. "src/api.py:34"
+            url_reference — external URL (second-class — flag durability caveat)
+        evidence_value: The evidence content (file path, repo path[:line],
+            URL, or inline text per evidence_type).
         justification: Reason for rebuttal (for rebut action).
     """
     import re as _re
@@ -1306,7 +1311,7 @@ def cl_update_finding_batch(
     Each update targets a specific obligation_id:
     [
       {"obligation_id": "ART09-OBL-1", "action": "provide_evidence",
-       "evidence_type": "file", "evidence_value": "docs/risk-management.md"},
+       "evidence_type": "repo_file", "evidence_value": "docs/risk-management.md"},
       {"obligation_id": "ART50-EXC-1", "action": "rebut",
        "justification": "System is not deployed in biometric context"}
     ]
@@ -1316,9 +1321,9 @@ def cl_update_finding_batch(
     to ALL open findings in that article:
     [
       {"article": "art9", "action": "provide_evidence",
-       "evidence_type": "file", "evidence_value": "docs/risk-management.md"},
+       "evidence_type": "repo_file", "evidence_value": "docs/risk-management.md"},
       {"article": "art12", "action": "provide_evidence",
-       "evidence_type": "file", "evidence_value": "src/logging_middleware.py"}
+       "evidence_type": "git_path", "evidence_value": "src/logging_middleware.py:34"}
     ]
     This expands internally: art9 with 11 open findings → 11 updates, all pointing
     to the same evidence file. Much more natural than listing each obligation.
@@ -1424,22 +1429,22 @@ def cl_verify_evidence(project_path: str) -> str:
     Reads compliance-evidence.json from the project root and returns
     structured verification instructions for each evidence item.
 
-    IMPORTANT — AI CLIENT WORKFLOW:
-    For each item where requires_ai_verification=true:
-      - type="url"  → Use WebFetch to fetch the URL. Evaluate whether the
-                      fetched content satisfies the legal obligation described
-                      in obligation_id. Check for required disclosures, policy
-                      language, or legal requirements specific to that article.
-      - type="file" → Use Read tool to read the file. Evaluate legal adequacy.
-
-    For attestation/screenshot items (requires_ai_verification=false):
-      Accept as human-declared. Mark as ATTESTED (unverified) in report.
-      Note that these cannot be confirmed by automated analysis.
+    IMPORTANT — AI CLIENT WORKFLOW (v4 storage kinds):
+    Every item ships with a `verification_instruction` the AI client must follow.
+    For each item, judge whether the cited content adequately satisfies the
+    obligation. Reject vague text. Accept specific evidence.
+      - storage_kind="text"          → Judge the inline declaration directly.
+      - storage_kind="repo_file"     → Use Read to inspect the file bytes.
+      - storage_kind="git_path"      → Use Read on the cited path[:line].
+      - storage_kind="url_reference" → Use WebFetch on the URL. Flag the
+                                       second-class durability caveat in the
+                                       final report.
 
     After verification, synthesize scan findings + evidence into a final report:
-      - Finding was NON_COMPLIANT + evidence URL verified → COMPLIANT (verified)
-      - Finding was NON_COMPLIANT + evidence URL insufficient → still NON_COMPLIANT
-      - Finding was NON_COMPLIANT + attestation only → ATTESTED (human-declared, unverified)
+      - Finding was NON_COMPLIANT + evidence verified adequate → COMPLIANT (verified)
+      - Finding was NON_COMPLIANT + evidence inadequate → still NON_COMPLIANT
+      - Finding was NON_COMPLIANT + url_reference verified → COMPLIANT with
+        second-class caveat (durability/provenance not proven)
 
     Args:
         project_path: Absolute path to the project directory.
@@ -1452,7 +1457,11 @@ def cl_verify_evidence(project_path: str) -> str:
     if evidence.load_error:
         return json.dumps({
             "error": f"Failed to parse compliance-evidence.json: {evidence.load_error}",
-            "fix": "Check that compliance-evidence.json is valid JSON with the correct schema.",
+            "fix": (
+                "Check that compliance-evidence.json is valid JSON and uses v4 storage "
+                "kinds: text, repo_file, git_path, url_reference. Pre-v4 kinds (url, "
+                "file, attestation, screenshot, google_drive, github) are rejected."
+            ),
             "details": f"File: {evidence.evidence_file}",
         })
 
@@ -1463,25 +1472,32 @@ def cl_verify_evidence(project_path: str) -> str:
             "fix": (
                 "Create a compliance-evidence.json file in your project root to declare "
                 "evidence for obligations that cannot be detected from source code alone "
-                "(e.g., external Terms of Service, Privacy Policy URLs, configuration screenshots)."
+                "(e.g., external Terms of Service, Privacy Policy URLs, configuration files)."
             ),
             "schema_example": {
                 "evidence": {
                     "ART13": {
-                        "type": "url",
+                        "storage_kind": "url_reference",
                         "location": "https://yourcompany.com/terms",
                         "description": "Terms of Service including AI system description and limitations",
                         "provided_by": "Legal Team"
                     },
                     "ART50-ai-disclosure": {
-                        "type": "url",
-                        "location": "https://yourcompany.com/ai-disclosure",
-                        "description": "AI interaction disclosure page shown to users on first login"
+                        "storage_kind": "repo_file",
+                        "location": "docs/legal/ai-disclosure.md",
+                        "description": "AI interaction disclosure page shown to users on first login",
+                        "provided_by": "Legal Team"
                     },
-                    "ART12-OBL-3": {
-                        "type": "attestation",
-                        "description": "Log retention set to 12 months in Vercel dashboard. Screenshot at /legal/vercel-logs.png",
+                    "ART12-OBL-6": {
+                        "storage_kind": "git_path",
+                        "location": "src/logging/retention.py:12",
+                        "description": "Log retention configured for 12 months at line 12.",
                         "provided_by": "DevOps Team"
+                    },
+                    "ART09-OBL-1": {
+                        "storage_kind": "text",
+                        "description": "Risk-management process documented in docs/risk.md §2 (7 risks identified, mitigations listed).",
+                        "provided_by": "Compliance Team"
                     }
                 }
             }
@@ -1489,14 +1505,11 @@ def cl_verify_evidence(project_path: str) -> str:
 
     summary = evidence.to_summary_dict()
     summary["found"] = True
-    summary["ai_verification_required"] = evidence.needs_ai_verification != []
     summary["verification_instructions"] = (
-        "Process each item in 'items' array:\n"
-        "1. If requires_ai_verification=true and type='url': fetch the URL, read its content, "
-        "evaluate legal adequacy for the stated obligation_id\n"
-        "2. If requires_ai_verification=true and type='file': read the file, evaluate adequacy\n"
-        "3. If requires_ai_verification=false: accept as attested, note cannot be verified\n"
-        "4. Combine with scan findings to produce final compliance report"
+        "Process each item in the 'items' array. Every item carries a "
+        "'verification_instruction' field — follow it. Judge adequacy strictly: "
+        "reject vague text, accept specific evidence. For url_reference items, "
+        "flag the second-class durability/provenance caveat in your report."
     )
 
     return json.dumps(summary, indent=2, ensure_ascii=False)
@@ -1767,11 +1780,12 @@ def _build_evidence_requests(article_number: int, article_title: str,
                     f"Scanner could not find evidence for {obligation_id} in the codebase.\n"
                     f"Gap found: {clean_desc}\n\n"
                     f"Does this evidence exist outside the codebase?\n"
-                    f"Please provide:\n"
-                    f"  a) URL (e.g., policy page on company website)\n"
-                    f"  b) File path (relative to project root)\n"
-                    f"  c) Description (if manual attestation/screenshot)\n"
-                    f"  d) Type 'skip' if this item does not apply"
+                    f"Please provide one of (v4 storage kinds):\n"
+                    f"  a) url_reference  — external policy URL\n"
+                    f"  b) repo_file      — file path in the repo (any file, including PNGs)\n"
+                    f"  c) git_path       — repo path[:line], e.g. src/api.py:34\n"
+                    f"  d) text           — inline declaration (specific, not vague)\n"
+                    f"  e) Type 'skip' if this item does not apply"
                 ),
                 "skippable": True,
                 # Structured evaluation output format for AI to use after evidence is provided

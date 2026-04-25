@@ -133,9 +133,9 @@ class TestUpdateFindingsBatch:
 
         updates = [
             {"obligation_id": "ART09-OBL-1", "action": "provide_evidence",
-             "evidence_type": "file", "evidence_value": "docs/risk.md"},
+             "evidence_type": "repo_file", "evidence_value": "docs/risk.md"},
             {"obligation_id": "ART12-OBL-1", "action": "provide_evidence",
-             "evidence_type": "file", "evidence_value": "src/logging.py"},
+             "evidence_type": "repo_file", "evidence_value": "src/logging.py"},
         ]
         result = update_findings_batch(project_dir, updates, attester=ATTESTER)
 
@@ -148,7 +148,7 @@ class TestUpdateFindingsBatch:
 
         updates = [
             {"obligation_id": "ART09-OBL-1", "action": "provide_evidence",
-             "evidence_type": "file", "evidence_value": "docs/risk.md"},
+             "evidence_type": "repo_file", "evidence_value": "docs/risk.md"},
         ]
         update_findings_batch(project_dir, updates, attester=ATTESTER)
 
@@ -167,7 +167,7 @@ class TestUpdateFindingsBatch:
 
         updates = [
             {"obligation_id": "ART09-OBL-1", "action": "provide_evidence",
-             "evidence_type": "file", "evidence_value": "docs/risk.md"},
+             "evidence_type": "repo_file", "evidence_value": "docs/risk.md"},
         ]
         update_findings_batch(project_dir, updates, attester=ATTESTER)
 
@@ -201,7 +201,7 @@ class TestUpdateFindingsBatch:
 
         updates = [
             {"obligation_id": "ART09-OBL-1", "action": "provide_evidence",
-             "evidence_type": "file", "evidence_value": "docs/risk.md"},
+             "evidence_type": "repo_file", "evidence_value": "docs/risk.md"},
             {"obligation_id": "ART82-OBL-1", "action": "rebut",
              "justification": "Not applicable"},
             {"obligation_id": "ART12-OBL-2", "action": "acknowledge"},
@@ -215,9 +215,9 @@ class TestUpdateFindingsBatch:
 
         updates = [
             {"obligation_id": "ART09-OBL-1", "action": "provide_evidence",
-             "evidence_type": "file", "evidence_value": "docs/risk.md"},
+             "evidence_type": "repo_file", "evidence_value": "docs/risk.md"},
             {"obligation_id": "FAKE-OBL-99", "action": "provide_evidence",
-             "evidence_type": "file", "evidence_value": "fake.md"},
+             "evidence_type": "repo_file", "evidence_value": "fake.md"},
         ]
         result = update_findings_batch(project_dir, updates, attester=ATTESTER)
         assert result["updated"] == 1
@@ -292,7 +292,7 @@ class TestExpandArticleEvidence:
 
         items = [
             {"article": "art9", "action": "provide_evidence",
-             "evidence_type": "file", "evidence_value": "docs/risk.md"},
+             "evidence_type": "repo_file", "evidence_value": "docs/risk.md"},
         ]
         expanded = expand_article_evidence(project_dir, items)
 
@@ -314,9 +314,9 @@ class TestExpandArticleEvidence:
 
         items = [
             {"article": "art9", "action": "provide_evidence",
-             "evidence_type": "file", "evidence_value": "docs/risk.md"},
+             "evidence_type": "repo_file", "evidence_value": "docs/risk.md"},
             {"article": "art12", "action": "provide_evidence",
-             "evidence_type": "file", "evidence_value": "src/logging.py"},
+             "evidence_type": "repo_file", "evidence_value": "src/logging.py"},
         ]
         expanded = expand_article_evidence(project_dir, items)
 
@@ -379,7 +379,7 @@ class TestExpandThenBatch:
         # Step 1: Expand article-level evidence
         items = [
             {"article": "art9", "action": "provide_evidence",
-             "evidence_type": "file", "evidence_value": "docs/risk.md"},
+             "evidence_type": "repo_file", "evidence_value": "docs/risk.md"},
             {"article": "art82", "action": "rebut",
              "justification": "Deployer-specific"},
         ]
@@ -411,14 +411,14 @@ class TestExpandThenBatch:
         # Article-level for art9
         article_items = [
             {"article": "art9", "action": "provide_evidence",
-             "evidence_type": "file", "evidence_value": "docs/risk.md"},
+             "evidence_type": "repo_file", "evidence_value": "docs/risk.md"},
         ]
         expanded = expand_article_evidence(project_dir, article_items)
 
         # Per-obligation for art12
         per_obl = [
             {"obligation_id": "ART12-OBL-1", "action": "provide_evidence",
-             "evidence_type": "file", "evidence_value": "src/logging.py"},
+             "evidence_type": "repo_file", "evidence_value": "src/logging.py"},
         ]
 
         # Combine and batch

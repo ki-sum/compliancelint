@@ -1,27 +1,35 @@
 """
-ComplianceLint — Evidence Management System
+ComplianceLint — Project-Level Evidence Declaration (v4)
 
-Allows project maintainers to declare compliance evidence that exists
-outside the scanned codebase (e.g., external URLs, legal documents,
-configuration screenshots).
+Allows project maintainers to declare compliance evidence in
+compliance-evidence.json. The scanner reads this file and returns
+verification instructions to the AI client (e.g. Claude in the IDE).
 
-The scanner finds what it can in code. Evidence fills the gaps.
+Aligned with v4 evidence architecture (shipped 2026-04-21). The four
+storage kinds are the single source of truth — no separate "attestation"
+or "screenshot" type. A screenshot is just a `repo_file` (PNG committed
+to the repo) or a `url_reference` (external link). A free-text declaration
+is `text`. The scanner finds what it can in code; this file fills the gaps
+that are not directly inferable from code structure (legal documents,
+external policy URLs, inline declarations).
 
-Evidence types:
-  url         — External URL (Terms of Service, Privacy Policy, etc.)
-                AI client MUST fetch and verify content adequacy.
-  file        — Local file path relative to project root
-                AI client MUST read and verify content adequacy.
-  attestation — Human declaration with description only.
-                Accepted with a warning: not AI-verifiable.
-  screenshot  — Visual evidence (config panels, UI screenshots).
-                Accepted with a warning: not AI-verifiable.
+storage_kind ∈ {text, repo_file, git_path, url_reference}
+  text          — Inline declaration. The description IS the evidence.
+  repo_file     — File committed to the repo (any binary or text file).
+                  AI client uses Read to inspect the bytes and judge.
+  git_path      — Specific path[:line] in the repo (e.g. src/api.py:34).
+                  AI client reads the cited code/text and judges.
+  url_reference — External URL. Second-class evidence (no durability /
+                  provenance proof). AI client fetches and judges.
+
+Synced with: private/dashboard/src/db/schema.ts:312 (`storageKind`)
+            private/dashboard/src/app/api/v1/findings/[findingId]/respond/route.ts §4.b
 
 Workflow:
   1. PM runs scan → finds NON_COMPLIANT findings
-  2. PM creates compliance-evidence.json in project root
+  2. PM creates compliance-evidence.json in project root using v4 kinds
   3. cl_verify_evidence() returns evidence list with verification instructions
-  4. AI client fetches URLs / reads files / evaluates legal adequacy
+  4. AI client inspects each item per its storage_kind and evaluates adequacy
   5. AI synthesizes final report: scanner findings + verified evidence
 """
 
@@ -35,59 +43,76 @@ from typing import Optional
 
 EVIDENCE_FILE = "compliance-evidence.json"
 
-# Evidence types that require AI fetch/read to verify
-AI_VERIFIABLE_TYPES = {"url", "file"}
+# v4 storage kinds — single source of truth, synced with dashboard schema.
+STORAGE_KINDS = frozenset({"text", "repo_file", "git_path", "url_reference"})
 
-# Evidence types accepted on human declaration only
-ATTESTATION_TYPES = {"attestation", "screenshot"}
+# Pre-v4 vocabulary. Rejected at load time with a migration message.
+_DEPRECATED_KINDS = {
+    "url":         "url_reference",
+    "file":        "repo_file (or git_path for path:line citations)",
+    "attestation": "text (inline declaration)",
+    "screenshot":  "repo_file (commit the PNG to the repo) or url_reference (external link)",
+    "google_drive": "repo_file (download + commit) or url_reference",
+    "github":       "url_reference (paste the GitHub link)",
+}
 
 
 @dataclass
 class EvidenceItem:
     """A single piece of compliance evidence provided by the project maintainer."""
-    obligation_id: str          # e.g. "ART13" or "ART12-OBL-1" (article-level or specific)
-    evidence_type: str          # "url" | "file" | "attestation" | "screenshot"
-    location: Optional[str]     # URL or relative file path (None for attestation/screenshot)
-    description: str            # Human description of what this evidence proves
-    provided_by: Optional[str]  # Optional: who provided this evidence (name/role)
+    obligation_id: str             # e.g. "ART13" or "ART12-OBL-1"
+    storage_kind: str              # v4: text | repo_file | git_path | url_reference
+    location: Optional[str]        # path / path:line / URL — None for `text`
+    description: str               # inline content for text; human description otherwise
+    provided_by: Optional[str]     # who provided this evidence (name/role)
 
     @property
     def requires_ai_verification(self) -> bool:
-        return self.evidence_type in AI_VERIFIABLE_TYPES
+        """All v4 kinds require the AI client to inspect content and judge.
+
+        v4 removed the "attested but not verified" loophole. Every declared
+        item must be inspectable — either inline text the AI judges, a file
+        the AI reads, a code line the AI reads, or a URL the AI fetches.
+        """
+        return True
 
     @property
     def verification_instruction(self) -> str:
-        """Returns instruction for the AI client on how to verify this evidence."""
-        if self.evidence_type == "url":
+        """Returns the instruction the AI client must follow for this item."""
+        if self.storage_kind == "text":
             return (
-                f"Fetch URL: {self.location}\n"
-                f"Evaluate whether the content satisfies the legal obligation for {self.obligation_id}.\n"
-                f"Look for: specific disclosures, policy language, or information required by the article.\n"
-                f"The maintainer says: \"{self.description}\""
+                f"Inline text evidence for {self.obligation_id}: \"{self.description}\"\n"
+                f"Evaluate whether this declaration adequately satisfies the legal "
+                f"obligation. Reject if vague (e.g. 'I think we're fine'). Accept if "
+                f"specific (e.g. 'docs/risk.md §2 lists 7 identified risks with mitigations')."
             )
-        elif self.evidence_type == "file":
+        if self.storage_kind == "repo_file":
             return (
                 f"Read file: {self.location}\n"
-                f"Evaluate whether the content satisfies the legal obligation for {self.obligation_id}.\n"
-                f"The maintainer says: \"{self.description}\""
+                f"Evaluate whether the content satisfies {self.obligation_id}.\n"
+                f"Maintainer says: \"{self.description}\""
             )
-        elif self.evidence_type == "screenshot":
+        if self.storage_kind == "git_path":
             return (
-                f"Screenshot provided — cannot be automatically verified.\n"
-                f"Accept as human attestation: \"{self.description}\"\n"
-                f"Mark as ATTESTED (unverified) in the report."
+                f"Read the cited path/line: {self.location}\n"
+                f"Evaluate whether the cited code or text satisfies {self.obligation_id}.\n"
+                f"Maintainer says: \"{self.description}\""
             )
-        else:  # attestation
+        if self.storage_kind == "url_reference":
             return (
-                f"Human attestation — cannot be automatically verified.\n"
-                f"Accept as declared: \"{self.description}\"\n"
-                f"Mark as ATTESTED (unverified) in the report."
+                f"Fetch URL: {self.location}\n"
+                f"Evaluate whether the page content satisfies {self.obligation_id}.\n"
+                f"NOTE: url_reference is second-class evidence — no durability or "
+                f"provenance proof. Flag this caveat in the final report.\n"
+                f"Maintainer says: \"{self.description}\""
             )
+        # Should be unreachable — load_evidence rejects unknown kinds.
+        return f"Unknown storage_kind: {self.storage_kind}"
 
     def to_dict(self) -> dict:
         return {
             "obligation_id": self.obligation_id,
-            "evidence_type": self.evidence_type,
+            "storage_kind": self.storage_kind,
             "location": self.location,
             "description": self.description,
             "provided_by": self.provided_by,
@@ -107,16 +132,6 @@ class ProjectEvidence:
     @property
     def has_evidence(self) -> bool:
         return len(self.items) > 0
-
-    @property
-    def needs_ai_verification(self) -> list[EvidenceItem]:
-        """Items that require AI to fetch/read and verify."""
-        return [i for i in self.items if i.requires_ai_verification]
-
-    @property
-    def attestation_only(self) -> list[EvidenceItem]:
-        """Items accepted on human declaration only."""
-        return [i for i in self.items if not i.requires_ai_verification]
 
     @staticmethod
     def _normalize_art_prefix(s: str) -> str:
@@ -153,8 +168,6 @@ class ProjectEvidence:
         return {
             "evidence_file": self.evidence_file,
             "total_items": len(self.items),
-            "needs_ai_verification": len(self.needs_ai_verification),
-            "attestation_only": len(self.attestation_only),
             "items": [i.to_dict() for i in self.items],
         }
 
@@ -163,8 +176,13 @@ def load_evidence(project_path: str) -> ProjectEvidence:
     """
     Load compliance-evidence.json from the project root.
 
-    Returns a ProjectEvidence object. If the file doesn't exist,
-    returns an empty ProjectEvidence (no error — evidence is optional).
+    Returns a ProjectEvidence object. If the file doesn't exist, returns an
+    empty ProjectEvidence (no error — evidence is optional).
+
+    Hard-rejects pre-v4 storage kinds (`url`, `file`, `attestation`,
+    `screenshot`, `google_drive`, `github`) with a migration message in
+    `load_error`. Mixed files are rejected entirely — partial load would
+    silently drop evidence the maintainer intended to declare.
     """
     evidence_path = os.path.join(project_path, EVIDENCE_FILE)
 
@@ -186,17 +204,47 @@ def load_evidence(project_path: str) -> ProjectEvidence:
             load_error=str(e),
         )
 
-    items = []
+    items: list[EvidenceItem] = []
+    rejected: list[dict] = []
     for obligation_id, val in data.get("evidence", {}).items():
         if not isinstance(val, dict):
             continue
+        kind = val.get("storage_kind") or val.get("type") or ""
+        if kind in _DEPRECATED_KINDS:
+            rejected.append({
+                "obligation_id": obligation_id,
+                "deprecated_kind": kind,
+                "migrate_to": _DEPRECATED_KINDS[kind],
+            })
+            continue
+        if kind not in STORAGE_KINDS:
+            rejected.append({
+                "obligation_id": obligation_id,
+                "unknown_kind": kind or "(missing)",
+                "valid_kinds": sorted(STORAGE_KINDS),
+            })
+            continue
         items.append(EvidenceItem(
             obligation_id=obligation_id,
-            evidence_type=val.get("type", "attestation"),
+            storage_kind=kind,
             location=val.get("location"),
             description=val.get("description", ""),
             provided_by=val.get("provided_by"),
         ))
+
+    if rejected:
+        return ProjectEvidence(
+            project_path=project_path,
+            evidence_file=evidence_path,
+            items=[],
+            load_error=json.dumps({
+                "message": (
+                    "compliance-evidence.json uses pre-v4 storage kinds. v4 (shipped "
+                    "2026-04-21) accepts only: " + ", ".join(sorted(STORAGE_KINDS)) + "."
+                ),
+                "rejected": rejected,
+            }),
+        )
 
     return ProjectEvidence(
         project_path=project_path,
@@ -209,10 +257,11 @@ def apply_evidence_to_findings(findings: list[dict], evidence: ProjectEvidence) 
     """
     Annotate scan findings with available evidence.
 
-    Does NOT change compliance levels — that is the AI client's job after verification.
-    Adds an 'evidence' key to findings where evidence is declared.
+    Does NOT change compliance levels — that is the AI client's job after
+    verification. Adds an 'evidence' key to findings where evidence is declared.
 
-    The AI client reads the evidence, fetches/verifies, then decides the final level.
+    The AI client reads the evidence per `verification_instruction`, then
+    decides the final compliance level.
     """
     if not evidence.has_evidence:
         return findings
@@ -229,8 +278,8 @@ def apply_evidence_to_findings(findings: list[dict], evidence: ProjectEvidence) 
                 finding = dict(finding)  # don't mutate original
                 finding["evidence"] = ev.to_dict()
                 finding["evidence_note"] = (
-                    f"Maintainer has provided {ev.evidence_type} evidence for this obligation. "
-                    f"AI verification {'required' if ev.requires_ai_verification else 'not possible (attestation only)'}."
+                    f"Maintainer has provided {ev.storage_kind} evidence. "
+                    f"AI client must follow `verification_instruction` and judge adequacy."
                 )
 
         annotated.append(finding)
