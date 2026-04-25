@@ -347,6 +347,8 @@ The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard
 
 **Evidence stays in your repo.** Upload files from the dashboard — bytes commit to `.compliancelint/evidence/` in your git repo. We relay transiently. We never hold your files.
 
+**Team members are free + unlimited.** Invited members inherit the owner's tier — Pro members get Human Gates, Business members get Time Capsule exports. No per-seat billing. All actions are audit-logged with the actor's identity.
+
 ---
 
 ## Roadmap
@@ -368,6 +370,7 @@ The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard
 - [x] Snapshot ledger (deterministic state hash on every scan)
 - [x] Directory v2 — local cache (`.compliancelint/local/`, gitignored) vs committed evidence (`.compliancelint/evidence/` + `manifest.json`) split
 - [x] Cross-OS CI matrix (Ubuntu, macOS, Windows × Python 3.10–3.13)
+- [x] Profiling Wizard — answer 6 questions about your AI system (EU establishment, Annex III category, training data, GPAI status) and the 247-obligation matrix is filtered down to the ~30–80 that actually apply to you (Starter+)
 
 ### Pre-launch
 
