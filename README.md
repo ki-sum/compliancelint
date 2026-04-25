@@ -371,6 +371,7 @@ The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard
 - [x] Directory v2 — local cache (`.compliancelint/local/`, gitignored) vs committed evidence (`.compliancelint/evidence/` + `manifest.json`) split
 - [x] Cross-OS CI matrix (Ubuntu, macOS, Windows × Python 3.10–3.13)
 - [x] Profiling Wizard — answer 6 questions about your AI system (EU establishment, Annex III category, training data, GPAI status) and the 247-obligation matrix is filtered down to the ~30–80 that actually apply to you (Starter+)
+- [x] **Public EU AI Act browser at [`/eu-ai-act`](https://compliancelint.dev/eu-ai-act)** — full text of 44 articles + 13 annexes + searchable across 247 obligations, **no signup required**. Browse legal text + search "biometric" / "logging" / "human oversight" instantly
 
 ### Pre-launch
 
