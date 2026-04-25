@@ -371,7 +371,7 @@ The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard
 
 ### Pre-launch
 
-- [x] **Compliance Time Capsule** — calendar-pick historical snapshot + one-click zip export of all applicable article PDFs + Declaration of Conformity + Technical Documentation + audit-trail CSV (Phase 1.5; verifier `npx tsx scripts/verify-time-capsule-phase-1-5.ts` exits 0 on 8/8 PASS)
+- [x] **Compliance Time Capsule** (Business+ tier) — historical snapshot zip with Declaration of Conformity + Technical Documentation + per-article PDFs + audit-trail CSV + an embedded HTML viewer (index/dashboard/tasks/human-gates pages SSR-rendered from the same React components the live SaaS dashboard uses, so the offline bundle stays in step with the dashboard automatically). 11/11 verifier-gated (`npx tsx dashboard/scripts/verify-time-capsule-phase-1-5.ts` exits 0).
 
 ### Post-launch (v2+)
 
