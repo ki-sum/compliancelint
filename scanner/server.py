@@ -2836,7 +2836,7 @@ def cl_delete(
     root_dir = str(cl_paths.root_dir(project_path))
     local_dir = str(cl_paths.local_dir(project_path))
     evidence_dir = str(cl_paths.evidence_dir(project_path))
-    rc_file = os.path.join(project_path, ".compliancelintrc")
+    rc_file = str(cl_paths.rc_file(project_path))
     config = ProjectConfig.load(project_path)
 
     MAGIC_PHRASE = "I understand this is irreversible"

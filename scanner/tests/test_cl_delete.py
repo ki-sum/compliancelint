@@ -6,12 +6,25 @@ Directory v2 (2026-04-24) semantics:
   - target="all": full working-tree wipe (local/, evidence/, .compliancelintrc).
   - target="dashboard": server-side purge only.
 
+Safety hardening (2026-04-24, commit 8f659e1):
+  - target in {"local", "dashboard"} requires confirm=True.
+  - target="all" requires confirm_phrase="I understand this is irreversible"
+    (exact string). Boolean confirm=True is NOT sufficient for target="all".
+  - Abort response carries will_delete / will_keep / reversibility /
+    action_to_proceed so the LLM can echo concrete consequences.
+
 Covers:
-  - safety gate: confirm=False does NOT delete, returns confirmation_required
+  - safety gate: confirm=False returns status="aborted" with will_delete list
   - target="local" removes .compliancelint/local/ but preserves
     .compliancelint/evidence/ and .compliancelintrc (v2 regression)
-  - target="all" removes local/, evidence/, and .compliancelintrc
+  - target="all" removes local/, evidence/, and .compliancelintrc — only
+    when the magic phrase is supplied
   - error path: invalid target returns error listing legal values
+  - abort message contents: concrete paths, reversibility wording,
+    audit-trail warning for target="all"
+  - magic-phrase gate: rejects empty / partial / wrong phrases; accepts the
+    exact phrase even without boolean confirm
+  - paths.human_size helper: missing path, file, directory tree
   - BUG-1 regression: cl_delete after a real cl_scan-style logger attach
     must succeed (no WinError 32 sharing violation on Windows)
   - BUG-1 regression: scanner.log must live under Path.home(), not inside
@@ -333,3 +346,66 @@ def test_target_all_accepts_exact_phrase(tmp_path):
     assert parsed["results"]["root"] == "deleted"
     assert not (tmp_path / ".compliancelint").exists()
     assert not rc.exists()
+
+
+def test_target_all_phrase_alone_suffices_without_boolean_confirm(tmp_path):
+    """L2 edge case: magic phrase REPLACES (not augments) the boolean gate
+    for target='all'. confirm=False + exact phrase must still execute,
+    because the phrase is the sole authority for irreversible target='all'.
+    Documents intent: do NOT add a "phrase AND confirm" rule by accident.
+    """
+    _seed_cl_dir(str(tmp_path))
+    rc = tmp_path / ".compliancelintrc"
+    rc.write_text("{}", encoding="utf-8")
+
+    raw = server.cl_delete(
+        str(tmp_path),
+        target="all",
+        confirm=False,  # explicitly False
+        confirm_phrase="I understand this is irreversible",
+    )
+    parsed = json.loads(raw)
+
+    assert parsed["status"] == "deleted", (
+        f"target='all' with exact phrase must execute regardless of boolean "
+        f"confirm; got: {parsed}"
+    )
+    assert parsed["results"]["root"] == "deleted"
+    assert not (tmp_path / ".compliancelint").exists()
+    assert not rc.exists()
+
+
+# ── paths.human_size unit tests (covers helper directly) ─────────────────────
+
+def test_human_size_missing_path_returns_zero(tmp_path):
+    """human_size of a non-existent path is the safe '0 B' rather than raising."""
+    from core.paths import human_size
+
+    assert human_size(tmp_path / "does-not-exist") == "0 B"
+
+
+def test_human_size_single_file_reports_byte_count(tmp_path):
+    """human_size of a regular file reports its byte count, not a directory walk."""
+    from core.paths import human_size
+
+    f = tmp_path / "tiny.bin"
+    f.write_bytes(b"x" * 500)
+    assert human_size(f) == "500 B"
+
+
+def test_human_size_directory_sums_subtree(tmp_path):
+    """human_size of a directory walks the subtree and aggregates all file sizes,
+    rolling up to KB/MB units as the total grows."""
+    from core.paths import human_size
+
+    sub = tmp_path / "sub" / "deeper"
+    sub.mkdir(parents=True)
+    # 3 KB total spread across 3 files in 2 directory levels
+    (tmp_path / "a.bin").write_bytes(b"x" * 1024)
+    (sub / "b.bin").write_bytes(b"y" * 1024)
+    (sub / "c.bin").write_bytes(b"z" * 1024)
+
+    result = human_size(tmp_path)
+    assert result.endswith(" KB"), f"expected KB unit for ~3 KB tree, got: {result!r}"
+    # 3072 B / 1024 = 3.0 KB → formatter renders "3 KB"
+    assert result == "3 KB", f"expected exactly '3 KB' for 3×1024 B, got: {result!r}"

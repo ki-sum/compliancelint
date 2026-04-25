@@ -41,6 +41,16 @@ def root_dir(project_path: str) -> Path:
     return Path(project_path) / _ROOT_DIR
 
 
+def rc_file(project_path: str) -> Path:
+    """`<project>/.compliancelintrc` — project↔dashboard binding file.
+
+    Lives at the project root (NOT under .compliancelint/) so cl_disconnect
+    and target=all destructive flows can reason about it as a separate
+    artifact from the .compliancelint/ tree.
+    """
+    return Path(project_path) / ".compliancelintrc"
+
+
 def local_dir(project_path: str) -> Path:
     """`<project>/.compliancelint/local/` — ephemeral, gitignored."""
     return root_dir(project_path) / _LOCAL_DIR
