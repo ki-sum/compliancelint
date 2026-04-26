@@ -296,6 +296,38 @@ def _fetch_saas_scan_settings(config) -> dict | None:
     return None
 
 
+def _apply_saas_settings_to_scope(scope: dict, saas_settings: dict) -> dict:
+    """Merge SaaS scan-settings into the scanner's _scope dict.
+
+    Pure function — extracted from cl_scan_all so it can be unit-tested
+    without HTTP mocking. Mutates scope in place AND returns it.
+
+    Sets:
+      - _saas_settings_active = True
+      - is_provider / is_deployer / is_authorised_representative /
+        is_importer / is_distributor (booleans, derived from roles[])
+      - risk_classification / risk_classification_confidence (when
+        SaaS supplies a non-empty riskClassification)
+
+    The five EU AI Act Art 3 operator roles are mirrored from the SaaS
+    roles[] array; unknown role values (typo, custom, future) are
+    silently dropped — known roles control behaviour, unknowns add
+    no scope.
+    """
+    scope["_saas_settings_active"] = True
+    roles = saas_settings.get("roles") or []
+    scope["is_provider"] = "provider" in roles
+    scope["is_deployer"] = "deployer" in roles
+    scope["is_importer"] = "importer" in roles
+    scope["is_distributor"] = "distributor" in roles
+    scope["is_authorised_representative"] = "authorised_representative" in roles
+    risk = saas_settings.get("riskClassification")
+    if risk:
+        scope["risk_classification"] = risk
+        scope["risk_classification_confidence"] = "high"
+    return scope
+
+
 def _build_post_scan_hint(project_path: str, nc_count: int = 0, score_pct: int = -1) -> str:
     """Build contextual post-scan guidance.
 
@@ -627,24 +659,13 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
         saas_settings = _fetch_saas_scan_settings(config)
         if saas_settings:
             scope = ctx.compliance_answers.get("_scope", {})
-            scope["_saas_settings_active"] = True
-            roles = saas_settings.get("roles", [])
-            # Five EU AI Act Art 3 operator roles. SaaS dashboard's role
-            # select is the source of truth; scanner mirrors per-role flags
-            # for downstream gating. Unknown role values (e.g. typo from a
-            # third-party API client) are silently ignored — known roles
-            # control behavior, unknown ones add no scope.
-            scope["is_provider"] = "provider" in roles
-            scope["is_deployer"] = "deployer" in roles
-            scope["is_importer"] = "importer" in roles
-            scope["is_distributor"] = "distributor" in roles
-            scope["is_authorised_representative"] = "authorised_representative" in roles
-            risk = saas_settings.get("riskClassification")
-            if risk:
-                scope["risk_classification"] = risk
-                scope["risk_classification_confidence"] = "high"
+            _apply_saas_settings_to_scope(scope, saas_settings)
             ctx.compliance_answers["_scope"] = scope
-            logger.info("cl_scan_all — SaaS settings applied: roles=%s, risk=%s", roles, risk)
+            logger.info(
+                "cl_scan_all — SaaS settings applied: roles=%s, risk=%s",
+                saas_settings.get("roles"),
+                saas_settings.get("riskClassification"),
+            )
 
     # ── Validation Gate: coerce + validate compliance_answers ──
     from core.validation_gate import run_gate
