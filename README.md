@@ -161,7 +161,7 @@ Track compliance over time at **[compliancelint.dev](https://compliancelint.dev)
 | **Citations** | "You need logging" | `Art. 12(1): "High-risk AI systems shall technically allow for the automatic recording of events..."` |
 | **False positives** | Keyword matching → many | AI understands context → near zero |
 | **Privacy** | Cloud upload | **100% local** — code never leaves your machine |
-| **Cost** | Separate subscription | **Free + open source** — uses your existing AI IDE |
+| **Cost** | Separate subscription | **Free + source-available (BSL 1.1)** — uses your existing AI IDE |
 
 ---
 
