@@ -828,7 +828,7 @@ Respond with ONLY a JSON object (no markdown, no explanation) with this structur
       "is_open_source": null,
       "open_source_license": "license name if open source, e.g. MIT, Apache-2.0",
       "user_role": null,
-      "user_role_reasoning": "are you scanning as the provider (developer) or deployer (user) of this system?",
+      "user_role_reasoning": "are you scanning as the provider (3(3) — developer/manufacturer), deployer (3(4) — operational user), authorised representative (3(5) — EU rep for non-EU provider), importer (3(6)), or distributor (3(7)) per EU AI Act Art. 3?",
       "is_military_defense": false,
       "is_research_only": false,
       "is_biometric_system": null,

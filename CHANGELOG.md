@@ -6,6 +6,23 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [1.1.0] — 2026-04-11 (unreleased)
 
+### Changed — Role coverage 4 → 5 (2026-04-26)
+- **Authorised Representative** added as the 5th selectable role, completing
+  the EU AI Act Art. 3 operator set (provider 3(3), deployer 3(4), authorised
+  representative 3(5), importer 3(6), distributor 3(7)).
+- **`isActionableForUser` is now role-aware** — accepts an optional `userRoles`
+  argument so AR-addressed obligations are visible to AR users only and
+  hidden from provider/deployer/importer/distributor users.
+- **Art 54 OBL-3 + OBL-5 addressee fixed**: were previously misclassified as
+  `provider`; corrected to `authorised_representative` to match the
+  source-text "the authorised representative shall…".
+- **Backward compatible**: existing users with `roles: ["provider"]` etc.
+  see no change in behavior. AR-addressed oids were globally hidden before
+  (because the addressee was excluded from `USER_ADDRESSEES`); they now
+  surface only for users who explicitly select AR.
+- **Note on README article table**: the per-article role mapping is paid
+  content (Starter+ tier feature) and was removed from the public README.
+
 ### Changed — marketing copy + SEO metadata (2026-04-18)
 - Primary tagline: **"Compliance in your IDE. Not in a meeting."** (was "From non-compliant to audit-ready. Automatically.")
 - Landing page H1 now reads as two lines. Old tagline retained as sub-text in README.
