@@ -629,8 +629,16 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
             scope = ctx.compliance_answers.get("_scope", {})
             scope["_saas_settings_active"] = True
             roles = saas_settings.get("roles", [])
+            # Five EU AI Act Art 3 operator roles. SaaS dashboard's role
+            # select is the source of truth; scanner mirrors per-role flags
+            # for downstream gating. Unknown role values (e.g. typo from a
+            # third-party API client) are silently ignored — known roles
+            # control behavior, unknown ones add no scope.
+            scope["is_provider"] = "provider" in roles
+            scope["is_deployer"] = "deployer" in roles
             scope["is_importer"] = "importer" in roles
             scope["is_distributor"] = "distributor" in roles
+            scope["is_authorised_representative"] = "authorised_representative" in roles
             risk = saas_settings.get("riskClassification")
             if risk:
                 scope["risk_classification"] = risk
