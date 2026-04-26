@@ -146,7 +146,7 @@ def test_delete_invalid_target_returns_error(tmp_path):
         assert legal in parsed["error"], f"error must list legal target '{legal}'"
 
 
-# ── BUG-1 regression tests (see scanner/tests/G1_BUGS.md) ───────────────────
+# ── Regression: cl_delete on Windows with an open scanner.log handle ────────
 
 def test_delete_works_after_real_cl_scan_without_monkeypatch(tmp_path):
     """Regression for BUG-1: cl_delete must succeed on Windows even after a

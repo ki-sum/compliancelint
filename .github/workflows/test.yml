@@ -25,5 +25,5 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install -r requirements.txt
-      # --ignore=tests/e2e: cross-system flows, see CI_MATRIX_BUGS.md BUG-CI-1
+      # --ignore=tests/e2e: cross-system flows requiring deployed dashboard
       - run: python -m pytest -x --tb=short --ignore=tests/e2e

@@ -22,8 +22,9 @@ storage_kind ∈ {text, repo_file, git_path, url_reference}
   url_reference — External URL. Second-class evidence (no durability /
                   provenance proof). AI client fetches and judges.
 
-Synced with: private/dashboard/src/db/schema.ts:312 (`storageKind`)
-            private/dashboard/src/app/api/v1/findings/[findingId]/respond/route.ts §4.b
+storage_kind values must stay in sync with the dashboard's storageKind
+column and the evidence-respond route. When changing this set, audit the
+SaaS schema + the upload-file / respond endpoints in lock-step.
 
 Workflow:
   1. PM runs scan → finds NON_COMPLIANT findings

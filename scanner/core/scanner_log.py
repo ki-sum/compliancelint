@@ -2,9 +2,9 @@
 
 Writes to ~/.compliancelint/logs/{project_hash}/scanner.log. The log dir
 lives OUTSIDE the project tree so cl_delete's shutil.rmtree on the project's
-.compliancelint/ directory can never hit an open log handle (BUG-1 fix:
-on Windows, an open RotatingFileHandler inside the rmtree target raised
-WinError 32 sharing violation — see scanner/tests/G1_BUGS.md).
+.compliancelint/ directory can never hit an open log handle (on Windows,
+an open RotatingFileHandler inside the rmtree target raises WinError 32
+sharing violation; see test_scanner_log_lives_outside_project_tree).
 
 Rotates at 2MB, keeps last 3 files. Also logs to stderr for MCP protocol.
 
