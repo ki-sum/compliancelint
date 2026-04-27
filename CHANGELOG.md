@@ -75,7 +75,9 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 - `cl_report` MCP tool — compliance reports are now exclusively generated as PDF from the dashboard. This prevents free-tier feature leakage. Tool count: 16 → 15.
 
 ### Added — Bug reporting
-- `cl_report_bug` MCP tool — generate a privacy-scrubbed bundle (recent scanner logs + environment info) for attaching to GitHub bug reports. Local-only, no auto-upload. Tool count: 15 → 16 → 17 (with `cl_connect` already counted, the operative number is 17 against the v1.0.0 baseline of 16).
+- `cl_report_bug` MCP tool — generate a privacy-scrubbed bundle (recent scanner logs + environment info) for attaching to GitHub bug reports. Local-only, no auto-upload.
+
+**v1.1.0 cumulative tool changes**: −1 `cl_report` (PDF-only via dashboard now), +1 `cl_action_guide` (Human Gates signpost), +1 `cl_report_bug` (this entry) ⇒ net **16 → 17 tools**.
 
 ### Changed — PDF Redesign
 - **Declaration PDF**: redesigned System Identification as structured card; scope as color-coded grid; appendix now groups by article with per-obligation table; added Place field to signature; removed ambiguous percentage score
