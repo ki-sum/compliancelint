@@ -382,7 +382,12 @@ The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard
 
 - [ ] OAuth direct-commit integration — dashboard can commit evidence to cloud git without requiring MCP to be running (GitHub first, GitLab second; together they cover ~80% of cloud git users)
 - [ ] GitHub Marketplace App (discovery + one-click install)
-- [ ] Additional regulations (expanding beyond EU AI Act based on user demand)
+- [ ] **EU regulation expansion — "five-pillar" coverage roadmap** (expanding beyond EU AI Act, architecture-reuse-driven so each new regulation is ~3–4 weeks instead of starting from zero)
+  - [ ] **Phase 2 — GDPR** (Regulation (EU) 2016/679, ~99 articles): personal-data processing for any SaaS handling EU users. Reuses our deontic-decomposition engine + Three Locks + Human Gates. Differentiator vs incumbent GDPR tools (Vanta / Drata / OneTrust): ComplianceLint runs *in your IDE* and auto-collects code-level evidence, instead of vendor-management questionnaires.
+  - [ ] **Phase 3 — CRA** (Cyber Resilience Act, Reg (EU) 2024/2847, ~85 articles, full effect 2027): security-by-design + vulnerability handling + CE marking for any software product placed on the EU market. Highest market-fit for our IDE-attached architecture; very few code-level tools exist today.
+  - [ ] **Phase 4 — NIS2** (Directive (EU) 2022/2555, ~46 articles): cybersecurity for "essential" + "important" entities (digital service providers, MSPs, healthcare, energy, etc.). Risk management, incident reporting, supply-chain security obligations.
+  - [ ] **Phase 4 — DORA** (Reg (EU) 2022/2554, ~64 articles, in force 2025): ICT operational resilience for the financial sector. Incident reporting, third-party-risk register, threat-led penetration testing.
+  - The five pillars (EU AI Act + GDPR + CRA + NIS2 + DORA) cover the legal stack a typical EU SaaS / regulated-industry deployment must satisfy. No existing tool we are aware of bundles all five at the code level.
 - [ ] OSCAL export format (Business+ tier) — structured compliance data for enterprise audit workflows
 - [ ] **Incremental scanning** — only re-scan obligations whose underlying code changed since the last `cl_scan_all`, instead of running every article every time. Demand-driven, triggered post-launch when usage warrants the optimization.
 - [ ] **Human Gates evidence verifier** (`cl_verify_human_gates`) — AI cross-checks each questionnaire answer against the obligation's `source_quote` requirements; flags vague text, missing answers, and cross-obligation contradictions before re-scan promotes evidence to COMPLIANT.
