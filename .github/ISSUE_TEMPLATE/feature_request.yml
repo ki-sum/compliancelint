@@ -1,0 +1,71 @@
+name: Feature Request
+description: Suggest a new feature, regulation, or improvement for ComplianceLint
+title: "[Feature] "
+labels: ["enhancement", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for thinking about how to make ComplianceLint better. Before submitting:
+
+        - **Search [existing issues](https://github.com/ki-sum/compliancelint/issues?q=is%3Aissue)** — your idea may already be tracked.
+        - **Check the [roadmap](https://github.com/ki-sum/compliancelint#roadmap)** — some features may already be planned for a future phase.
+
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What kind of feature?
+      options:
+        - New regulation (e.g. GDPR, NIS2, HIPAA, ISO 42001)
+        - New MCP tool / capability
+        - Dashboard / UI improvement
+        - Report / PDF improvement
+        - Integration (CI, IDE, third-party tool)
+        - Performance / scalability
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: |
+        Describe the use case. Who is the user? What are they trying to do?
+        Without this context we cannot weigh feature requests against each other.
+      placeholder: |
+        e.g. As a compliance officer at a startup, I need to share the dashboard with our external auditor for a quarterly review. Today there is no read-only auditor role.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: How would you imagine this working? UI sketch, API shape, command name — anything concrete helps.
+      placeholder: |
+        e.g. Add a new "Auditor" role to the team-permissions panel. Auditor can view all scans + download all PDFs but cannot trigger new scans or modify findings.
+    validations:
+      required: false
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you considered
+      description: What else have you tried? Why doesn't it work?
+      placeholder: |
+        e.g. We tried sharing the Member role with our auditor, but they accidentally re-ran a scan and the timeline was disrupted.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: How urgent is this for you?
+      options:
+        - Nice to have — would use it if it existed
+        - Important — would change how I use the product
+        - Blocker — I cannot adopt ComplianceLint without this
+    validations:
+      required: true

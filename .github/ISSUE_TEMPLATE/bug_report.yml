@@ -1,0 +1,130 @@
+name: Bug Report
+description: Report a bug in ComplianceLint (MCP server, scanner, dashboard, or docs)
+title: "[Bug] "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to file a bug report. Before submitting, please:
+
+        - **Search [existing issues](https://github.com/ki-sum/compliancelint/issues?q=is%3Aissue)** to avoid duplicates.
+        - For **security vulnerabilities**, do NOT use this form — see [SECURITY.md](https://github.com/ki-sum/compliancelint/blob/master/SECURITY.md) for the responsible disclosure process.
+        - The fields below help us reproduce the issue quickly. Skipping them slows down a fix.
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Which component is affected?
+      options:
+        - MCP server (cl_scan, cl_analyze_project, cl_sync, etc.)
+        - Scanner / obligation engine
+        - Dashboard (compliancelint.dev SaaS)
+        - PDF / report generation
+        - Documentation
+        - Other / not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: A clear, concise description of the bug. What did you expect vs. what actually happened?
+      placeholder: |
+        e.g. I ran `cl_scan` on a Next.js project and the dashboard shows the scan as "in progress" forever, even though the MCP tool returned a result.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Minimal steps that reproduce the bug. The fewer steps, the faster we can fix it.
+      placeholder: |
+        1. Connect a fresh repo via `cl_connect`
+        2. Run `cl_scan` with `regulation="eu-ai-act"`
+        3. Open dashboard, navigate to /repos/{repoId}
+        4. Observe...
+      value: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+
+  - type: input
+    id: error-id
+    attributes:
+      label: Error ID (if shown)
+      description: |
+        If the dashboard or MCP server displayed an Error ID (looks like `err_abc123def456`), paste it here.
+        This lets us look up the full server-side stack trace without needing more info from you.
+      placeholder: e.g. err_a1b2c3d4e5f6
+    validations:
+      required: false
+
+  - type: textarea
+    id: bug-bundle
+    attributes:
+      label: Bug report bundle (if available)
+      description: |
+        If you ran `cl_report_bug` from the MCP tool, paste the bundle path here, or attach the file.
+        The bundle contains your scanner logs + environment info (no source code, no sensitive data) and is the fastest path to a fix.
+      placeholder: e.g. ~/compliancelint-bugreport-2026-04-27.md (attached)
+    validations:
+      required: false
+
+  - type: input
+    id: cl-version
+    attributes:
+      label: ComplianceLint version
+      description: Output of `cl_version` (or `pip show compliancelint`).
+      placeholder: e.g. 1.1.0
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - macOS
+        - Linux
+        - Windows
+        - WSL
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: client
+    attributes:
+      label: MCP client
+      description: Which client are you running ComplianceLint through?
+      placeholder: e.g. Claude Code 2.0.55, Cursor, Claude Desktop, custom integration
+    validations:
+      required: false
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log output
+      description: |
+        Paste any error message, stack trace, or relevant output from `~/.compliancelint/logs/{project_hash}/scanner.log`.
+        Tip: `cl_report_bug` packages the last 200 log lines automatically.
+      render: shell
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Pre-submission checklist
+      options:
+        - label: I have searched existing issues and this is not a duplicate.
+          required: true
+        - label: This is NOT a security vulnerability (those go through [SECURITY.md](https://github.com/ki-sum/compliancelint/blob/master/SECURITY.md)).
+          required: true
+        - label: I have removed any sensitive data (API keys, customer names, internal URLs) from the logs above.
+          required: true
