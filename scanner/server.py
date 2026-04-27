@@ -2298,6 +2298,17 @@ def cl_sync(project_path: str, regulation: str = "") -> str:
             f"warning(s); will surface after repo_id resolution"
         )
 
+    # R5-F3 (2026-04-27) — POST /scans returns two distinct fields:
+    #   `warnings` (array)  — fingerprint-mismatch advisories (handled above)
+    #   `warning`  (string) — API-key-sharing tier-monitor advisory
+    # Older scanner only read `warnings` so the singular `warning` was
+    # silently dropped — the user got an email but nothing in their CLI.
+    monitor_warning = (
+        resp_data.get("warning") if isinstance(resp_data, dict) else None
+    )
+    if monitor_warning:
+        slog.info("STEP 10c: scan response carried API-key-sharing warning")
+
     # ── Evidence v4 deferred-path pull (sub-3b) ──
     # After scan state is uploaded, fetch any pending evidence bytes the
     # team has uploaded via the dashboard and write them to the working
@@ -2383,6 +2394,13 @@ def cl_sync(project_path: str, regulation: str = "") -> str:
         result_payload["fingerprint_warning"] = fingerprint_msg
         result_payload["message"] = (
             f"{result_payload['message']}\n\n{fingerprint_msg}"
+        )
+    if monitor_warning:
+        # Show the API-key-sharing alert prominently — appended to message
+        # AND set as a top-level field so MCP clients can render it.
+        result_payload["warning"] = monitor_warning
+        result_payload["message"] = (
+            f"{result_payload['message']}\n\n⚠️ {monitor_warning}"
         )
     if human_prompt:
         # Surface the prompt at top-level so MCP clients (Claude Code,
