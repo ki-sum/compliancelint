@@ -305,22 +305,49 @@ def _apply_saas_settings_to_scope(scope: dict, saas_settings: dict) -> dict:
     Sets:
       - _saas_settings_active = True
       - is_provider / is_deployer / is_authorised_representative /
-        is_importer / is_distributor (booleans, derived from roles[])
+        is_importer / is_distributor (booleans)
       - risk_classification / risk_classification_confidence (when
         SaaS supplies a non-empty riskClassification)
 
-    The five EU AI Act Art 3 operator roles are mirrored from the SaaS
-    roles[] array; unknown role values (typo, custom, future) are
-    silently dropped — known roles control behaviour, unknowns add
-    no scope.
+    Two response shapes are supported (R5-F2 fix 2026-04-27):
+      Modern: response includes pre-computed effective flags
+              (`is_provider`, `is_deployer`, etc.). The server merges
+              roles[] with the per-role wizard booleans
+              (isImporter / isDistributor / isDeployer /
+              isAuthorisedRepresentative from compliance-profile)
+              using OR semantics. Three-state: true | false | null.
+              Null = user has not confirmed → leave AI scope alone.
+      Legacy: response only has roles[] + riskClassification.
+              Fall back to the original roles[]-only derivation
+              (False when role missing) so older SaaS deployments
+              keep working until upgrade.
+
+    Detection: presence of any `is_<role>` key in the response means
+    the server is the modern shape. The 5 keys ship together.
     """
     scope["_saas_settings_active"] = True
     roles = saas_settings.get("roles") or []
-    scope["is_provider"] = "provider" in roles
-    scope["is_deployer"] = "deployer" in roles
-    scope["is_importer"] = "importer" in roles
-    scope["is_distributor"] = "distributor" in roles
-    scope["is_authorised_representative"] = "authorised_representative" in roles
+
+    role_flag_keys = {
+        "is_provider": "provider",
+        "is_deployer": "deployer",
+        "is_importer": "importer",
+        "is_distributor": "distributor",
+        "is_authorised_representative": "authorised_representative",
+    }
+    has_effective = any(k in saas_settings for k in role_flag_keys)
+
+    for scope_key, role_str in role_flag_keys.items():
+        if has_effective:
+            # Modern SaaS: honor server-computed effective flag.
+            # null → don't override (let AI-supplied value stand).
+            eff = saas_settings.get(scope_key)
+            if eff is not None:
+                scope[scope_key] = bool(eff)
+        else:
+            # Legacy SaaS: roles[]-only derivation (pre-R5-F2 behaviour).
+            scope[scope_key] = role_str in roles
+
     risk = saas_settings.get("riskClassification")
     if risk:
         scope["risk_classification"] = risk
