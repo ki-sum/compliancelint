@@ -23,7 +23,6 @@ Thumbs.db
 
 # Private — never public
 private/
-scanner/tools/
 CLAUDE.md
 CLAUDE.local.md
 .compliancelintrc
