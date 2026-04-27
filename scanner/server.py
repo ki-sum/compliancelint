@@ -33,6 +33,7 @@ from core.context import analyze_project_metadata, ProjectContext
 from core.protocol import BaseArticleModule, ScanResult
 from core.config import ProjectConfig
 from core.evidence import load_evidence, apply_evidence_to_findings
+from core.error_response import dump_error
 
 mcp = FastMCP("compliancelint")
 
@@ -241,7 +242,7 @@ def cl_analyze_project(project_path: str) -> str:
         project_path: Absolute path to the project directory.
     """
     if not os.path.isdir(project_path):
-        return json.dumps({"error": f"Directory not found: {project_path}"})
+        return dump_error(f"Directory not found: {project_path}")
 
     metadata = analyze_project_metadata(project_path)
     return json.dumps(metadata, indent=2, ensure_ascii=False)
@@ -437,7 +438,7 @@ def cl_scan(
     Args:
         project_path: Absolute path to the project directory to scan.
         project_context: JSON string with AI-enriched project context.
-            Call cl_analyze() first, read the codebase, then pass your answers.
+            Call cl_analyze_project() first, read the codebase, then pass your answers.
         regulation: Which regulation to scan against. Currently supported:
             - "eu-ai-act" (default) — EU AI Act (Regulation (EU) 2024/1689)
             Future: "gdpr", "nist-ai-rmf", etc.
@@ -464,7 +465,7 @@ def cl_scan(
         try:
             ctx = ProjectContext.from_json(project_context)
         except (json.JSONDecodeError, TypeError) as e:
-            return json.dumps({"error": f"Invalid project_context JSON: {e}"})
+            return dump_error(f"Invalid project_context JSON: {e}")
 
         # ── Validation Gate for per-article scan ──
         from core.validation_gate import run_gate
@@ -614,9 +615,11 @@ def cl_explain(regulation: str = "eu-ai-act", article: int = 0) -> str:
         article: Article number to explain (e.g. 12 for Article 12).
     """
     if regulation != "eu-ai-act":
-        return json.dumps({"error": f"Regulation '{regulation}' is not yet supported.",
-                           "fix": "Use regulation='eu-ai-act'.",
-                           "details": "Supported: ['eu-ai-act']. Additional regulations are on the roadmap."})
+        return dump_error(
+            f"Regulation '{regulation}' is not yet supported.",
+            fix="Use regulation='eu-ai-act'.",
+            details="Supported: ['eu-ai-act']. Additional regulations are on the roadmap.",
+        )
     _ensure_module_loaded(article)
     if article in _modules:
         explanation = _modules[article].explain()
@@ -658,7 +661,7 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
         })
 
     if not os.path.isdir(project_path):
-        return json.dumps({"error": f"Directory not found: {project_path}"})
+        return dump_error(f"Directory not found: {project_path}")
 
     # Save AI provider metadata if provided
     if ai_provider:
@@ -667,18 +670,18 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
 
     # Parse project context — required for scanning
     if not project_context:
-        return json.dumps({
-            "error": (
+        return dump_error(
+            (
                 "project_context is required. Call cl_analyze_project() first, "
                 "read the output, add your own understanding, then pass the enriched "
                 "JSON to cl_scan_all()."
             ),
-            "fix": "Call cl_analyze_project() first, then pass its output as project_context.",
-        })
+            fix="Call cl_analyze_project() first, then pass its output as project_context.",
+        )
     try:
         ctx = ProjectContext.from_json(project_context)
     except (json.JSONDecodeError, TypeError) as e:
-        return json.dumps({"error": f"Invalid project_context JSON: {e}"})
+        return dump_error(f"Invalid project_context JSON: {e}")
 
     # ── SaaS Source of Truth: fetch role/risk settings if connected ──
     config = ProjectConfig.load(project_path)
@@ -1077,7 +1080,7 @@ def cl_action_plan(project_path: str, regulation: str = "eu-ai-act", article: in
         })
 
     if not os.path.isdir(project_path):
-        return json.dumps({"error": f"Directory not found: {project_path}"})
+        return dump_error(f"Directory not found: {project_path}")
 
     _ensure_all_modules_loaded()
 
@@ -1398,13 +1401,13 @@ def cl_update_finding_batch(
     try:
         updates_list = json.loads(updates)
     except (json.JSONDecodeError, TypeError) as e:
-        return json.dumps({"error": f"Invalid updates JSON: {e}"})
+        return dump_error(f"Invalid updates JSON: {e}")
 
     if not isinstance(updates_list, list):
-        return json.dumps({"error": "updates must be a JSON array"})
+        return dump_error("updates must be a JSON array")
 
     if len(updates_list) == 0:
-        return json.dumps({"error": "updates array is empty"})
+        return dump_error("updates array is empty")
 
     # ── Separate article-level items from obligation-level items ──
     article_items = []
@@ -1446,7 +1449,7 @@ def cl_update_finding_batch(
     valid_updates = expanded_from_articles + valid_updates
 
     if not valid_updates:
-        return json.dumps({"error": "No valid updates in batch", "validation_errors": errors})
+        return dump_error("No valid updates in batch", validation_errors=errors)
 
     # Resolve attester (once for entire batch)
     from core.config import ProjectConfig
@@ -1506,7 +1509,7 @@ def cl_verify_evidence(project_path: str) -> str:
         project_path: Absolute path to the project directory.
     """
     if not os.path.isdir(project_path):
-        return json.dumps({"error": f"Directory not found: {project_path}"})
+        return dump_error(f"Directory not found: {project_path}")
 
     evidence = load_evidence(project_path)
 
@@ -1583,7 +1586,7 @@ def _scan_single_article(article_number: int, project_path: str, context=None, r
         regulation: Which regulation to scan against (default: "eu-ai-act").
     """
     if not os.path.isdir(project_path):
-        return json.dumps({"error": f"Directory not found: {project_path}"})
+        return dump_error(f"Directory not found: {project_path}")
 
     from core.scanner_log import get_scanner_logger
     slog = get_scanner_logger(project_path)
@@ -1622,7 +1625,7 @@ def _scan_single_article(article_number: int, project_path: str, context=None, r
         result = mod.scan(project_path)
     except Exception as e:
         logger.error("Art. %d — scan ERROR: %s", article_number, e)
-        return json.dumps({"error": str(e), "article": article_number, "type": type(e).__name__})
+        return dump_error(str(e), article=article_number, type=type(e).__name__)
 
     # Inject AI model attribution once at the ScanResult level (not per-finding)
     if context and getattr(context, "ai_model", ""):
@@ -1893,7 +1896,7 @@ async def cl_connect(project_path: str, email: str = "", switch_account: bool = 
     import uuid
 
     if not os.path.isdir(project_path):
-        return json.dumps({"error": f"Directory not found: {project_path}"})
+        return dump_error(f"Directory not found: {project_path}")
 
     from core.scanner_log import get_scanner_logger
     slog = get_scanner_logger(project_path)
@@ -2046,21 +2049,31 @@ def cl_sync(project_path: str, regulation: str = "") -> str:
     Returns: JSON with sync status and dashboard URL.
     """
     if not os.path.isdir(project_path):
-        return json.dumps({"error": f"Directory not found: {project_path}"})
+        return dump_error(f"Directory not found: {project_path}")
+
+    # Generate ONE request_id for this entire cl_sync invocation. We send
+    # it in the X-Request-Id header on the curl POST to /api/v1/scans so
+    # the dashboard can correlate scanner-side logs with SaaS-side logs
+    # for the same upload. Any error envelope returned from this flow
+    # also reuses this id, so the user's bug-report bundle and the
+    # dashboard error_logs row share one identifier end-to-end.
+    from core.error_response import new_request_id
+    sync_request_id = new_request_id()
 
     from core.scanner_log import get_scanner_logger
     slog = get_scanner_logger(project_path)
-    slog.info("cl_sync: started project_path=%s", project_path)
+    slog.info("cl_sync: started project_path=%s request_id=%s", project_path, sync_request_id)
 
     # Load config for API key
     slog.info("cl_sync: loading config")
     config = ProjectConfig.load(project_path)
     slog.info(f"STEP 3: config loaded, api_key={config.saas_api_key[:10] if config.saas_api_key else 'NONE'}...")
     if not config.saas_api_key:
-        return json.dumps({
-            "error": "No API key configured. Run cl_connect() first to link your dashboard account.",
-            "fix": "Run cl_connect() — it opens your browser to sign in.",
-        })
+        return dump_error(
+            "No API key configured. Run cl_connect() first to link your dashboard account.",
+            request_id=sync_request_id,
+            fix="Run cl_connect() — it opens your browser to sign in.",
+        )
 
     saas_url = config.saas_url or "https://compliancelint.dev"
 
@@ -2225,6 +2238,7 @@ def cl_sync(project_path: str, regulation: str = "") -> str:
             "-X", "POST", scans_url,
             "-H", "Content-Type: application/json; charset=utf-8",
             "-H", f"Authorization: Bearer {config.saas_api_key}",
+            "-H", f"X-Request-Id: {sync_request_id}",
             "-d", f"@{_tmp_path}",
             "-w", "\n%{http_code}",
         ]
@@ -2247,10 +2261,11 @@ def cl_sync(project_path: str, regulation: str = "") -> str:
         slog.info(f"STEP 10: HTTP done, code={http_code}, body={body_str[:200]}")
 
         if http_code == 401:
-            return json.dumps({
-                "error": "API key is invalid or expired.",
-                "fix": "Run cl_connect() again to generate a new API key.",
-            })
+            return dump_error(
+                "API key is invalid or expired.",
+                request_id=sync_request_id,
+                fix="Run cl_connect() again to generate a new API key.",
+            )
         if http_code == 403:
             detail = ""
             upgrade_url = ""
@@ -2261,27 +2276,34 @@ def cl_sync(project_path: str, regulation: str = "") -> str:
             except Exception:
                 detail = body_str
             settings_url = f"{saas_url}/dashboard/settings"
-            return json.dumps({
-                "error": f"Dashboard returned HTTP 403: {detail}",
-                "fix": f"Upgrade your plan at {settings_url}",
-            })
+            return dump_error(
+                f"Dashboard returned HTTP 403: {detail}",
+                request_id=sync_request_id,
+                fix=f"Upgrade your plan at {settings_url}",
+            )
         if http_code >= 400:
-            return json.dumps({
-                "error": f"Dashboard returned HTTP {http_code}.",
-                "fix": "Check the dashboard status at compliancelint.dev or try again later.",
-                "details": body_str[:500],
-            })
+            return dump_error(
+                f"Dashboard returned HTTP {http_code}.",
+                request_id=sync_request_id,
+                fix="Check the dashboard status at compliancelint.dev or try again later.",
+                details=body_str[:500],
+            )
         if body_str:
             resp_data = json.loads(body_str)
 
     except _sp.TimeoutExpired:
-        return json.dumps({
-            "error": f"Request to {saas_url} timed out after 15 seconds.",
-            "fix": "Check your internet connection or try again.",
-        })
+        return dump_error(
+            f"Request to {saas_url} timed out after 15 seconds.",
+            request_id=sync_request_id,
+            fix="Check your internet connection or try again.",
+        )
     except Exception as e:
         slog.info(f"STEP 10-ERR: {e}")
-        return json.dumps({"error": f"Sync failed: {e}", "fix": "Check your internet connection or try again."})
+        return dump_error(
+            f"Sync failed: {e}",
+            request_id=sync_request_id,
+            fix="Check your internet connection or try again.",
+        )
 
     dashboard_url = resp_data.get("dashboard_url", f"{saas_url}/dashboard")
     scan_id = resp_data.get("scan_id", "")
@@ -2892,7 +2914,7 @@ def cl_delete(
     import shutil
 
     if not os.path.isdir(project_path):
-        return json.dumps({"error": f"Directory not found: {project_path}"})
+        return dump_error(f"Directory not found: {project_path}")
 
     _VALID_TARGETS = ("local", "all", "dashboard")
     if target not in _VALID_TARGETS:
@@ -3112,7 +3134,7 @@ def cl_disconnect(project_path: str) -> str:
         project_path: Project directory path.
     """
     if not os.path.isdir(project_path):
-        return json.dumps({"error": f"Directory not found: {project_path}"})
+        return dump_error(f"Directory not found: {project_path}")
 
     from core.scanner_log import get_scanner_logger
     slog = get_scanner_logger(project_path)
@@ -3125,7 +3147,7 @@ def cl_disconnect(project_path: str) -> str:
         with open(config_path, "r", encoding="utf-8") as f:
             data = json.load(f)
     except (json.JSONDecodeError, OSError):
-        return json.dumps({"error": "Could not read .compliancelintrc.", "fix": "Check that .compliancelintrc is valid JSON."})
+        return dump_error("Could not read .compliancelintrc.", fix="Check that .compliancelintrc is valid JSON.")
 
     # Remove connection fields, keep local config
     removed = []
@@ -3154,11 +3176,53 @@ def cl_disconnect(project_path: str) -> str:
 @mcp.tool()
 def cl_version() -> str:
     """Return ComplianceLint scanner version and check for updates."""
-    result = {"version": CL_VERSION, "tools": 16}
+    result = {"version": CL_VERSION, "tools": 17}
     update_info = _check_latest_version()
     if update_info:
         result.update(update_info)
     return json.dumps(result)
+
+
+@mcp.tool()
+def cl_report_bug() -> str:
+    """Generate a bug-report bundle (Markdown) for attaching to a GitHub issue.
+
+    Bundles the user's recent scanner logs + environment info into a single
+    Markdown file at ``~/compliancelint-bugreport-{timestamp}.md``. The file
+    is privacy-scrubbed (home paths collapsed to ``~``, emails/IPs redacted)
+    and contains no project source code — only the logs ComplianceLint
+    itself wrote.
+
+    The user is then directed to attach the file to a GitHub bug report or
+    email it to support@compliancelint.dev. We never auto-upload anything.
+
+    Returns a JSON object with ``bundle_path``, ``size_bytes``, and a short
+    ``next_steps`` string.
+    """
+    from core.bug_report import build_bundle
+
+    try:
+        bundle_path = build_bundle(CL_VERSION)
+    except Exception as e:
+        return dump_error(f"Failed to build bug report bundle: {e}",
+                          fix="Check write permissions on your home directory.")
+
+    try:
+        size = bundle_path.stat().st_size
+    except OSError:
+        size = 0
+
+    return json.dumps({
+        "status": "ok",
+        "bundle_path": str(bundle_path),
+        "size_bytes": size,
+        "next_steps": (
+            "1. Review the file before sharing.\n"
+            "2. Attach it to a new GitHub issue: "
+            "https://github.com/ki-sum/compliancelint/issues/new?template=bug_report.yml\n"
+            "3. Or email it to support@compliancelint.dev."
+        ),
+    })
 
 
 def main():

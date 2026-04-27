@@ -74,6 +74,9 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 ### Removed
 - `cl_report` MCP tool — compliance reports are now exclusively generated as PDF from the dashboard. This prevents free-tier feature leakage. Tool count: 16 → 15.
 
+### Added — Bug reporting
+- `cl_report_bug` MCP tool — generate a privacy-scrubbed bundle (recent scanner logs + environment info) for attaching to GitHub bug reports. Local-only, no auto-upload. Tool count: 15 → 16 → 17 (with `cl_connect` already counted, the operative number is 17 against the v1.0.0 baseline of 16).
+
 ### Changed — PDF Redesign
 - **Declaration PDF**: redesigned System Identification as structured card; scope as color-coded grid; appendix now groups by article with per-obligation table; added Place field to signature; removed ambiguous percentage score
 - **Scan Findings PDF** (renamed from "Compliance Report"): removed "How to Fix" remediation (belongs in Tasks PDF); removed overall status badge; added per-finding source quotes

@@ -262,6 +262,7 @@ Not all 44 articles apply to every project. The applicable obligations depend on
 | `cl_action_guide` | Get guidance for Human Gate obligations (directs to dashboard) |
 | `cl_check_updates` | Enforcement deadlines and regulation status |
 | `cl_version` | Show ComplianceLint version |
+| `cl_report_bug` | Generate privacy-scrubbed bug-report bundle for GitHub issues |
 
 All scanning tools accept a `regulation` parameter (default: `"eu-ai-act"`), designed to support multiple regulations as they are added.
 
@@ -355,7 +356,7 @@ The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard
 
 ### Shipped
 
-- [x] MCP Server (16 tools) + 44 EU AI Act articles, 247 obligations
+- [x] MCP Server (17 tools) + 44 EU AI Act articles, 247 obligations
 - [x] SaaS Dashboard with Compliance Journey tracking
 - [x] PDF exports (Scan Report, Journey, Declaration of Conformity, Technical Documentation, Tasks)
 - [x] Attestation system (evidence, rebuttals, acknowledgements, defer, questionnaire response)
