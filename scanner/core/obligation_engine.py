@@ -40,8 +40,24 @@ class Obligation:
     modality: str
     addressee: str
     atoms: list[dict]
-    automation_level: str          # "full", "partial", "manual"
-    automation_confidence: str     # "high", "medium", "low"
+    automation_level: str          # "full", "partial", "manual" — what the scanner CAN
+                                   # do for this obligation. full=detect compliance/non-
+                                   # compliance from code+docs alone; partial=detect
+                                   # artifact presence but cannot verify completeness/
+                                   # correctness; manual=cannot detect, requires human
+                                   # attestation via Human Gates questionnaire.
+    automation_confidence: str     # "high"|"medium"|"low" — confidence in our own
+                                   # automation_level assignment, not in the obligation
+                                   # itself. high = we are sure scanner can deliver the
+                                   # automation_level claim (typically code obligations
+                                   # with deterministic checks). medium = level is our
+                                   # best read but the boundary case could go either
+                                   # way (most hybrid obligations land here). low = we
+                                   # know the assignment is contested and the obligation
+                                   # may need re-classification as the product evolves
+                                   # (typically subjective adequacy/proportionality
+                                   # language). Note: ALL obligations are mandatory SHALL;
+                                   # confidence is NOT a strictness rating.
     detection_method: str
     what_to_scan: list[str]
     human_judgment_needed: Optional[str] = None
