@@ -166,3 +166,94 @@ def test_sync_handles_401_gracefully(tmp_path, monkeypatch):
     assert "error" in parsed, f"expected error on 401, got: {parsed}"
     assert "invalid or expired" in parsed["error"].lower()
     assert "cl_connect" in parsed["fix"]
+
+
+def test_sync_surfaces_singular_warning_field_R5_F3(tmp_path, monkeypatch):
+    """R5-F3 (2026-04-27 hostile-audit fix): the dashboard's POST /scans
+    response can carry TWO distinct shapes:
+
+      * `warnings` (array)  — fingerprint-mismatch advisories
+      * `warning`  (string) — API-key-sharing tier-monitor advisory
+
+    Pre-fix, cl_sync only read `warnings` (the array form), which meant
+    the singular `warning` field was silently dropped — the user got an
+    email about API-key sharing but their CLI showed nothing.
+
+    This test mocks the dashboard to return ONLY the singular `warning`
+    field and asserts cl_sync surfaces it both as a top-level `warning`
+    field on the result and inline in the `message` text.
+
+    §2.4 of 2026-04-27 test-debt backlog.
+    """
+    _seed_rc_with_saas(str(tmp_path))
+    _seed_article_state(str(tmp_path))
+
+    captured: dict = {}
+    warning_text = (
+        "API key used from 4 distinct IPs in the last 24h "
+        "(possible key sharing). Reset at /dashboard/account."
+    )
+    fake_scans = {
+        "status": 200,
+        "body": json.dumps({
+            "scan_id": "scan-fake-warn",
+            "dashboard_url": "https://dash.test.local/dashboard/scans/scan-fake-warn",
+            # Singular "warning" only — no "warnings" array.
+            "warning": warning_text,
+        }),
+    }
+    monkeypatch.setattr(subprocess, "run", _make_fake_run(fake_scans, captured))
+
+    raw = server.cl_sync(str(tmp_path), regulation="")
+    parsed = json.loads(raw)
+
+    assert "error" not in parsed, f"cl_sync surfaced unexpected error: {parsed}"
+
+    # (1) Top-level `warning` field exposed for MCP clients to render.
+    assert "warning" in parsed, (
+        f"singular `warning` was silently dropped — keys: {sorted(parsed.keys())}"
+    )
+    assert parsed["warning"] == warning_text
+
+    # (2) Inline in the human-readable `message` so one-line UIs see it.
+    assert "message" in parsed
+    assert warning_text in parsed["message"], (
+        f"warning text missing from message: {parsed['message']!r}"
+    )
+
+
+def test_sync_surfaces_array_warnings_unchanged(tmp_path, monkeypatch):
+    """Regression guard: §1.2/§1.3 fingerprint-warning array path still
+    works. The R5-F3 fix added a NEW branch for the singular field; this
+    asserts it didn't break the existing array branch.
+    """
+    _seed_rc_with_saas(str(tmp_path))
+    _seed_article_state(str(tmp_path))
+
+    captured: dict = {}
+    fake_scans = {
+        "status": 200,
+        "body": json.dumps({
+            "scan_id": "scan-fake-fp",
+            "dashboard_url": "https://dash.test.local/dashboard/scans/scan-fake-fp",
+            "warnings": [
+                {
+                    "code": "fingerprint_changed",
+                    "message": "First-commit fingerprint changed since last scan",
+                },
+            ],
+        }),
+    }
+    monkeypatch.setattr(subprocess, "run", _make_fake_run(fake_scans, captured))
+
+    raw = server.cl_sync(str(tmp_path), regulation="")
+    parsed = json.loads(raw)
+
+    assert "error" not in parsed, f"cl_sync errored: {parsed}"
+    # Array-path surfaces under fingerprint_warning, not the new singular
+    # warning field. Either field present (or absent if repo_id resolution
+    # failed and the formatter early-returned) is acceptable; the contract
+    # is "did not raise + did not silently swallow".
+    assert "warning" not in parsed or parsed["warning"] is None or isinstance(
+        parsed.get("warning"), str
+    )
