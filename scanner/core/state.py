@@ -133,6 +133,63 @@ def save_metadata(project_path: str, ai_provider: str = "") -> None:
         json.dump(meta, f, indent=2, ensure_ascii=False)
 
 
+def save_commit_shas(
+    project_path: str,
+    head_commit_sha: Optional[str],
+    first_commit_sha: Optional[str],
+) -> None:
+    """Cache git HEAD + first-commit SHAs into metadata.json.
+
+    Why this helper exists (per memory bug_mcp_tool_hang.md):
+        cl_sync MUST NOT call git subprocess — Windows MCP stdio + Python
+        subprocess interaction has a race that makes timeout=2 not fire,
+        causing 5-7 minute hangs (regressed 3 times: pre-2026-04-16,
+        commit 8aec693, commit 0a5d94db+96ede258 in 2026-04-20/21).
+        cl_scan_all is the only approved exception — slow scan tolerates
+        the worst-case 7min git call. So we derive in cl_scan_all and
+        cache here; cl_sync reads from cache.
+
+    Both args may be None (no git, empty repo, or git unavailable). Stored
+    keys: `head_commit_sha`, `first_commit_sha`, `commit_shas_cached_at`.
+    Existing metadata.json keys are preserved.
+    """
+    meta_path = paths.metadata_file_str(project_path)
+    paths.ensure_local_dir(project_path)
+    meta = {}
+    if os.path.isfile(meta_path):
+        try:
+            with open(meta_path, "r", encoding="utf-8") as f:
+                meta = json.load(f)
+        except (json.JSONDecodeError, OSError):
+            pass
+    meta["head_commit_sha"] = head_commit_sha
+    meta["first_commit_sha"] = first_commit_sha
+    meta["commit_shas_cached_at"] = datetime.now(timezone.utc).isoformat()
+    with open(meta_path, "w", encoding="utf-8") as f:
+        json.dump(meta, f, indent=2, ensure_ascii=False)
+
+
+def load_commit_shas(
+    project_path: str,
+) -> tuple[Optional[str], Optional[str]]:
+    """Read cached (head_commit_sha, first_commit_sha) from metadata.json.
+
+    Returns (None, None) if metadata.json is missing, malformed, or has
+    no commit cache. Caller (cl_sync) is responsible for behaving
+    correctly when both are None — typically the first sync after a
+    cl_scan_all that didn't get to the cache step yet.
+    """
+    meta_path = paths.metadata_file_str(project_path)
+    if not os.path.isfile(meta_path):
+        return (None, None)
+    try:
+        with open(meta_path, "r", encoding="utf-8") as f:
+            meta = json.load(f)
+    except (json.JSONDecodeError, OSError):
+        return (None, None)
+    return (meta.get("head_commit_sha"), meta.get("first_commit_sha"))
+
+
 def _articles_dir(project_path: str) -> str:
     return paths.articles_dir_str(project_path)
 

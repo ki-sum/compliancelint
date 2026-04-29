@@ -892,6 +892,20 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
             # Risk classification comes from AI-provided ctx.risk_classification.
             # _high_risk_only_check() in each module handles gating.
 
+    # ── Cache git commit SHAs for cl_sync (memory: bug_mcp_tool_hang.md) ──
+    # cl_sync MUST NOT call git in MCP stdio context (Windows hangs 5-7 min,
+    # timeout=2 doesn't fire — regressed 3 times: pre-2026-04-16, 8aec693,
+    # 0a5d94db+96ede258). cl_scan_all is the approved exception (slow scan
+    # absorbs worst-case 7 min git call). Derive once here, persist to
+    # metadata.json, cl_sync reads from cache.
+    try:
+        head_sha = _derive_head_commit_sha(project_path)
+        first_sha = _derive_first_commit_sha(project_path)
+        from core.state import save_commit_shas
+        save_commit_shas(project_path, head_sha, first_sha)
+    except Exception as e:
+        logger.warning("Could not cache commit SHAs: %s", e)
+
     # Determine worst-case overall
     if "non_compliant" in overall_levels:
         overall = "non_compliant"
@@ -2187,18 +2201,28 @@ def cl_sync(project_path: str, regulation: str = "") -> str:
                 elif finding.get("evidence") and len(finding["evidence"]) > 0:
                     finding["level"] = "compliant"
 
-    # Derive current git HEAD sha for stale-detection anchor (Track 4a).
-    # Read-only git call, safe in MCP. None if not a git repo or git missing.
-    head_commit_sha = _derive_head_commit_sha(project_path)
-    slog.info(f"STEP 7c: HEAD commit sha = {head_commit_sha[:12] if head_commit_sha else 'none'}")
-
-    # Derive project-identity fingerprint (oldest root commit) for v4
-    # §1.2/§1.3 force-push / repo-rewrite detection. Dashboard stores this
-    # on first sync and compares on subsequent syncs; mismatch surfaces a
-    # warning in the response body (no blocking, no auto-update — owner
-    # acknowledges via dashboard UI).
-    first_commit_sha = _derive_first_commit_sha(project_path)
-    slog.info(f"STEP 7d: first commit sha = {first_commit_sha[:12] if first_commit_sha else 'none'}")
+    # Read cached commit SHAs from metadata.json (cl_scan_all wrote these).
+    #
+    # NEVER call git subprocess in cl_sync — Windows MCP stdio + Python
+    # subprocess have a race that makes timeout=2 not fire, causing 5-7
+    # minute hangs. Permanent rule from memory bug_mcp_tool_hang.md (set
+    # 2026-04-16; broken twice in commits 0a5d94db and 96ede258 on
+    # 2026-04-20/21 by adding _derive_head_commit_sha + _derive_first_commit_sha
+    # back into cl_sync's hot path with a misleading "safe in MCP" comment).
+    # 3rd regression confirmed 2026-04-29: 6m 50s hang on the manual-fixture
+    # snapshot-pipeline trial, even with the supposedly safe timeout=2.
+    #
+    # cl_scan_all is the only approved git caller; it persists both SHAs to
+    # metadata.json so cl_sync just reads. First-time syncs without a prior
+    # scan_all return (None, None) — dashboard accepts both as nullable.
+    from core.state import load_commit_shas
+    head_commit_sha, first_commit_sha = load_commit_shas(project_path)
+    slog.info(
+        f"STEP 7c: HEAD commit sha = {head_commit_sha[:12] if head_commit_sha else 'none'} (from cache)"
+    )
+    slog.info(
+        f"STEP 7d: first commit sha = {first_commit_sha[:12] if first_commit_sha else 'none'} (from cache)"
+    )
 
     # Build payload matching the API schema
     payload = {
