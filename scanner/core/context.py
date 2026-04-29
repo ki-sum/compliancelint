@@ -134,7 +134,23 @@ _BOOL_FIELDS: dict = {
     "_scope": ["is_ai_system", "territorial_scope_applies", "is_open_source",
                "is_military_defense", "is_research_only",
                "is_biometric_system", "is_financial_institution", "is_distributor",
-               "is_importer", "is_gpai_provider"],
+               "is_importer", "is_gpai_provider",
+               # 2026-04-29 Phase 3 §E — schema sync. AR was added to SaaS UI
+               # + DB + scan-settings API on 2026-04-26 (commits 541dfcf,
+               # 28d3fcd) but the scanner _scope schema was never updated.
+               # Free MCP without SaaS connection had AI-supplied
+               # is_authorised_representative silently dropped because the
+               # schema didn't recognize the field.
+               "is_authorised_representative"],
+    # NOTE on sme_status: this is a STRING enum (microenterprise/small/
+    # medium/large per Recommendation 2003/361/EC), NOT a bool. It MUST
+    # NOT live in _BOOL_FIELDS — the coerce step would try to map the
+    # string to bool/None and silently destroy it. Like risk_classification,
+    # sme_status is read directly from _scope when needed and is populated
+    # by _apply_saas_settings_to_scope on paid tiers (Phase 2 §B). No
+    # standalone validation is needed at the AI-template stage; the SaaS
+    # response is the authority for paid users, and scanner falls back to
+    # absent/None for free + offline.
 }
 
 

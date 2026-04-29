@@ -87,9 +87,49 @@ def compute_applicable_articles(scope: dict) -> tuple[set[str], dict[str, str]]:
         (applicable_keys, skipped_reasons)
         - applicable_keys: set of article keys like {"art4", "art50", ...}
         - skipped_reasons: {article_key: reason} for non-applicable articles
+
+    Three-state SaaS-list semantics (Phase 2 §B 2026-04-29):
+        Key `_applicable_articles_from_saas` controls the path taken:
+
+        ABSENT  → legacy local derivation (v1.1.0 behaviour). Used by
+                  scanners running against pre-Phase-2 SaaS deployments
+                  AND by offline scans (no SaaS connection). Local
+                  filter applies role + risk gates exactly as before.
+
+        None    → SaaS-confirmed "see all 44". Free tier sentinel.
+                  Bypasses local filter (no role-based narrowing).
+                  Spec §B legal-safety: free users see everything.
+
+        list    → SaaS-supplied authoritative list. Scanner echoes the
+                  list verbatim, attributing skipped articles with a
+                  "Decided by SaaS Applicability Engine" reason. Local
+                  derivation is NOT consulted — IP-protection rule.
+
+        empty list → defensive fallback to "all 44". Per Spec §B never
+                  fall back to "scan nothing" — legal risk asymmetry.
     """
     all_article_nums = _all_article_nums()
 
+    # ── Phase 2 §B SaaS-list-wins path ───────────────────────────────
+    if "_applicable_articles_from_saas" in scope:
+        saas_list = scope.get("_applicable_articles_from_saas")
+        # None or [] → fall through to "all 44" (legal-safe sentinel)
+        if isinstance(saas_list, list) and len(saas_list) > 0:
+            applicable = {str(a) for a in saas_list}
+            skipped: dict[str, str] = {}
+            for art_num in sorted(all_article_nums):
+                art_key = f"art{art_num}"
+                if art_key not in applicable:
+                    skipped[art_key] = (
+                        "Decided by SaaS Applicability Engine "
+                        f"(_engine_version={scope.get('_saas_engine_version', 'unknown')})"
+                    )
+            return applicable, skipped
+        # Free-tier null sentinel OR defensive empty — return all 44.
+        applicable = {f"art{n}" for n in all_article_nums}
+        return applicable, {}
+
+    # ── Legacy v1.1.0 local derivation ───────────────────────────────
     # _saas_settings_active: only filter articles when SaaS-confirmed settings exist.
     # When False (default), AI-provided role/risk values are IGNORED for filtering —
     # all articles are scanned. This prevents AI mistakes from hiding obligations.
