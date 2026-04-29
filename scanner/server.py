@@ -2565,23 +2565,32 @@ def cl_sync(project_path: str, regulation: str = "") -> str:
 
 
 def _safely_derive_with_timeout(fn, *args, timeout_sec: float = 3.0, slog=None):
-    """Run a git-subprocess-using helper with a HARD timeout via threadpool.
+    """Run a git-subprocess-using helper with a HARD timeout via daemon thread.
 
     Why this wrapper exists (per memory bug_mcp_tool_hang.md):
         On Windows MCP stdio context, ANY git subprocess can hang 5-7
         minutes because the subprocess child handle interacts badly
         with the asyncio event loop — `subprocess.run(timeout=N)` does
-        NOT fire reliably. This was exhibited 3 times in cl_sync (each
-        time the workaround was supposed to be permanent).
+        NOT fire reliably.
 
-        cl_scan_all and cl_delete legitimately need git derivation, but
-        they MUST NOT block the event loop on it. Pattern: submit the
-        git call to a ThreadPoolExecutor and use `.result(timeout=N)`
-        — that timeout fires reliably because it's at the EVENT LOOP
-        layer, not inside the subprocess child handle race.
+    Why DAEMON THREAD specifically (not ThreadPoolExecutor):
+        First implementation used `concurrent.futures.ThreadPoolExecutor`
+        with `.result(timeout=N)`. The `.result(timeout)` DID fire — but
+        exiting the `with executor:` block calls `shutdown(wait=True)`
+        by default, which BLOCKS waiting for the stuck git subprocess to
+        complete. Result: tool hangs anyway, just inside a different
+        function.
 
-        Worst case: the orphaned subprocess thread keeps running until
-        Windows reaps it; we don't wait. Returns None on timeout.
+        Daemon thread is the bulletproof fix:
+        - We start a daemon thread that runs the git call
+        - We wait on a `threading.Event` with a timeout
+        - On timeout: return None and DON'T join the thread (it stays
+          stuck in git subprocess until Windows eventually reaps it)
+        - Daemon flag = the leaked thread doesn't prevent Python exit
+
+        Worst case: 1 leaked daemon thread per timeout. Acceptable —
+        a hang every cl_scan_all is much worse than a leaked thread
+        that gets cleaned up at Python exit.
 
     Args:
         fn: function to call (e.g. _derive_head_commit_sha)
@@ -2593,21 +2602,39 @@ def _safely_derive_with_timeout(fn, *args, timeout_sec: float = 3.0, slog=None):
     Returns:
         Whatever fn returns, or None on timeout/error.
     """
-    import concurrent.futures
-    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as ex:
+    import threading
+
+    holder = {"result": None, "error": None}
+    done = threading.Event()
+
+    def _runner():
         try:
-            return ex.submit(fn, *args).result(timeout=timeout_sec)
-        except concurrent.futures.TimeoutError:
-            if slog:
-                slog.warning(
-                    f"{fn.__name__}: hard timeout after {timeout_sec}s "
-                    f"(MCP stdio + git subprocess race) — returning None"
-                )
-            return None
+            holder["result"] = fn(*args)
         except Exception as e:
-            if slog:
-                slog.warning(f"{fn.__name__}: error {type(e).__name__}: {e}")
-            return None
+            holder["error"] = e
+        finally:
+            done.set()
+
+    t = threading.Thread(target=_runner, daemon=True, name=f"safe-git-{fn.__name__}")
+    t.start()
+
+    if not done.wait(timeout=timeout_sec):
+        # Timed out — leak the daemon thread, return None
+        if slog:
+            slog.warning(
+                f"{fn.__name__}: hard timeout after {timeout_sec}s "
+                f"(MCP stdio + git subprocess race) — leaking thread, returning None"
+            )
+        return None
+
+    if holder["error"] is not None:
+        if slog:
+            slog.warning(
+                f"{fn.__name__}: error {type(holder['error']).__name__}: {holder['error']}"
+            )
+        return None
+
+    return holder["result"]
 
 
 def _derive_head_commit_sha(project_path: str) -> str | None:
