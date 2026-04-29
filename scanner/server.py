@@ -950,12 +950,17 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
     # ── Cache git commit SHAs for cl_sync (memory: bug_mcp_tool_hang.md) ──
     # cl_sync MUST NOT call git in MCP stdio context (Windows hangs 5-7 min,
     # timeout=2 doesn't fire — regressed 3 times: pre-2026-04-16, 8aec693,
-    # 0a5d94db+96ede258). cl_scan_all is the approved exception (slow scan
-    # absorbs worst-case 7 min git call). Derive once here, persist to
+    # 0a5d94db+96ede258). cl_scan_all derives SHAs once here, persists to
     # metadata.json, cl_sync reads from cache.
+    #
+    # The two _derive_* helpers themselves call git subprocess, which has
+    # the same Windows MCP-stdio race. Wrap in _safely_derive_with_timeout
+    # (3s hard timeout via threadpool — fires reliably even when subprocess
+    # child handle hangs). Worst case: cache stays empty, cl_sync falls back
+    # to (None, None) — graceful, dashboard accepts both as nullable.
     try:
-        head_sha = _derive_head_commit_sha(project_path)
-        first_sha = _derive_first_commit_sha(project_path)
+        head_sha = _safely_derive_with_timeout(_derive_head_commit_sha, project_path, slog=logger)
+        first_sha = _safely_derive_with_timeout(_derive_first_commit_sha, project_path, slog=logger)
         from core.state import save_commit_shas
         save_commit_shas(project_path, head_sha, first_sha)
     except Exception as e:
@@ -2559,6 +2564,52 @@ def cl_sync(project_path: str, regulation: str = "") -> str:
     return result
 
 
+def _safely_derive_with_timeout(fn, *args, timeout_sec: float = 3.0, slog=None):
+    """Run a git-subprocess-using helper with a HARD timeout via threadpool.
+
+    Why this wrapper exists (per memory bug_mcp_tool_hang.md):
+        On Windows MCP stdio context, ANY git subprocess can hang 5-7
+        minutes because the subprocess child handle interacts badly
+        with the asyncio event loop — `subprocess.run(timeout=N)` does
+        NOT fire reliably. This was exhibited 3 times in cl_sync (each
+        time the workaround was supposed to be permanent).
+
+        cl_scan_all and cl_delete legitimately need git derivation, but
+        they MUST NOT block the event loop on it. Pattern: submit the
+        git call to a ThreadPoolExecutor and use `.result(timeout=N)`
+        — that timeout fires reliably because it's at the EVENT LOOP
+        layer, not inside the subprocess child handle race.
+
+        Worst case: the orphaned subprocess thread keeps running until
+        Windows reaps it; we don't wait. Returns None on timeout.
+
+    Args:
+        fn: function to call (e.g. _derive_head_commit_sha)
+        args: positional args to pass
+        timeout_sec: hard timeout in seconds (default 3 — git ops are
+            ~100ms when healthy; 3s is generous slack for cold disk)
+        slog: optional logger for warning on timeout/error
+
+    Returns:
+        Whatever fn returns, or None on timeout/error.
+    """
+    import concurrent.futures
+    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as ex:
+        try:
+            return ex.submit(fn, *args).result(timeout=timeout_sec)
+        except concurrent.futures.TimeoutError:
+            if slog:
+                slog.warning(
+                    f"{fn.__name__}: hard timeout after {timeout_sec}s "
+                    f"(MCP stdio + git subprocess race) — returning None"
+                )
+            return None
+        except Exception as e:
+            if slog:
+                slog.warning(f"{fn.__name__}: error {type(e).__name__}: {e}")
+            return None
+
+
 def _derive_head_commit_sha(project_path: str) -> str | None:
     """Return current git HEAD SHA (40-char lowercase hex), or None.
 
@@ -3196,7 +3247,11 @@ def cl_delete(
             results["dashboard"] = "error: no API key configured. Run cl_connect() first."
         else:
             saas_url = config.saas_url or "https://compliancelint.dev"
-            config.derive_git_identity(project_path)
+            # derive_git_identity calls git subprocess — wrap in hard
+            # timeout to avoid the Windows MCP-stdio hang (memory:
+            # bug_mcp_tool_hang.md). Worst case: repo_name falls back
+            # to the directory basename (still usable for the API call).
+            _safely_derive_with_timeout(config.derive_git_identity, project_path, slog=logger)
             repo_name = config.repo_name or os.path.basename(os.path.normpath(project_path))
 
             import subprocess
