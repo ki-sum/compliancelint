@@ -333,9 +333,15 @@ The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard
 | Projects | 1 | 2 | 10 | Unlimited | Unlimited |
 | Scan history | 7 days | Unlimited | Unlimited | Unlimited | Unlimited |
 | PDF reports | Watermarked | Clean | Clean | Clean | Clean |
-| Penalty display (worst-case) | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Penalty configuration (precise) | — | ✓ | ✓ | ✓ | ✓ |
-| Risk mapping | — | ✓ | ✓ | ✓ | ✓ |
+| All 247 obligations visible (worst-case) | ✓ | ✓ | ✓ | ✓ | ✓ |
+| **Scope narrowing** — see only obligations applicable to your AI system (typically saves ~70% review time) | — | ✓ | ✓ | ✓ | ✓ |
+| **Risk classification picker** (Art. 5 / 6 / 50) | — | ✓ | ✓ | ✓ | ✓ |
+| **SME relief** (Art. 11 simplified tech-doc per Recommendation 2003/361/EC) | — | ✓ | ✓ | ✓ | ✓ |
+| **Per-obligation questionnaires** (anchor AI answers to verbatim legal text) | — | ✓ | ✓ | ✓ | ✓ |
+| **Art. 2 carve-outs** (territorial / military / research / open-source — entire-Act exemption flags) | — | ✓ | ✓ | ✓ | ✓ |
+| Penalty display (worst-case Art. 99 caps) | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Penalty configuration (precise — based on your headcount + turnover + balance sheet) | — | ✓ | ✓ | ✓ | ✓ |
+| Risk mapping (MIT AI Risk Repository) | — | ✓ | ✓ | ✓ | ✓ |
 | Evidence references (URL, text) | — | — | ✓ | ✓ | ✓ |
 | Human Gates questionnaires | — | — | ✓ | ✓ | ✓ |
 | Evidence file upload to your repo | — | — | ✓ | ✓ | ✓ |
@@ -343,6 +349,7 @@ The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard
 | CI/CD quality gate | — | — | ✓ | ✓ | ✓ |
 | Multi-framework mapping (ISO 42001, NIST AI RMF) | — | — | — | ✓ | ✓ |
 | Regulation updates | — | — | — | ✓ | ✓ |
+| Compliance All-in-One Pack (audit-grade snapshot zip) | — | — | — | ✓ | ✓ |
 | SSO / SAML / on-prem | — | — | — | — | ✓ |
 | Team members | Unlimited | Unlimited | Unlimited | Unlimited | Unlimited |
 
