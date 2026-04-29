@@ -167,7 +167,7 @@
       "source": "Art. 54(6)",
       "source_quote": "The obligation set out in this Article shall not apply to providers of general-purpose AI models that are released under a free and open-source licence that allows for the access, usage, modification, and distribution of the model, and whose parameters, including the weights, the information on the model architecture, and the information on model usage, are made publicly available, unless the general-purpose AI models present systemic risks.",
       "deontic_type": "exception",
-      "modality": "shall_not",
+      "modality": "shall not",
       "addressee": "provider",
       "scope_limitation": "Open-source GPAI models exempt unless systemic risk",
       "context_skip_field": "is_open_source_gpai",
