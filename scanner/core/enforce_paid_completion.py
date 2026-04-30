@@ -17,7 +17,7 @@ silently HIDING obligations is 100x more dangerous):
   enforcement_mode=None       → treated as "lenient" (default safe)
   enforcement_mode="lenient"  → status="ok" with `warnings` list
   enforcement_mode="strict"   → block on missing evidence
-  evidence_min_count missing  → treated as 0 (no structural enforcement)
+  evidence_min missing  → treated as 0 (no structural enforcement)
   completion_required missing → treated as False (don't enforce)
 
 The function is intentionally I/O-free. The wrapper that loads
@@ -82,7 +82,7 @@ def enforce_paid_completion(
 
     Args:
         questionnaire: dict mapping obligation_id → spec row (with
-          `evidence_min_count` int + `completion_required` bool fields),
+          `evidence_min` int + `completion_required` bool fields),
           or None when SaaS returned no narrowing (free tier / fallback).
         evidence_counts: dict mapping obligation_id → int (current
           evidence array length on disk). Use evidence_counts_from_state
@@ -107,7 +107,7 @@ def enforce_paid_completion(
             continue
         if not row.get("completion_required"):
             continue
-        expected = _coerce_int(row.get("evidence_min_count"))
+        expected = _coerce_int(row.get("evidence_min"))
         if expected <= 0:
             continue
         actual = _coerce_int(counts.get(oid))

@@ -219,12 +219,15 @@ def test_indicator_lists_deduplicate_when_lib_in_multiple_manifests():
 
 
 def test_tier_at_scan_defaults_to_unconnected_when_no_cache():
+    """`get_cached_tier` returns the literal "unconnected" when the
+    cache file is absent — the value is deterministic, not a free-tier
+    alias. (Spec §H + upgrade_hint.py:141-152.)"""
     from server import cl_analyze_project
 
     with tempfile.TemporaryDirectory() as tmp:
         parsed = json.loads(cl_analyze_project(tmp))
 
-    assert parsed["_ai_recommended_scope"]["tier_at_scan"] in ("unconnected", "free")
+    assert parsed["_ai_recommended_scope"]["tier_at_scan"] == "unconnected"
 
 
 def test_tier_at_scan_reflects_cached_pro_tier():

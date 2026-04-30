@@ -51,19 +51,19 @@ def questionnaire_two_required_one_optional():
     return {
         "ART9-OBL-1": {
             "prompt": "Has a risk management system been established?",
-            "evidence_min_count": 1,
+            "evidence_min": 1,
             "completion_required": True,
             "evidence_types_allowed": ["repo_file", "text"],
         },
         "ART11-OBL-1": {
             "prompt": "Is technical documentation maintained?",
-            "evidence_min_count": 2,
+            "evidence_min": 2,
             "completion_required": True,
             "evidence_types_allowed": ["repo_file"],
         },
         "ART50-OBL-1": {
             "prompt": "Are users informed of AI interaction (chatbot disclosure)?",
-            "evidence_min_count": 0,
+            "evidence_min": 0,
             "completion_required": False,
             "evidence_types_allowed": [],
         },
@@ -81,7 +81,7 @@ def test_lenient_mode_with_complete_evidence_returns_ok():
     result = enforce_paid_completion(
         questionnaire={
             "ART9-OBL-1": {
-                "evidence_min_count": 1,
+                "evidence_min": 1,
                 "completion_required": True,
             },
         },
@@ -101,7 +101,7 @@ def test_lenient_mode_with_missing_evidence_returns_ok_with_warnings():
     result = enforce_paid_completion(
         questionnaire={
             "ART9-OBL-1": {
-                "evidence_min_count": 1,
+                "evidence_min": 1,
                 "completion_required": True,
             },
         },
@@ -122,7 +122,7 @@ def test_lenient_mode_with_partial_evidence_returns_ok_with_warning():
     result = enforce_paid_completion(
         questionnaire={
             "ART11-OBL-1": {
-                "evidence_min_count": 2,
+                "evidence_min": 2,
                 "completion_required": True,
             },
         },
@@ -140,7 +140,7 @@ def test_default_mode_when_none_passed_is_lenient():
 
     result = enforce_paid_completion(
         questionnaire={
-            "ART9-OBL-1": {"evidence_min_count": 1, "completion_required": True},
+            "ART9-OBL-1": {"evidence_min": 1, "completion_required": True},
         },
         evidence_counts={},
         enforcement_mode=None,
@@ -154,7 +154,7 @@ def test_unknown_mode_string_is_treated_as_lenient():
 
     result = enforce_paid_completion(
         questionnaire={
-            "ART9-OBL-1": {"evidence_min_count": 1, "completion_required": True},
+            "ART9-OBL-1": {"evidence_min": 1, "completion_required": True},
         },
         evidence_counts={},
         enforcement_mode="garbage_unknown_mode",
@@ -172,8 +172,8 @@ def test_strict_mode_with_complete_evidence_returns_ok():
 
     result = enforce_paid_completion(
         questionnaire={
-            "ART9-OBL-1": {"evidence_min_count": 1, "completion_required": True},
-            "ART11-OBL-1": {"evidence_min_count": 2, "completion_required": True},
+            "ART9-OBL-1": {"evidence_min": 1, "completion_required": True},
+            "ART11-OBL-1": {"evidence_min": 2, "completion_required": True},
         },
         evidence_counts={"ART9-OBL-1": 1, "ART11-OBL-1": 5},
         enforcement_mode="strict",
@@ -188,7 +188,7 @@ def test_strict_mode_with_missing_evidence_returns_pending_signal():
 
     result = enforce_paid_completion(
         questionnaire={
-            "ART9-OBL-1": {"evidence_min_count": 1, "completion_required": True},
+            "ART9-OBL-1": {"evidence_min": 1, "completion_required": True},
         },
         evidence_counts={},
         enforcement_mode="strict",
@@ -245,9 +245,9 @@ def test_strict_mode_multiple_pending_oids_all_listed():
 
     result = enforce_paid_completion(
         questionnaire={
-            "ART9-OBL-1": {"evidence_min_count": 1, "completion_required": True},
-            "ART11-OBL-1": {"evidence_min_count": 2, "completion_required": True},
-            "ART15-OBL-1": {"evidence_min_count": 1, "completion_required": True},
+            "ART9-OBL-1": {"evidence_min": 1, "completion_required": True},
+            "ART11-OBL-1": {"evidence_min": 2, "completion_required": True},
+            "ART15-OBL-1": {"evidence_min": 1, "completion_required": True},
         },
         evidence_counts={},
         enforcement_mode="strict",
@@ -298,7 +298,7 @@ def test_oid_missing_completion_required_treated_as_false():
 
     result = enforce_paid_completion(
         questionnaire={
-            "ART9-OBL-1": {"evidence_min_count": 1},  # NO completion_required
+            "ART9-OBL-1": {"evidence_min": 1},  # NO completion_required
         },
         evidence_counts={},
         enforcement_mode="strict",
@@ -306,14 +306,14 @@ def test_oid_missing_completion_required_treated_as_false():
     assert result.status == "ok"
 
 
-def test_oid_missing_evidence_min_count_treated_as_zero():
-    """Schema gap — no evidence_min_count means structural prohibition
+def test_oid_missing_evidence_min_treated_as_zero():
+    """Schema gap — no evidence_min means structural prohibition
     (e.g. Art 5) → 0 required, status stays ok."""
     from core.enforce_paid_completion import enforce_paid_completion
 
     result = enforce_paid_completion(
         questionnaire={
-            "ART5-PROH-1": {"completion_required": True},  # no evidence_min_count
+            "ART5-PROH-1": {"completion_required": True},  # no evidence_min
         },
         evidence_counts={},
         enforcement_mode="strict",
@@ -321,7 +321,7 @@ def test_oid_missing_evidence_min_count_treated_as_zero():
     assert result.status == "ok"
 
 
-def test_evidence_min_count_zero_explicit_no_evidence_required():
+def test_evidence_min_zero_explicit_no_evidence_required():
     """Empty `evidence_types_allowed` + min=0 = prohibition pattern.
     Even completion_required=True must not block when min=0."""
     from core.enforce_paid_completion import enforce_paid_completion
@@ -329,7 +329,7 @@ def test_evidence_min_count_zero_explicit_no_evidence_required():
     result = enforce_paid_completion(
         questionnaire={
             "ART5-PROH-1": {
-                "evidence_min_count": 0,
+                "evidence_min": 0,
                 "completion_required": True,
                 "evidence_types_allowed": [],
             },
@@ -346,7 +346,7 @@ def test_evidence_count_above_min_is_satisfied():
 
     result = enforce_paid_completion(
         questionnaire={
-            "ART9-OBL-1": {"evidence_min_count": 1, "completion_required": True},
+            "ART9-OBL-1": {"evidence_min": 1, "completion_required": True},
         },
         evidence_counts={"ART9-OBL-1": 17},
         enforcement_mode="strict",
@@ -366,7 +366,7 @@ def test_prompt_to_user_is_a_single_short_question():
 
     result = enforce_paid_completion(
         questionnaire={
-            "ART9-OBL-1": {"evidence_min_count": 1, "completion_required": True},
+            "ART9-OBL-1": {"evidence_min": 1, "completion_required": True},
         },
         evidence_counts={},
         enforcement_mode="strict",
@@ -385,7 +385,7 @@ def test_prompt_lists_count_when_multiple_pending():
 
     result = enforce_paid_completion(
         questionnaire={
-            f"ART{n}-OBL-1": {"evidence_min_count": 1, "completion_required": True}
+            f"ART{n}-OBL-1": {"evidence_min": 1, "completion_required": True}
             for n in (8, 9, 10, 11, 12)
         },
         evidence_counts={},
@@ -464,3 +464,75 @@ def test_evidence_counts_from_state_skips_malformed_evidence():
     }
     counts = evidence_counts_from_state(state)
     assert counts == {"ART9-OBL-1": 0, "ART9-OBL-2": 0}
+
+
+# ──────────────────────────────────────────────────────────────────────
+# 6. Cross-system contract — field name MUST match SaaS API output
+# ──────────────────────────────────────────────────────────────────────
+#
+# Self-audit follow-up 2026-04-30: a previous version of this code used
+# `evidence_min_count` as the field name (matching the source-file
+# schema). The SaaS API actually emits `evidence_min` (renamed by the
+# dashboard sync layer). The mismatch made the gate silently dead in
+# production — all unit tests passed because they used the wrong name
+# too. Lock the contract here.
+
+
+def test_contract_field_name_matches_saas_api_shape_evidence_min():
+    """Real-shape questionnaire entry as emitted by SaaS API
+    (questionnaire-builder.ts:98 + bundled questionnaires.json) MUST
+    trigger the gate when evidence_min > on-disk count.
+
+    If a future PR accidentally renames the field, this test fails —
+    NOT silently green like the original Task 12b shipped state.
+    """
+    from core.enforce_paid_completion import enforce_paid_completion
+
+    # Verbatim shape from the bundled SaaS-side questionnaires.json
+    # for ART04-OBL-1 (AI Literacy). Trimmed to the fields scanner reads.
+    saas_api_questionnaire = {
+        "ART04-OBL-1": {
+            "prompt": (
+                "Have AI literacy measures been established for staff and "
+                "other persons operating the AI systems on the provider's "
+                "or deployer's behalf, accounting for training and use "
+                "context?"
+            ),
+            "evidence_min": 2,  # ← CANONICAL field name per API contract
+            "completion_required": True,
+            "expected_answer_type": "bool",
+            "evidence_types_allowed": ["repo_file", "text", "url_reference", "git_path"],
+        },
+    }
+    result = enforce_paid_completion(
+        questionnaire=saas_api_questionnaire,
+        evidence_counts={"ART04-OBL-1": 0},
+        enforcement_mode="strict",
+    )
+    assert result.status == "pending_evidence_needs_sync"
+    assert len(result.pending) == 1
+    assert result.pending[0]["expected"] == 2  # NOT 0 — would mean field-name miss
+    assert result.pending[0]["actual"] == 0
+
+
+def test_contract_field_name_evidence_min_count_is_NOT_read():
+    """Negative regression: the obsolete spec §C0 source-file name
+    `evidence_min_count` must NOT be silently read. If both names
+    appear, only `evidence_min` (the API contract name) wins."""
+    from core.enforce_paid_completion import enforce_paid_completion
+
+    questionnaire_with_old_name_only = {
+        "ART9-OBL-1": {
+            "evidence_min_count": 99,  # OLD name — must be ignored
+            "completion_required": True,
+        },
+    }
+    result = enforce_paid_completion(
+        questionnaire=questionnaire_with_old_name_only,
+        evidence_counts={},
+        enforcement_mode="strict",
+    )
+    # If scanner accidentally reads evidence_min_count, expected=99,
+    # gap fires → status=pending. We expect status=ok because
+    # evidence_min (the contract name) is missing → coerce 0 → no gap.
+    assert result.status == "ok"

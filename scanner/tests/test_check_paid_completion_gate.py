@@ -123,7 +123,7 @@ def test_lenient_mode_with_pending_evidence_returns_none():
 
     ctx = _StubCtx({
         "_saas_questionnaire": {
-            "ART9-OBL-1": {"evidence_min_count": 1, "completion_required": True},
+            "ART9-OBL-1": {"evidence_min": 1, "completion_required": True},
         },
         "_saas_enforcement_mode": "lenient",
     })
@@ -139,7 +139,7 @@ def test_strict_mode_with_complete_evidence_returns_none():
 
     ctx = _StubCtx({
         "_saas_questionnaire": {
-            "ART9-OBL-1": {"evidence_min_count": 1, "completion_required": True},
+            "ART9-OBL-1": {"evidence_min": 1, "completion_required": True},
         },
         "_saas_enforcement_mode": "strict",
     })
@@ -161,7 +161,7 @@ def test_strict_mode_with_missing_evidence_returns_pending_json():
 
     ctx = _StubCtx({
         "_saas_questionnaire": {
-            "ART9-OBL-1": {"evidence_min_count": 1, "completion_required": True},
+            "ART9-OBL-1": {"evidence_min": 1, "completion_required": True},
         },
         "_saas_enforcement_mode": "strict",
     })
@@ -185,8 +185,8 @@ def test_strict_mode_with_partial_evidence_returns_pending_json():
 
     ctx = _StubCtx({
         "_saas_questionnaire": {
-            "ART9-OBL-1": {"evidence_min_count": 1, "completion_required": True},
-            "ART11-OBL-1": {"evidence_min_count": 2, "completion_required": True},
+            "ART9-OBL-1": {"evidence_min": 1, "completion_required": True},
+            "ART11-OBL-1": {"evidence_min": 2, "completion_required": True},
         },
         "_saas_enforcement_mode": "strict",
     })
@@ -219,7 +219,7 @@ def test_load_state_exception_degrades_to_proceed(monkeypatch):
 
     ctx = _StubCtx({
         "_saas_questionnaire": {
-            "ART9-OBL-1": {"evidence_min_count": 1, "completion_required": True},
+            "ART9-OBL-1": {"evidence_min": 1, "completion_required": True},
         },
         "_saas_enforcement_mode": "strict",
     })
@@ -237,7 +237,7 @@ def test_strict_mode_default_when_mode_missing_in_scope():
 
     ctx = _StubCtx({
         "_saas_questionnaire": {
-            "ART9-OBL-1": {"evidence_min_count": 1, "completion_required": True},
+            "ART9-OBL-1": {"evidence_min": 1, "completion_required": True},
         },
         # _saas_enforcement_mode INTENTIONALLY omitted
     })
@@ -255,7 +255,7 @@ def test_optional_oids_not_blocking_in_strict_mode():
 
     ctx = _StubCtx({
         "_saas_questionnaire": {
-            "ART50-OBL-1": {"evidence_min_count": 1, "completion_required": False},
+            "ART50-OBL-1": {"evidence_min": 1, "completion_required": False},
         },
         "_saas_enforcement_mode": "strict",
     })

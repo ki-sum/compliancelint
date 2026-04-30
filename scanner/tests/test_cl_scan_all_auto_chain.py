@@ -101,17 +101,19 @@ def test_empty_project_context_does_NOT_return_legacy_error_shape():
 
 def test_invalid_project_path_still_hard_errors():
     """Auto-chain only kicks in on missing context. Bad path is a
-    different failure that user can't fix via cl_analyze_project."""
+    different failure that user can't fix via cl_analyze_project.
+
+    Path validation runs BEFORE the context check, so the response
+    is the legacy 'Directory not found' hard error — deterministic.
+    No need to accept the auto-chain shape here."""
     from server import cl_scan_all
 
     raw = cl_scan_all("/nonexistent/path/that/does/not/exist", project_context="")
     parsed = json.loads(raw)
 
-    # Path validation runs BEFORE the context check, so this is the
-    # legacy "Directory not found" hard error — still acceptable
-    # because re-running analyze won't fix the bad path.
-    assert "error" in parsed or parsed.get("status") == "needs_analysis_first"
-    # Either shape is OK; the regression we guard is "doesn't crash".
+    assert "error" in parsed
+    assert "not found" in parsed["error"].lower() or "directory" in parsed["error"].lower()
+    assert parsed.get("status") != "needs_analysis_first"
 
 
 def test_malformed_project_context_json_still_hard_errors():
