@@ -332,8 +332,10 @@ not our SaaS. Five architectural commitments:
 
 The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard is freemium:
 
-| | Free | Starter (€19/mo) | Pro (€99/mo) | Business (€199/mo) | Enterprise |
-|-|------|------------------|--------------|--------------------|------------|
+| | Free | Starter | Pro | Business | Enterprise |
+|-|------|---------|-----|----------|------------|
+| **Monthly** | €0 forever | €19/mo | €99/mo | €199/mo | Custom |
+| **Annual (per-month rate · billed yearly)** | — | €19/mo · €228/yr | €79/mo · €948/yr | €149/mo · €1,788/yr | — |
 | Projects | 1 | 2 | 10 | Unlimited | Unlimited |
 | Scan history | 7 days | Unlimited | Unlimited | Unlimited | Unlimited |
 | PDF reports | Watermarked | Clean | Clean | Clean | Clean |
