@@ -131,18 +131,42 @@ def test_interim_standard_anti_official_signal_for_multiple_articles(
     """The top-level non-official signal MUST appear for every article
     that has an interim-standard.json file. If we ever ship an
     article without the top-level fields, AI consumers may treat it
-    as official."""
+    as official.
+
+    Strictness contract (post 2026-04-30 self-audit): art9 / art12 /
+    art14 all have committed interim-standard.json files. If one
+    goes missing this test must FAIL, not silently skip — silent
+    skip would let a regression (deleted/moved interim standard)
+    pass CI unnoticed."""
     from server import cl_interim_standard
+
+    # Hard pre-condition: the on-disk file MUST exist for these three
+    # articles. If a future cleanup deletes them, fail loud here so
+    # we can either restore the file or remove the article from this
+    # parametrize list with explicit reason.
+    standard_path = os.path.join(
+        SCANNER_ROOT,
+        "modules",
+        {
+            9: "art09-risk-management",
+            12: "art12-record-keeping",
+            14: "art14-human-oversight",
+        }[article_number],
+        "interim-standard.json",
+    )
+    assert os.path.exists(standard_path), (
+        f"Interim standard file missing for art{article_number}: "
+        f"{standard_path}. Either restore the file or remove this "
+        f"article from the parametrize list with a recorded reason."
+    )
 
     raw = cl_interim_standard(article_number)
     decoder = json.JSONDecoder()
     obj, _ = decoder.raw_decode(raw)
-    if "error" in obj:
-        # Some articles may not have interim-standard.json yet —
-        # that's OK; the test only applies when the standard exists.
-        pytest.skip(
-            f"Article {article_number} has no interim standard yet"
-        )
+    assert "error" not in obj, (
+        f"cl_interim_standard({article_number}) returned error despite "
+        f"on-disk file existing at {standard_path}: {obj.get('error')!r}"
+    )
     assert obj.get("is_official_standard") is False
     assert obj.get("non_official_banner")
 

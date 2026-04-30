@@ -88,7 +88,14 @@ def test_explain_verbatim_obligations_contain_source_quote():
 
 def test_explain_verbatim_obligations_match_committed_json():
     """The verbatim_obligations text MUST match the obligation JSON
-    on disk byte-for-byte — guard against any AI inference / drift."""
+    on disk byte-for-byte — guard against any AI inference / drift.
+
+    Strictness contract (post 2026-04-30 self-audit):
+      - every OID in payload['verbatim_obligations'] MUST be present
+        in art12-record-keeping.json (no foreign OIDs leaking in)
+      - source_quote MUST match byte-for-byte
+      - count MUST match (no entries silently dropped or duplicated)
+    """
     payload = _explain(12)
 
     # Load canonical art12 obligations
@@ -101,19 +108,33 @@ def test_explain_verbatim_obligations_match_committed_json():
         ob["id"]: ob["source_quote"] for ob in canonical["obligations"]
     }
 
+    payload_oids = [ob["id"] for ob in payload["verbatim_obligations"]]
+    # Strict count match — guards against drop / duplication regressions.
+    assert len(payload_oids) == len(canonical_by_id), (
+        f"verbatim_obligations count mismatch: payload has "
+        f"{len(payload_oids)} entries, art12 JSON has "
+        f"{len(canonical_by_id)}. Difference: "
+        f"payload-only={set(payload_oids) - set(canonical_by_id)}, "
+        f"json-only={set(canonical_by_id) - set(payload_oids)}"
+    )
+
     for ob in payload["verbatim_obligations"]:
         oid = ob["id"]
-        # Some obligations in art12 are cross-references (e.g. ART19-OBL-1b);
-        # they're loaded into art12 but the canonical lives in art19.
-        # For the article-12 explain endpoint we expect the cross-ref
-        # entries to be in art12's JSON.
-        if oid in canonical_by_id:
-            assert ob["source_quote"] == canonical_by_id[oid], (
-                f"Drift detected for {oid}: cl_explain returned\n"
-                f"  {ob['source_quote']!r}\n"
-                f"but art12-record-keeping.json has\n"
-                f"  {canonical_by_id[oid]!r}"
-            )
+        # Strict membership — every payload OID MUST come from art12's
+        # canonical JSON. If obligations_for_article ever leaked a
+        # foreign-article OID into the article-12 result, this fires.
+        assert oid in canonical_by_id, (
+            f"verbatim_obligations contains foreign OID {oid!r} not "
+            f"present in art12-record-keeping.json. "
+            f"obligations_for_article(12) leaked an entry from "
+            f"another article's JSON."
+        )
+        assert ob["source_quote"] == canonical_by_id[oid], (
+            f"Drift detected for {oid}: cl_explain returned\n"
+            f"  {ob['source_quote']!r}\n"
+            f"but art12-record-keeping.json has\n"
+            f"  {canonical_by_id[oid]!r}"
+        )
 
 
 # ──────────────────────────────────────────────────────────────────────
