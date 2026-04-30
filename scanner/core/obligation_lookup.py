@@ -179,6 +179,78 @@ def loaded_oid_count() -> int:
 # ──────────────────────────────────────────────────────────────────────
 
 
+def obligations_for_article(article_number: int) -> list[dict]:
+    """Return the list of obligation rows for a given article.
+
+    Used by `cl_explain` to surface verbatim source_quote for every
+    obligation in the article — anti-hallucination by reference. The
+    consumer (AI agent) reads the verbatim text instead of trusting
+    our paraphrased prose summary.
+
+    Lookup walks ALL committed obligation JSONs and filters by
+    `_metadata.article == article_number`. Cross-reference rows
+    (e.g. ART19-OBL-1b mirrored into art12) appear under EVERY
+    article that hosts them — we want this duplication when
+    explaining art12 (because Art. 12 logging extends through
+    Art. 19 retention) but cl_explain callers only ask for one
+    article at a time.
+
+    Returns [] when the article has no obligation JSON on disk.
+    """
+    obligations_dir = _obligations_dir()
+    if not os.path.isdir(obligations_dir):
+        return []
+
+    out: list[dict] = []
+    for fname in sorted(os.listdir(obligations_dir)):
+        if not fname.endswith(".json") or not fname.startswith("art"):
+            continue
+        fpath = os.path.join(obligations_dir, fname)
+        try:
+            with open(fpath, "r", encoding="utf-8") as f:
+                data = json.load(f)
+        except (OSError, json.JSONDecodeError):
+            continue
+        if not isinstance(data, dict):
+            continue
+        meta = data.get("_metadata") or {}
+        if meta.get("article") != article_number:
+            continue
+        rows = data.get("obligations")
+        if not isinstance(rows, list):
+            continue
+        for row in rows:
+            if not isinstance(row, dict):
+                continue
+            oid = row.get("id")
+            if not isinstance(oid, str) or not oid:
+                continue
+            out.append({
+                "id": oid,
+                "source": str(row.get("source", "")),
+                "source_quote": str(row.get("source_quote", "")),
+                "addressee": str(row.get("addressee", "")),
+                "deontic_type": str(row.get("deontic_type", "")),
+            })
+    return out
+
+
+def eur_lex_url_for_article(article_number: int) -> str:
+    """Return the canonical EUR-Lex URL for the article — anchored at
+    the article fragment so the AI consumer lands at the right
+    paragraph.
+
+    Format follows EUR-Lex's stable CELEX URL pattern for the EU AI
+    Act consolidated text (Regulation 2024/1689). The fragment
+    `#art_N` is the official anchor naming convention used by
+    eur-lex.europa.eu.
+    """
+    return (
+        f"https://eur-lex.europa.eu/legal-content/EN/TXT/"
+        f"?uri=CELEX:32024R1689#art_{article_number}"
+    )
+
+
 def extract_action_guide_fields(row: dict) -> dict:
     """Pull the cl_action_guide-relevant fields from an obligation
     row. Defensive against missing/malformed sub-fields — never throws.

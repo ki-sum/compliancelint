@@ -796,7 +796,35 @@ def cl_explain(regulation: str = "eu-ai-act", article: int = 0) -> str:
     _ensure_module_loaded(article)
     if article in _modules:
         explanation = _modules[article].explain()
-        return append_upgrade_hint(explanation.to_json(), "cl_explain")
+        # Q1 anti-hallucination enrichment: pull the article's verbatim
+        # obligation atoms from the committed JSON + a direct EUR-Lex
+        # URL + an explicit disclaimer telling the AI consumer the
+        # prose summary fields are paraphrased and the verbatim law
+        # text lives in `verbatim_obligations`. Without these fields,
+        # an AI agent reading cl_explain output cannot distinguish our
+        # summary from the regulation itself and may amplify paraphrase
+        # drift across multiple AI hops.
+        from core.obligation_lookup import (
+            obligations_for_article,
+            eur_lex_url_for_article,
+        )
+        payload = explanation.to_dict()
+        payload["verbatim_obligations"] = obligations_for_article(article)
+        payload["eur_lex_official_url"] = eur_lex_url_for_article(article)
+        payload["disclaimer"] = (
+            "Prose fields (one_sentence, official_summary, recital, "
+            "compliance_checklist_summary) are ComplianceLint's "
+            "paraphrased summary, NOT verbatim regulation text. The "
+            "verbatim EU AI Act text — character-for-character from "
+            "EUR-Lex — is in the `verbatim_obligations` array (each "
+            "entry's `source_quote` field). Use `verbatim_obligations` "
+            "as the ground truth when quoting the regulation; consult "
+            "`eur_lex_official_url` for the canonical PDF."
+        )
+        return append_upgrade_hint(
+            json.dumps(payload, indent=2, ensure_ascii=False),
+            "cl_explain",
+        )
     return append_upgrade_hint(
         json.dumps({
             "error": f"Article {article} explanation not yet available.",
@@ -1488,18 +1516,54 @@ def cl_check_updates() -> str:
 def cl_interim_standard(article_number: int) -> str:  # Tool name kept for backward compat
     """Show the ComplianceLint compliance checklist for a specific article.
 
-    Interim standards fill the gap where official CEN-CENELEC standards
-    don't exist yet. They are clearly marked as non-official and will be
-    updated when official standards are published.
+    ⚠️  This is ComplianceLint's INTERIM checklist — NOT an EU / ISO /
+    CEN-CENELEC official standard. It fills the gap until official
+    harmonized standards are published. The output payload includes
+    a top-level `is_official_standard: false` flag and a
+    `non_official_banner` so AI consumers do not mistake this for
+    binding legal text.
 
     Args:
         article_number: The article number (e.g., 12 for Article 12).
     """
+    _ensure_module_loaded(article_number)
     if article_number in _modules:
         standard = _modules[article_number].compliance_checklist()
         if standard:
+            # Q2 anti-misinterpretation enrichment: surface the
+            # "not official" signal at the TOP LEVEL of the payload,
+            # not buried inside _metadata.disclaimer. AI consumers
+            # often quote top-level fields as authoritative; we must
+            # make the non-official status impossible to miss.
+            md = standard.get("_metadata", {}) if isinstance(standard, dict) else {}
+            awaiting = ""
+            if isinstance(md, dict):
+                awaiting = str(md.get("awaiting_standard", "") or "")
+
+            enriched = {
+                "is_official_standard": False,
+                "non_official_banner": (
+                    "⚠️ This is ComplianceLint's INTERIM compliance "
+                    "checklist for the EU AI Act. It is NOT an "
+                    "official EU / ISO / CEN-CENELEC standard and "
+                    "carries no binding legal authority. Use it as a "
+                    "practical implementation guide; consult the "
+                    "official Regulation (EU) 2024/1689 text for "
+                    "binding requirements."
+                ),
+                "superseded_when": (
+                    awaiting
+                    or "An official harmonized standard has not been "
+                    "announced for this article yet."
+                ),
+            }
+            # Merge: new top-level fields first so they appear at the
+            # head of the JSON, then existing payload (which keeps
+            # _metadata.disclaimer for redundancy).
+            if isinstance(standard, dict):
+                enriched.update(standard)
             return append_upgrade_hint(
-                json.dumps(standard, indent=2, ensure_ascii=False),
+                json.dumps(enriched, indent=2, ensure_ascii=False),
                 "cl_interim_standard",
             )
         return append_upgrade_hint(
