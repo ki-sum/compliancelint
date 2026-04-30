@@ -34,6 +34,11 @@ from core.protocol import BaseArticleModule, ScanResult
 from core.config import ProjectConfig
 from core.evidence import load_evidence, apply_evidence_to_findings
 from core.error_response import dump_error
+from core.upgrade_hint import (
+    append_upgrade_hint,
+    cache_tier,
+    get_cached_tier,
+)
 
 mcp = FastMCP("compliancelint")
 
@@ -251,14 +256,13 @@ def cl_analyze_project(project_path: str) -> str:
     # summary and ask for confirmation BEFORE chaining cl_scan_all.
     # Spec §H.
     from core.ai_recommended_scope import build_ai_recommended_scope
-    from core.upgrade_hint import append_upgrade_hint as _append_hint, get_cached_tier
 
     metadata["_ai_recommended_scope"] = build_ai_recommended_scope(
         metadata,
         tier_at_scan=get_cached_tier(project_path),
     )
 
-    return _append_hint(
+    return append_upgrade_hint(
         json.dumps(metadata, indent=2, ensure_ascii=False),
         "cl_analyze_project",
         project_path=project_path,
@@ -724,8 +728,7 @@ def cl_scan(
     else:
         output += _build_post_scan_hint(project_path)
 
-    from core.upgrade_hint import append_upgrade_hint as _append_hint
-    return _append_hint(output, "cl_scan", project_path=project_path)
+    return append_upgrade_hint(output, "cl_scan", project_path=project_path)
 
 
 @mcp.tool()
@@ -749,11 +752,10 @@ def cl_explain(regulation: str = "eu-ai-act", article: int = 0) -> str:
             details="Supported: ['eu-ai-act']. Additional regulations are on the roadmap.",
         )
     _ensure_module_loaded(article)
-    from core.upgrade_hint import append_upgrade_hint as _append_hint
     if article in _modules:
         explanation = _modules[article].explain()
-        return _append_hint(explanation.to_json(), "cl_explain")
-    return _append_hint(
+        return append_upgrade_hint(explanation.to_json(), "cl_explain")
+    return append_upgrade_hint(
         json.dumps({
             "error": f"Article {article} explanation not yet available.",
             "fix": f"Available articles: {sorted(_modules.keys())}.",
@@ -1173,15 +1175,11 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
     # Phase 5 Task 15 — cross-AI-client paywall hint footer.
     # Cache fresh tier from this scan's SaaS response if available,
     # otherwise append based on previously cached tier.
-    from core.upgrade_hint import (
-        append_upgrade_hint as _append_hint,
-        cache_tier as _cache_tier,
-    )
     _scope = ctx.compliance_answers.get("_scope", {}) if isinstance(ctx.compliance_answers, dict) else {}
     _tier_now = _scope.get("_tier_to_cache")
     if _tier_now:
-        _cache_tier(project_path, _tier_now)
-    output = _append_hint(output, "cl_scan_all", project_path=project_path, tier=_tier_now)
+        cache_tier(project_path, _tier_now)
+    output = append_upgrade_hint(output, "cl_scan_all", project_path=project_path, tier=_tier_now)
     return output
 
 
@@ -1202,9 +1200,8 @@ def cl_action_guide(obligation_id: str) -> str:
     import re
 
     # Validate obligation ID format
-    from core.upgrade_hint import append_upgrade_hint as _append_hint_v
     if not re.match(r"^ART\d+-OBL-\d+", obligation_id.upper()):
-        return _append_hint_v(
+        return append_upgrade_hint(
             json.dumps({
                 "error": f"Invalid obligation ID format: {obligation_id}",
                 "fix": "Use format like ART26-OBL-2",
@@ -1226,8 +1223,7 @@ def cl_action_guide(obligation_id: str) -> str:
     title = HUMAN_GATES.get(obl_id, f"Obligation {obl_id}")
     is_known_gate = obl_id in HUMAN_GATES
 
-    from core.upgrade_hint import append_upgrade_hint as _append_hint
-    return _append_hint(
+    return append_upgrade_hint(
         json.dumps({
             "obligation_id": obl_id,
             "title": title,
@@ -1333,8 +1329,7 @@ def cl_action_plan(project_path: str, regulation: str = "eu-ai-act", article: in
             "Official CEN-CENELEC standards (expected Q4 2026) may modify these requirements."
         ),
     }
-    from core.upgrade_hint import append_upgrade_hint as _append_hint
-    return _append_hint(
+    return append_upgrade_hint(
         json.dumps(combined_plan, indent=2, ensure_ascii=False, default=str),
         "cl_action_plan",
         project_path=project_path,
@@ -1348,7 +1343,6 @@ def cl_check_updates() -> str:
     Returns the current status of relevant standards and upcoming deadlines.
     """
     from datetime import date
-    from core.upgrade_hint import append_upgrade_hint as _append_hint
     days_remaining = (date(2026, 8, 2) - date.today()).days
 
     _check_updates_response = json.dumps({
@@ -1399,7 +1393,7 @@ def cl_check_updates() -> str:
         "note": "Regulation tracking will be automated in future versions.",
         "scanner_update": _check_latest_version(),
     }, indent=2)
-    return _append_hint(_check_updates_response, "cl_check_updates")
+    return append_upgrade_hint(_check_updates_response, "cl_check_updates")
 
 
 @mcp.tool()
@@ -1413,15 +1407,14 @@ def cl_interim_standard(article_number: int) -> str:  # Tool name kept for backw
     Args:
         article_number: The article number (e.g., 12 for Article 12).
     """
-    from core.upgrade_hint import append_upgrade_hint as _append_hint
     if article_number in _modules:
         standard = _modules[article_number].compliance_checklist()
         if standard:
-            return _append_hint(
+            return append_upgrade_hint(
                 json.dumps(standard, indent=2, ensure_ascii=False),
                 "cl_interim_standard",
             )
-        return _append_hint(
+        return append_upgrade_hint(
             json.dumps({
                 "error": f"No compliance checklist file found for Article {article_number}.",
                 "fix": "This article's module exists but the checklist is not yet available.",
@@ -1430,7 +1423,7 @@ def cl_interim_standard(article_number: int) -> str:  # Tool name kept for backw
             "cl_interim_standard",
         )
 
-    return _append_hint(
+    return append_upgrade_hint(
         json.dumps({
             "error": f"No module available for Article {article_number}.",
             "fix": f"Available articles: {sorted(_modules.keys())}.",
@@ -1775,8 +1768,7 @@ def cl_verify_evidence(project_path: str) -> str:
         "flag the second-class durability/provenance caveat in your report."
     )
 
-    from core.upgrade_hint import append_upgrade_hint as _append_hint
-    return _append_hint(
+    return append_upgrade_hint(
         json.dumps(summary, indent=2, ensure_ascii=False),
         "cl_verify_evidence",
         project_path=project_path,
