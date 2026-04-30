@@ -447,19 +447,45 @@ def _check_paid_completion_gate(ctx, project_path: str):
 
     enforcement_mode = scope.get("_saas_enforcement_mode") or "lenient"
 
-    try:
-        from core.state import load_state
-        from core.enforce_paid_completion import (
-            enforce_paid_completion,
-            evidence_counts_from_state,
-        )
+    from core.state import load_state
+    from core.enforce_paid_completion import (
+        enforce_paid_completion,
+        evidence_counts_from_state,
+    )
 
+    # Distinguish two failure modes (B4 self-audit follow-up 2026-04-30):
+    #   1. "No articles dir" — load_state internally returns empty state
+    #      (no exception). This is legitimate zero state for never-scanned
+    #      projects; gate runs with empty counts. No warning.
+    #   2. "Articles dir EXISTS but read fails" — listdir raises (perm
+    #      denied / disk error / corruption). load_state's per-file
+    #      try/except can't shield this; it bubbles to here.
+    #
+    # The 2nd path used to log at WARNING + return None silently. Customers
+    # who shipped under "strict mode" would have their gate bypassed
+    # without any visible signal in scan output — regulator audit risk.
+    # Fix: log at ERROR with traceback AND mutate scope so cl_scan_all
+    # surfaces the warning to the user. Still proceed (legal-asymmetry
+    # safe — over-blocking is also a harm).
+    try:
         state = load_state(project_path)
         evidence_counts = evidence_counts_from_state(state)
     except Exception as e:
-        logger.warning(
-            "paid completion gate: state load failed (%s) — degrading to proceed",
+        logger.error(
+            "paid completion gate: state load failed (%s: %s) — gate "
+            "would silently bypass without surfacing. Articles dir "
+            "likely corrupted or unreadable. cl_scan_all will surface "
+            "to user via _paid_gate_state_load_warning in scope.",
+            type(e).__name__,
             e,
+            exc_info=True,
+        )
+        scope["_paid_gate_state_load_warning"] = (
+            f"Paid completion gate could not read evidence state "
+            f"({type(e).__name__}: {e}). Scan proceeded but the gate "
+            f"was bypassed — strict-mode enforcement was effectively "
+            f"disabled for this scan. Check filesystem permissions on "
+            f".compliancelint/local/articles and re-run."
         )
         return None
 
@@ -671,7 +697,13 @@ def cl_scan(
                 logger.debug("Auto-sync after scan failed: %s", e)
         else:
             output += _build_post_scan_hint(project_path)
-        return output
+        # B3 self-audit follow-up 2026-04-30 — single-article path
+        # was silently bypassing the upgrade_hint wrap. The
+        # multi-article path below DOES wrap. AST static contract
+        # only verified "function calls append_upgrade_hint somewhere",
+        # not "every return path wraps". This is the kind of
+        # regression that motivated writing the runtime e2e tests.
+        return append_upgrade_hint(output, "cl_scan", project_path=project_path)
 
     # Multiple articles → scan each, persist full results to state,
     # but return compact summaries to stay within MCP response limits.
@@ -1094,6 +1126,14 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
                 "Boolean fields must be true/false/null, not strings."
             ) if gate.coerce_log else None,
         } if gate else {},
+        # B4 self-audit follow-up 2026-04-30 — surface paid completion
+        # gate's state-load failures so customers don't ship "strict
+        # mode passed" claims when the gate actually bypassed silently.
+        # Set by _check_paid_completion_gate when load_state raises.
+        "paid_gate_warning": (
+            ctx.compliance_answers.get("_scope", {}).get("_paid_gate_state_load_warning")
+            if ctx else None
+        ),
         "results": results,
         "next_steps": (
             "IMPORTANT: Do not stop here. Your job is to help the user reach full compliance.\n\n"

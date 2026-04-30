@@ -210,6 +210,250 @@ def test_unwrapped_tool_does_not_call_append_upgrade_hint(tool_name, mcp_tools):
 # ──────────────────────────────────────────────────────────────────────
 
 
+def _is_wrapped_return(return_node: ast.Return) -> bool | None:
+    """Return True if the Return statement is `return append_upgrade_hint(...)`,
+    False if it returns something else, None if it has no value (bare return).
+
+    Only direct wrap counts — `return some_var` doesn't, even if `some_var`
+    was assigned from append_upgrade_hint earlier (we can't statically prove
+    that)."""
+    if return_node.value is None:
+        return None
+    if not isinstance(return_node.value, ast.Call):
+        return False
+    func = return_node.value.func
+    if isinstance(func, ast.Name) and func.id == "append_upgrade_hint":
+        return True
+    if isinstance(func, ast.Attribute) and func.attr == "append_upgrade_hint":
+        return True
+    return False
+
+
+def _direct_returns_in_body(node: ast.AST) -> list[ast.Return]:
+    """Collect Return statements that belong DIRECTLY to the given
+    function — including those inside if/try/while/for blocks, but
+    NOT inside nested function defs (which have their own wrap rules
+    or are private helpers like cl_scan_all's _scan_one).
+
+    Walks the body iteratively, descending into control-flow nodes
+    but stopping at FunctionDef / AsyncFunctionDef boundaries."""
+    returns: list[ast.Return] = []
+
+    def _walk(n: ast.AST) -> None:
+        for child in ast.iter_child_nodes(n):
+            if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                # Don't descend — nested helper has its own contract
+                continue
+            if isinstance(child, ast.Return):
+                returns.append(child)
+            _walk(child)
+
+    _walk(node)
+    return returns
+
+
+def _vars_assigned_from_wrap(node: ast.AST) -> set[str]:
+    """Find variable names assigned from append_upgrade_hint(...) calls
+    in this function body (top-level, not nested defs). Used so
+    `return some_var` is accepted when `some_var = append_upgrade_hint(...)`
+    earlier in the function — common pattern for cl_scan_all that
+    wraps then returns the variable later."""
+    names: set[str] = set()
+
+    def _walk(n: ast.AST) -> None:
+        for child in ast.iter_child_nodes(n):
+            if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                continue
+            if isinstance(child, ast.Assign):
+                if (
+                    isinstance(child.value, ast.Call)
+                    and isinstance(child.value.func, ast.Name)
+                    and child.value.func.id == "append_upgrade_hint"
+                ):
+                    for target in child.targets:
+                        if isinstance(target, ast.Name):
+                            names.add(target.id)
+            elif isinstance(child, ast.AugAssign):
+                # `output += ...` doesn't create a new wrap binding
+                pass
+            _walk(child)
+
+    _walk(node)
+    return names
+
+
+def _is_delegating_return(return_node: ast.Return, mcp_tools: dict) -> bool:
+    """`return some_other_mcp_tool(...)` is acceptable when the called
+    function is itself in the WRAPPED_TOOLS set (which we verify
+    independently). The delegated tool wraps internally."""
+    val = return_node.value
+    if not isinstance(val, ast.Call):
+        return False
+    func = val.func
+    if isinstance(func, ast.Name) and func.id in mcp_tools and func.id in WRAPPED_TOOLS:
+        return True
+    return False
+
+
+def _looks_like_error_path(return_node: ast.Return) -> bool:
+    """Heuristic: a return whose value is a `dump_error(...)` call OR a
+    `json.dumps({...})` containing one of these markers is an
+    error/empty-state/AI-first-prompt path that should NOT wrap with
+    upgrade_hint. Spec §H + Phase 5 Task 15:
+      - error paths: no value in nudging users on errors
+      - AI-first prompts: that JSON IS the prompt, double-wrapping
+        would corrupt the AI client handler
+      - empty-state guidance: "no evidence file found, here's what to
+        create" — adding paywall nudge is annoying when user just
+        hasn't set up yet
+
+    Markers (any of):
+      - `error` key (error response)
+      - `status` key with value in {needs_analysis_first,
+        pending_evidence_needs_sync, blocked_strict, ok_with_warning}
+        (AI-first prompt shapes)
+      - `found: False` (empty-state — convention from
+        cl_verify_evidence "no compliance-evidence.json yet")
+      - `fix` + `schema_example` keys (instructional empty-state)
+    """
+    val = return_node.value
+    if val is None:
+        return False
+    if isinstance(val, ast.Call):
+        func = val.func
+        if isinstance(func, ast.Name) and func.id == "dump_error":
+            return True
+        if (
+            isinstance(func, ast.Attribute)
+            and func.attr == "dumps"
+            and isinstance(func.value, ast.Name)
+            and func.value.id == "json"
+        ):
+            if val.args and isinstance(val.args[0], ast.Dict):
+                d = val.args[0]
+                key_names: set[str] = set()
+                for k, v in zip(d.keys, d.values):
+                    if isinstance(k, ast.Constant) and isinstance(k.value, str):
+                        key_names.add(k.value)
+                        if k.value == "error":
+                            return True
+                        if (
+                            k.value == "status"
+                            and isinstance(v, ast.Constant)
+                            and isinstance(v.value, str)
+                            and v.value
+                            in {
+                                "needs_analysis_first",
+                                "pending_evidence_needs_sync",
+                                "blocked_strict",
+                                "ok_with_warning",
+                            }
+                        ):
+                            return True
+                        if (
+                            k.value == "found"
+                            and isinstance(v, ast.Constant)
+                            and v.value is False
+                        ):
+                            return True
+                # `fix` + `schema_example` = instructional empty-state
+                if "fix" in key_names and "schema_example" in key_names:
+                    return True
+    return False
+
+
+@pytest.mark.parametrize("tool_name", sorted(WRAPPED_TOOLS))
+def test_wrapped_tool_every_non_error_return_path_is_wrapped(tool_name, mcp_tools):
+    """Stronger contract than test_wrapped_tool_calls_append_upgrade_hint:
+    verifies EVERY non-error return path in the function body wraps
+    with append_upgrade_hint. Catches the cl_scan single-article
+    regression class (2026-04-30 self-audit B3): one return path
+    silently bypasses the wrap → paying customers don't see the
+    paywall hint they should.
+
+    Acceptable unwrapped returns:
+      - Bare `return` (no value)
+      - `return dump_error(...)` — error path
+      - `return json.dumps({"error": ...})` — error JSON
+      - `return json.dumps({"status": "needs_analysis_first"|...})` —
+        AI-first prompt shape (Spec §H — that JSON IS the prompt,
+        not a tool output to nudge on)
+      - `return None`
+      - `return some_var` where `some_var = append_upgrade_hint(...)`
+        was assigned earlier in the body (common cl_scan_all pattern)
+      - `return another_wrapped_mcp_tool(...)` — delegation; the
+        delegate's own wrap fires
+      - `return early_return_var` where the variable was assigned
+        from a side-channel (e.g. `paid_gate = _check_...gate(...)`
+        which itself returns wrapped JSON or None — accepted
+        heuristically)
+
+    Returns inside NESTED function definitions are skipped (they're
+    helpers like cl_scan_all's _scan_one with their own contracts).
+    """
+    func = mcp_tools[tool_name]
+    returns = _direct_returns_in_body(func)
+    wrap_assigned_vars = _vars_assigned_from_wrap(func)
+
+    # Side-channel vars: assigned from gate helpers that themselves
+    # return either None (proceed) or wrapped JSON (early-return).
+    # The early-return is itself the user-facing payload — wrapping
+    # it again would double-inject _meta.
+    GATE_HELPERS = frozenset({"_check_paid_completion_gate"})
+
+    side_channel_vars: set[str] = set()
+
+    def _collect_side_channel(n: ast.AST) -> None:
+        for child in ast.iter_child_nodes(n):
+            if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                continue
+            if isinstance(child, ast.Assign):
+                if (
+                    isinstance(child.value, ast.Call)
+                    and isinstance(child.value.func, ast.Name)
+                    and child.value.func.id in GATE_HELPERS
+                ):
+                    for target in child.targets:
+                        if isinstance(target, ast.Name):
+                            side_channel_vars.add(target.id)
+            _collect_side_channel(child)
+
+    _collect_side_channel(func)
+
+    unwrapped: list[tuple[int, str]] = []
+    for r in returns:
+        wrapped = _is_wrapped_return(r)
+        if wrapped is True:
+            continue
+        if wrapped is None:
+            continue
+        if _looks_like_error_path(r):
+            continue
+        if isinstance(r.value, ast.Constant) and r.value.value is None:
+            continue
+        # `return some_var` where some_var is assigned from a wrap call
+        if isinstance(r.value, ast.Name):
+            if r.value.id in wrap_assigned_vars:
+                continue
+            if r.value.id in side_channel_vars:
+                continue
+        # Delegation to another wrapped MCP tool
+        if _is_delegating_return(r, mcp_tools):
+            continue
+        unwrapped.append(
+            (r.lineno, ast.unparse(r) if hasattr(ast, "unparse") else str(r.lineno))
+        )
+
+    assert unwrapped == [], (
+        f"{tool_name} has {len(unwrapped)} non-error return path(s) "
+        f"that don't wrap with append_upgrade_hint:\n"
+        + "\n".join(f"  line {ln}: {src}" for ln, src in unwrapped)
+        + "\n\nEvery user-visible return MUST go through "
+        "append_upgrade_hint(...) so paid-feature paywall hints fire "
+        "for unconnected/free tier users. Spec §H + Phase 5 Task 15."
+    )
+
+
 def test_no_inline_upgrade_hint_imports_inside_functions():
     """After the 2026-04-30 hoist, the only `from core.upgrade_hint
     import` statement should be at module level. Any inline import
