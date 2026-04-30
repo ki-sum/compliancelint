@@ -245,7 +245,19 @@ def cl_analyze_project(project_path: str) -> str:
         return dump_error(f"Directory not found: {project_path}")
 
     metadata = analyze_project_metadata(project_path)
-    from core.upgrade_hint import append_upgrade_hint as _append_hint
+
+    # Phase 6 Task 16 — AI-first onboarding scaffolding. Adds
+    # `_ai_recommended_scope` so AI clients can render a user-facing
+    # summary and ask for confirmation BEFORE chaining cl_scan_all.
+    # Spec §H.
+    from core.ai_recommended_scope import build_ai_recommended_scope
+    from core.upgrade_hint import append_upgrade_hint as _append_hint, get_cached_tier
+
+    metadata["_ai_recommended_scope"] = build_ai_recommended_scope(
+        metadata,
+        tier_at_scan=get_cached_tier(project_path),
+    )
+
     return _append_hint(
         json.dumps(metadata, indent=2, ensure_ascii=False),
         "cl_analyze_project",
@@ -788,16 +800,23 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
         from core.state import save_metadata
         save_metadata(project_path, ai_provider=ai_provider)
 
-    # Parse project context — required for scanning
+    # Phase 6 Task 16 — AI-first onboarding for missing project_context.
+    # Old behavior was a hostile hard error ("Cannot scan: project_context
+    # is required..."). New behavior returns the same structured-prompt
+    # JSON shape as Task 12b's pending_evidence so AI clients can chain
+    # cl_analyze_project → cl_scan_all without surfacing the error to
+    # the user. Spec §H.
     if not project_context:
-        return dump_error(
-            (
-                "project_context is required. Call cl_analyze_project() first, "
-                "read the output, add your own understanding, then pass the enriched "
-                "JSON to cl_scan_all()."
+        return json.dumps({
+            "status": "needs_analysis_first",
+            "prompt_to_user": (
+                "I need to analyze the project structure before scanning. "
+                "Want me to run cl_analyze_project to detect frameworks "
+                "and AI libraries first?"
             ),
-            fix="Call cl_analyze_project() first, then pass its output as project_context.",
-        )
+            "auto_action_on_yes": "cl_analyze_project",
+            "then_continue": "cl_scan_all",
+        })
     try:
         ctx = ProjectContext.from_json(project_context)
     except (json.JSONDecodeError, TypeError) as e:
