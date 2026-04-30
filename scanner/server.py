@@ -406,6 +406,71 @@ def _apply_saas_settings_to_scope(scope: dict, saas_settings: dict) -> dict:
     return scope
 
 
+def _check_paid_completion_gate(ctx, project_path: str):
+    """Phase 4 Task 12b — Evidence completeness gate (post-2026-04-29).
+
+    Reads `_scope._saas_questionnaire` + `_scope._saas_enforcement_mode`
+    (already populated by `_apply_saas_settings_to_scope`), loads
+    on-disk evidence counts via `load_state`, and delegates to the pure
+    `enforce_paid_completion` function. Returns:
+
+        None       — proceed with scan (ok / lenient / no questionnaire
+                     / state-load failure → safe fallback to proceed)
+        str (JSON) — early-return shape with status, prompt_to_user,
+                     auto_action_on_yes="cl_sync",
+                     then_continue="cl_scan_all", pending_obligations.
+
+    Spec safe-fallback rule (§B): infrastructure failures during the
+    state read MUST NOT block the scan. Hiding obligations is 100x
+    worse than over-reporting; same applies to over-blocking.
+    """
+    scope = ctx.compliance_answers.get("_scope", {}) if ctx else {}
+    questionnaire = scope.get("_saas_questionnaire")
+    if not questionnaire:
+        return None
+
+    enforcement_mode = scope.get("_saas_enforcement_mode") or "lenient"
+
+    try:
+        from core.state import load_state
+        from core.enforce_paid_completion import (
+            enforce_paid_completion,
+            evidence_counts_from_state,
+        )
+
+        state = load_state(project_path)
+        evidence_counts = evidence_counts_from_state(state)
+    except Exception as e:
+        logger.warning(
+            "paid completion gate: state load failed (%s) — degrading to proceed",
+            e,
+        )
+        return None
+
+    result = enforce_paid_completion(
+        questionnaire=questionnaire,
+        evidence_counts=evidence_counts,
+        enforcement_mode=enforcement_mode,
+    )
+
+    if result.warnings:
+        for w in result.warnings:
+            logger.info("paid completion gate (lenient): %s", w)
+
+    if result.status == "ok":
+        return None
+
+    return json.dumps(
+        {
+            "status": result.status,
+            "prompt_to_user": result.prompt_to_user,
+            "auto_action_on_yes": result.auto_action_on_yes,
+            "then_continue": result.then_continue,
+            "pending_obligations": result.pending,
+        }
+    )
+
+
 def _build_post_scan_hint(project_path: str, nc_count: int = 0, score_pct: int = -1) -> str:
     """Build contextual post-scan guidance.
 
@@ -801,6 +866,15 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
                 "exactly true, false, or null — not a string. Use the compliance_answers_template."
             ),
         })
+
+    # Phase 4 Task 12b — paid-tier evidence completeness gate.
+    # Soft pre-check (NOT hard reject): in strict mode + missing
+    # evidence, return AI-first prompt JSON so AI clients chain
+    # cl_sync → cl_scan_all automatically. Lenient mode logs warnings
+    # and proceeds. Spec §B + §H.
+    paid_gate = _check_paid_completion_gate(ctx, project_path)
+    if paid_gate is not None:
+        return paid_gate
 
     # Lazy-load all modules now (deferred from startup)
     logger.info("cl_scan_all — loading all modules...")
