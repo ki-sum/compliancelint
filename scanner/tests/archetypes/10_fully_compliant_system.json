@@ -380,7 +380,7 @@
       "must_have_obligations": [
         "ART12-OBL-1",
         "ART12-OBL-2a",
-        "ART19-OBL-1"
+        "ART19-OBL-1b"
       ],
       "legal_basis": "Art. 12(1)-(3): high-risk AI requires automatic logging; has_logging=true, has_retention_config=true (730 days) \u00e2\u20ac\u201d evidence found but needs human verification of event coverage completeness (PARTIAL)"
     },

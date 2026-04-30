@@ -68,7 +68,7 @@
     },
     {
       "id": "IS-ART12-R04",
-      "obligation_ref": "ART19-OBL-1",
+      "obligation_ref": "ART19-OBL-1b",
       "title": "Log Retention",
       "requirement": "Logs MUST be retained for a minimum of 6 months. Systems in healthcare, law enforcement, or critical infrastructure SHOULD retain for 12+ months.",
       "rationale": "Art. 19(1) explicitly states 'at least six months.' Longer retention for high-impact domains is industry best practice.",

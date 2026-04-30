@@ -35,6 +35,13 @@ logger = logging.getLogger("compliancelint")
 _OID_INDEX: Optional[dict[str, dict]] = None
 
 
+class ObligationDriftError(RuntimeError):
+    """Raised when the same OID appears in multiple obligation JSONs
+    with conflicting source_quote values. Indicates the cross-reference
+    has drifted from EUR-Lex and a human must reconcile before the
+    engine can serve cl_action_guide for that OID."""
+
+
 def _obligations_dir() -> str:
     """`scanner/obligations/` resolved from THIS module's location.
 
@@ -91,17 +98,43 @@ def _build_index() -> dict[str, dict]:
             oid = row.get("id")
             if not isinstance(oid, str) or not oid:
                 continue
-            # Don't blow up on duplicates — first-write wins. Log so
-            # the team knows there's a duplicate to clean up.
-            if oid in index:
-                logger.warning(
-                    "obligation_lookup: duplicate obligation id %s "
-                    "(seen in earlier file, ignoring duplicate in %s)",
-                    oid,
-                    fname,
-                )
+            # Normalise the index key to upper-case so lookup is
+            # case-insensitive for the 80+ OIDs that use a lowercase
+            # suffix letter (e.g. ART12-OBL-2a, ART19-OBL-1b). The row
+            # itself preserves its original-case `id` field for
+            # display purposes.
+            key = oid.upper()
+            # Cross-reference policy: an OID may appear in multiple
+            # article JSONs (e.g. ART19-OBL-2 lives in art19 but is
+            # mirrored into art12 because it directly extends Art. 12
+            # logging requirements — see art12-consensus-lock-2026-03-20.md
+            # for the design decision). When that happens, both copies
+            # MUST share the same verbatim source_quote — otherwise the
+            # cross-reference has drifted from EUR-Lex and we cannot
+            # safely pick a winner without a human reconciling.
+            #
+            # 2026-04-30 incident: ART19-OBL-1 appeared in art12 (with
+            # retention quote, from 2026-03-20) and art19 (with
+            # kept-under-control quote, from 2026-04-04). Resolved by
+            # renaming the art12 mirror to ART19-OBL-1b. This guard
+            # ensures any future drift fails loud at load time.
+            if key in index:
+                existing_quote = (index[key] or {}).get("source_quote", "")
+                new_quote = row.get("source_quote", "")
+                if existing_quote != new_quote:
+                    raise ObligationDriftError(
+                        f"OID {oid} appears in multiple obligation JSONs "
+                        f"with DIFFERENT source_quote values. The "
+                        f"cross-reference has drifted from the canonical "
+                        f"article. Reconcile the source_quote (or rename "
+                        f"one OID — see art12 / art19 OBL-1b precedent) "
+                        f"before this engine can answer cl_action_guide "
+                        f"for {oid}. Conflicting file: {fname}."
+                    )
+                # Same source_quote → legitimate cross-reference.
+                # First-write wins; canonical row stays in cache.
                 continue
-            index[oid] = row
+            index[key] = row
 
     return index
 

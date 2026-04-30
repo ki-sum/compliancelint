@@ -299,13 +299,13 @@
       ]
     },
     {
-      "id": "ART19-OBL-1",
+      "id": "ART19-OBL-1b",
       "source": "Art. 19(1)",
-      "source_quote": "the logs shall be kept for a period appropriate to the intended purpose of the high-risk AI system, of at least six months, unless provided otherwise in applicable Union or national law, in particular in Union law on the protection of personal data.",
+      "source_quote": "Without prejudice to applicable Union or national law, the logs shall be kept for a period appropriate to the intended purpose of the high-risk AI system, of at least six months, unless provided otherwise in the applicable Union or national law, in particular in Union law on the protection of personal data.",
       "deontic_type": "obligation",
       "modality": "shall",
       "addressee": "provider",
-      "note": "This obligation is in Art. 19 but directly extends Art. 12 logging requirements",
+      "note": "Cross-referenced from Art. 19(1) second clause — included here because Art. 12 (record-keeping) defines the logging lifecycle that Art. 19 retention extends. Canonical definition lives in art19-automatically-generated-logs.json as ART19-OBL-1b; this entry mirrors it verbatim. See art12-consensus-lock-2026-03-20.md for the original cross-reference design decision and the 2026-04-30 OID alignment fix (ART19-OBL-1 → OBL-1b) that resolved a same-OID-different-content drift introduced by the 2026-04-04 art19 split.",
       "decomposed_atoms": [
         {
           "atom": "logs_retained_minimum_six_months",
@@ -384,7 +384,7 @@
       "automation_assessment": {
         "level": "partial",
         "confidence": "medium",
-        "detection_method": "Check for log retention config — same as ART19-OBL-1 but from deployer perspective",
+        "detection_method": "Check for log retention config — same as ART19-OBL-1b but from deployer perspective",
         "what_to_scan": [
           "config",
           "infrastructure"
@@ -407,7 +407,7 @@
       "manual": 3
     },
     "scope_notes": {
-      "general_obligations": "ART12-OBL-1, ART12-OBL-2a, ART12-OBL-2b, ART12-OBL-2c, ART19-OBL-1 — apply to ALL high-risk AI systems",
+      "general_obligations": "ART12-OBL-1, ART12-OBL-2a, ART12-OBL-2b, ART12-OBL-2c, ART19-OBL-1b — apply to ALL high-risk AI systems",
       "biometric_only": "ART12-OBL-3a, ART12-OBL-3b, ART12-OBL-3c, ART12-OBL-3d — apply ONLY to biometric identification systems (Annex III, point 1(a))"
     }
   }

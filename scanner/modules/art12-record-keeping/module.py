@@ -118,7 +118,7 @@ class Art12Module(BaseArticleModule):
             gap_type=GapType.CODE,
         ))
 
-        # ── ART19-OBL-1: Log retention (Art. 19(1)) ──
+        # ── ART19-OBL-1b: Log retention (Art. 19(1) second clause) ──
         findings.append(self._make_retention_finding(
             has_retention_config=has_retention_config,
             retention_days=retention_days,
@@ -214,7 +214,7 @@ class Art12Module(BaseArticleModule):
         retention_days,
         retention_evidence: str,
     ) -> Finding:
-        """Build the ART12-OBL-2a retention finding from AI answers.
+        """Build the ART19-OBL-1b retention finding from AI answers.
 
         Rules:
           - has_retention_config=True, retention_days >= 180  → PARTIAL (compliant threshold)
@@ -225,7 +225,7 @@ class Art12Module(BaseArticleModule):
         """
         if has_retention_config is None:
             return Finding(
-                obligation_id="ART19-OBL-1",
+                obligation_id="ART19-OBL-1b",
                 file_path="project-wide",
                 line_number=None,
                 level=ComplianceLevel.UNABLE_TO_DETERMINE,
@@ -240,7 +240,7 @@ class Art12Module(BaseArticleModule):
 
         if has_retention_config is False:
             return Finding(
-                obligation_id="ART19-OBL-1",
+                obligation_id="ART19-OBL-1b",
                 file_path="project-wide",
                 line_number=None,
                 level=ComplianceLevel.NON_COMPLIANT,
@@ -260,7 +260,7 @@ class Art12Module(BaseArticleModule):
         # has_retention_config is True
         if retention_days is None:
             return Finding(
-                obligation_id="ART19-OBL-1",
+                obligation_id="ART19-OBL-1b",
                 file_path="project-wide",
                 line_number=None,
                 level=ComplianceLevel.PARTIAL,
@@ -278,7 +278,7 @@ class Art12Module(BaseArticleModule):
 
         if retention_days >= RETENTION_MINIMUM_DAYS:
             return Finding(
-                obligation_id="ART19-OBL-1",
+                obligation_id="ART19-OBL-1b",
                 file_path="project-wide",
                 line_number=None,
                 level=ComplianceLevel.PARTIAL,
@@ -292,7 +292,7 @@ class Art12Module(BaseArticleModule):
             )
         else:
             return Finding(
-                obligation_id="ART19-OBL-1",
+                obligation_id="ART19-OBL-1b",
                 file_path="project-wide",
                 line_number=None,
                 level=ComplianceLevel.NON_COMPLIANT,

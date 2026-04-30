@@ -218,7 +218,7 @@ class TestClScanArticle12:
 
         # Core obligations (must be in scan)
         for obl_id in ["ART12-OBL-1", "ART12-OBL-2a", "ART12-OBL-2b",
-                        "ART12-OBL-2c", "ART19-OBL-1"]:
+                        "ART12-OBL-2c", "ART19-OBL-1b"]:
             assert obl_id in finding_ids, (
                 f"{obl_id} not in findings. Found: {sorted(finding_ids)}"
             )
@@ -291,7 +291,7 @@ class TestClScanArticle12:
             assert findings[0]["level"] == "unable_to_determine"
 
     def test_retention_insufficient_non_compliant(self, project_dir):
-        """Retention < 180 days → ART19-OBL-1 NON_COMPLIANT."""
+        """Retention < 180 days → ART19-OBL-1b NON_COMPLIANT."""
         ctx = ProjectContext.from_json(json.dumps({
             "art12": {
                 "has_logging": True,
@@ -306,7 +306,7 @@ class TestClScanArticle12:
         result = json.loads(result_json)
 
         retention = [f for f in result.get("findings", [])
-                    if f["obligation_id"] == "ART19-OBL-1"]
+                    if f["obligation_id"] == "ART19-OBL-1b"]
         assert len(retention) > 0
         assert retention[0]["level"] == "non_compliant", (
             f"30-day retention should be non_compliant, got {retention[0]['level']}"
@@ -404,7 +404,7 @@ class TestClScanArticle12:
         }))
         result_json = _scan_single_article(12, project_dir, context=ctx)
         result = json.loads(result_json)
-        retention = [f for f in result["findings"] if f["obligation_id"] == "ART19-OBL-1"]
+        retention = [f for f in result["findings"] if f["obligation_id"] == "ART19-OBL-1b"]
         assert len(retention) > 0
         assert retention[0]["level"] == "non_compliant", (
             f"has_retention_policy=False should give non_compliant, got {retention[0]['level']}"

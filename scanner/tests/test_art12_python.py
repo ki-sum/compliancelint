@@ -5,7 +5,7 @@ The scanner does no detection; the AI provides compliance_answers.
 
 Obligation mapping:
   has_logging             → ART12-OBL-1, ART12-OBL-2a, ART12-OBL-2b
-  has_retention_config    → ART19-OBL-1 (with retention_days for threshold)
+  has_retention_config    → ART19-OBL-1b (with retention_days for threshold)
   Manual (always UTD)     → ART12-OBL-2c
   Scope-limited (gap)     → ART12-OBL-3a, 3b, 3c, 3d (biometric only)
   Scope-limited (gap)     → ART19-OBL-2 (financial institution), ART26-OBL-6 (deployer)
@@ -137,12 +137,12 @@ class TestArt12Obl2b:
         assert obl[0].level == ComplianceLevel.UNABLE_TO_DETERMINE
 
 
-# ── ART19-OBL-1: Log retention (has_retention_config + retention_days) ──
+# ── ART19-OBL-1b: Log retention (has_retention_config + retention_days) ──
 
 class TestArt19Obl1Retention:
 
     def test_retention_sufficient_gives_partial(self, art12_module, tmp_path):
-        """has_retention_config=True, retention_days >= 180 → ART19-OBL-1 PARTIAL."""
+        """has_retention_config=True, retention_days >= 180 → ART19-OBL-1b PARTIAL."""
         ctx = _ctx_with("art12", {
             "has_logging": True,
             "logging_description": "winston",
@@ -153,12 +153,12 @@ class TestArt19Obl1Retention:
         })
         BaseArticleModule.set_context(ctx)
         result = art12_module.scan(str(tmp_path))
-        obl = _find(result, "ART19-OBL-1")
+        obl = _find(result, "ART19-OBL-1b")
         assert len(obl) > 0
         assert obl[0].level == ComplianceLevel.PARTIAL
 
     def test_retention_insufficient_gives_non_compliant(self, art12_module, tmp_path):
-        """has_retention_config=True, retention_days < 180 → ART19-OBL-1 NON_COMPLIANT."""
+        """has_retention_config=True, retention_days < 180 → ART19-OBL-1b NON_COMPLIANT."""
         ctx = _ctx_with("art12", {
             "has_logging": True,
             "logging_description": "logback",
@@ -169,12 +169,12 @@ class TestArt19Obl1Retention:
         })
         BaseArticleModule.set_context(ctx)
         result = art12_module.scan(str(tmp_path))
-        obl = _find(result, "ART19-OBL-1")
+        obl = _find(result, "ART19-OBL-1b")
         assert len(obl) > 0
         assert obl[0].level == ComplianceLevel.NON_COMPLIANT
 
     def test_retention_config_true_days_none_gives_partial(self, art12_module, tmp_path):
-        """has_retention_config=True, retention_days=None → ART19-OBL-1 PARTIAL."""
+        """has_retention_config=True, retention_days=None → ART19-OBL-1b PARTIAL."""
         ctx = _ctx_with("art12", {
             "has_logging": True,
             "logging_description": "structlog",
@@ -185,12 +185,12 @@ class TestArt19Obl1Retention:
         })
         BaseArticleModule.set_context(ctx)
         result = art12_module.scan(str(tmp_path))
-        obl = _find(result, "ART19-OBL-1")
+        obl = _find(result, "ART19-OBL-1b")
         assert len(obl) > 0
         assert obl[0].level == ComplianceLevel.PARTIAL
 
     def test_retention_config_false_gives_non_compliant(self, art12_module, tmp_path):
-        """has_retention_config=False → ART19-OBL-1 NON_COMPLIANT."""
+        """has_retention_config=False → ART19-OBL-1b NON_COMPLIANT."""
         ctx = _ctx_with("art12", {
             "has_logging": True,
             "logging_description": "test",
@@ -201,20 +201,20 @@ class TestArt19Obl1Retention:
         })
         BaseArticleModule.set_context(ctx)
         result = art12_module.scan(str(tmp_path))
-        obl = _find(result, "ART19-OBL-1")
+        obl = _find(result, "ART19-OBL-1b")
         assert len(obl) > 0
         assert obl[0].level == ComplianceLevel.NON_COMPLIANT
 
     def test_retention_config_none_gives_utd(self, art12_module, tmp_path):
-        """has_retention_config=None → ART19-OBL-1 UNABLE_TO_DETERMINE."""
+        """has_retention_config=None → ART19-OBL-1b UNABLE_TO_DETERMINE."""
         BaseArticleModule.set_context(_empty_ctx())
         result = art12_module.scan(str(tmp_path))
-        obl = _find(result, "ART19-OBL-1")
+        obl = _find(result, "ART19-OBL-1b")
         assert len(obl) > 0
         assert obl[0].level == ComplianceLevel.UNABLE_TO_DETERMINE
 
     def test_retention_exactly_180_gives_partial(self, art12_module, tmp_path):
-        """retention_days == 180 (boundary) → ART19-OBL-1 PARTIAL."""
+        """retention_days == 180 (boundary) → ART19-OBL-1b PARTIAL."""
         ctx = _ctx_with("art12", {
             "has_logging": True,
             "logging_description": "test",
@@ -225,12 +225,12 @@ class TestArt19Obl1Retention:
         })
         BaseArticleModule.set_context(ctx)
         result = art12_module.scan(str(tmp_path))
-        obl = _find(result, "ART19-OBL-1")
+        obl = _find(result, "ART19-OBL-1b")
         assert len(obl) > 0
         assert obl[0].level == ComplianceLevel.PARTIAL
 
     def test_retention_179_gives_non_compliant(self, art12_module, tmp_path):
-        """retention_days == 179 (just below threshold) → ART19-OBL-1 NON_COMPLIANT."""
+        """retention_days == 179 (just below threshold) → ART19-OBL-1b NON_COMPLIANT."""
         ctx = _ctx_with("art12", {
             "has_logging": True,
             "logging_description": "test",
@@ -241,7 +241,7 @@ class TestArt19Obl1Retention:
         })
         BaseArticleModule.set_context(ctx)
         result = art12_module.scan(str(tmp_path))
-        obl = _find(result, "ART19-OBL-1")
+        obl = _find(result, "ART19-OBL-1b")
         assert len(obl) > 0
         assert obl[0].level == ComplianceLevel.NON_COMPLIANT
 
@@ -292,7 +292,7 @@ class TestArt12Structural:
         result = art12_module.scan(str(tmp_path))
         automatable_ids = [
             "ART12-OBL-1", "ART12-OBL-2a", "ART12-OBL-2b",
-            "ART19-OBL-1",
+            "ART19-OBL-1b",
         ]
         for obl_id in automatable_ids:
             findings = _find(result, obl_id)
@@ -353,6 +353,6 @@ class TestArt12Aliases:
         })
         BaseArticleModule.set_context(ctx)
         result = art12_module.scan(str(tmp_path))
-        obl = _find(result, "ART19-OBL-1")
+        obl = _find(result, "ART19-OBL-1b")
         assert len(obl) > 0
         assert obl[0].level == ComplianceLevel.NON_COMPLIANT
