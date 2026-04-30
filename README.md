@@ -346,10 +346,10 @@ The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard
 | Penalty display (worst-case Art. 99 caps) | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Penalty configuration (precise — based on your headcount + turnover + balance sheet) | — | ✓ | ✓ | ✓ | ✓ |
 | Risk mapping (MIT AI Risk Repository) | — | ✓ | ✓ | ✓ | ✓ |
-| Evidence — `text` declarations + `git_path` pointers (lightest, string-only) | — | ✓ | ✓ | ✓ | ✓ |
-| Evidence — `url_reference` (external URLs) | — | — | ✓ | ✓ | ✓ |
-| Human Gates questionnaires | — | — | ✓ | ✓ | ✓ |
+| Evidence — `text` declarations + `git_path` pointers (captured: content saved in DB or git) | — | ✓ | ✓ | ✓ | ✓ |
+| Evidence — `url_reference` (external pointer — content not captured, may link-rot) | — | ✓ | ✓ | ✓ | ✓ |
 | Evidence — `repo_file` upload from dashboard (bytes relayed to your git repo) | — | — | ✓ | ✓ | ✓ |
+| Human Gates questionnaires | — | — | ✓ | ✓ | ✓ |
 | SARIF export | — | — | ✓ | ✓ | ✓ |
 | CI/CD quality gate | — | — | ✓ | ✓ | ✓ |
 | Multi-framework mapping (ISO 42001, NIST AI RMF) | — | — | — | ✓ | ✓ |
