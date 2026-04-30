@@ -31,6 +31,10 @@ Watch a full compliance scan: from non-compliant to fully verified in under 2 mi
 
 Track compliance across all your AI systems. Export audit-ready PDF reports. [Try the live demo →](https://compliancelint.dev/demo)
 
+### Documentation
+
+Full user manual at **[compliancelint.dev/docs](https://compliancelint.dev/docs/quick-start)** — 30 chapters covering setup, daily use, persona-specific reference (Provider / Deployer / Authorised Representative / Importer / Distributor), and troubleshooting.
+
 ---
 
 ## Who Needs This
