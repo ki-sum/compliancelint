@@ -77,8 +77,10 @@ def enforce_paid_completion(
     questionnaire: Optional[dict],
     evidence_counts: Optional[dict],
     enforcement_mode: Optional[str] = None,
+    oid_answers: Optional[dict] = None,
 ) -> EnforceResult:
-    """Check evidence completeness against the SaaS-narrowed questionnaire.
+    """Check evidence + answer completeness against the SaaS-narrowed
+    questionnaire.
 
     Args:
         questionnaire: dict mapping obligation_id → spec row (with
@@ -89,13 +91,25 @@ def enforce_paid_completion(
           to derive this from the on-disk state.json.
         enforcement_mode: "strict" enables blocking; anything else is
           lenient. Default lenient.
+        oid_answers: dict mapping obligation_id → bool|None (user's
+          answer to the per-OID question). When provided, the function
+          ALSO requires a non-None answer for each completion_required
+          OID — pre-B1 only checked evidence, leaving "1 evidence + 0
+          answer = silent pass" as a false-COMPLIANT bug. When None
+          or omitted, falls back to legacy evidence-only check (no
+          regression for existing callers).
 
     Returns:
-        EnforceResult — caller (cl_scan_all wrapper) reads `.status`
-        and either proceeds (`ok`) or emits the AI-first prompt JSON
-        from the other fields.
+        EnforceResult — caller (cl_scan_all wrapper) reads `.status`.
+        Pending OID rows now carry `missing` field:
+          "answer"   — user has not answered the per-OID question
+          "evidence" — answer present, evidence count below evidence_min
+          "both"     — neither answer nor evidence
     """
     counts = evidence_counts or {}
+    # Sentinel: True means "skip answer check" (legacy callers).
+    skip_answer_check = oid_answers is None
+    answers = oid_answers or {}
 
     # Safe-fallback: nothing to enforce against → proceed.
     if not questionnaire:
@@ -108,31 +122,44 @@ def enforce_paid_completion(
         if not row.get("completion_required"):
             continue
         expected = _coerce_int(row.get("evidence_min"))
-        if expected <= 0:
-            continue
         actual = _coerce_int(counts.get(oid))
-        if actual < expected:
-            pending.append(
-                {
-                    "obligation_id": oid,
-                    "expected": expected,
-                    "actual": actual,
-                }
-            )
+
+        evidence_missing = expected > 0 and actual < expected
+
+        # Answer check (only when oid_answers was supplied — backward
+        # compat for legacy callers)
+        answer_missing = False
+        if not skip_answer_check:
+            answer_value = answers.get(oid)
+            # `None` (or absent) = unanswered. `False` = answered No.
+            answer_missing = answer_value is None
+
+        if not (evidence_missing or answer_missing):
+            continue
+
+        if evidence_missing and answer_missing:
+            missing_class = "both"
+        elif answer_missing:
+            missing_class = "answer"
+        else:
+            missing_class = "evidence"
+
+        pending.append(
+            {
+                "obligation_id": oid,
+                "expected": expected,
+                "actual": actual,
+                "missing": missing_class,
+            }
+        )
 
     if not pending:
         return EnforceResult(status="ok")
 
     if not _is_strict(enforcement_mode):
-        # Lenient (and the unknown-mode safe default): never block,
-        # surface gaps as warnings only.
-        warnings = [
-            f"{p['obligation_id']}: {p['actual']} of {p['expected']} expected evidence"
-            for p in pending
-        ]
+        warnings = [_warn_for(p) for p in pending]
         return EnforceResult(status="ok", warnings=warnings)
 
-    # Strict mode — block, return AI-first prompt shape.
     return EnforceResult(
         status="pending_evidence_needs_sync",
         pending=pending,
@@ -142,6 +169,20 @@ def enforce_paid_completion(
     )
 
 
+def _warn_for(p: dict) -> str:
+    """Lenient-mode warning string for a pending OID row."""
+    miss = p.get("missing", "evidence")
+    oid = p["obligation_id"]
+    if miss == "answer":
+        return f"{oid}: questionnaire answer missing"
+    if miss == "both":
+        return (
+            f"{oid}: questionnaire answer missing AND "
+            f"{p['actual']} of {p['expected']} expected evidence"
+        )
+    return f"{oid}: {p['actual']} of {p['expected']} expected evidence"
+
+
 def _build_prompt(pending: list[dict]) -> str:
     """Single-line, user-facing prompt that AI clients render verbatim.
 
@@ -149,13 +190,41 @@ def _build_prompt(pending: list[dict]) -> str:
     in '?', under 300 chars, no newlines, no markdown — AI clients
     paste it into chat. Spec §H discourages framework jargon
     ('_scope', 'template') in user-facing copy.
+
+    B1 extension: when ANY pending OID is missing an answer (not just
+    evidence), the prompt mentions "questionnaire answer" so AI client
+    surfaces the right next action (visit dashboard / cl_update_finding
+    / fill the question), not just cl_sync.
     """
     n = len(pending)
+    miss_classes = {p.get("missing", "evidence") for p in pending}
+    has_answer_missing = "answer" in miss_classes or "both" in miss_classes
+
     if n == 1:
-        oid = pending[0]["obligation_id"]
+        p = pending[0]
+        oid = p["obligation_id"]
+        miss = p.get("missing", "evidence")
+        if miss == "answer":
+            return (
+                f"{oid} is missing its questionnaire answer. "
+                f"Want me to pull the latest from your dashboard via cl_sync?"
+            )
+        if miss == "both":
+            return (
+                f"{oid} is missing both its questionnaire answer and "
+                f"evidence. Want me to run cl_sync to pull from your "
+                f"dashboard?"
+            )
         return (
             f"{oid} needs evidence on file before this scan can run. "
             f"Want me to run cl_sync to pull it from your dashboard?"
+        )
+
+    if has_answer_missing:
+        return (
+            f"{n} obligations are missing questionnaire answers and/or "
+            f"evidence. Want me to run cl_sync to pull the latest from "
+            f"your dashboard?"
         )
     return (
         f"{n} obligations need evidence on file before this scan can run. "

@@ -412,6 +412,20 @@ def _build_answers_template() -> dict:
     for field_name in _BOOL_FIELDS.get("_scope", []):
         template["_scope"][field_name] = None
 
+    # B1 self-audit follow-up 2026-04-30 — _oid_answers field for
+    # per-obligation questionnaire answers (paid feature). When SaaS
+    # narrows applicable_obligations, AI client MUST fill an answer
+    # for each OID listed in `_saas_questionnaire`:
+    #   "_oid_answers": {
+    #     "ART9-OBL-1": true,    # answered yes (compliant)
+    #     "ART9-OBL-3": false,   # answered no (non-compliant)
+    #     "ART11-OBL-1": null    # cannot determine (skipped)
+    #   }
+    # Free tier (no SaaS questionnaire) → leave as null. Strict mode
+    # without per-OID answers blocks the scan with `missing: answer`
+    # in pending_obligations — false-COMPLIANT pre-B1 bug class.
+    template["_oid_answers"] = None
+
     return template
 
 

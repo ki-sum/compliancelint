@@ -262,3 +262,106 @@ def test_optional_oids_not_blocking_in_strict_mode():
     with tempfile.TemporaryDirectory() as tmp:
         result = _check_paid_completion_gate(ctx, tmp)
     assert result is None
+
+
+# ──────────────────────────────────────────────────────────────────────
+# 4. B1 self-audit follow-up — `_oid_answers` reading from compliance_answers
+# ──────────────────────────────────────────────────────────────────────
+
+
+def test_strict_evidence_present_but_oid_answer_missing_blocks():
+    """B1 headline integration: customer has evidence on disk but the
+    AI client did NOT fill `_oid_answers[ART9-OBL-1]`. Pre-B1 = silent
+    pass. Post-B1 = block with `missing: answer`."""
+    from core import paths
+    from server import _check_paid_completion_gate
+
+    class _CtxWithOidAnswers:
+        def __init__(self, scope, oid_answers):
+            self.compliance_answers = {
+                "_scope": scope,
+                "_oid_answers": oid_answers,
+            }
+
+    ctx = _CtxWithOidAnswers(
+        scope={
+            "_saas_questionnaire": {
+                "ART9-OBL-1": {"evidence_min": 1, "completion_required": True},
+            },
+            "_saas_enforcement_mode": "strict",
+        },
+        oid_answers={"ART9-OBL-1": None},  # explicit unanswered
+    )
+
+    with tempfile.TemporaryDirectory() as tmp:
+        # Seed evidence on disk
+        paths.ensure_local_dir(tmp)
+        articles_dir = os.path.join(tmp, ".compliancelint", "local", "articles")
+        os.makedirs(articles_dir, exist_ok=True)
+        with open(os.path.join(articles_dir, "art9.json"), "w", encoding="utf-8") as f:
+            json.dump({
+                "scan_date": "2026-04-30T00:00:00Z",
+                "findings": {
+                    "ART9-OBL-1": {"status": "open", "evidence": [{"id": "e1"}]},
+                },
+            }, f)
+
+        result = _check_paid_completion_gate(ctx, tmp)
+
+    assert result is not None, "expected JSON early-return, got None (proceed)"
+    parsed = json.loads(result)
+    assert parsed["status"] == "pending_evidence_needs_sync"
+    assert len(parsed["pending_obligations"]) == 1
+    assert parsed["pending_obligations"][0]["missing"] == "answer"
+
+
+def test_legacy_ctx_without_oid_answers_falls_through():
+    """Backward compat: ctx without `_oid_answers` key (legacy AI
+    client) skips answer check. Evidence-only check runs as pre-B1."""
+    from server import _check_paid_completion_gate
+
+    # _StubCtx doesn't set _oid_answers — legacy shape
+    ctx = _StubCtx({
+        "_saas_questionnaire": {
+            "ART9-OBL-1": {"evidence_min": 1, "completion_required": True},
+        },
+        "_saas_enforcement_mode": "strict",
+    })
+    with tempfile.TemporaryDirectory() as tmp:
+        # No evidence dir → 0 evidence → blocks (legacy behavior intact)
+        result = _check_paid_completion_gate(ctx, tmp)
+
+    assert result is not None
+    parsed = json.loads(result)
+    # Pre-B1, missing field was just "expected" + "actual". Post-B1,
+    # `missing` is added but for legacy ctx it should be "evidence"
+    # (not "answer" or "both") since answer check was skipped.
+    assert parsed["pending_obligations"][0]["missing"] == "evidence"
+
+
+def test_oid_answers_corrupted_shape_falls_back_to_legacy():
+    """Defensive: if `_oid_answers` is a list/string/etc. (data
+    corruption), gate degrades to legacy evidence-only check rather
+    than crashing."""
+    from server import _check_paid_completion_gate
+
+    class _BadCtx:
+        def __init__(self):
+            self.compliance_answers = {
+                "_scope": {
+                    "_saas_questionnaire": {
+                        "ART9-OBL-1": {"evidence_min": 1, "completion_required": True},
+                    },
+                    "_saas_enforcement_mode": "strict",
+                },
+                "_oid_answers": "not-a-dict",  # corruption
+            }
+
+    with tempfile.TemporaryDirectory() as tmp:
+        # No exception, falls through to legacy evidence-only path
+        result = _check_paid_completion_gate(_BadCtx(), tmp)
+
+    assert result is not None
+    parsed = json.loads(result)
+    # Should be evidence-only check (corrupt _oid_answers ignored)
+    assert parsed["pending_obligations"][0]["missing"] == "evidence"

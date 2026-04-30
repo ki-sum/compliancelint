@@ -447,6 +447,15 @@ def _check_paid_completion_gate(ctx, project_path: str):
 
     enforcement_mode = scope.get("_saas_enforcement_mode") or "lenient"
 
+    # B1 self-audit follow-up 2026-04-30 — read per-OID answers from
+    # ctx.compliance_answers._oid_answers if AI client filled it. None
+    # means legacy AI client → skip answer check (evidence-only legacy
+    # behavior, no regression).
+    oid_answers = ctx.compliance_answers.get("_oid_answers") if ctx else None
+    if oid_answers is not None and not isinstance(oid_answers, dict):
+        # Defensive — corrupted shape, treat as None
+        oid_answers = None
+
     from core.state import load_state
     from core.enforce_paid_completion import (
         enforce_paid_completion,
@@ -493,6 +502,7 @@ def _check_paid_completion_gate(ctx, project_path: str):
         questionnaire=questionnaire,
         evidence_counts=evidence_counts,
         enforcement_mode=enforcement_mode,
+        oid_answers=oid_answers,
     )
 
     if result.warnings:
