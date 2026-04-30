@@ -346,13 +346,14 @@ The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard
 | Penalty display (worst-case Art. 99 caps) | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Penalty configuration (precise — based on your headcount + turnover + balance sheet) | — | ✓ | ✓ | ✓ | ✓ |
 | Risk mapping (MIT AI Risk Repository) | — | ✓ | ✓ | ✓ | ✓ |
-| Evidence references (URL, text) | — | — | ✓ | ✓ | ✓ |
+| Evidence — `text` declarations + `git_path` pointers (lightest, string-only) | — | ✓ | ✓ | ✓ | ✓ |
+| Evidence — `url_reference` (external URLs) | — | — | ✓ | ✓ | ✓ |
 | Human Gates questionnaires | — | — | ✓ | ✓ | ✓ |
-| Evidence file upload to your repo | — | — | ✓ | ✓ | ✓ |
+| Evidence — `repo_file` upload from dashboard (bytes relayed to your git repo) | — | — | ✓ | ✓ | ✓ |
 | SARIF export | — | — | ✓ | ✓ | ✓ |
 | CI/CD quality gate | — | — | ✓ | ✓ | ✓ |
 | Multi-framework mapping (ISO 42001, NIST AI RMF) | — | — | — | ✓ | ✓ |
-| Regulation updates | — | — | — | ✓ | ✓ |
+| Regulation updates timeline (in-app) — current EU AI Act milestones; email digest is roadmap | — | — | — | ✓ | ✓ |
 | Compliance All-in-One Pack (audit-grade snapshot zip) | — | — | — | ✓ | ✓ |
 | SSO / SAML / on-prem | — | — | — | — | ✓ |
 | Team members | Unlimited | Unlimited | Unlimited | Unlimited | Unlimited |

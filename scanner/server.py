@@ -1235,21 +1235,37 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
 
 @mcp.tool()
 def cl_action_guide(obligation_id: str) -> str:
-    """Get guidance for completing a Human Gate obligation.
+    """Return verbatim EUR-Lex content + decomposed obligation atoms
+    for a specific obligation_id.
 
-    Human Gates are compliance obligations that require human verification —
-    they cannot be determined from code scanning alone. This tool returns
-    guidance on where to complete the Human Gate questionnaire.
+    Q3 self-audit follow-up 2026-04-30 — was a thin "go to dashboard"
+    redirect; now surfaces the anti-hallucination IP that lives in
+    `scanner/obligations/art*.json`:
 
-    IMPORTANT: This tool does NOT return questionnaire content or accept answers.
-    Human Gates must be completed at the ComplianceLint dashboard.
+      - `source` ("Art. 26(2)") — human-readable section reference
+      - `source_quote` — verbatim EUR-Lex text (NEVER paraphrased)
+      - `addressee` ("provider" / "deployer" / etc.)
+      - `decomposed_atoms[]` — our team's decomposition of the
+        obligation into testable atoms (atom / description /
+        requirement)
+      - `automation_level` ("full" / "partial" / "manual")
+      - `human_judgment_needed` — what a human must judge that code
+        scanning cannot determine
+
+    Plus the legacy fields for backward compat:
+      - `obligation_id`, `title`, `is_human_gate`, `dashboard_url`,
+        `note`
+
+    AI clients render this directly to the user. ChatGPT can't match
+    this because it doesn't have our decomposed_atoms IP — that's
+    the value-add over generic LLM Q&A.
 
     Args:
         obligation_id: The obligation ID (e.g., "ART26-OBL-2").
     """
     import re
 
-    # Validate obligation ID format
+    # Validate obligation ID format (legacy contract — preserve)
     if not re.match(r"^ART\d+-OBL-\d+", obligation_id.upper()):
         return append_upgrade_hint(
             json.dumps({
@@ -1261,7 +1277,13 @@ def cl_action_guide(obligation_id: str) -> str:
 
     obl_id = obligation_id.upper()
 
-    # Known Human Gate obligations (manual obligations from deployer/importer/distributor)
+    # Pull verbatim obligation JSON (anti-hallucination payload)
+    from core.obligation_lookup import lookup_obligation, extract_action_guide_fields
+
+    row = lookup_obligation(obl_id)
+
+    # Known Human Gate obligations (curated list — these have
+    # structured-form support on the SaaS dashboard)
     HUMAN_GATES = {
         "ART26-OBL-2": "Human Oversight Assignment",
         "ART26-OBL-6": "Log Retention Policy",
@@ -1269,28 +1291,44 @@ def cl_action_guide(obligation_id: str) -> str:
         "ART26-OBL-9": "Data Protection Impact Assessment (DPIA)",
         "ART27-OBL-1": "Fundamental Rights Impact Assessment (FRIA)",
     }
-
-    title = HUMAN_GATES.get(obl_id, f"Obligation {obl_id}")
     is_known_gate = obl_id in HUMAN_GATES
 
-    return append_upgrade_hint(
-        json.dumps({
-            "obligation_id": obl_id,
-            "title": title,
-            "is_human_gate": is_known_gate,
-            "status": "pending",
-            "message": (
-                "This Human Gate requires structured questionnaire completion. "
-                "Complete it at your ComplianceLint dashboard."
-                if is_known_gate else
-                f"Obligation {obl_id} may require manual verification. "
-                "Check your ComplianceLint dashboard for guidance."
-            ),
-            "dashboard_url": "https://compliancelint.dev/dashboard",
-            "note": "Human Gates cannot be completed from the IDE. The dashboard provides guided forms for each obligation.",
-        }),
-        "cl_action_guide",
-    )
+    # Title strategy:
+    #   1. If in HUMAN_GATES, use the curated short title (UI-friendly)
+    #   2. Else if in obligation JSON, derive from atom or fallback
+    #      to the OID
+    if is_known_gate:
+        title = HUMAN_GATES[obl_id]
+    elif row and row.get("decomposed_atoms"):
+        first_atom = row["decomposed_atoms"][0] if row["decomposed_atoms"] else {}
+        title = first_atom.get("description") or f"Obligation {obl_id}"
+    else:
+        title = f"Obligation {obl_id}"
+
+    response = {
+        "obligation_id": obl_id,
+        "title": title,
+        "is_human_gate": is_known_gate,
+        "status": "pending",
+        "message": (
+            "This Human Gate requires structured questionnaire completion. "
+            "Complete it at your ComplianceLint dashboard."
+            if is_known_gate else
+            f"Obligation {obl_id} may require manual verification. "
+            "Check your ComplianceLint dashboard for guidance."
+        ),
+        "dashboard_url": "https://compliancelint.dev/dashboard",
+        "note": "Human Gates cannot be completed from the IDE. The dashboard provides guided forms for each obligation.",
+    }
+
+    # Enriched fields when the OID is known. For unknown OIDs (typo /
+    # OID format valid but no matching JSON entry) we omit these
+    # rather than fabricate empty stubs — the caller can detect
+    # absence to tell the user "I don't recognize this obligation".
+    if row is not None:
+        response.update(extract_action_guide_fields(row))
+
+    return append_upgrade_hint(json.dumps(response), "cl_action_guide")
 
 
 @mcp.tool()
