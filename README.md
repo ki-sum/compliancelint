@@ -341,6 +341,7 @@ The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard
 | PDF reports | Watermarked | Clean | Clean | Clean | Clean |
 | All 247 obligations visible (worst-case) | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Penalty display (worst-case Art. 99 caps) | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Team members | Unlimited | Unlimited | Unlimited | Unlimited | Unlimited |
 | **Scope narrowing** — see only obligations applicable to your AI system (typically saves ~70% review time) | — | ✓ | ✓ | ✓ | ✓ |
 | **Risk classification picker** (Art. 5 / 6 / 50) | — | ✓ | ✓ | ✓ | ✓ |
 | **SME relief** (Art. 11 simplified tech-doc per Recommendation 2003/361/EC) | — | ✓ | ✓ | ✓ | ✓ |
@@ -358,7 +359,6 @@ The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard
 | Regulation updates timeline (in-app) — current EU AI Act milestones; email digest is roadmap | — | — | — | ✓ | ✓ |
 | Compliance All-in-One Pack (audit-grade snapshot zip) | — | — | — | ✓ | ✓ |
 | SSO / SAML / on-prem | — | — | — | — | ✓ |
-| Team members | Unlimited | Unlimited | Unlimited | Unlimited | Unlimited |
 
 **Evidence stays in your repo.** Upload files from the dashboard — bytes commit to `.compliancelint/evidence/` in your git repo. We relay transiently. We never hold your files.
 
