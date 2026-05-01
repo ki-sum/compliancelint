@@ -340,12 +340,12 @@ The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard
 | Scan history | 7 days | Unlimited | Unlimited | Unlimited | Unlimited |
 | PDF reports | Watermarked | Clean | Clean | Clean | Clean |
 | All 247 obligations visible (worst-case) | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Penalty display (worst-case Art. 99 caps) | ✓ | ✓ | ✓ | ✓ | ✓ |
 | **Scope narrowing** — see only obligations applicable to your AI system (typically saves ~70% review time) | — | ✓ | ✓ | ✓ | ✓ |
 | **Risk classification picker** (Art. 5 / 6 / 50) | — | ✓ | ✓ | ✓ | ✓ |
 | **SME relief** (Art. 11 simplified tech-doc per Recommendation 2003/361/EC) | — | ✓ | ✓ | ✓ | ✓ |
 | **Per-obligation questionnaires** (anchor AI answers to verbatim legal text) | — | ✓ | ✓ | ✓ | ✓ |
 | **Art. 2 carve-outs** (territorial / military / research / open-source — entire-Act exemption flags) | — | ✓ | ✓ | ✓ | ✓ |
-| Penalty display (worst-case Art. 99 caps) | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Penalty configuration (precise — based on your headcount + turnover + balance sheet) | — | ✓ | ✓ | ✓ | ✓ |
 | Risk mapping (MIT AI Risk Repository) | — | ✓ | ✓ | ✓ | ✓ |
 | Evidence — `text` declarations + `git_path` pointers (captured: content saved in DB or git) | — | ✓ | ✓ | ✓ | ✓ |
