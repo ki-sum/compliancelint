@@ -68,7 +68,31 @@ class Obligation:
 
     @classmethod
     def from_dict(cls, data: dict) -> Obligation:
-        """Parse an obligation from the JSON structure."""
+        """Parse an obligation from the JSON structure.
+
+        Raises:
+            ValueError: when `addressee` is missing or empty. Every
+                obligation must explicitly tag one of: provider /
+                deployer / authorised_representative / importer /
+                distributor / both / any_person / commission /
+                ai_office / law_enforcement / notified_bodies /
+                provider_and_deployer. Silent fallback to "provider"
+                (the previous behavior pre-§Z Z.2 audit 2026-05-02)
+                would misroute AR-only obligations to provider users
+                and hide AR duties from AR users — same fraud-risk
+                surface §Z Z.2 was checking for.
+        """
+        addressee = data.get("addressee")
+        if not addressee or not isinstance(addressee, str):
+            raise ValueError(
+                f"Obligation {data.get('id', 'unknown')!r} missing or "
+                f"non-string `addressee` field. Every OID must explicitly "
+                f"tag a role from the canonical set "
+                f"(provider / deployer / authorised_representative / "
+                f"importer / distributor / both / any_person / commission / "
+                f"ai_office / law_enforcement / notified_bodies / "
+                f"provider_and_deployer). Got: {addressee!r}"
+            )
         auto = data.get("automation_assessment", {})
         return cls(
             id=data.get("id", "UNKNOWN"),
@@ -76,7 +100,7 @@ class Obligation:
             source_quote=data.get("source_quote", ""),
             deontic_type=data.get("deontic_type", "obligation"),
             modality=data.get("modality", "shall"),
-            addressee=data.get("addressee", "provider"),
+            addressee=addressee,
             atoms=data.get("decomposed_atoms", []),
             automation_level=auto.get("level", "manual"),
             automation_confidence=auto.get("confidence", "low"),

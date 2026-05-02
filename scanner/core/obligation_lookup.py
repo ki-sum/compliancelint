@@ -163,7 +163,13 @@ def _build_index() -> dict[str, dict]:
     # ── §AA Option C merge step ─────────────────────────────────
     # For each article we saw, fetch its 5-field classification map
     # and merge into matching rows' automation_assessment. None
-    # response → degraded mode, leave rows with public-only fields.
+    # response → degraded mode, leave rows with public-only fields
+    # AND mark each row in that article with `_classification_unavailable: True`
+    # so downstream callers (cl_action_guide, cl_action_plan, UI) can
+    # explicitly detect degraded state without inferring from absent fields.
+    # (Spec: 2026-05-02-aa-option-c-implementation-spec.md Step 3,
+    # noted but not implemented in initial Step 3 commit; closed by
+    # the §Z Z.2 audit follow-up.)
     degraded_for_first_article = False
     for article_num in sorted(articles_seen):
         classifications = classification_client.fetch_classifications(article_num)
@@ -171,6 +177,13 @@ def _build_index() -> dict[str, dict]:
             if not degraded_for_first_article:
                 degraded_for_first_article = True
                 classification_client.emit_degraded_notice_once()
+            # Mark every row for this article so callers can detect
+            # degraded state. Iterate index keys whose OID parses to
+            # this article number.
+            article_prefix = f"ART{article_num:02d}-"
+            for key, row in index.items():
+                if key.startswith(article_prefix):
+                    row["_classification_unavailable"] = True
             continue
         # Merge per-OID into the index. Missing OIDs in the
         # classification payload are silently skipped (private file
