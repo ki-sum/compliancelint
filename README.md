@@ -364,7 +364,7 @@ The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard
 
 **Evidence stays in your repo.** Upload files from the dashboard — bytes commit to `.compliancelint/evidence/` in your git repo. We relay transiently. We never hold your files.
 
-**Team members are free + unlimited.** Invited members inherit the owner's tier — Pro members get Human Gates, Business members get Time Capsule exports. No per-seat billing. All actions are audit-logged with the actor's identity.
+**Team members are free + unlimited.** Invited members inherit the owner's tier — Pro members get Human Gates, Business members get Compliance All-in-One Pack exports. No per-seat billing. All actions are audit-logged with the actor's identity.
 
 ---
 
@@ -374,7 +374,7 @@ The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard
 
 - [x] MCP Server (17 tools) + 44 EU AI Act articles, 247 obligations
 - [x] SaaS Dashboard with Compliance Journey tracking
-- [x] PDF exports (Scan Report, Journey, Declaration of Conformity, Technical Documentation, Tasks)
+- [x] Audit-ready exports — Compliance Journey PDF, Human Gates per-article PDFs (Declaration of Conformity at Art. 47, Technical Documentation at Art. 11, per-article evidence packs), and Compliance All-in-One Pack ZIP (Business+)
 - [x] Attestation system (evidence, rebuttals, acknowledgements, defer, questionnaire response)
 - [x] `npx compliancelint init` — one-line setup
 - [x] Role-based obligation filtering (Provider, Deployer, Authorised Representative, Importer, Distributor)
@@ -392,7 +392,7 @@ The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard
 
 ### Pre-launch
 
-- [x] **Compliance Time Capsule** (Business+ tier) — historical snapshot zip with Declaration of Conformity + Technical Documentation + per-article PDFs + audit-trail CSV + an embedded HTML viewer (index/dashboard/tasks/human-gates pages SSR-rendered from the same React components the live SaaS dashboard uses, so the offline bundle stays in step with the dashboard automatically). 11/11 verifier-gated (`npx tsx dashboard/scripts/verify-time-capsule-phase-1-5.ts` exits 0).
+- [x] **Compliance All-in-One Pack** (Business+ tier) — historical snapshot zip with Declaration of Conformity + Technical Documentation + per-article PDFs + audit-trail CSV + an embedded HTML viewer (index/dashboard/tasks/human-gates pages SSR-rendered from the same React components the live SaaS dashboard uses, so the offline bundle stays in step with the dashboard automatically). 11/11 verifier-gated (`npx tsx dashboard/scripts/verify-time-capsule-phase-1-5.ts` exits 0).
 
 ### Post-launch (v2+)
 
@@ -407,8 +407,8 @@ The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard
 - [ ] OSCAL export format (Business+ tier) — structured compliance data for enterprise audit workflows
 - [ ] **Incremental scanning** — only re-scan obligations whose underlying code changed since the last `cl_scan_all`, instead of running every article every time. Demand-driven, triggered post-launch when usage warrants the optimization.
 - [ ] **Human Gates evidence verifier** (`cl_verify_human_gates`) — AI cross-checks each questionnaire answer against the obligation's `source_quote` requirements; flags vague text, missing answers, and cross-obligation contradictions before re-scan promotes evidence to COMPLIANT.
-- [ ] **Time Capsule `dashboard_state.json`** (post-launch, possibly tier-gated) — extend the export zip with a serialized snapshot of the dashboard's KPI cards, penalty calculation, role/risk-classification context, and per-article status matrix. Today the zip contains the legal artefacts (PDFs + manifest); this adds the *interpretive layer* the dashboard provides. Consumed by the offline viewer below.
-- [ ] **Public Time Capsule viewer** (`/viewer`, post-launch, possibly tier-gated) — public, no-login web page where an auditor or external lawyer drag-drops a Time Capsule zip and the page renders the same KPI cards, penalty estimates, and article-status visualisations as the live dashboard, all client-side from the zip's `dashboard_state.json`. No backend hit. Closes the gap that today's zip is "audit-ready files" but not "audit-ready *interface*". Pricing tier and exact UX still TBD.
+- [ ] **All-in-One Pack `dashboard_state.json`** (post-launch, possibly tier-gated) — extend the export zip with a serialized snapshot of the dashboard's KPI cards, penalty calculation, role/risk-classification context, and per-article status matrix. Today the zip contains the legal artefacts (PDFs + manifest); this adds the *interpretive layer* the dashboard provides. Consumed by the offline viewer below.
+- [ ] **Public All-in-One Pack viewer** (`/viewer`, post-launch, possibly tier-gated) — public, no-login web page where an auditor or external lawyer drag-drops a Compliance All-in-One Pack zip and the page renders the same KPI cards, penalty estimates, and article-status visualisations as the live dashboard, all client-side from the zip's `dashboard_state.json`. No backend hit. Closes the gap that today's zip is "audit-ready files" but not "audit-ready *interface*". Pricing tier and exact UX still TBD.
 
 ---
 
