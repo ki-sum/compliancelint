@@ -62,9 +62,28 @@ def _build_index() -> dict[str, dict]:
 
     Skips files that fail to parse (logs warning).
     Skips obligations missing `id` field (data corruption guard).
+
+    §AA Option C (2026-05-02): public obligation JSONs only carry
+    `automation_assessment.level`. The other 5 fields (detection_method,
+    rationale, what_to_scan, confidence, human_judgment_needed) live
+    in the SaaS dashboard and are fetched per-article by
+    `classification_client.fetch_classifications`. We merge them in
+    here so downstream consumers (obligation_engine, cl_action_guide)
+    see one unified row whether the SaaS metadata was available or not.
+    Degraded mode (no API key / network failure): rows have only
+    `level` — existing consumers default to empty strings on missing
+    keys, so behaviour is graceful but feature-degraded.
     """
+    # Lazy import to avoid forcing the network module on callers that
+    # don't actually load obligations (e.g. unit tests for unrelated
+    # scanner modules).
+    from scanner.core import classification_client
+
     obligations_dir = _obligations_dir()
     index: dict[str, dict] = {}
+    # Track which articles we still need to fetch classifications for.
+    # Filled as we walk public files; emptied as we merge.
+    articles_seen: set[int] = set()
     if not os.path.isdir(obligations_dir):
         logger.warning(
             "obligation_lookup: obligations dir not found at %s — "
@@ -91,6 +110,11 @@ def _build_index() -> dict[str, dict]:
         rows = data.get("obligations") if isinstance(data, dict) else None
         if not isinstance(rows, list):
             continue
+
+        meta = data.get("_metadata") or {}
+        article_num = meta.get("article")
+        if isinstance(article_num, int):
+            articles_seen.add(article_num)
 
         for row in rows:
             if not isinstance(row, dict):
@@ -135,6 +159,36 @@ def _build_index() -> dict[str, dict]:
                 # First-write wins; canonical row stays in cache.
                 continue
             index[key] = row
+
+    # ── §AA Option C merge step ─────────────────────────────────
+    # For each article we saw, fetch its 5-field classification map
+    # and merge into matching rows' automation_assessment. None
+    # response → degraded mode, leave rows with public-only fields.
+    degraded_for_first_article = False
+    for article_num in sorted(articles_seen):
+        classifications = classification_client.fetch_classifications(article_num)
+        if classifications is None:
+            if not degraded_for_first_article:
+                degraded_for_first_article = True
+                classification_client.emit_degraded_notice_once()
+            continue
+        # Merge per-OID into the index. Missing OIDs in the
+        # classification payload are silently skipped (private file
+        # may legitimately omit obligations that need only public
+        # `level`).
+        for oid, fields in classifications.items():
+            key = oid.upper()
+            if key not in index:
+                continue
+            row = index[key]
+            existing_aa = row.get("automation_assessment")
+            if not isinstance(existing_aa, dict):
+                existing_aa = {}
+            # Public `level` wins over any private value if both exist
+            # (defensive — they should never disagree, but if they do
+            # the public file is the canonical taxonomy).
+            merged = {**fields, **existing_aa}
+            row["automation_assessment"] = merged
 
     return index
 

@@ -38,11 +38,93 @@ the legacy "go to dashboard" redirect (no source_quote available).
 import json
 import os
 import sys
+from unittest.mock import patch
 
 import pytest
 
 SCANNER_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, SCANNER_ROOT)
+
+# §AA Option C (2026-05-02): the 5 SaaS-only fields (detection_method,
+# rationale, what_to_scan, confidence, human_judgment_needed) live in
+# the SaaS dashboard and are fetched from the API endpoint at scan
+# time. In tests we don't have a SaaS server running, so we look for a
+# sibling fixture directory containing the same per-article JSON the
+# production endpoint serves. When the fixture dir is absent (clean
+# public checkout / CI without dual-repo setup), tests in this file
+# are SKIPPED — degraded-mode assertions are covered separately.
+import json as _json_for_fixture
+import os.path as _path_for_fixture
+from scanner.core import classification_client, obligation_lookup
+
+# Resolve fixture dir for classification metadata via the
+# CL_CLASSIFICATION_FIXTURE_DIR env var. The fixture is a directory of
+# per-article JSON files mirroring what the
+# /api/v1/regulations/eu-ai-act/articles/N/classifications endpoint
+# returns. Tests in this file are skipped when the env var is unset
+# or points at a non-existent directory — degraded-mode coverage lives
+# in test_obligation_lookup_classification_merge.py via direct mocks.
+#
+# Maintainers running a dual-checkout layout typically set this in their
+# shell profile or activate-script:
+#     export CL_CLASSIFICATION_FIXTURE_DIR="$HOME/path/to/saas/data/obligation-classifications"
+_FIXTURE_ENV = os.environ.get("CL_CLASSIFICATION_FIXTURE_DIR", "")
+_CLASS_FIXTURE_DIR = (
+    _path_for_fixture.normpath(_path_for_fixture.join(SCANNER_ROOT, "..", _FIXTURE_ENV))
+    if _FIXTURE_ENV
+    else ""
+)
+_FIXTURE_PRESENT = bool(_CLASS_FIXTURE_DIR) and _path_for_fixture.isdir(_CLASS_FIXTURE_DIR)
+
+
+def _load_classifications_fixture(article_number: int):
+    """Mirror what the production /api/.../classifications endpoint
+    returns — load per-article JSON from the fixture dir and return
+    its `obligations` dict, or None when the file is missing."""
+    path = _path_for_fixture.join(
+        _CLASS_FIXTURE_DIR, f"art{article_number:02d}.json"
+    )
+    if not _path_for_fixture.exists(path):
+        return None
+    with open(path, "r", encoding="utf-8") as f:
+        return _json_for_fixture.load(f).get("obligations") or {}
+
+
+# All tests in this file depend on the classification fixture being
+# present locally. CI without dual-repo setup skips the file rather
+# than failing — degraded-mode behavior is covered in
+# test_obligation_lookup_classification_merge.py which mocks the
+# fetch directly.
+pytestmark = pytest.mark.skipif(
+    not _FIXTURE_PRESENT,
+    reason=(
+        "classification fixture dir not present — set "
+        "CL_CLASSIFICATION_FIXTURE_DIR or run from a checkout that "
+        "has the SaaS-side fixture available"
+    ),
+)
+
+
+@pytest.fixture(autouse=True)
+def _mock_classification_fetch():
+    """Auto-mock fetch_classifications for every test in this file so
+    the 5 SaaS-only fields are populated as if the scanner were
+    authenticated against compliancelint.dev. Mirrors what production
+    behaviour looks like once `cl_connect` has been run.
+
+    Without this, every test that asserts on detection_method /
+    rationale / what_to_scan / confidence / human_judgment_needed
+    would fail with empty strings (degraded mode = those fields stay
+    stripped from public JSON post-§AA Step 1)."""
+    obligation_lookup.reset_cache()
+    classification_client.reset_degraded_notice_flag()
+    with patch.object(
+        classification_client,
+        "fetch_classifications",
+        side_effect=_load_classifications_fixture,
+    ):
+        yield
+    obligation_lookup.reset_cache()
 
 
 def _strip_text_footer(s: str) -> str:
