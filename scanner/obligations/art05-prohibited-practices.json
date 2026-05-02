@@ -55,16 +55,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "low",
-        "detection_method": "Heuristic: detect dark pattern libraries, subliminal messaging code, A/B testing frameworks that optimize for behavioural manipulation",
-        "what_to_scan": [
-          "code",
-          "config",
-          "dependencies"
-        ],
-        "human_judgment_needed": "Whether a detected pattern constitutes a 'subliminal technique' or 'purposeful manipulation' requires legal assessment of intent, effect, and harm threshold",
-        "rationale": "Can detect code patterns associated with manipulation (dark patterns, subliminal stimuli) but cannot determine intent, effect on decision-making, or whether harm threshold is met"
+        "level": "partial"
       }
     },
     {
@@ -98,15 +89,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "low",
-        "detection_method": "Heuristic: detect code that segments users by age/disability/socioeconomic status and applies differentiated manipulation strategies",
-        "what_to_scan": [
-          "code",
-          "config"
-        ],
-        "human_judgment_needed": "Whether targeting vulnerable groups constitutes 'exploitation' vs. legitimate accessibility or age-appropriate content — intent and effect on behaviour must be assessed",
-        "rationale": "Can detect user segmentation by vulnerability factors but cannot determine whether the purpose is exploitation vs. legitimate adaptation"
+        "level": "partial"
       }
     },
     {
@@ -140,16 +123,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Heuristic: detect social scoring variables, person rating/ranking systems, trustworthiness score computation, cross-context behaviour aggregation, citizen score patterns",
-        "what_to_scan": [
-          "code",
-          "config",
-          "documentation"
-        ],
-        "human_judgment_needed": "Whether a scoring system constitutes prohibited 'social scoring' vs. legitimate single-context reputation systems (e.g., marketplace seller ratings) — context, cross-domain application, and proportionality must be assessed",
-        "rationale": "Can detect scoring patterns and cross-context data aggregation but cannot determine whether the treatment is disproportionate or whether contexts are sufficiently related"
+        "level": "partial"
       }
     },
     {
@@ -183,16 +157,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Heuristic: detect criminal risk scoring functions, recidivism prediction models, person-level crime risk profiling patterns",
-        "what_to_scan": [
-          "code",
-          "config",
-          "documentation"
-        ],
-        "human_judgment_needed": "Whether the system relies 'solely' on profiling vs. incorporating objective facts, and whether the exception conditions are met — requires analysis of data sources and human oversight mechanisms",
-        "rationale": "Can detect criminal risk prediction code patterns but cannot determine whether the system relies solely on profiling or incorporates objective facts"
+        "level": "partial"
       },
       "cross_references": [
         {
@@ -232,16 +197,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Heuristic: detect web scraping libraries combined with face detection/extraction, CCTV processing with face extraction pipelines, bulk image download combined with facial recognition, face database building code",
-        "what_to_scan": [
-          "code",
-          "config",
-          "dependencies"
-        ],
-        "human_judgment_needed": "Whether scraping is 'untargeted' vs. targeted with lawful basis, and whether the purpose is to build or expand a facial recognition database",
-        "rationale": "Can detect combinations of scraping and facial recognition code but cannot determine whether scraping is targeted or untargeted, or whether consent/legal basis exists"
+        "level": "partial"
       }
     },
     {
@@ -275,16 +231,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Heuristic: detect emotion recognition library imports (fer, deepface emotion mode, py-feat, opensmile, speech emotion), facial expression analysis, voice emotion analysis, engagement/attention scoring patterns",
-        "what_to_scan": [
-          "code",
-          "config",
-          "dependencies"
-        ],
-        "human_judgment_needed": "Whether the deployment context is workplace/education, and whether medical or safety exceptions apply — requires analysis of intended use context and documentation of exception justification",
-        "rationale": "Can detect emotion recognition code but cannot determine deployment context (workplace/education vs. other) or whether exceptions genuinely apply"
+        "level": "partial"
       }
     },
     {
@@ -333,16 +280,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Heuristic: detect race/ethnicity classification from facial images, political opinion inference from biometric data, sexual orientation prediction, religion inference from appearance analysis, sensitive attribute classification patterns",
-        "what_to_scan": [
-          "code",
-          "config",
-          "dependencies"
-        ],
-        "human_judgment_needed": "Whether the biometric processing actually infers the listed sensitive attributes, and whether the dataset labelling or law enforcement exceptions apply",
-        "rationale": "Can detect sensitive attribute classification code patterns but cannot determine whether the system genuinely infers these attributes from biometric data or whether exceptions are validly claimed"
+        "level": "partial"
       }
     },
     {
@@ -396,16 +334,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Heuristic: detect real-time facial recognition pipelines with camera/stream input, live biometric matching against watchlists, surveillance system integration with biometric identification, public space deployment configuration",
-        "what_to_scan": [
-          "code",
-          "config",
-          "dependencies"
-        ],
-        "human_judgment_needed": "Whether the system is 'real-time', whether deployment is in publicly accessible spaces, whether it is for law enforcement purposes, and whether any exception is validly claimed with proper authorization",
-        "rationale": "Can detect real-time biometric identification code patterns but cannot determine deployment context, law enforcement purpose, or whether exception conditions (including judicial authorization) are met"
+        "level": "partial"
       },
       "cross_references": [
         {

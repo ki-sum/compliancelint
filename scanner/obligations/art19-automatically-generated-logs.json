@@ -46,13 +46,11 @@
         }
       ],
       "automation_assessment": {
-        "level": "full",
-        "confidence": "high",
-        "detection_method": "code_pattern_search",
-        "what_to_scan": "Log storage configuration, log retention policies, log archival mechanisms, log persistence setup",
-        "human_judgment_needed": false
+        "level": "full"
       },
-      "cross_references": ["Art. 12(1)"]
+      "cross_references": [
+        "Art. 12(1)"
+      ]
     },
     {
       "id": "ART19-OBL-1b",
@@ -75,11 +73,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "full",
-        "confidence": "high",
-        "detection_method": "code_pattern_search",
-        "what_to_scan": "Log retention configuration (TTL, expiry, rotation policies), log storage duration settings",
-        "human_judgment_needed": false
+        "level": "full"
       }
     },
     {
@@ -98,11 +92,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "low",
-        "detection_method": "documentation_search",
-        "what_to_scan": "Financial services compliance configuration, regulatory log integration",
-        "human_judgment_needed": true
+        "level": "partial"
       },
       "scope_limitation": "Only applies to providers that are financial institutions subject to Union financial services law",
       "context_skip_field": "is_financial_institution"

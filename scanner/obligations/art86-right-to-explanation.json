@@ -66,14 +66,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check for explainability interfaces, explanation generation code, SHAP/LIME integration, decision audit trails, user-facing explanation endpoints",
-        "what_to_scan": [
-          "code",
-          "documentation"
-        ],
-        "human_judgment_needed": "Whether explanations are truly clear and meaningful to affected persons"
+        "level": "partial"
       }
     },
     {
@@ -91,13 +84,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "Check for legal analysis documenting applicable Union or national law exceptions",
-        "what_to_scan": [
-          "documentation"
-        ],
-        "human_judgment_needed": "Legal assessment of whether an exception under Union or national law applies"
+        "level": "manual"
       },
       "linked_obligation": [
         "ART86-OBL-1"
@@ -118,13 +105,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "Check for legal analysis of whether other Union law already provides equivalent right to explanation (e.g. GDPR Art. 22)",
-        "what_to_scan": [
-          "documentation"
-        ],
-        "human_judgment_needed": "Legal assessment of whether other Union law provisions already cover the right to explanation"
+        "level": "manual"
       }
     }
   ],

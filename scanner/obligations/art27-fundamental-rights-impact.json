@@ -18,7 +18,10 @@
       "celex": "32024R1689",
       "oj_citation": "OJ L 2024/1689, 12.7.2024"
     },
-    "pdf_pages": [69, 70],
+    "pdf_pages": [
+      69,
+      70
+    ],
     "related_standards": {
       "published": [
         "ISO/IEC 42001:2023 -- AI management system",
@@ -73,11 +76,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check for FRIA documentation covering all six required elements: processes, period/frequency, affected categories, specific risks, oversight measures, risk materialisation measures",
-        "what_to_scan": ["documentation"],
-        "human_judgment_needed": "Whether the FRIA content is substantively adequate for the specific deployment context"
+        "level": "partial"
       }
     },
     {
@@ -103,11 +102,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "low",
-        "detection_method": "Check for FRIA documentation with dates, version history, change log showing updates",
-        "what_to_scan": ["documentation"],
-        "human_judgment_needed": "Whether the FRIA was completed before first use and updated appropriately"
+        "level": "partial"
       }
     },
     {
@@ -128,11 +123,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "Check for evidence of authority notification, submission records, correspondence",
-        "what_to_scan": ["documentation"],
-        "human_judgment_needed": "Whether notification has actually been submitted to the relevant authority"
+        "level": "manual"
       }
     },
     {
@@ -153,11 +144,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "Check for FRIA documentation that references and complements existing DPIA",
-        "what_to_scan": ["documentation"],
-        "human_judgment_needed": "Whether the FRIA adequately complements the DPIA"
+        "level": "manual"
       }
     }
   ],

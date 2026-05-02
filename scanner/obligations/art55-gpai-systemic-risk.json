@@ -10,7 +10,9 @@
       "celex": "32024R1689",
       "oj_citation": "OJ L 2024/1689, 12.7.2024"
     },
-    "pdf_pages": [86],
+    "pdf_pages": [
+      86
+    ],
     "related_standards": {
       "published": [
         "ISO/IEC 23894:2023 -- AI risk management",
@@ -43,11 +45,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check for evaluation scripts, adversarial testing documentation, red-teaming results, benchmark results",
-        "what_to_scan": ["code", "documentation"],
-        "human_judgment_needed": "Whether evaluation uses appropriate standardized protocols"
+        "level": "partial"
       }
     },
     {
@@ -65,11 +63,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "Check for systemic risk assessment documentation",
-        "what_to_scan": ["documentation"],
-        "human_judgment_needed": "Whether systemic risks have been adequately assessed and mitigated"
+        "level": "manual"
       }
     },
     {
@@ -92,11 +86,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "low",
-        "detection_method": "Check for incident tracking systems, reporting procedures, incident documentation",
-        "what_to_scan": ["documentation", "config"],
-        "human_judgment_needed": "Whether incident tracking and reporting is adequate"
+        "level": "partial"
       }
     },
     {
@@ -114,11 +104,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "low",
-        "detection_method": "Check for security policies, access controls, infrastructure security documentation",
-        "what_to_scan": ["code", "config", "documentation"],
-        "human_judgment_needed": "Whether cybersecurity level is 'adequate' for the systemic risk"
+        "level": "partial"
       }
     },
     {
@@ -136,13 +122,14 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "Check for adherence to approved codes of practice or harmonised standards",
-        "what_to_scan": ["documentation"],
-        "human_judgment_needed": "Whether the provider follows an approved code of practice"
+        "level": "manual"
       },
-      "cross_references": [{"article": 56, "context": "Codes of practice"}]
+      "cross_references": [
+        {
+          "article": 56,
+          "context": "Codes of practice"
+        }
+      ]
     },
     {
       "id": "ART55-OBL-2",
@@ -160,11 +147,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "Check for alternative compliance documentation submitted to Commission",
-        "what_to_scan": ["documentation"],
-        "human_judgment_needed": "Whether alternative means are adequate"
+        "level": "manual"
       }
     }
   ],

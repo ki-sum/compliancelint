@@ -39,11 +39,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "context_analysis",
-        "what_to_scan": "Project metadata for rebranding indicators, modification history, intended purpose documentation, upstream AI system integration details",
-        "human_judgment_needed": true
+        "level": "partial"
       },
       "cross_references": [
         "Art. 6",
@@ -71,11 +67,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "low",
-        "detection_method": "documentation_search",
-        "what_to_scan": "Upstream provider agreements, technical documentation transfer records, cooperation documentation",
-        "human_judgment_needed": true
+        "level": "partial"
       }
     },
     {
@@ -94,11 +86,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "low",
-        "detection_method": "documentation_search",
-        "what_to_scan": "License terms, usage restrictions, upstream provider documentation for opt-out clauses",
-        "human_judgment_needed": true
+        "level": "partial"
       },
       "linked_obligation": [
         "ART25-OBL-4"
@@ -125,11 +113,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "low",
-        "detection_method": "context_analysis",
-        "what_to_scan": "Product packaging metadata, brand/trademark usage, Annex I product classification",
-        "human_judgment_needed": true
+        "level": "partial"
       },
       "cross_references": [
         "Art. 16",
@@ -159,11 +143,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "documentation_search",
-        "what_to_scan": "Third-party supplier agreements, vendor contracts, component supply documentation, open-source license files",
-        "human_judgment_needed": true
+        "level": "partial"
       }
     },
     {
@@ -182,11 +162,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "full",
-        "confidence": "high",
-        "detection_method": "code_pattern_search",
-        "what_to_scan": "License files, dependency manifests, open-source declarations for third-party AI components",
-        "human_judgment_needed": false
+        "level": "full"
       },
       "linked_obligation": [
         "ART25-OBL-4"
@@ -208,11 +184,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "documentation_search",
-        "what_to_scan": "IP protection clauses in agreements, NDA documentation, trade secret policies",
-        "human_judgment_needed": true
+        "level": "manual"
       }
     }
   ],

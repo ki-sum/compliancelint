@@ -42,11 +42,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "documentation_search",
-        "what_to_scan": "Compliance documentation availability, language support for documentation, authority request response procedures",
-        "human_judgment_needed": true
+        "level": "partial"
       }
     },
     {
@@ -65,13 +61,11 @@
         }
       ],
       "automation_assessment": {
-        "level": "full",
-        "confidence": "high",
-        "detection_method": "code_pattern_search",
-        "what_to_scan": "Log export mechanisms, log access APIs, log retrieval procedures, log storage accessibility",
-        "human_judgment_needed": false
+        "level": "full"
       },
-      "cross_references": ["Art. 12(1)"]
+      "cross_references": [
+        "Art. 12(1)"
+      ]
     }
   ],
   "summary": {

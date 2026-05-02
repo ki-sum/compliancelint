@@ -92,13 +92,14 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "documentation_search",
-        "what_to_scan": "Testing plans, authority approval documentation, registration records, consent forms, oversight procedures, data transfer policies",
-        "human_judgment_needed": true
+        "level": "partial"
       },
-      "cross_references": ["Art. 13", "Art. 61", "Art. 71(4)", "Annex IX"],
+      "cross_references": [
+        "Art. 13",
+        "Art. 61",
+        "Art. 71(4)",
+        "Annex IX"
+      ],
       "scope_limitation": "Only applies to testing of Annex III high-risk AI systems in real world conditions outside regulatory sandboxes",
       "context_skip_field": "conducts_real_world_testing"
     },
@@ -128,13 +129,11 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "documentation_search",
-        "what_to_scan": "Incident reporting procedures, mitigation plans, testing suspension protocols, recall procedures",
-        "human_judgment_needed": true
+        "level": "partial"
       },
-      "cross_references": ["Art. 73"],
+      "cross_references": [
+        "Art. 73"
+      ],
       "scope_limitation": "Only applies during real-world testing",
       "context_skip_field": "conducts_real_world_testing"
     },
@@ -159,11 +158,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "low",
-        "detection_method": "documentation_search",
-        "what_to_scan": "Testing notification procedures, authority communication records",
-        "human_judgment_needed": true
+        "level": "partial"
       },
       "scope_limitation": "Only applies during real-world testing",
       "context_skip_field": "conducts_real_world_testing"
@@ -184,11 +179,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "documentation_search",
-        "what_to_scan": "Insurance policies, liability coverage documentation, indemnification agreements",
-        "human_judgment_needed": true
+        "level": "manual"
       },
       "scope_limitation": "Only applies during real-world testing",
       "context_skip_field": "conducts_real_world_testing"

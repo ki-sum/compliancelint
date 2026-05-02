@@ -37,13 +37,12 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "documentation_search",
-        "what_to_scan": "EU database registration records, Annex VIII data preparation, registration confirmation",
-        "human_judgment_needed": true
+        "level": "partial"
       },
-      "cross_references": ["Annex VIII Sections A and B", "Art. 49"]
+      "cross_references": [
+        "Annex VIII Sections A and B",
+        "Art. 49"
+      ]
     },
     {
       "id": "ART71-OBL-3",
@@ -61,15 +60,15 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "low",
-        "detection_method": "documentation_search",
-        "what_to_scan": "Deployer registration records, public authority classification, Annex VIII Section C data",
-        "human_judgment_needed": true
+        "level": "partial"
       },
       "scope_limitation": "Only applies to deployers who are, or act on behalf of, public authorities",
       "context_skip_field": "is_public_authority_deployer",
-      "cross_references": ["Annex VIII Section C", "Art. 49(3)", "Art. 49(4)"]
+      "cross_references": [
+        "Annex VIII Section C",
+        "Art. 49(3)",
+        "Art. 49(4)"
+      ]
     }
   ],
   "summary": {

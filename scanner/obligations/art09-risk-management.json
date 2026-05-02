@@ -67,15 +67,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check for risk management documentation files (risk_assessment.md, risk_register.*, FMEA files)",
-        "what_to_scan": [
-          "documentation",
-          "config"
-        ],
-        "human_judgment_needed": "Whether the documented RMS is adequate and truly maintained",
-        "rationale": "Can detect presence of documentation but cannot assess quality or maintenance"
+        "level": "partial"
       }
     },
     {
@@ -108,15 +100,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "low",
-        "detection_method": "Check for version-controlled risk documents with change history, review schedules",
-        "what_to_scan": [
-          "documentation",
-          "config"
-        ],
-        "human_judgment_needed": "Whether the process is truly continuous and iterative",
-        "rationale": "Can check for version history but cannot verify genuine iteration"
+        "level": "partial"
       }
     },
     {
@@ -144,14 +128,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check for risk register with risk categories covering health, safety, fundamental rights",
-        "what_to_scan": [
-          "documentation"
-        ],
-        "human_judgment_needed": "Whether all foreseeable risks have been identified",
-        "rationale": "Can detect presence of risk register but cannot assess completeness"
+        "level": "partial"
       }
     },
     {
@@ -174,14 +151,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "low",
-        "detection_method": "Check for intended use / misuse documentation, model cards",
-        "what_to_scan": [
-          "documentation"
-        ],
-        "human_judgment_needed": "Whether misuse scenarios are realistic and comprehensive",
-        "rationale": "Can detect presence of documentation but cannot assess completeness"
+        "level": "partial"
       }
     },
     {
@@ -199,14 +169,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "Check for post-market monitoring integration in risk management docs",
-        "what_to_scan": [
-          "documentation"
-        ],
-        "human_judgment_needed": "Whether post-market data is actually feeding into risk management",
-        "rationale": "Post-market monitoring feedback loop cannot be verified from code alone"
+        "level": "manual"
       },
       "cross_references": [
         {
@@ -235,15 +198,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check for guardrails, safety checks, input validation, content filters in code",
-        "what_to_scan": [
-          "code",
-          "config"
-        ],
-        "human_judgment_needed": "Whether measures are appropriate and targeted to specific risks",
-        "rationale": "Can detect risk mitigation code patterns but cannot assess appropriateness"
+        "level": "partial"
       }
     },
     {
@@ -262,12 +217,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "N/A — scope-definition clause requiring legal judgment",
-        "what_to_scan": [],
-        "human_judgment_needed": "Whether identified risks fall within scope of what is reasonably mitigable through design or technical information",
-        "rationale": "Scope determination requires domain expertise and legal judgment — cannot be automated"
+        "level": "manual"
       }
     },
     {
@@ -290,12 +240,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "N/A — requires human assessment of cross-requirement interactions",
-        "what_to_scan": [],
-        "human_judgment_needed": "Whether combined effects have been adequately considered",
-        "rationale": "Cross-requirement interaction analysis requires domain expertise"
+        "level": "manual"
       }
     },
     {
@@ -318,14 +263,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "Check for residual risk documentation, known limitations sections",
-        "what_to_scan": [
-          "documentation"
-        ],
-        "human_judgment_needed": "Whether residual risks are truly acceptable",
-        "rationale": "Acceptability involves value judgments beyond technical assessment"
+        "level": "manual"
       }
     },
     {
@@ -343,14 +281,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "low",
-        "detection_method": "Check for safety-by-design patterns (guardrails, input validation, output filters)",
-        "what_to_scan": [
-          "code"
-        ],
-        "human_judgment_needed": "Whether design choices adequately address identified risks",
-        "rationale": "Can detect safety patterns but cannot assess adequacy"
+        "level": "partial"
       }
     },
     {
@@ -368,15 +299,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "low",
-        "detection_method": "Check for monitoring, alerting, fallback mechanisms, circuit breakers",
-        "what_to_scan": [
-          "code",
-          "config"
-        ],
-        "human_judgment_needed": "Whether mitigations are adequate and proportionate",
-        "rationale": "Can detect mitigation patterns but cannot assess proportionality"
+        "level": "partial"
       }
     },
     {
@@ -399,14 +322,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "Check for deployer documentation and training materials",
-        "what_to_scan": [
-          "documentation"
-        ],
-        "human_judgment_needed": "Whether information and training are sufficient",
-        "rationale": "Training adequacy requires human assessment"
+        "level": "manual"
       },
       "cross_references": [
         {
@@ -435,14 +351,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "Check for target user documentation, deployment context description",
-        "what_to_scan": [
-          "documentation"
-        ],
-        "human_judgment_needed": "Whether deployer context has been adequately considered",
-        "rationale": "Deployer context assessment requires domain knowledge"
+        "level": "manual"
       }
     },
     {
@@ -470,15 +379,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check for test files, evaluation scripts, benchmark files",
-        "what_to_scan": [
-          "code",
-          "config"
-        ],
-        "human_judgment_needed": "Whether tests adequately cover identified risks",
-        "rationale": "Can detect testing infrastructure but cannot assess test adequacy"
+        "level": "partial"
       }
     },
     {
@@ -501,15 +402,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check for CI/CD test integration, pre-deployment test gates",
-        "what_to_scan": [
-          "config",
-          "code"
-        ],
-        "human_judgment_needed": "Whether testing was performed at appropriate times",
-        "rationale": "Can detect CI/CD integration but cannot verify timing of all tests"
+        "level": "partial"
       }
     },
     {
@@ -537,15 +430,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check for metric definitions (accuracy, precision, recall, F1, AUC), threshold values in config",
-        "what_to_scan": [
-          "code",
-          "config"
-        ],
-        "human_judgment_needed": "Whether metrics are appropriate for the specific system",
-        "rationale": "Can detect metric usage but cannot assess appropriateness"
+        "level": "partial"
       }
     },
     {
@@ -571,15 +456,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "low",
-        "detection_method": "Check for references to children, minors, age verification, child safety in code and docs",
-        "what_to_scan": [
-          "code",
-          "documentation"
-        ],
-        "human_judgment_needed": "Whether the system actually affects children and whether protections are adequate",
-        "rationale": "Can detect references but cannot determine actual impact on children"
+        "level": "partial"
       }
     },
     {
@@ -598,12 +475,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "N/A — permission, not obligation",
-        "what_to_scan": [],
-        "human_judgment_needed": "Whether real-world testing is appropriate",
-        "rationale": "Permission (may), not obligation (shall)"
+        "level": "manual"
       },
       "cross_references": [
         {
@@ -628,12 +500,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "N/A — permission, not obligation",
-        "what_to_scan": [],
-        "human_judgment_needed": "Whether integration with other risk management is appropriate",
-        "rationale": "Permission (may), not obligation (shall)"
+        "level": "manual"
       }
     }
   ],

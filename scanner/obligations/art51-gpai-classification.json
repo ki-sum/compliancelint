@@ -10,7 +10,9 @@
       "celex": "32024R1689",
       "oj_citation": "OJ L 2024/1689, 12.7.2024"
     },
-    "pdf_pages": [82],
+    "pdf_pages": [
+      82
+    ],
     "related_standards": {
       "published": [],
       "upcoming": [
@@ -34,11 +36,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "low",
-        "detection_method": "Check if AI answers indicate the model has high impact capabilities, training compute > 10^25 FLOPs, or Commission designation",
-        "what_to_scan": ["documentation", "config"],
-        "human_judgment_needed": "Whether the model truly has 'high impact capabilities' requires expert evaluation of benchmarks and capabilities"
+        "level": "partial"
       }
     },
     {
@@ -56,11 +54,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check documentation for training compute figures (FLOPs)",
-        "what_to_scan": ["documentation"],
-        "human_judgment_needed": "Verification of compute figures"
+        "level": "partial"
       }
     },
     {
@@ -78,11 +72,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "N/A -- Commission empowerment, not provider obligation",
-        "what_to_scan": [],
-        "human_judgment_needed": "Monitor Commission delegated acts for threshold changes"
+        "level": "manual"
       }
     }
   ],

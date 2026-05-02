@@ -29,15 +29,15 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "low",
-        "detection_method": "documentation_search",
-        "what_to_scan": "GPAI model documentation readiness, Art. 53/55 documentation completeness, information request response procedures",
-        "human_judgment_needed": true
+        "level": "partial"
       },
       "scope_limitation": "Only applies to providers of general-purpose AI models when requested by the Commission",
       "context_skip_field": "is_gpai_provider",
-      "cross_references": ["Art. 53", "Art. 55", "Art. 101"]
+      "cross_references": [
+        "Art. 53",
+        "Art. 55",
+        "Art. 101"
+      ]
     }
   ],
   "summary": {

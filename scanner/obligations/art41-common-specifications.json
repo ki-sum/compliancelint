@@ -44,11 +44,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "documentation_search",
-        "what_to_scan": "Standards compliance documentation, technical justification documents, alternative solution descriptions, equivalence assessments",
-        "human_judgment_needed": true
+        "level": "partial"
       },
       "scope_limitation": "Only applies when common specifications have been adopted and the provider does not comply with them",
       "context_skip_field": "follows_common_specifications"

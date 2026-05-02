@@ -18,7 +18,10 @@
       "celex": "32024R1689",
       "oj_citation": "OJ L 2024/1689, 12.7.2024"
     },
-    "pdf_pages": [100, 101],
+    "pdf_pages": [
+      100,
+      101
+    ],
     "related_standards": {
       "published": [
         "ISO/IEC 42001:2023 -- AI management system",
@@ -45,11 +48,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check for incident reporting procedures, incident detection systems, authority contact information, reporting templates",
-        "what_to_scan": ["documentation", "code", "config"],
-        "human_judgment_needed": "Whether incidents are correctly classified as serious and reported to the right authority"
+        "level": "partial"
       }
     },
     {
@@ -67,11 +66,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check for incident response timeline documentation, SLA definitions, escalation procedures with time bounds",
-        "what_to_scan": ["documentation", "config"],
-        "human_judgment_needed": "Whether the 15-day deadline is being met in practice"
+        "level": "partial"
       }
     },
     {
@@ -89,11 +84,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "low",
-        "detection_method": "Check for escalation procedures distinguishing widespread infringement from other incidents, expedited reporting procedures",
-        "what_to_scan": ["documentation"],
-        "human_judgment_needed": "Whether an incident constitutes a widespread infringement requiring expedited reporting"
+        "level": "partial"
       }
     },
     {
@@ -111,11 +102,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "low",
-        "detection_method": "Check for escalation procedures for fatal incidents, expedited reporting procedures for death cases",
-        "what_to_scan": ["documentation"],
-        "human_judgment_needed": "Whether the causal link between AI system and death is correctly established"
+        "level": "partial"
       }
     },
     {
@@ -133,11 +120,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "Check for two-stage reporting procedures in incident response documentation",
-        "what_to_scan": ["documentation"],
-        "human_judgment_needed": "Whether initial report contains sufficient information"
+        "level": "manual"
       }
     },
     {
@@ -170,11 +153,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check for incident investigation procedures, root cause analysis templates, corrective action tracking, risk assessment methodology",
-        "what_to_scan": ["documentation", "code"],
-        "human_judgment_needed": "Whether investigations are sufficiently thorough and corrective actions adequate"
+        "level": "partial"
       }
     }
   ],

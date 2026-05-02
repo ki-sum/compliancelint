@@ -41,13 +41,18 @@
         }
       ],
       "automation_assessment": {
-        "level": "full",
-        "confidence": "high",
-        "detection_method": "cross_reference_check",
-        "what_to_scan": "Aggregate compliance status across Art. 9-15 scan results",
-        "human_judgment_needed": false
+        "level": "full"
       },
-      "cross_references": ["Art. 8", "Art. 9", "Art. 10", "Art. 11", "Art. 12", "Art. 13", "Art. 14", "Art. 15"]
+      "cross_references": [
+        "Art. 8",
+        "Art. 9",
+        "Art. 10",
+        "Art. 11",
+        "Art. 12",
+        "Art. 13",
+        "Art. 14",
+        "Art. 15"
+      ]
     },
     {
       "id": "ART16-OBL-1b",
@@ -65,11 +70,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "documentation_search",
-        "what_to_scan": "README, package metadata, documentation files for provider identification and contact details",
-        "human_judgment_needed": true
+        "level": "partial"
       }
     },
     {
@@ -88,13 +89,11 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "documentation_search",
-        "what_to_scan": "Quality management documentation, QMS policies, process documentation",
-        "human_judgment_needed": true
+        "level": "partial"
       },
-      "cross_references": ["Art. 17"]
+      "cross_references": [
+        "Art. 17"
+      ]
     },
     {
       "id": "ART16-OBL-1d",
@@ -112,13 +111,11 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "documentation_search",
-        "what_to_scan": "Technical documentation, quality system docs, conformity declarations",
-        "human_judgment_needed": true
+        "level": "partial"
       },
-      "cross_references": ["Art. 18"]
+      "cross_references": [
+        "Art. 18"
+      ]
     },
     {
       "id": "ART16-OBL-1e",
@@ -136,13 +133,12 @@
         }
       ],
       "automation_assessment": {
-        "level": "full",
-        "confidence": "high",
-        "detection_method": "code_pattern_search",
-        "what_to_scan": "Log retention configuration, log storage policies, log archival mechanisms",
-        "human_judgment_needed": false
+        "level": "full"
       },
-      "cross_references": ["Art. 12", "Art. 19"],
+      "cross_references": [
+        "Art. 12",
+        "Art. 19"
+      ],
       "scope_limitation": "when under their control",
       "context_skip_field": null
     },
@@ -162,13 +158,11 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "documentation_search",
-        "what_to_scan": "Conformity assessment records, notified body certificates, self-assessment documentation",
-        "human_judgment_needed": true
+        "level": "partial"
       },
-      "cross_references": ["Art. 43"]
+      "cross_references": [
+        "Art. 43"
+      ]
     },
     {
       "id": "ART16-OBL-1g",
@@ -186,13 +180,11 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "documentation_search",
-        "what_to_scan": "EU declaration of conformity document, compliance documentation directory",
-        "human_judgment_needed": true
+        "level": "partial"
       },
-      "cross_references": ["Art. 47"]
+      "cross_references": [
+        "Art. 47"
+      ]
     },
     {
       "id": "ART16-OBL-1h",
@@ -210,13 +202,11 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "low",
-        "detection_method": "documentation_search",
-        "what_to_scan": "Product documentation, packaging specifications, release artifacts for CE marking references",
-        "human_judgment_needed": true
+        "level": "partial"
       },
-      "cross_references": ["Art. 48"]
+      "cross_references": [
+        "Art. 48"
+      ]
     },
     {
       "id": "ART16-OBL-1i",
@@ -234,13 +224,11 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "documentation_search",
-        "what_to_scan": "EU database registration records, registration confirmation documentation",
-        "human_judgment_needed": true
+        "level": "partial"
       },
-      "cross_references": ["Art. 49"]
+      "cross_references": [
+        "Art. 49"
+      ]
     },
     {
       "id": "ART16-OBL-1j",
@@ -258,13 +246,11 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "documentation_search",
-        "what_to_scan": "Corrective action procedures, incident response documentation, withdrawal/recall plans",
-        "human_judgment_needed": true
+        "level": "partial"
       },
-      "cross_references": ["Art. 20"]
+      "cross_references": [
+        "Art. 20"
+      ]
     },
     {
       "id": "ART16-OBL-1k",
@@ -282,11 +268,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "documentation_search",
-        "what_to_scan": "Compliance evidence documentation, audit-ready materials, conformity assessment records",
-        "human_judgment_needed": true
+        "level": "partial"
       }
     },
     {
@@ -305,13 +287,12 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "code_and_documentation_search",
-        "what_to_scan": "Accessibility features, WCAG compliance, accessibility testing, accessibility documentation",
-        "human_judgment_needed": true
+        "level": "partial"
       },
-      "cross_references": ["Directive (EU) 2016/2102", "Directive (EU) 2019/882"]
+      "cross_references": [
+        "Directive (EU) 2016/2102",
+        "Directive (EU) 2019/882"
+      ]
     }
   ],
   "summary": {

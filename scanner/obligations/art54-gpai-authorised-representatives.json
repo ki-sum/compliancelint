@@ -37,13 +37,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "low",
-        "detection_method": "Check for authorised representative documentation, mandate records",
-        "what_to_scan": [
-          "documentation"
-        ],
-        "human_judgment_needed": "Whether the provider is a third-country provider and whether appointment is valid"
+        "level": "partial"
       }
     },
     {
@@ -64,13 +58,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "Check for evidence that representative has necessary access, resources and information",
-        "what_to_scan": [
-          "documentation"
-        ],
-        "human_judgment_needed": "Whether the provider has adequately enabled the representative"
+        "level": "manual"
       }
     },
     {
@@ -101,13 +89,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "Check for mandate documentation",
-        "what_to_scan": [
-          "documentation"
-        ],
-        "human_judgment_needed": "Whether mandate covers all required tasks"
+        "level": "manual"
       }
     },
     {
@@ -128,13 +110,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "Check mandate documentation for addressability clause",
-        "what_to_scan": [
-          "documentation"
-        ],
-        "human_judgment_needed": "Whether the mandate adequately empowers the representative"
+        "level": "manual"
       }
     },
     {
@@ -155,11 +131,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "N/A -- procedural obligation",
-        "what_to_scan": [],
-        "human_judgment_needed": "Organizational/legal process"
+        "level": "manual"
       }
     },
     {
@@ -180,13 +152,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check license type and systemic risk classification",
-        "what_to_scan": [
-          "documentation"
-        ],
-        "human_judgment_needed": "Whether open-source exception applies"
+        "level": "partial"
       },
       "linked_obligation": [
         "ART54-OBL-1",

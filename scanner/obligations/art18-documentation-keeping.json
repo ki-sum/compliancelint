@@ -59,13 +59,13 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "documentation_search",
-        "what_to_scan": "Document retention policies, compliance documentation directories, archival configuration",
-        "human_judgment_needed": true
+        "level": "partial"
       },
-      "cross_references": ["Art. 11", "Art. 17", "Art. 47"]
+      "cross_references": [
+        "Art. 11",
+        "Art. 17",
+        "Art. 47"
+      ]
     },
     {
       "id": "ART18-OBL-3",
@@ -83,11 +83,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "low",
-        "detection_method": "documentation_search",
-        "what_to_scan": "Financial services compliance documentation, regulatory filing structures",
-        "human_judgment_needed": true
+        "level": "partial"
       },
       "scope_limitation": "Only applies to providers that are financial institutions subject to Union financial services law",
       "context_skip_field": "is_financial_institution"

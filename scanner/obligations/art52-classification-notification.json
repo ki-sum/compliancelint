@@ -10,7 +10,9 @@
       "celex": "32024R1689",
       "oj_citation": "OJ L 2024/1689, 12.7.2024"
     },
-    "pdf_pages": [83],
+    "pdf_pages": [
+      83
+    ],
     "related_standards": {
       "published": [],
       "upcoming": []
@@ -40,11 +42,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "Check for evidence of Commission notification documentation",
-        "what_to_scan": ["documentation"],
-        "human_judgment_needed": "Whether the model meets the threshold and whether notification has been made is an organizational/legal matter"
+        "level": "manual"
       }
     },
     {
@@ -65,11 +63,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "N/A -- permission, not obligation",
-        "what_to_scan": [],
-        "human_judgment_needed": "Whether to exercise this right is a strategic/legal decision"
+        "level": "manual"
       }
     },
     {
@@ -90,11 +84,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "Check for reassessment request documentation with substantive new reasons",
-        "what_to_scan": ["documentation"],
-        "human_judgment_needed": "Whether the reasons are sufficiently objective, detailed and new"
+        "level": "manual"
       }
     },
     {
@@ -115,11 +105,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "N/A -- permission, not obligation",
-        "what_to_scan": [],
-        "human_judgment_needed": "Whether to exercise this right is a strategic decision"
+        "level": "manual"
       }
     },
     {
@@ -137,11 +123,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "N/A -- Commission obligation",
-        "what_to_scan": [],
-        "human_judgment_needed": "N/A"
+        "level": "manual"
       }
     }
   ],

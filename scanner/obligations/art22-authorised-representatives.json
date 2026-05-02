@@ -37,11 +37,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "documentation_search",
-        "what_to_scan": "Authorised representative documentation, mandate agreements, EU representative contact details",
-        "human_judgment_needed": true
+        "level": "partial"
       },
       "scope_limitation": "Only applies to providers established in third countries (non-EU)",
       "context_skip_field": "is_eu_established_provider"
@@ -62,11 +58,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "low",
-        "detection_method": "documentation_search",
-        "what_to_scan": "Mandate scope documentation, representative access and authority records",
-        "human_judgment_needed": true
+        "level": "partial"
       },
       "scope_limitation": "Only applies to providers established in third countries",
       "context_skip_field": "is_eu_established_provider"
@@ -127,13 +119,16 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "documentation_search",
-        "what_to_scan": "Mandate task completion records, document retention systems, authority correspondence, registration records",
-        "human_judgment_needed": true
+        "level": "manual"
       },
-      "cross_references": ["Art. 47", "Art. 11", "Art. 74(10)", "Art. 12(1)", "Art. 49(1)", "Annex VIII Section A point 3"]
+      "cross_references": [
+        "Art. 47",
+        "Art. 11",
+        "Art. 74(10)",
+        "Art. 12(1)",
+        "Art. 49(1)",
+        "Annex VIII Section A point 3"
+      ]
     },
     {
       "id": "ART22-OBL-4",
@@ -151,11 +146,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "low",
-        "detection_method": "documentation_search",
-        "what_to_scan": "Mandate agreement scope, authorised representative authority clauses",
-        "human_judgment_needed": true
+        "level": "partial"
       },
       "scope_limitation": "Only applies to providers established in third countries",
       "context_skip_field": "is_eu_established_provider"

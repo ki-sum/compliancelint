@@ -18,7 +18,11 @@
       "celex": "32024R1689",
       "oj_citation": "OJ L 2024/1689, 12.7.2024"
     },
-    "pdf_pages": [67, 68, 69],
+    "pdf_pages": [
+      67,
+      68,
+      69
+    ],
     "related_standards": {
       "published": [
         "ISO/IEC 42001:2023 -- AI management system",
@@ -45,11 +49,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check for deployment documentation referencing provider instructions, configuration following provider guidelines",
-        "what_to_scan": ["documentation", "config"],
-        "human_judgment_needed": "Whether the system is actually being used per instructions"
+        "level": "partial"
       }
     },
     {
@@ -67,11 +67,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "low",
-        "detection_method": "Check for human oversight role documentation, oversight assignment records, competency requirements",
-        "what_to_scan": ["documentation"],
-        "human_judgment_needed": "Whether assigned persons truly have necessary competence, training and authority"
+        "level": "partial"
       }
     },
     {
@@ -92,11 +88,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "low",
-        "detection_method": "Check for input data validation, data quality checks, representativeness documentation",
-        "what_to_scan": ["code", "documentation"],
-        "human_judgment_needed": "Whether input data is truly representative for the intended purpose"
+        "level": "partial"
       }
     },
     {
@@ -119,11 +111,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check for monitoring dashboards, alerting systems, health checks, provider communication procedures",
-        "what_to_scan": ["code", "config", "documentation"],
-        "human_judgment_needed": "Whether monitoring is adequate for the specific system"
+        "level": "partial"
       }
     },
     {
@@ -141,11 +129,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check for log retention configuration, log storage systems, retention policy documentation",
-        "what_to_scan": ["config", "documentation"],
-        "human_judgment_needed": "Whether logs are actually retained for the required period"
+        "level": "partial"
       }
     },
     {
@@ -166,11 +150,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "Check for worker notification documentation, communication templates",
-        "what_to_scan": ["documentation"],
-        "human_judgment_needed": "Whether workers have actually been informed per applicable labor law"
+        "level": "manual"
       }
     },
     {
@@ -191,11 +171,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "Check for EU database registration evidence",
-        "what_to_scan": ["documentation"],
-        "human_judgment_needed": "Whether registration has been completed"
+        "level": "manual"
       }
     },
     {
@@ -216,11 +192,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "Check for DPIA documentation",
-        "what_to_scan": ["documentation"],
-        "human_judgment_needed": "Whether DPIA has been conducted and uses Art. 13 information"
+        "level": "manual"
       }
     },
     {
@@ -241,11 +213,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "Not automatable — organizational/legal process",
-        "what_to_scan": [],
-        "human_judgment_needed": "This is a law enforcement operational requirement that cannot be assessed from code"
+        "level": "manual"
       }
     },
     {
@@ -263,11 +231,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check for user-facing AI disclosure notices, consent forms, notification mechanisms",
-        "what_to_scan": ["code", "documentation"],
-        "human_judgment_needed": "Whether notification actually reaches affected persons"
+        "level": "partial"
       }
     },
     {
@@ -285,11 +249,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "Check for authority liaison documentation, cooperation procedures",
-        "what_to_scan": ["documentation"],
-        "human_judgment_needed": "Organizational process requirement"
+        "level": "manual"
       }
     }
   ],

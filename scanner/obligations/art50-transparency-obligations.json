@@ -50,16 +50,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Detect chatbot/conversational AI patterns (LLM API calls, chat endpoints, conversational UI components) AND check for AI disclosure text in code/templates",
-        "what_to_scan": [
-          "code",
-          "templates",
-          "config"
-        ],
-        "human_judgment_needed": "Whether the disclosure is shown at the point of interaction (not just in documentation), and whether the 'obvious from circumstances' exception applies",
-        "rationale": "Can detect both chatbot presence and disclosure text in code, but cannot verify disclosure is actually displayed to users at the right moment"
+        "level": "partial"
       },
       "exceptions": [
         {
@@ -108,16 +99,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Detect content generation patterns (diffusion models, LLM APIs, TTS libraries, video generation) AND check for content marking patterns (C2PA, IPTC metadata, watermarking, SynthID, X-AI-Generated headers)",
-        "what_to_scan": [
-          "code",
-          "config",
-          "dependencies"
-        ],
-        "human_judgment_needed": "Whether marking covers ALL generated output (not just some paths), whether marking is robust enough to survive common transformations (compression, cropping, format conversion)",
-        "rationale": "Can detect both content generation and marking code patterns, but cannot verify marking is applied to every output or that it is robust against removal"
+        "level": "partial"
       },
       "recommended_standards": [
         {
@@ -180,15 +162,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Detect emotion recognition patterns (FER, deepface, facial expression analysis, voice emotion detection) and biometric categorization patterns (age/gender estimation, demographic classification) in code",
-        "what_to_scan": [
-          "code",
-          "dependencies"
-        ],
-        "human_judgment_needed": "Whether disclosure reaches ALL exposed persons (especially in physical spaces), whether GDPR compliance is adequate, and whether a DPIA is required",
-        "rationale": "Can detect presence of emotion/biometric code but cannot verify deployment-time disclosure or GDPR compliance"
+        "level": "partial"
       },
       "cross_references": [
         {
@@ -235,15 +209,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Detect deep fake generation patterns (face swap, voice cloning, lip sync, neural face rendering, body puppeteering) and check for disclosure mechanisms (C2PA manifests, watermarks, labels)",
-        "what_to_scan": [
-          "code",
-          "config"
-        ],
-        "human_judgment_needed": "Whether content qualifies as a 'deep fake' under the Act's definition, whether the artistic/satirical exception applies, and whether disclosure is adequate",
-        "rationale": "Can detect deep fake code patterns but cannot assess whether specific outputs constitute deep fakes or qualify for exceptions"
+        "level": "partial"
       },
       "exceptions": [
         {
@@ -292,15 +258,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Detect AI text generation patterns (LLM APIs, content generation pipelines) AND check for disclosure mechanisms in text publishing workflows",
-        "what_to_scan": [
-          "code",
-          "config"
-        ],
-        "human_judgment_needed": "Whether published text constitutes 'informing the public on matters of public interest' and whether disclosure is adequately presented",
-        "rationale": "Can detect text generation patterns but cannot assess whether content qualifies as public interest information"
+        "level": "partial"
       },
       "exceptions": [
         {
@@ -341,15 +299,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "low",
-        "detection_method": "Check for disclosure placement in UI initialization, conversation start handlers, first-render components, and onboarding flows",
-        "what_to_scan": [
-          "code",
-          "templates"
-        ],
-        "human_judgment_needed": "Whether the disclosure is truly provided at the point of first interaction, whether it is visually distinguishable, and whether accessibility requirements are met",
-        "rationale": "Can check code structure for early-stage disclosure but cannot verify the actual user experience meets the 'clear and distinguishable' standard"
+        "level": "partial"
       },
       "cross_references": [
         {
@@ -385,12 +335,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "N/A — this is a legal scope provision, not a technical requirement",
-        "what_to_scan": [],
-        "human_judgment_needed": "Legal analysis of which other transparency obligations apply to the specific system and whether cumulative compliance is achieved",
-        "rationale": "This obligation requires legal analysis of applicable law beyond the AI Act — cannot be automated"
+        "level": "manual"
       },
       "cross_references": [
         {
@@ -420,12 +365,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "N/A — AI Office obligation, not provider or deployer",
-        "what_to_scan": [],
-        "human_judgment_needed": "Monitor for AI Office publication of codes of practice — providers should align with published codes once available",
-        "rationale": "AI Office obligation — cannot be assessed from provider or deployer code"
+        "level": "manual"
       },
       "cross_references": [
         {
@@ -451,12 +391,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "N/A — Commission empowerment",
-        "what_to_scan": [],
-        "human_judgment_needed": "Monitor for Commission implementing acts specifying required machine-readable marking formats",
-        "rationale": "Commission empowerment — cannot be assessed from provider or deployer code"
+        "level": "manual"
       }
     },
     {
@@ -475,12 +410,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "N/A — Commission empowerment",
-        "what_to_scan": [],
-        "human_judgment_needed": "Monitor for Commission implementing acts specifying or expanding system categories subject to Art. 50(4)",
-        "rationale": "Commission empowerment — cannot be assessed from provider or deployer code"
+        "level": "manual"
       }
     }
   ],

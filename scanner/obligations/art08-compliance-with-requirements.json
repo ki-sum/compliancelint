@@ -42,13 +42,17 @@
         }
       ],
       "automation_assessment": {
-        "level": "full",
-        "confidence": "high",
-        "detection_method": "cross_reference_check",
-        "what_to_scan": "Aggregate compliance status across Art. 9-15 scan results",
-        "human_judgment_needed": false
+        "level": "full"
       },
-      "cross_references": ["Art. 9", "Art. 10", "Art. 11", "Art. 12", "Art. 13", "Art. 14", "Art. 15"]
+      "cross_references": [
+        "Art. 9",
+        "Art. 10",
+        "Art. 11",
+        "Art. 12",
+        "Art. 13",
+        "Art. 14",
+        "Art. 15"
+      ]
     },
     {
       "id": "ART08-OBL-2",
@@ -71,15 +75,13 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "documentation_search",
-        "what_to_scan": "Product compliance documentation, sectoral legislation references, integrated testing/reporting procedures",
-        "human_judgment_needed": true
+        "level": "partial"
       },
       "scope_limitation": "Only applies where a product contains an AI system subject to both AI Act and Annex I Union harmonisation legislation",
       "context_skip_field": "is_annex_i_product",
-      "cross_references": ["Annex I Section A"]
+      "cross_references": [
+        "Annex I Section A"
+      ]
     }
   ],
   "summary": {

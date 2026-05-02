@@ -52,16 +52,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check for accuracy metric definitions, evaluation scripts, performance benchmarks, and monitoring infrastructure that tracks metrics over time",
-        "what_to_scan": [
-          "code",
-          "config",
-          "documentation"
-        ],
-        "human_judgment_needed": "Whether accuracy/robustness/cybersecurity levels are 'appropriate' for the specific use case",
-        "rationale": "Can detect testing infrastructure but cannot assess appropriateness"
+        "level": "partial"
       }
     },
     {
@@ -80,11 +71,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "N/A -- Commission obligation",
-        "what_to_scan": [],
-        "rationale": "Commission obligation, not provider"
+        "level": "manual"
       }
     },
     {
@@ -107,14 +94,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check for model cards, instructions of use documents, or README files that contain accuracy metric values and metric type definitions",
-        "what_to_scan": [
-          "documentation"
-        ],
-        "human_judgment_needed": "Whether declared metrics are complete and appropriate",
-        "rationale": "Can detect metric declarations in documentation but cannot assess completeness"
+        "level": "partial"
       }
     },
     {
@@ -142,15 +122,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check for input validation frameworks, error handling patterns (try/except, error boundaries), graceful degradation logic, and integration test coverage",
-        "what_to_scan": [
-          "code",
-          "config"
-        ],
-        "human_judgment_needed": "Whether resilience measures are adequate for the specific deployment context",
-        "rationale": "Can detect error handling and fallback patterns but cannot assess adequacy"
+        "level": "partial"
       }
     },
     {
@@ -176,15 +148,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check for online learning patterns, model retraining pipelines, feedback loop detection, drift monitoring, data pipeline from outputs to inputs",
-        "what_to_scan": [
-          "code",
-          "config"
-        ],
-        "human_judgment_needed": "Whether feedback loop mitigation is adequate",
-        "rationale": "Can detect online learning patterns but cannot assess mitigation adequacy"
+        "level": "partial"
       }
     },
     {
@@ -208,15 +172,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check for backup systems, fail-safe patterns, redundancy configurations, fallback logic, circuit breakers",
-        "what_to_scan": [
-          "code",
-          "config"
-        ],
-        "human_judgment_needed": "Whether redundancy solutions are adequate for the specific robustness requirements",
-        "rationale": "Can detect redundancy patterns but cannot assess whether they achieve required robustness level"
+        "level": "partial"
       }
     },
     {
@@ -244,16 +200,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check for rate limiting, authentication/authorization, vulnerability scanning tools, security headers, and access control patterns",
-        "what_to_scan": [
-          "code",
-          "config",
-          "dependencies"
-        ],
-        "human_judgment_needed": "Whether cybersecurity measures address AI-specific attack vectors",
-        "rationale": "Can detect security patterns but cannot assess AI-specific vulnerability coverage"
+        "level": "partial"
       }
     },
     {
@@ -291,16 +238,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "low",
-        "detection_method": "Check for adversarial training, input sanitization, model integrity verification, access control on training data, differential privacy, model watermarking",
-        "what_to_scan": [
-          "code",
-          "config",
-          "dependencies"
-        ],
-        "human_judgment_needed": "Whether AI-specific security measures are comprehensive",
-        "rationale": "Can detect some security patterns but AI-specific attack mitigation is highly specialized"
+        "level": "partial"
       }
     }
   ],

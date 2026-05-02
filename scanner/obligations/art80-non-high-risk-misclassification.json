@@ -34,13 +34,11 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "low",
-        "detection_method": "documentation_search",
-        "what_to_scan": "Risk classification documentation, compliance remediation plans, authority correspondence",
-        "human_judgment_needed": true
+        "level": "partial"
       },
-      "cross_references": ["Art. 99"]
+      "cross_references": [
+        "Art. 99"
+      ]
     },
     {
       "id": "ART80-OBL-5",
@@ -58,11 +56,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "low",
-        "detection_method": "documentation_search",
-        "what_to_scan": "Product inventory, deployed system records, corrective action scope documentation",
-        "human_judgment_needed": true
+        "level": "partial"
       }
     },
     {
@@ -81,13 +75,12 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "context_analysis",
-        "what_to_scan": "Risk classification methodology documentation, classification rationale, Art. 6(3) criteria assessment",
-        "human_judgment_needed": true
+        "level": "partial"
       },
-      "cross_references": ["Art. 6(3)", "Art. 99"]
+      "cross_references": [
+        "Art. 6(3)",
+        "Art. 99"
+      ]
     }
   ],
   "summary": {

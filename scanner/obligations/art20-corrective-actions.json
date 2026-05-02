@@ -44,11 +44,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "documentation_search",
-        "what_to_scan": "Incident response procedures, corrective action plans, withdrawal/recall procedures, disable mechanisms",
-        "human_judgment_needed": true
+        "level": "partial"
       }
     },
     {
@@ -72,11 +68,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "documentation_search",
-        "what_to_scan": "Notification procedures, stakeholder communication plans, supply chain notification mechanisms",
-        "human_judgment_needed": true
+        "level": "partial"
       }
     },
     {
@@ -105,13 +97,12 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "documentation_search",
-        "what_to_scan": "Risk investigation procedures, authority notification protocols, incident reporting workflows",
-        "human_judgment_needed": true
+        "level": "partial"
       },
-      "cross_references": ["Art. 79(1)", "Art. 44"]
+      "cross_references": [
+        "Art. 79(1)",
+        "Art. 44"
+      ]
     }
   ],
   "summary": {

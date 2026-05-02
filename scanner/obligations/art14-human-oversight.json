@@ -48,16 +48,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check for human-in-the-loop patterns: approval flows, review queues, manual review gates, human-machine interface components",
-        "what_to_scan": [
-          "code",
-          "config",
-          "documentation"
-        ],
-        "human_judgment_needed": "Whether oversight mechanisms are truly 'effective'",
-        "rationale": "Can detect oversight patterns but cannot assess effectiveness"
+        "level": "partial"
       }
     },
     {
@@ -80,14 +71,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "Check for risk mitigation documentation linked to human oversight procedures",
-        "what_to_scan": [
-          "documentation"
-        ],
-        "human_judgment_needed": "Whether oversight measures adequately address identified risks",
-        "rationale": "Risk prevention effectiveness requires domain expertise"
+        "level": "manual"
       }
     },
     {
@@ -115,16 +99,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check for override mechanisms (kill switch, manual override, emergency stop), deployer-facing documentation of oversight procedures",
-        "what_to_scan": [
-          "code",
-          "config",
-          "documentation"
-        ],
-        "human_judgment_needed": "Whether measures are proportionate to the specific risks and autonomy level",
-        "rationale": "Can detect override mechanisms but cannot assess proportionality"
+        "level": "partial"
       }
     },
     {
@@ -162,16 +137,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check for: monitoring dashboards, system documentation describing capabilities/limitations, anomaly detection code, performance monitoring, model cards, override/stop mechanisms, confidence scores, automation bias warnings",
-        "what_to_scan": [
-          "code",
-          "config",
-          "documentation"
-        ],
-        "human_judgment_needed": "Whether all 5 capabilities (a-e) are adequately provided",
-        "rationale": "Can detect oversight UI patterns and override mechanisms but cannot assess adequacy"
+        "level": "partial"
       }
     },
     {
@@ -197,15 +163,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check for dual-approval workflows, multi-person verification gates, role-based access requiring 2+ approvals",
-        "what_to_scan": [
-          "code",
-          "config"
-        ],
-        "human_judgment_needed": "Whether the dual verification is genuinely independent and persons are qualified",
-        "rationale": "Can detect multi-approval patterns but cannot assess person qualifications"
+        "level": "partial"
       }
     },
     {
@@ -227,12 +185,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "N/A — legal exemption requiring case-by-case assessment",
-        "what_to_scan": [],
-        "human_judgment_needed": "Whether system is used for law enforcement/migration/border/asylum AND applicable law deems dual verification disproportionate",
-        "rationale": "Proportionality assessment under applicable Union/national law requires legal expertise"
+        "level": "manual"
       },
       "linked_obligation": [
         "ART14-OBL-5"

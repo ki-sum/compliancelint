@@ -18,7 +18,10 @@
       "celex": "32024R1689",
       "oj_citation": "OJ L 2024/1689, 12.7.2024"
     },
-    "pdf_pages": [62, 63],
+    "pdf_pages": [
+      62,
+      63
+    ],
     "related_standards": {
       "published": [
         "ISO 9001:2015 -- Quality management systems",
@@ -56,11 +59,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check for QMS documentation, quality policy, quality manual, procedures documentation",
-        "what_to_scan": ["documentation"],
-        "human_judgment_needed": "Whether the QMS is adequate and actually ensures compliance"
+        "level": "partial"
       }
     },
     {
@@ -78,11 +77,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "low",
-        "detection_method": "Check for compliance strategy documentation, conformity assessment procedures, change management procedures",
-        "what_to_scan": ["documentation"],
-        "human_judgment_needed": "Whether the strategy is adequate"
+        "level": "partial"
       }
     },
     {
@@ -100,11 +95,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check for design documentation, review processes, verification procedures in code/docs",
-        "what_to_scan": ["documentation", "config"],
-        "human_judgment_needed": "Whether procedures are systematic and adequate"
+        "level": "partial"
       }
     },
     {
@@ -122,11 +113,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check for CI/CD configuration, testing framework, code review processes, QA documentation",
-        "what_to_scan": ["code", "config", "documentation"],
-        "human_judgment_needed": "Whether QA procedures are adequate for high-risk AI"
+        "level": "partial"
       }
     },
     {
@@ -144,11 +131,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check for test suites, validation scripts, test schedules, CI/CD pipelines with testing stages",
-        "what_to_scan": ["code", "config"],
-        "human_judgment_needed": "Whether testing frequency and coverage are adequate"
+        "level": "partial"
       }
     },
     {
@@ -166,11 +149,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "low",
-        "detection_method": "Check for standards reference documentation, technical specifications",
-        "what_to_scan": ["documentation"],
-        "human_judgment_needed": "Whether all applicable standards are identified and applied"
+        "level": "partial"
       }
     },
     {
@@ -188,11 +167,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check for data management documentation, data pipelines, data governance policies",
-        "what_to_scan": ["code", "documentation", "config"],
-        "human_judgment_needed": "Whether data management covers all listed operations"
+        "level": "partial"
       }
     },
     {
@@ -210,13 +185,14 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check if Art. 9 risk management documentation exists and is referenced in QMS",
-        "what_to_scan": ["documentation"],
-        "human_judgment_needed": "Whether risk management is integrated into QMS"
+        "level": "partial"
       },
-      "cross_references": [{"article": 9, "context": "Risk management system"}]
+      "cross_references": [
+        {
+          "article": 9,
+          "context": "Risk management system"
+        }
+      ]
     },
     {
       "id": "ART17-OBL-1h",
@@ -233,13 +209,14 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "low",
-        "detection_method": "Check for post-market monitoring documentation, telemetry systems, feedback collection",
-        "what_to_scan": ["documentation", "config"],
-        "human_judgment_needed": "Whether monitoring system meets Art. 72 requirements"
+        "level": "partial"
       },
-      "cross_references": [{"article": 72, "context": "Post-market monitoring"}]
+      "cross_references": [
+        {
+          "article": 72,
+          "context": "Post-market monitoring"
+        }
+      ]
     },
     {
       "id": "ART17-OBL-1i",
@@ -256,13 +233,14 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "Check for incident response plans, reporting procedures",
-        "what_to_scan": ["documentation"],
-        "human_judgment_needed": "Whether procedures meet Art. 73 requirements"
+        "level": "manual"
       },
-      "cross_references": [{"article": 73, "context": "Serious incident reporting"}]
+      "cross_references": [
+        {
+          "article": 73,
+          "context": "Serious incident reporting"
+        }
+      ]
     },
     {
       "id": "ART17-OBL-1j",
@@ -279,11 +257,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "Check for communication procedures documentation",
-        "what_to_scan": ["documentation"],
-        "human_judgment_needed": "Whether communication procedures are adequate"
+        "level": "manual"
       }
     },
     {
@@ -301,11 +275,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check for documentation management systems, version control, document retention policies",
-        "what_to_scan": ["documentation", "config"],
-        "human_judgment_needed": "Whether record-keeping covers all relevant documentation"
+        "level": "partial"
       }
     },
     {
@@ -323,11 +293,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "Check for resource management documentation, supply chain documentation",
-        "what_to_scan": ["documentation"],
-        "human_judgment_needed": "Whether resource management is adequate"
+        "level": "manual"
       }
     },
     {
@@ -345,11 +311,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "low",
-        "detection_method": "Check for RACI matrix, roles documentation, accountability documentation",
-        "what_to_scan": ["documentation"],
-        "human_judgment_needed": "Whether accountability framework covers all QMS aspects"
+        "level": "partial"
       }
     },
     {
@@ -367,11 +329,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "Cannot be automated — requires judgment about proportionality",
-        "what_to_scan": [],
-        "human_judgment_needed": "Whether QMS is proportionate yet adequate for the system's risk level"
+        "level": "manual"
       }
     },
     {
@@ -389,11 +347,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "N/A — permission, not obligation",
-        "what_to_scan": [],
-        "human_judgment_needed": "Whether sectoral QMS covers all Art. 17 aspects"
+        "level": "manual"
       }
     }
   ],

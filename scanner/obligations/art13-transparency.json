@@ -52,16 +52,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check for interpretability tooling (SHAP, LIME, Captum, ELI5), explanation APIs, feature importance outputs, attention visualizations, and deployer-facing documentation",
-        "what_to_scan": [
-          "code",
-          "dependencies",
-          "documentation"
-        ],
-        "human_judgment_needed": "Whether the level of transparency is 'sufficient' for the specific use case",
-        "rationale": "Can detect explainability tooling but cannot assess if transparency is sufficient"
+        "level": "partial"
       }
     },
     {
@@ -90,14 +81,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "Assess whether the level of transparency provided enables compliance with Art. 9-15 and deployer obligations in Section 3",
-        "what_to_scan": [
-          "documentation"
-        ],
-        "human_judgment_needed": "Whether transparency type and degree are appropriate for the specific system and context, measured against Section 3 obligations",
-        "rationale": "Outcome-based requirement — appropriateness assessment requires legal and domain expertise"
+        "level": "manual"
       }
     },
     {
@@ -130,15 +114,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check for existence of deployer-facing documentation (user guide, deployer guide, instructions of use), digital format availability (MD, PDF, HTML), and completeness against Art. 13(3) checklist",
-        "what_to_scan": [
-          "documentation",
-          "config"
-        ],
-        "human_judgment_needed": "Whether instructions are truly concise, complete, correct, clear, relevant, accessible and comprehensible",
-        "rationale": "Can detect documentation existence but cannot assess quality attributes"
+        "level": "partial"
       }
     },
     {
@@ -211,14 +187,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "low",
-        "detection_method": "Check deployer documentation for provider name, trade name, contact address, or contact information sections",
-        "what_to_scan": [
-          "documentation"
-        ],
-        "human_judgment_needed": "Whether all 12 required elements (a-f with sub-items) are adequately covered",
-        "rationale": "Can detect some documentation sections but cannot verify completeness of all 12 elements"
+        "level": "partial"
       },
       "cross_references": [
         {

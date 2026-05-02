@@ -58,15 +58,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check for presence of README with substantive content (>500 chars), check file modification dates against deployment indicators, check for version tracking (CHANGELOG)",
-        "what_to_scan": [
-          "documentation",
-          "config"
-        ],
-        "human_judgment_needed": "Whether documentation is truly comprehensive and up-to-date",
-        "rationale": "Can detect documentation artifacts but cannot assess completeness or currency"
+        "level": "partial"
       }
     },
     {
@@ -94,15 +86,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "low",
-        "detection_method": "Check for architecture documentation describing system elements, design decisions, and development process. Cross-reference with other article requirements (Art. 9 risk management docs, Art. 10 data governance docs, Art. 12 logging docs)",
-        "what_to_scan": [
-          "documentation",
-          "code"
-        ],
-        "human_judgment_needed": "Whether documentation is truly clear, comprehensive, and sufficient for authority assessment",
-        "rationale": "Can detect documentation presence but cannot assess clarity or comprehensiveness"
+        "level": "partial"
       }
     },
     {
@@ -140,16 +124,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "low",
-        "detection_method": "Check for documentation artifacts covering each Annex IV section: README (section 1), architecture docs (section 2), model card (section 2), API docs (section 2/3), testing docs (section 4), security docs (section 5)",
-        "what_to_scan": [
-          "documentation",
-          "code",
-          "config"
-        ],
-        "human_judgment_needed": "Whether each Annex IV element is adequately covered",
-        "rationale": "Can detect presence of documentation sections but cannot assess Annex IV coverage completeness"
+        "level": "partial"
       }
     },
     {
@@ -171,12 +146,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "Determine if the provider qualifies as an SME or start-up under EU SME definition",
-        "what_to_scan": [],
-        "human_judgment_needed": "Whether the provider qualifies as an SME or start-up",
-        "rationale": "SME status determination requires business information, not code analysis"
+        "level": "manual"
       }
     },
     {
@@ -195,12 +165,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "N/A — Commission obligation, not provider",
-        "what_to_scan": [],
-        "human_judgment_needed": "Monitor for Commission publication of the simplified form",
-        "rationale": "Commission obligation — cannot be assessed from provider code"
+        "level": "manual"
       }
     },
     {
@@ -221,12 +186,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "N/A — conditional obligation for SMEs using simplified documentation",
-        "what_to_scan": [],
-        "human_judgment_needed": "Whether the SME has opted for simplified documentation and is using the correct Commission form",
-        "rationale": "Form compliance requires review of actual documentation, not code"
+        "level": "manual"
       }
     },
     {
@@ -245,12 +205,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "N/A — obligation on notified bodies, not providers",
-        "what_to_scan": [],
-        "human_judgment_needed": "If a notified body refuses to accept the simplified form, escalate — this is a legal obligation on the notified body",
-        "rationale": "Notified body obligation — cannot be assessed from provider code"
+        "level": "manual"
       }
     },
     {
@@ -271,14 +226,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "Determine if the system is a product covered by Annex I Section A legislation",
-        "what_to_scan": [
-          "documentation"
-        ],
-        "human_judgment_needed": "Whether the system falls under Annex I legislation",
-        "rationale": "Product classification requires domain expertise"
+        "level": "manual"
       }
     },
     {
@@ -297,12 +245,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "N/A — empowerment, not obligation",
-        "what_to_scan": [],
-        "human_judgment_needed": "Monitor for delegated acts that modify Annex IV",
-        "rationale": "Empowerment, not obligation"
+        "level": "manual"
       }
     }
   ],

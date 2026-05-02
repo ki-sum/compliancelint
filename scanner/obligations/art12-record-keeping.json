@@ -56,15 +56,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "full",
-        "confidence": "high",
-        "detection_method": "Static analysis: check for logging framework imports, logging calls in critical paths",
-        "what_to_scan": [
-          "code",
-          "config",
-          "dependencies"
-        ],
-        "rationale": "Whether a system has automatic logging is a binary technical fact, fully determinable from code analysis"
+        "level": "full"
       },
       "recital_alignment": {
         "recital": 71,
@@ -93,15 +85,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check if logging covers: error states, anomaly detection, model drift, performance degradation, input/output distribution shifts",
-        "what_to_scan": [
-          "code",
-          "config"
-        ],
-        "human_judgment_needed": "What constitutes a 'risk' or 'substantial modification' is context-dependent — depends on the specific AI system's intended purpose",
-        "rationale": "We can check IF risk-related events are logged, but cannot fully determine if ALL relevant risk events are covered without understanding the specific system's risk profile"
+        "level": "partial"
       },
       "cross_references": [
         {
@@ -126,16 +110,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check for: performance metric logging, usage statistics collection, error rate tracking, feedback loop mechanisms",
-        "what_to_scan": [
-          "code",
-          "config",
-          "monitoring"
-        ],
-        "human_judgment_needed": "What constitutes 'sufficient' monitoring data depends on the system's risk profile and Art. 72 monitoring plan",
-        "rationale": "Can verify presence of monitoring infrastructure but cannot determine completeness without the specific monitoring plan"
+        "level": "partial"
       },
       "cross_references": [
         {
@@ -164,16 +139,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "medium",
-        "detection_method": "Check for: log export capability, monitoring API/dashboard, deployer-facing log access controls",
-        "what_to_scan": [
-          "code",
-          "config",
-          "api"
-        ],
-        "human_judgment_needed": "Whether the log format and access mechanism is adequate for deployer monitoring",
-        "rationale": "Deployer operational monitoring cannot be verified from provider code — requires human review of deployer access controls"
+        "level": "manual"
       },
       "cross_references": [
         {
@@ -201,13 +167,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "full",
-        "confidence": "high",
-        "detection_method": "Check for session tracking with timestamp logging (start/end events)",
-        "what_to_scan": [
-          "code"
-        ],
-        "rationale": "Session timestamp logging is a binary technical check — either session start/end is logged or it isn't"
+        "level": "full"
       }
     },
     {
@@ -228,13 +188,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "full",
-        "confidence": "high",
-        "detection_method": "Check that database identifier is included in matching operation logs",
-        "what_to_scan": [
-          "code"
-        ],
-        "rationale": "Whether database reference is logged is deterministic"
+        "level": "full"
       }
     },
     {
@@ -255,13 +209,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "full",
-        "confidence": "high",
-        "detection_method": "Check that match events include input reference/hash",
-        "what_to_scan": [
-          "code"
-        ],
-        "rationale": "Whether matched input is logged is deterministic. Note: implementation may use hashes rather than raw biometric data for GDPR compliance."
+        "level": "full"
       }
     },
     {
@@ -282,13 +230,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "full",
-        "confidence": "high",
-        "detection_method": "Check for user/operator ID logging on verification/approval actions",
-        "what_to_scan": [
-          "code"
-        ],
-        "rationale": "Whether human verifier identity is logged is deterministic"
+        "level": "full"
       },
       "cross_references": [
         {
@@ -324,15 +266,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check for: log retention configuration, log rotation policies, TTL settings, archive policies",
-        "what_to_scan": [
-          "config",
-          "infrastructure"
-        ],
-        "human_judgment_needed": "Whether 6 months is sufficient for the specific system's purpose, and whether retention conflicts with GDPR data minimization",
-        "rationale": "Can verify if retention policy exists and meets 6-month minimum, but appropriateness to purpose requires human judgment"
+        "level": "partial"
       }
     },
     {
@@ -353,12 +287,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "Check if system is operated by a financial institution — requires human confirmation",
-        "what_to_scan": [],
-        "human_judgment_needed": "Whether the provider is a financial institution and which financial services law applies",
-        "rationale": "Cannot determine from code whether the operator is a financial institution"
+        "level": "manual"
       }
     },
     {
@@ -382,15 +311,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check for log retention config — same as ART19-OBL-1b but from deployer perspective",
-        "what_to_scan": [
-          "config",
-          "infrastructure"
-        ],
-        "human_judgment_needed": "Whether deployer has control over logs and whether retention period is appropriate",
-        "rationale": "Technical retention check is same as provider; but deployer control scope requires human judgment"
+        "level": "partial"
       }
     }
   ],

@@ -35,17 +35,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Keyword and pattern scanning for Annex I product indicators in source code, documentation, package metadata, and configuration files (e.g., 'medical device', 'machinery safety', 'civil aviation', 'motor vehicle')",
-        "what_to_scan": [
-          "code",
-          "config",
-          "dependencies",
-          "documentation"
-        ],
-        "human_judgment_needed": "Whether the system is genuinely a safety component or product under Annex I legislation",
-        "rationale": "Can detect product-type keywords but cannot determine legal classification"
+        "level": "partial"
       }
     },
     {
@@ -63,17 +53,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Library import detection (e.g., deepface, face_recognition, scorecardpy) and domain keyword scanning (e.g., 'credit scoring', 'resume screening', 'biometric identification') across source code, documentation, and configuration",
-        "what_to_scan": [
-          "code",
-          "config",
-          "dependencies",
-          "documentation"
-        ],
-        "human_judgment_needed": "Whether the system falls under a specific Annex III category",
-        "rationale": "Can detect domain-specific libraries and keywords but cannot determine legal scope"
+        "level": "partial"
       }
     },
     {
@@ -116,15 +96,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "low",
-        "detection_method": "Analyze code complexity, output space, and task specification -- systems with narrow output types (boolean, enum, fixed categories) may indicate procedural tasks. Check for intended use documentation describing the task scope.",
-        "what_to_scan": [
-          "code",
-          "documentation"
-        ],
-        "human_judgment_needed": "Whether the system truly poses no significant risk and qualifies for exception",
-        "rationale": "Exception determination requires understanding deployment context"
+        "level": "partial"
       }
     },
     {
@@ -152,14 +124,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check for risk classification documentation, non-high-risk assessment documents, intended use documentation with risk rationale",
-        "what_to_scan": [
-          "documentation"
-        ],
-        "human_judgment_needed": "Whether the assessment is adequate and the non-high-risk determination is correct",
-        "rationale": "Can detect documentation presence but cannot assess legal correctness of the determination"
+        "level": "partial"
       }
     },
     {
@@ -178,11 +143,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "N/A -- Commission obligation",
-        "what_to_scan": [],
-        "rationale": "Commission obligation, not provider"
+        "level": "manual"
       }
     },
     {
@@ -201,11 +162,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "N/A -- empowerment",
-        "what_to_scan": [],
-        "rationale": "Empowerment, not provider obligation"
+        "level": "manual"
       }
     },
     {
@@ -224,11 +181,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "N/A -- Commission obligation",
-        "what_to_scan": [],
-        "rationale": "Commission obligation, not provider"
+        "level": "manual"
       }
     },
     {
@@ -247,11 +200,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "N/A -- constraint on Commission",
-        "what_to_scan": [],
-        "rationale": "Constraint on Commission, not provider obligation"
+        "level": "manual"
       }
     }
   ],

@@ -42,13 +42,11 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "low",
-        "detection_method": "documentation_search",
-        "what_to_scan": "Corrective action plans, authority correspondence, system inventory, compliance remediation records",
-        "human_judgment_needed": true
+        "level": "partial"
       },
-      "cross_references": ["Art. 79"]
+      "cross_references": [
+        "Art. 79"
+      ]
     }
   ],
   "summary": {

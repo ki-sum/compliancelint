@@ -52,15 +52,17 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "documentation_search",
-        "what_to_scan": "Import compliance records, conformity certificates, CE marking verification, authorised representative documentation",
-        "human_judgment_needed": true
+        "level": "partial"
       },
       "scope_limitation": "Only applies to importers of high-risk AI systems",
       "context_skip_field": "is_importer",
-      "cross_references": ["Art. 43", "Art. 11", "Annex IV", "Art. 47", "Art. 22(1)"]
+      "cross_references": [
+        "Art. 43",
+        "Art. 11",
+        "Annex IV",
+        "Art. 47",
+        "Art. 22(1)"
+      ]
     },
     {
       "id": "ART23-OBL-2",
@@ -78,11 +80,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "low",
-        "detection_method": "documentation_search",
-        "what_to_scan": "Import compliance review records, non-conformity flags, market placement approval records",
-        "human_judgment_needed": true
+        "level": "partial"
       },
       "scope_limitation": "Only applies to importers",
       "context_skip_field": "is_importer"
@@ -103,11 +101,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "documentation_search",
-        "what_to_scan": "Package metadata, documentation headers, product labeling for importer identification",
-        "human_judgment_needed": true
+        "level": "partial"
       },
       "scope_limitation": "Only applies to importers",
       "context_skip_field": "is_importer"
@@ -128,11 +122,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "documentation_search",
-        "what_to_scan": "Storage and transport procedures, handling documentation",
-        "human_judgment_needed": true
+        "level": "manual"
       },
       "scope_limitation": "Only applies to importers",
       "context_skip_field": "is_importer"
@@ -153,15 +143,13 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "documentation_search",
-        "what_to_scan": "Risk notification records, provider correspondence, authority notification logs",
-        "human_judgment_needed": true
+        "level": "manual"
       },
       "scope_limitation": "Only applies to importers",
       "context_skip_field": "is_importer",
-      "cross_references": ["Art. 79(1)"]
+      "cross_references": [
+        "Art. 79(1)"
+      ]
     },
     {
       "id": "ART23-OBL-5",
@@ -179,15 +167,13 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "documentation_search",
-        "what_to_scan": "Document retention records, certificate archives, declaration storage",
-        "human_judgment_needed": true
+        "level": "partial"
       },
       "scope_limitation": "Only applies to importers",
       "context_skip_field": "is_importer",
-      "cross_references": ["Art. 47"]
+      "cross_references": [
+        "Art. 47"
+      ]
     },
     {
       "id": "ART23-OBL-6",
@@ -210,11 +196,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "documentation_search",
-        "what_to_scan": "Authority correspondence records, documentation accessibility, language compliance",
-        "human_judgment_needed": true
+        "level": "partial"
       },
       "scope_limitation": "Only applies to importers",
       "context_skip_field": "is_importer"
@@ -235,11 +217,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "documentation_search",
-        "what_to_scan": "Authority cooperation records, risk mitigation actions",
-        "human_judgment_needed": true
+        "level": "manual"
       },
       "scope_limitation": "Only applies to importers",
       "context_skip_field": "is_importer"

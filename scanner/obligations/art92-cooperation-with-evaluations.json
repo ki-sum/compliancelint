@@ -29,15 +29,13 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "low",
-        "detection_method": "documentation_search",
-        "what_to_scan": "GPAI model documentation, API access readiness, source code access procedures, evaluation response procedures",
-        "human_judgment_needed": true
+        "level": "partial"
       },
       "scope_limitation": "Only applies to providers of general-purpose AI models during Commission evaluations",
       "context_skip_field": "is_gpai_provider",
-      "cross_references": ["Art. 101"]
+      "cross_references": [
+        "Art. 101"
+      ]
     }
   ],
   "summary": {

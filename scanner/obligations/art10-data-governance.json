@@ -54,15 +54,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check for dataset documentation files (data_card.md, datasheet.*, data_governance.*, dataset_card.*)",
-        "what_to_scan": [
-          "documentation",
-          "config"
-        ],
-        "human_judgment_needed": "Whether datasets actually meet quality criteria requires domain expertise",
-        "rationale": "Can detect presence of data documentation but cannot assess data quality"
+        "level": "partial"
       }
     },
     {
@@ -105,16 +97,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check for dedicated data pipeline/preprocessing files (preprocess.*, data_clean.*, data_pipeline.*, etl.*, feature_engineering.*)",
-        "what_to_scan": [
-          "documentation",
-          "code",
-          "config"
-        ],
-        "human_judgment_needed": "Whether all 6 sub-requirements (a-e) are adequately covered",
-        "rationale": "Can detect data pipeline code and documentation but cannot assess completeness of governance practices"
+        "level": "partial"
       }
     },
     {
@@ -137,15 +120,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check for bias detection framework imports (fairlearn, aif360, aequitas, what_if_tool, responsibleai, fairness_indicators) in source code and dependencies",
-        "what_to_scan": [
-          "code",
-          "dependencies"
-        ],
-        "human_judgment_needed": "Whether bias examination is adequate for the specific domain and protected categories",
-        "rationale": "Can detect bias detection tooling but cannot assess examination thoroughness"
+        "level": "partial"
       }
     },
     {
@@ -173,15 +148,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check for bias mitigation code patterns (resampling, reweighting, adversarial debiasing, fairness constraints, demographic parity enforcement)",
-        "what_to_scan": [
-          "code",
-          "config"
-        ],
-        "human_judgment_needed": "Whether mitigation measures are appropriate and effective",
-        "rationale": "Can detect bias mitigation code but cannot assess effectiveness"
+        "level": "partial"
       }
     },
     {
@@ -204,14 +171,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "Check for data gap analysis in documentation, known limitations sections",
-        "what_to_scan": [
-          "documentation"
-        ],
-        "human_judgment_needed": "Whether all relevant data gaps have been identified and remediation plans are adequate",
-        "rationale": "Data gap identification requires domain expertise beyond code analysis"
+        "level": "manual"
       }
     },
     {
@@ -244,15 +204,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "Check for data quality validation scripts, error checking in data pipeline, completeness assertions",
-        "what_to_scan": [
-          "code",
-          "documentation"
-        ],
-        "human_judgment_needed": "Whether data is truly representative, complete, and error-free requires domain expertise",
-        "rationale": "Data quality is highly context-dependent and cannot be fully assessed from code"
+        "level": "manual"
       }
     },
     {
@@ -275,15 +227,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "Check for statistical analysis of dataset distributions, demographic breakdowns, stratification documentation",
-        "what_to_scan": [
-          "documentation",
-          "code"
-        ],
-        "human_judgment_needed": "Whether statistical properties are appropriate for the specific use case",
-        "rationale": "Statistical adequacy is domain-specific"
+        "level": "manual"
       }
     },
     {
@@ -307,12 +251,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "N/A — permission granting implementation flexibility",
-        "what_to_scan": [],
-        "human_judgment_needed": "Whether the combination of datasets together satisfies representativeness requirements",
-        "rationale": "Permission (may), not obligation — dataset combination assessment requires domain expertise"
+        "level": "manual"
       }
     },
     {
@@ -345,14 +284,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "Check for deployment context documentation, geographic coverage analysis, user behavior analysis",
-        "what_to_scan": [
-          "documentation"
-        ],
-        "human_judgment_needed": "Whether deployment context has been adequately considered in data selection",
-        "rationale": "Deployment context adequacy requires understanding of specific use case"
+        "level": "manual"
       }
     },
     {
@@ -379,15 +311,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "Check for special category data processing code, GDPR compliance documentation",
-        "what_to_scan": [
-          "code",
-          "documentation"
-        ],
-        "human_judgment_needed": "Whether processing is strictly necessary and safeguards are adequate",
-        "rationale": "Necessity and safeguard assessment requires legal expertise"
+        "level": "manual"
       }
     },
     {
@@ -406,15 +330,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "Determine if system uses training techniques or is rule-based/expert system",
-        "what_to_scan": [
-          "code",
-          "documentation"
-        ],
-        "human_judgment_needed": "Whether the system uses training techniques",
-        "rationale": "Distinguishing training-based from rule-based requires understanding system architecture"
+        "level": "manual"
       }
     }
   ],

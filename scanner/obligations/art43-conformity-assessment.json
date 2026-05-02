@@ -18,7 +18,10 @@
       "celex": "32024R1689",
       "oj_citation": "OJ L 2024/1689, 12.7.2024"
     },
-    "pdf_pages": [77, 78],
+    "pdf_pages": [
+      77,
+      78
+    ],
     "related_standards": {
       "published": [
         "ISO/IEC 42001:2023 -- AI management system",
@@ -48,11 +51,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "Check for conformity assessment documentation, notified body involvement",
-        "what_to_scan": ["documentation"],
-        "human_judgment_needed": "Which assessment procedure is appropriate and whether it has been completed"
+        "level": "manual"
       }
     },
     {
@@ -70,11 +69,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "low",
-        "detection_method": "Check for self-assessment documentation, internal control procedures",
-        "what_to_scan": ["documentation"],
-        "human_judgment_needed": "Whether internal control assessment has been properly conducted"
+        "level": "partial"
       }
     },
     {
@@ -95,11 +90,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "Check for sectoral conformity assessment documentation",
-        "what_to_scan": ["documentation"],
-        "human_judgment_needed": "Which sectoral legislation applies and whether assessment is complete"
+        "level": "manual"
       }
     },
     {
@@ -117,11 +108,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "low",
-        "detection_method": "Check for change management procedures, substantial modification tracking",
-        "what_to_scan": ["documentation", "config"],
-        "human_judgment_needed": "What constitutes a 'substantial modification'"
+        "level": "partial"
       }
     }
   ],

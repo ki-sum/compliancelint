@@ -18,7 +18,9 @@
       "celex": "32024R1689",
       "oj_citation": "OJ L 2024/1689, 12.7.2024"
     },
-    "pdf_pages": [81],
+    "pdf_pages": [
+      81
+    ],
     "related_standards": {
       "published": [
         "Annex VIII -- Information to be submitted upon registration of high-risk AI systems"
@@ -47,11 +49,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "low",
-        "detection_method": "Check for EU database registration documentation, registration confirmation",
-        "what_to_scan": ["documentation"],
-        "human_judgment_needed": "Whether registration has been completed in the EU database"
+        "level": "partial"
       }
     },
     {
@@ -72,11 +70,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "Check for Art. 6(3) exception documentation and registration",
-        "what_to_scan": ["documentation"],
-        "human_judgment_needed": "Whether Art. 6(3) exception is validly claimed and system is registered"
+        "level": "manual"
       }
     },
     {
@@ -97,11 +91,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "Not automatable from code — registration is in the EU database",
-        "what_to_scan": [],
-        "human_judgment_needed": "Whether the organization is a public authority and has registered"
+        "level": "manual"
       }
     }
   ],

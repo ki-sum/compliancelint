@@ -18,7 +18,9 @@
       "celex": "32024R1689",
       "oj_citation": "OJ L 2024/1689, 12.7.2024"
     },
-    "pdf_pages": [80],
+    "pdf_pages": [
+      80
+    ],
     "related_standards": {
       "published": [
         "Annex V of EU AI Act -- EU Declaration of Conformity content"
@@ -62,11 +64,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check for EU declaration of conformity document, machine-readable format, retention policy",
-        "what_to_scan": ["documentation"],
-        "human_judgment_needed": "Whether the DoC contains all required Annex V elements"
+        "level": "partial"
       }
     },
     {
@@ -94,11 +92,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "low",
-        "detection_method": "Check for Annex V elements in DoC document, language availability",
-        "what_to_scan": ["documentation"],
-        "human_judgment_needed": "Whether DoC covers all Annex V elements and appropriate languages"
+        "level": "partial"
       }
     },
     {
@@ -124,11 +118,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "Check if product is subject to multiple EU harmonisation laws, verify single consolidated DoC",
-        "what_to_scan": ["documentation"],
-        "human_judgment_needed": "Whether all applicable legislation has been identified and covered"
+        "level": "manual"
       }
     },
     {
@@ -146,11 +136,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "Check DoC document date vs last system modification",
-        "what_to_scan": ["documentation"],
-        "human_judgment_needed": "Whether DoC reflects current system state"
+        "level": "manual"
       }
     }
   ],

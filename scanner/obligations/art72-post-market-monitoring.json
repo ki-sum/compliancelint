@@ -18,7 +18,10 @@
       "celex": "32024R1689",
       "oj_citation": "OJ L 2024/1689, 12.7.2024"
     },
-    "pdf_pages": [99, 100],
+    "pdf_pages": [
+      99,
+      100
+    ],
     "related_standards": {
       "published": [
         "ISO/IEC 42001:2023 -- AI management system",
@@ -55,11 +58,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check for post-market monitoring documentation, monitoring system configuration, risk-proportionate design evidence",
-        "what_to_scan": ["documentation", "config"],
-        "human_judgment_needed": "Whether the monitoring system is truly proportionate to the specific risks"
+        "level": "partial"
       }
     },
     {
@@ -82,11 +81,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check for data collection pipelines, analytics dashboards, compliance evaluation procedures, performance tracking systems",
-        "what_to_scan": ["code", "config", "documentation"],
-        "human_judgment_needed": "Whether data collection is sufficiently comprehensive and analysis is meaningful"
+        "level": "partial"
       }
     },
     {
@@ -109,11 +104,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "Check for post-market monitoring plan document, integration with technical documentation per Annex IV",
-        "what_to_scan": ["documentation"],
-        "human_judgment_needed": "Whether the plan is sufficiently detailed and properly integrated into technical documentation"
+        "level": "partial"
       }
     },
     {
@@ -134,11 +125,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "Check for documentation of integrated monitoring systems for Annex I products",
-        "what_to_scan": ["documentation"],
-        "human_judgment_needed": "Whether integration with existing monitoring is appropriate and complete"
+        "level": "manual"
       }
     }
   ],

@@ -47,15 +47,16 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "documentation_search",
-        "what_to_scan": "Distribution compliance checklist, CE marking verification, documentation completeness records",
-        "human_judgment_needed": true
+        "level": "partial"
       },
       "scope_limitation": "Only applies to distributors of high-risk AI systems",
       "context_skip_field": "is_distributor",
-      "cross_references": ["Art. 47", "Art. 16(b)", "Art. 16(c)", "Art. 23(3)"]
+      "cross_references": [
+        "Art. 47",
+        "Art. 16(b)",
+        "Art. 16(c)",
+        "Art. 23(3)"
+      ]
     },
     {
       "id": "ART24-OBL-2",
@@ -73,11 +74,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "low",
-        "detection_method": "documentation_search",
-        "what_to_scan": "Distribution compliance review records, non-conformity flags",
-        "human_judgment_needed": true
+        "level": "partial"
       },
       "scope_limitation": "Only applies to distributors",
       "context_skip_field": "is_distributor"
@@ -98,11 +95,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "documentation_search",
-        "what_to_scan": "Storage and transport procedures, handling documentation",
-        "human_judgment_needed": true
+        "level": "manual"
       },
       "scope_limitation": "Only applies to distributors",
       "context_skip_field": "is_distributor"
@@ -123,15 +116,13 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "documentation_search",
-        "what_to_scan": "Risk notification records, provider/importer correspondence",
-        "human_judgment_needed": true
+        "level": "manual"
       },
       "scope_limitation": "Only applies to distributors",
       "context_skip_field": "is_distributor",
-      "cross_references": ["Art. 79(1)"]
+      "cross_references": [
+        "Art. 79(1)"
+      ]
     },
     {
       "id": "ART24-OBL-4",
@@ -149,11 +140,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "documentation_search",
-        "what_to_scan": "Corrective action records, withdrawal/recall documentation, operator correspondence",
-        "human_judgment_needed": true
+        "level": "manual"
       },
       "scope_limitation": "Only applies to distributors",
       "context_skip_field": "is_distributor"
@@ -174,15 +161,13 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "documentation_search",
-        "what_to_scan": "Risk notification records, authority correspondence, corrective action details",
-        "human_judgment_needed": true
+        "level": "manual"
       },
       "scope_limitation": "Only applies to distributors",
       "context_skip_field": "is_distributor",
-      "cross_references": ["Art. 79(1)"]
+      "cross_references": [
+        "Art. 79(1)"
+      ]
     },
     {
       "id": "ART24-OBL-5",
@@ -200,11 +185,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial",
-        "confidence": "medium",
-        "detection_method": "documentation_search",
-        "what_to_scan": "Authority correspondence, distribution compliance documentation",
-        "human_judgment_needed": true
+        "level": "partial"
       },
       "scope_limitation": "Only applies to distributors",
       "context_skip_field": "is_distributor"
@@ -225,11 +206,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual",
-        "confidence": "low",
-        "detection_method": "documentation_search",
-        "what_to_scan": "Authority cooperation records, risk mitigation actions",
-        "human_judgment_needed": true
+        "level": "manual"
       },
       "scope_limitation": "Only applies to distributors",
       "context_skip_field": "is_distributor"
