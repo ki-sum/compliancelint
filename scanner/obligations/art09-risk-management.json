@@ -169,7 +169,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual"
+        "level": "partial"
       },
       "cross_references": [
         {
@@ -217,7 +217,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual"
+        "level": "partial"
       }
     },
     {
@@ -240,7 +240,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual"
+        "level": "partial"
       }
     },
     {
@@ -263,7 +263,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual"
+        "level": "partial"
       }
     },
     {
@@ -322,7 +322,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual"
+        "level": "partial"
       },
       "cross_references": [
         {
@@ -351,7 +351,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual"
+        "level": "partial"
       }
     },
     {
@@ -515,8 +515,8 @@
     },
     "automation_breakdown": {
       "full": 0,
-      "partial": 11,
-      "manual": 7
+      "partial": 17,
+      "manual": 2
     },
     "scope_notes": {
       "general_obligations": "ART09-OBL-1 through ART09-OBL-8b — apply to ALL high-risk AI systems",

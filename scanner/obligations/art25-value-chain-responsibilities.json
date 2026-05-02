@@ -162,7 +162,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "full"
+        "level": "partial"
       },
       "linked_obligation": [
         "ART25-OBL-4"
@@ -201,8 +201,8 @@
       "both": 2
     },
     "automation_breakdown": {
-      "full": 1,
-      "partial": 5,
+      "full": 0,
+      "partial": 6,
       "manual": 1
     }
   }

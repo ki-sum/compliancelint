@@ -186,7 +186,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual"
+        "level": "partial"
       }
     },
     {
@@ -226,7 +226,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual"
+        "level": "partial"
       }
     },
     {
@@ -262,8 +262,8 @@
     },
     "automation_breakdown": {
       "full": 0,
-      "partial": 3,
-      "manual": 6
+      "partial": 5,
+      "manual": 4
     },
     "scope_notes": {
       "general_obligations": "ART11-OBL-1, ART11-OBL-1b, ART11-OBL-1c — apply to ALL high-risk AI systems",

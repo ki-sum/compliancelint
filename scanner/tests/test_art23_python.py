@@ -345,10 +345,15 @@ class TestArt23Structural:
         assert not missing, f"Missing obligation IDs in findings: {missing}"
 
     def test_manual_obligations_are_gap_findings(self, art23_module, tmp_path):
-        """Manual obligations (OBL-4, OBL-2b, OBL-7) appear as gap findings with UTD."""
+        """Manual obligations (OBL-2b, OBL-7) appear as gap findings with UTD.
+
+        ART23-OBL-4 was removed from this list 2026-05-03 — sync from
+        classification.json (2026-04-20 o3 cross-verified) reclassified
+        it manual → partial. OBL-2b + OBL-7 remain manual per o3.
+        """
         BaseArticleModule.set_context(_importer_true_ctx())
         result = art23_module.scan(str(tmp_path))
-        for obl_id in ["ART23-OBL-4", "ART23-OBL-2b", "ART23-OBL-7"]:
+        for obl_id in ["ART23-OBL-2b", "ART23-OBL-7"]:
             obl = _find(result, obl_id)
             assert len(obl) > 0, f"{obl_id} not in findings"
             assert obl[0].level == ComplianceLevel.UNABLE_TO_DETERMINE, (
@@ -356,10 +361,14 @@ class TestArt23Structural:
             )
 
     def test_manual_obligations_have_human_gate_hint(self, art23_module, tmp_path):
-        """Manual obligation gap findings include human_gate_hint."""
+        """Manual obligation gap findings include human_gate_hint.
+
+        ART23-OBL-4 removed from list 2026-05-03 (now partial — see
+        previous test docstring). OBL-2b + OBL-7 still manual.
+        """
         BaseArticleModule.set_context(_importer_true_ctx())
         result = art23_module.scan(str(tmp_path))
-        for obl_id in ["ART23-OBL-4", "ART23-OBL-2b", "ART23-OBL-7"]:
+        for obl_id in ["ART23-OBL-2b", "ART23-OBL-7"]:
             obl = _find(result, obl_id)
             assert len(obl) > 0, f"{obl_id} not in findings"
             assert obl[0].human_gate_hint is not None, (

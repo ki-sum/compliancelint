@@ -94,7 +94,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial"
+        "level": "full"
       }
     },
     {
@@ -172,7 +172,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial"
+        "level": "manual"
       }
     },
     {
@@ -253,9 +253,9 @@
       "commission": 1
     },
     "automation_breakdown": {
-      "full": 0,
-      "partial": 7,
-      "manual": 1
+      "full": 1,
+      "partial": 5,
+      "manual": 2
     },
     "scope_notes": {
       "general": "ART15-OBL-1, OBL-3, OBL-4, OBL-5, OBL-5b -- apply to ALL high-risk AI systems",

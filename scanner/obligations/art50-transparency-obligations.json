@@ -50,7 +50,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial"
+        "level": "full"
       },
       "exceptions": [
         {
@@ -99,7 +99,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial"
+        "level": "full"
       },
       "recommended_standards": [
         {
@@ -424,8 +424,8 @@
       "commission": 2
     },
     "automation_breakdown": {
-      "full": 0,
-      "partial": 6,
+      "full": 2,
+      "partial": 4,
       "manual": 4
     },
     "scope_notes": {

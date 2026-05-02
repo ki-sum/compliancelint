@@ -171,7 +171,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual"
+        "level": "partial"
       }
     },
     {
@@ -204,7 +204,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual"
+        "level": "partial"
       }
     },
     {
@@ -227,7 +227,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual"
+        "level": "partial"
       }
     },
     {
@@ -251,7 +251,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual"
+        "level": "partial"
       }
     },
     {
@@ -284,7 +284,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual"
+        "level": "partial"
       }
     },
     {
@@ -311,7 +311,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual"
+        "level": "partial"
       }
     },
     {
@@ -330,7 +330,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual"
+        "level": "partial"
       }
     }
   ],
@@ -345,8 +345,8 @@
     },
     "automation_breakdown": {
       "full": 0,
-      "partial": 4,
-      "manual": 6
+      "partial": 11,
+      "manual": 0
     },
     "scope_notes": {
       "general_obligations": "ART10-OBL-1 through ART10-OBL-4 — apply to ALL high-risk AI systems using training data",

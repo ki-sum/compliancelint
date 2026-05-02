@@ -42,7 +42,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "full"
+        "level": "partial"
       },
       "cross_references": [
         "Art. 9",
@@ -93,8 +93,8 @@
       "provider": 2
     },
     "automation_breakdown": {
-      "full": 1,
-      "partial": 1,
+      "full": 0,
+      "partial": 2,
       "manual": 0
     }
   }

@@ -81,7 +81,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual"
+        "level": "partial"
       }
     },
     {
@@ -187,7 +187,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial"
+        "level": "full"
       },
       "cross_references": [
         {
@@ -219,7 +219,7 @@
       "commission": 0
     },
     "automation_breakdown": {
-      "full": 0,
+      "full": 1,
       "partial": 3,
       "manual": 0
     }

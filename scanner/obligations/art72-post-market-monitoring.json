@@ -58,7 +58,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial"
+        "level": "full"
       }
     },
     {
@@ -104,7 +104,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial"
+        "level": "full"
       }
     },
     {
@@ -137,8 +137,8 @@
       "provider": 4
     },
     "automation_breakdown": {
-      "full": 0,
-      "partial": 3,
+      "full": 2,
+      "partial": 1,
       "manual": 1
     }
   }

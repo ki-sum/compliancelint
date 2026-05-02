@@ -29,7 +29,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial"
+        "level": "manual"
       },
       "scope_limitation": "Only applies to providers of general-purpose AI models when requested by the Commission",
       "context_skip_field": "is_gpai_provider",
@@ -50,8 +50,8 @@
     },
     "automation_breakdown": {
       "full": 0,
-      "partial": 1,
-      "manual": 0
+      "partial": 0,
+      "manual": 1
     }
   }
 }

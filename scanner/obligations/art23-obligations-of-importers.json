@@ -80,7 +80,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial"
+        "level": "manual"
       },
       "scope_limitation": "Only applies to importers",
       "context_skip_field": "is_importer"
@@ -101,7 +101,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial"
+        "level": "full"
       },
       "scope_limitation": "Only applies to importers",
       "context_skip_field": "is_importer"
@@ -122,7 +122,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual"
+        "level": "partial"
       },
       "scope_limitation": "Only applies to importers",
       "context_skip_field": "is_importer"
@@ -232,8 +232,8 @@
       "importer": 9
     },
     "automation_breakdown": {
-      "full": 0,
-      "partial": 5,
+      "full": 1,
+      "partial": 4,
       "manual": 3
     }
   }

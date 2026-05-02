@@ -75,7 +75,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial"
+        "level": "manual"
       },
       "cross_references": [
         "Art. 6(3)",
@@ -93,8 +93,8 @@
     },
     "automation_breakdown": {
       "full": 0,
-      "partial": 3,
-      "manual": 0
+      "partial": 2,
+      "manual": 1
     }
   }
 }

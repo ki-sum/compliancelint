@@ -95,7 +95,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual"
+        "level": "partial"
       },
       "scope_limitation": "Only applies to distributors",
       "context_skip_field": "is_distributor"
@@ -116,7 +116,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual"
+        "level": "partial"
       },
       "scope_limitation": "Only applies to distributors",
       "context_skip_field": "is_distributor",
@@ -140,7 +140,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual"
+        "level": "partial"
       },
       "scope_limitation": "Only applies to distributors",
       "context_skip_field": "is_distributor"
@@ -161,7 +161,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual"
+        "level": "partial"
       },
       "scope_limitation": "Only applies to distributors",
       "context_skip_field": "is_distributor",
@@ -206,7 +206,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "manual"
+        "level": "partial"
       },
       "scope_limitation": "Only applies to distributors",
       "context_skip_field": "is_distributor"
@@ -222,8 +222,8 @@
     },
     "automation_breakdown": {
       "full": 0,
-      "partial": 3,
-      "manual": 4
+      "partial": 8,
+      "manual": 0
     }
   }
 }

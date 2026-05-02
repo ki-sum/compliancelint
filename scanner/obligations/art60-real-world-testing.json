@@ -158,7 +158,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial"
+        "level": "manual"
       },
       "scope_limitation": "Only applies during real-world testing",
       "context_skip_field": "conducts_real_world_testing"
@@ -195,8 +195,8 @@
     },
     "automation_breakdown": {
       "full": 0,
-      "partial": 3,
-      "manual": 1
+      "partial": 2,
+      "manual": 2
     }
   }
 }

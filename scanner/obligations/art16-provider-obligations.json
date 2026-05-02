@@ -41,7 +41,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "full"
+        "level": "partial"
       },
       "cross_references": [
         "Art. 8",
@@ -70,7 +70,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial"
+        "level": "full"
       }
     },
     {
@@ -133,7 +133,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "full"
+        "level": "partial"
       },
       "cross_references": [
         "Art. 12",
@@ -180,7 +180,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial"
+        "level": "full"
       },
       "cross_references": [
         "Art. 47"
@@ -202,7 +202,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial"
+        "level": "full"
       },
       "cross_references": [
         "Art. 48"
@@ -304,8 +304,8 @@
       "provider": 12
     },
     "automation_breakdown": {
-      "full": 2,
-      "partial": 10,
+      "full": 3,
+      "partial": 9,
       "manual": 0
     }
   }
