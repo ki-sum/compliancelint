@@ -602,6 +602,15 @@ def cl_scan(
 
     Unified scanning entry point. Scans one or more articles from a regulation.
 
+    **Requires `cl_connect` for full functionality** (free at compliancelint.dev).
+    The 5 SaaS-side classification fields (detection_method, what_to_scan,
+    rationale, confidence, human_judgment_needed) are fetched per-article
+    from the SaaS endpoint at scan time. Without an api_key in
+    ~/.compliancelint/config.json, scanning falls back to degraded mode:
+    obligation list + automation `level` only — no detection logic,
+    no scan messages. The scanner emits a one-time stderr notice in
+    degraded mode telling the user to run `cl_connect`.
+
     Args:
         project_path: Absolute path to the project directory to scan.
         project_context: JSON string with AI-enriched project context.
@@ -1268,7 +1277,7 @@ def cl_action_guide(obligation_id: str) -> str:
 
     Q3 self-audit follow-up 2026-04-30 — was a thin "go to dashboard"
     redirect; now surfaces the anti-hallucination IP that lives in
-    `scanner/obligations/art*.json`:
+    `scanner/obligations/art*.json` (public) plus SaaS-side enrichment:
 
       - `source` ("Art. 26(2)") — human-readable section reference
       - `source_quote` — verbatim EUR-Lex text (NEVER paraphrased)
@@ -1278,7 +1287,7 @@ def cl_action_guide(obligation_id: str) -> str:
         requirement)
       - `automation_level` ("full" / "partial" / "manual")
       - `human_judgment_needed` — what a human must judge that code
-        scanning cannot determine
+        scanning cannot determine (**SaaS-side**, requires `cl_connect`)
 
     Plus the legacy fields for backward compat:
       - `obligation_id`, `title`, `is_human_gate`, `dashboard_url`,
@@ -1287,6 +1296,14 @@ def cl_action_guide(obligation_id: str) -> str:
     AI clients render this directly to the user. ChatGPT can't match
     this because it doesn't have our decomposed_atoms IP — that's
     the value-add over generic LLM Q&A.
+
+    **§AA Option C (2026-05-02)**: `human_judgment_needed` and the
+    other 4 detection-related fields (detection_method / what_to_scan
+    / confidence / rationale) live in the SaaS layer. Without an api_key
+    in ~/.compliancelint/config.json, this tool returns the public
+    fields only (source / source_quote / decomposed_atoms / level).
+    Run `cl_connect` to unlock the SaaS fields (free at
+    compliancelint.dev).
 
     Args:
         obligation_id: The obligation ID (e.g., "ART26-OBL-2").
@@ -1365,6 +1382,14 @@ def cl_action_plan(project_path: str, regulation: str = "eu-ai-act", article: in
 
     Scans articles and combines action items into a prioritized plan.
     Items requiring human judgment are marked accordingly.
+
+    **Requires `cl_connect` for full action-plan content.** The plan
+    surfaces detection_method + human_judgment_needed for each
+    obligation, both of which live SaaS-side (§AA Option C). Without
+    an api_key the tool still returns one entry per obligation but
+    those fields are empty strings — the plan degrades to "scan all,
+    review all" without specific detection guidance. Free sign-up at
+    compliancelint.dev.
 
     Args:
         project_path: Absolute path to the project directory.
