@@ -16,14 +16,19 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-    defaults:
-      run:
-        working-directory: scanner
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: pip install -r requirements.txt
+      # Install from root pyproject.toml — there is no separate
+      # scanner/requirements.txt; deps live at the project root in
+      # pyproject.toml [project] `dependencies`. The prior workflow used
+      # `working-directory: scanner` + `pip install -r requirements.txt`
+      # which broke when the file was never created (failing since at
+      # least 2026-04-30 per gh run history). Now installs the package
+      # editable + pytest-only test deps explicitly.
+      - run: pip install -e . pytest pytest-timeout pytest-asyncio
       # --ignore=tests/e2e: cross-system flows requiring deployed dashboard
-      - run: python -m pytest -x --tb=short --ignore=tests/e2e
+      # Run from project root so scanner/tests/ resolves cleanly.
+      - run: python -m pytest scanner/tests/ -x --tb=short --ignore=scanner/tests/e2e
