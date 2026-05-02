@@ -73,11 +73,13 @@ After setup, reload your IDE window so it picks up the new MCP server, then ask:
 
 No extra API key needed — uses your existing AI subscription.
 
-### Track over time (optional)
+### Connect for full scanning (free)
 
 > "Connect to ComplianceLint dashboard."
 
-Opens browser, links your dashboard at [compliancelint.dev](https://compliancelint.dev).
+Opens browser, links your scanner to [compliancelint.dev](https://compliancelint.dev) with a free account. **Free sign-up enables full scanning** — the 5 detection-related fields (`detection_method`, `what_to_scan`, `confidence`, `human_judgment_needed`, `rationale`) live SaaS-side and are fetched per article at scan time. Without `cl_connect`, the scanner runs in degraded mode: obligation list + automation `level` browsable, but no detection logic. The BSL source remains usable as an obligation browser; sign-up unlocks the methodology layer.
+
+### Track over time (optional, paid tiers)
 
 > "Sync my compliance results."
 
