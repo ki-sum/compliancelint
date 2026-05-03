@@ -38,9 +38,11 @@ ALLOWED_HOST_REFERENCES = {
     "server.py": "bug-report URL link",
     "core/bug_report.py": "bug-report URL constant",
     "core/error_response.py": "bug-report URL hint",
-    # art50/module.py mentions external SDK doc URLs in obligation
-    # detection hints (string content, not behavior gating)
-    "modules/art50/module.py": "external SDK doc URLs in obligation detection hints",
+    # art50 transparency module mentions external SDK doc URLs in
+    # obligation detection hints (string content, not behavior
+    # gating)
+    "modules/art50-transparency-obligations/module.py":
+        "external SDK doc URLs in obligation detection hints",
 }
 
 
