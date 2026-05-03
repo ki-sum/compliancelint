@@ -75,17 +75,23 @@ def cells() -> dict[str, ToolCell]:
 
 def test_loader_loads_all_cells(cells: dict[str, ToolCell]) -> None:
     """Sanity: same cell count as the TS smoke (412 as of 2026-05-03)."""
-    assert len(cells) >= 400, (
-        f"Pool 4 cell count regressed: expected >= 400, got {len(cells)}. "
+    # Floor numbers below: regression detectors. Set ~5% below current
+    # truth so APPLICABILITY_FILTER refinements that legitimately drop
+    # cells (e.g. filtering scenarios that aren't actually testable —
+    # cl_check_updates non-success scenarios were removed 2026-05-03)
+    # don't fail this assert spuriously. If the floor breaks, either
+    # cells got accidentally deleted OR the filter dropped a category
+    # — re-run smoke and decide before lowering.
+    assert len(cells) >= 380, (
+        f"Pool 4 cell count regressed: expected >= 380, got {len(cells)}. "
         f"Did someone delete cells without updating the generator?"
     )
-    # Spot-check tier breakdown matches what we shipped in Step 2.
     tier_a = sum(1 for c in cells.values() if c.tier == "A")
     tier_b = sum(1 for c in cells.values() if c.tier == "B")
     tier_s = sum(1 for c in cells.values() if c.tier == "S")
     assert tier_a >= 9, f"tier-A cells: expected >= 9, got {tier_a}"
     assert tier_b >= 15, f"tier-B cells: expected >= 15, got {tier_b}"
-    assert tier_s >= 380, f"tier-S cells: expected >= 380, got {tier_s}"
+    assert tier_s >= 370, f"tier-S cells: expected >= 370, got {tier_s}"
 
 
 def test_smoke_cl_version_round_trip(cells: dict[str, ToolCell]) -> None:
