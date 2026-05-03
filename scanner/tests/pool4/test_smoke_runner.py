@@ -36,6 +36,7 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -292,9 +293,6 @@ def _find_hand_edited_cells(cells_dir: Path) -> list[str]:
 def _cell_needs_fixture_ctx(cell: ToolCell) -> bool:
     """Return True if any cell.invoke.args value uses a $-placeholder
     that requires runtime ctx setup (tmp_path, persona email, etc.).
-    Cells with only literal-value args can run via the parametrized
-    matrix smoke; cells with placeholders need dedicated tests that
-    seed the right fixture state.
     """
     if not cell.invoke or "args" not in cell.invoke:
         return False
@@ -302,6 +300,49 @@ def _cell_needs_fixture_ctx(cell: ToolCell) -> bool:
         if isinstance(value, str) and value.startswith("$"):
             return True
     return False
+
+
+def _build_ctx_for_cell(cell: ToolCell, tmp_path: Path) -> dict[str, Any] | None:
+    """Per-tool fixture builder. Returns the ctx dict the dispatcher
+    needs to resolve placeholders + seeds any scanner-side state the
+    invoke depends on. Returns None if no builder exists for the tool
+    yet — caller skips the cell with a clear reason.
+
+    Adding a new tool to this dispatcher unlocks all hand-edited cells
+    of that tool for matrix-smoke auto-execution.
+
+    Per the internal Pool 4 route audit §local-only: each builder
+    seeds the minimum scanner-side state the tool's invoke surface
+    reads. Cross-system tools (cl_sync / cl_connect / cl_delete
+    with target=dashboard) need DB-side seeding too — that's the
+    Python sibling of the SaaS-introspection helper, not yet
+    implemented.
+    """
+    if cell.tool == "cl_disconnect":
+        # cl_disconnect reads project_path/.compliancelintrc and
+        # removes saas_api_key / saas_url / auto_sync. Seed a fresh
+        # rc with all 3 fields so the success scenario gets the
+        # 'disconnected' response branch (not 'not_connected' which
+        # fires on missing rc per server.py:3608).
+        rc_file = tmp_path / ".compliancelintrc"
+        rc_file.write_text(
+            json.dumps(
+                {
+                    "saas_api_key": "cl_test_key_for_pool4_smoke",
+                    "saas_url": "http://localhost:3000",
+                    "auto_sync": True,
+                    "repo_name": "pool4-smoke-fixture",
+                },
+                indent=2,
+            ),
+            encoding="utf-8",
+        )
+        return {"tmp_path": tmp_path}
+
+    # No builder for this tool yet. Return None so the matrix smoke
+    # skips the cell with an explicit reason (rather than failing
+    # mysteriously inside the dispatcher).
+    return None
 
 
 # Collected at import time. Stays empty when env var is unset (public-
@@ -319,36 +360,46 @@ else:
 def test_matrix_smoke_simple_args_cells(
     cells: dict[str, ToolCell],
     cell_id: str,
+    tmp_path: Path,
 ) -> None:
     """Parametrized matrix smoke — auto-discovers every HAND-EDITED
-    cell with simple (no-placeholder) args and dispatches it.
+    cell and dispatches it via the cell-driven runner.
 
-    Cells that need fixture-driven ctx (e.g. $pytest.tmp_path) are
-    skipped here and covered by dedicated tests above.
+    Cells with simple (no-placeholder) args run with empty ctx.
+    Cells with $-placeholder args invoke the per-tool fixture
+    builder (`_build_ctx_for_cell`) which seeds scanner-side state
+    + returns the resolved ctx. Tools without a builder yet result
+    in a clean skip with an explicit reason (forward-compat for
+    cells whose tool's builder lands in a later commit).
 
-    Why parametrize over discovered cells (not a static list): when
-    Step 5 hand-fills more cells, this test's coverage extends
-    automatically without test_smoke_runner.py edits. New cell yaml
-    + # HAND-EDITED marker → next pytest run picks it up.
+    Why parametrize over discovered cells: when Step 5 hand-fills
+    more cells, coverage extends automatically without edits to
+    this file. New cell yaml + # HAND-EDITED marker → next pytest
+    run picks it up. Adding a new tool's fixture builder unlocks
+    all that tool's $-placeholder cells in one commit.
 
     The assertion is intentionally minimal (status field matches
-    expected_response.status). Per-tool deep assertions (e.g. Q1
-    anti-hallucination payload check) live in dedicated tests
-    above. The matrix smoke is a "did the dispatcher reach the
-    tool and get a response of the right outcome class" sanity
-    floor — it catches cell-args-out-of-sync-with-scanner-signature
-    drift.
+    expected_response.status). Per-tool deep assertions live in
+    dedicated tests above. The matrix smoke is a "did the
+    dispatcher reach the tool and get a response of the right
+    outcome class" sanity floor — catches cell-args-out-of-sync-
+    with-scanner-signature drift.
     """
     cell = cells.get(cell_id)
     assert cell is not None, f"hand-edited cell {cell_id!r} missing from registry"
 
     if _cell_needs_fixture_ctx(cell):
-        pytest.skip(
-            f"cell {cell_id} uses $-placeholder args that need fixture "
-            f"context; covered by a dedicated test above"
-        )
+        ctx = _build_ctx_for_cell(cell, tmp_path)
+        if ctx is None:
+            pytest.skip(
+                f"cell {cell_id} needs fixture ctx but no builder exists "
+                f"for tool {cell.tool!r} yet; add an entry to "
+                f"_build_ctx_for_cell to enable matrix-smoke dispatch"
+            )
+    else:
+        ctx = {}
 
-    raw_response = invoke_tool(cell, ctx={})
+    raw_response = invoke_tool(cell, ctx=ctx)
     response = json.loads(raw_response)
 
     expected_status = (cell.expected_response or {}).get("status")
