@@ -261,6 +261,103 @@ def test_smoke_cl_explain_covered_article_via_dispatcher(
     )
 
 
+def _find_hand_edited_cells(cells_dir: Path) -> list[str]:
+    """Return cell_ids whose yaml file contains the # HAND-EDITED marker.
+
+    yaml.safe_load strips comments, so the marker can't be discovered
+    via the parsed cell. We grep the raw text instead. Read only the
+    first 800 bytes (header zone) — the marker is by convention on
+    line 2-3.
+    """
+    if not cells_dir.is_dir():
+        return []
+    found: list[str] = []
+    for path in sorted(cells_dir.glob("*.yml")):
+        try:
+            with open(path, encoding="utf-8") as fp:
+                head = fp.read(800)
+        except OSError:
+            continue
+        if "HAND-EDITED" in head:
+            found.append(path.stem)
+    return found
+
+
+def _cell_needs_fixture_ctx(cell: ToolCell) -> bool:
+    """Return True if any cell.invoke.args value uses a $-placeholder
+    that requires runtime ctx setup (tmp_path, persona email, etc.).
+    Cells with only literal-value args can run via the parametrized
+    matrix smoke; cells with placeholders need dedicated tests that
+    seed the right fixture state.
+    """
+    if not cell.invoke or "args" not in cell.invoke:
+        return False
+    for value in (cell.invoke["args"] or {}).values():
+        if isinstance(value, str) and value.startswith("$"):
+            return True
+    return False
+
+
+# Collected at import time. Stays empty when env var is unset (public-
+# repo CI without the cell tree); pytest's parametrize then expands to
+# zero cases and the test is silently absent — same as how dedicated
+# tests skip when the cells fixture skips.
+_CELLS_DIR_FOR_PARAMETRIZE = _resolve_cells_dir()
+if _CELLS_DIR_FOR_PARAMETRIZE is not None:
+    _HAND_EDITED_IDS = _find_hand_edited_cells(_CELLS_DIR_FOR_PARAMETRIZE)
+else:
+    _HAND_EDITED_IDS = []
+
+
+@pytest.mark.parametrize("cell_id", _HAND_EDITED_IDS, ids=lambda cid: cid)
+def test_matrix_smoke_simple_args_cells(
+    cells: dict[str, ToolCell],
+    cell_id: str,
+) -> None:
+    """Parametrized matrix smoke — auto-discovers every HAND-EDITED
+    cell with simple (no-placeholder) args and dispatches it.
+
+    Cells that need fixture-driven ctx (e.g. $pytest.tmp_path) are
+    skipped here and covered by dedicated tests above.
+
+    Why parametrize over discovered cells (not a static list): when
+    Step 5 hand-fills more cells, this test's coverage extends
+    automatically without test_smoke_runner.py edits. New cell yaml
+    + # HAND-EDITED marker → next pytest run picks it up.
+
+    The assertion is intentionally minimal (status field matches
+    expected_response.status). Per-tool deep assertions (e.g. Q1
+    anti-hallucination payload check) live in dedicated tests
+    above. The matrix smoke is a "did the dispatcher reach the
+    tool and get a response of the right outcome class" sanity
+    floor — it catches cell-args-out-of-sync-with-scanner-signature
+    drift.
+    """
+    cell = cells.get(cell_id)
+    assert cell is not None, f"hand-edited cell {cell_id!r} missing from registry"
+
+    if _cell_needs_fixture_ctx(cell):
+        pytest.skip(
+            f"cell {cell_id} uses $-placeholder args that need fixture "
+            f"context; covered by a dedicated test above"
+        )
+
+    raw_response = invoke_tool(cell, ctx={})
+    response = json.loads(raw_response)
+
+    expected_status = (cell.expected_response or {}).get("status")
+    if expected_status == "ok":
+        assert "error" not in response, (
+            f"cell {cell_id} expected status='ok' but response has error: "
+            f"{response.get('error')!r}"
+        )
+    elif expected_status == "error":
+        assert "error" in response, (
+            f"cell {cell_id} expected status='error' but response has no "
+            f"error field: keys={list(response.keys())}"
+        )
+
+
 def test_loader_rejects_invalid_cells(tmp_path: Path) -> None:
     """Negative test: loader must reject malformed yaml.
 
