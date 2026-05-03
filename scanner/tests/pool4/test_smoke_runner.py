@@ -40,6 +40,7 @@ from pathlib import Path
 import pytest
 
 from .cell_loader import ToolCell, load_all_cells
+from .dispatcher import invoke_tool
 
 
 CELLS_DIR_ENV = "POOL4_CELLS_DIR"
@@ -138,7 +139,7 @@ def test_smoke_cl_disconnect_local_only_round_trip(
     cells: dict[str, ToolCell],
     tmp_path: Path,
 ) -> None:
-    """End-to-end for a local-only mutating tool.
+    """End-to-end for a local-only mutating tool, via the cell dispatcher.
 
     cl_disconnect is the second smoke target. Per the internal Pool 4
     route audit (§local-only tools), it removes
@@ -146,14 +147,8 @@ def test_smoke_cl_disconnect_local_only_round_trip(
     `.compliancelintrc` and writes nothing to SaaS.
 
     This test proves the local-only pattern (8 of 11 mutating tools)
-    is plumbed correctly: cell yaml exists, MCP tool invokes against
-    a real project_path, scanner-side state mutates, response shape
-    matches the cell's expected_response.
-
-    The cell args placeholder (`args: {}`) is overridden here with a
-    real tmp project path — Step 5's full hand-fill pass will encode
-    a `$pytest.tmp_path` placeholder in the yaml that a future runner
-    resolves automatically. For this smoke we resolve manually.
+    AND the cell-driven dispatcher pattern (cell yaml drives the
+    invoke; runner resolves $pytest.tmp_path placeholder at runtime).
     """
     cell_id = "s-cl_disconnect-success-pro"
     cell = cells.get(cell_id)
@@ -162,8 +157,8 @@ def test_smoke_cl_disconnect_local_only_round_trip(
     assert cell.expected_response is not None
     assert cell.expected_response.get("status") == "ok"
 
-    # Set up a minimal project: .compliancelintrc with the fields
-    # cl_disconnect targets (saas_api_key + saas_url + auto_sync).
+    # Set up a minimal project at $pytest.tmp_path/demo-project — the
+    # cell's args.project_path placeholder resolves to ctx["tmp_path"].
     project = tmp_path / "demo-project"
     project.mkdir()
     rc_file = project / ".compliancelintrc"
@@ -180,9 +175,9 @@ def test_smoke_cl_disconnect_local_only_round_trip(
         encoding="utf-8",
     )
 
-    from scanner.server import cl_disconnect
-
-    raw_response = cl_disconnect(str(project))
+    # Dispatcher resolves $pytest.tmp_path placeholder + invokes the
+    # named MCP tool from scanner.server.
+    raw_response = invoke_tool(cell, ctx={"tmp_path": project})
     response = json.loads(raw_response)
 
     assert response.get("status") == "disconnected", (
@@ -207,6 +202,62 @@ def test_smoke_cl_disconnect_local_only_round_trip(
     # auto_sync} removal set).
     assert rc_after.get("repo_name") == "demo-project", (
         f"non-connection-related fields must survive disconnect: got {rc_after}"
+    )
+
+
+def test_smoke_cl_explain_covered_article_via_dispatcher(
+    cells: dict[str, ToolCell],
+) -> None:
+    """End-to-end for a read-only tool that returns rich payload.
+
+    cl_explain (article=9) is the third smoke target. Per
+    scanner/server.py:786-836, it returns the obligation explanation
+    plus Q1 anti-hallucination enrichment fields:
+      - verbatim_obligations[] — character-for-character EU AI Act text
+      - eur_lex_official_url — canonical PDF link
+      - disclaimer — explicit "prose fields are paraphrased" warning
+
+    This test exercises the dispatcher with a non-tmp_path placeholder
+    set (regulation + article are literal values, no resolution needed)
+    and verifies the response carries the Q1 enrichment fields. If
+    those fields go missing in a future scanner refactor, this test
+    fails RED — exactly the regression detection Pool 4 was built for.
+    """
+    cell_id = "s-cl_explain-covered_article-free"
+    cell = cells.get(cell_id)
+    assert cell is not None, f"smoke cell {cell_id!r} missing"
+    assert cell.tool == "cl_explain"
+    assert cell.invoke is not None
+    assert cell.invoke["args"]["article"] == 9, (
+        f"cell args.article should be 9 (canonical risk-mgmt article); "
+        f"got {cell.invoke['args']}"
+    )
+
+    raw_response = invoke_tool(cell, ctx={})
+    response = json.loads(raw_response)
+
+    # Verify Q1 anti-hallucination enrichment present.
+    assert "verbatim_obligations" in response, (
+        f"cl_explain response missing 'verbatim_obligations' (Q1 anti-"
+        f"hallucination enrichment): keys={list(response.keys())}"
+    )
+    assert isinstance(response["verbatim_obligations"], list)
+    assert len(response["verbatim_obligations"]) > 0, (
+        f"Article 9 verbatim_obligations should be non-empty (19 obligations "
+        f"per scanner/obligations/art09.json); got 0"
+    )
+    assert "eur_lex_official_url" in response, (
+        f"cl_explain response missing 'eur_lex_official_url': {list(response.keys())}"
+    )
+    assert "eur-lex.europa.eu" in response["eur_lex_official_url"], (
+        f"eur_lex_official_url should point to EUR-Lex domain: {response['eur_lex_official_url']!r}"
+    )
+    assert "disclaimer" in response, (
+        f"cl_explain response missing 'disclaimer' (Q1 anti-hallucination)"
+    )
+    assert "verbatim" in response["disclaimer"].lower(), (
+        f"disclaimer should mention verbatim/paraphrase distinction: "
+        f"{response['disclaimer'][:120]!r}"
     )
 
 
