@@ -372,7 +372,7 @@ The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard
 
 ### Shipped
 
-- [x] MCP Server (17 tools) + 44 EU AI Act articles, 247 obligations
+- [x] MCP Server with full EU AI Act tool surface — 44 articles, 247 obligations
 - [x] SaaS Dashboard with Compliance Journey tracking
 - [x] Audit-ready exports — Compliance Journey PDF, Human Gates per-article PDFs (Declaration of Conformity at Art. 47, Technical Documentation at Art. 11, per-article evidence packs), and Compliance All-in-One Pack ZIP (Business+)
 - [x] Attestation system (evidence, rebuttals, acknowledgements, defer, questionnaire response)
@@ -387,7 +387,7 @@ The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard
 - [x] Snapshot ledger (deterministic state hash on every scan)
 - [x] Directory v2 — local cache (`.compliancelint/local/`, gitignored) vs committed evidence (`.compliancelint/evidence/` + `manifest.json`) split
 - [x] Cross-OS CI matrix (Ubuntu, macOS, Windows × Python 3.10–3.13)
-- [x] Profiling Wizard — answer 6 questions about your AI system (EU establishment, Annex III category, training data, GPAI status) and the 247-obligation matrix is filtered down to the ~30–80 that actually apply to you (Starter+)
+- [x] Profiling Wizard — answer a series of questions about your AI system (EU establishment, Annex III category, training data, GPAI status, value-chain role, Art. 2 carve-outs) and the 247-obligation matrix is filtered down to the ones that actually apply to you (Starter+)
 - [x] **Public EU AI Act browser at [`/eu-ai-act`](https://compliancelint.dev/eu-ai-act)** — full text of 44 articles + 13 annexes + searchable across 247 obligations, **no signup required**. Browse legal text + search "biometric" / "logging" / "human oversight" instantly
 
 ### Pre-launch

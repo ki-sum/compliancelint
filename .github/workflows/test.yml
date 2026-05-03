@@ -13,17 +13,24 @@ on:
 
 jobs:
   # ── Scanner (Python) ──────────────────────────────────
+  # README claims "Cross-OS CI matrix (Ubuntu, macOS, Windows ×
+  # Python 3.10–3.13)". §Y deeper-pass 2026-05-03 found we were only
+  # running 3.12. Expanded to honor the README claim. Total = 4 ×
+  # 3 = 12 jobs. Source code grep'd 0 Python 3.11+ specific features
+  # (ExceptionGroup / except* / asyncio.TaskGroup / tomllib) so 3.10
+  # support is structurally sound.
   scanner-tests:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ['3.10', '3.11', '3.12', '3.13']
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: ${{ matrix.python-version }}
       # Install from root pyproject.toml — there is no separate
       # scanner/requirements.txt; deps live at the project root in
       # pyproject.toml [project] `dependencies`. The prior workflow used

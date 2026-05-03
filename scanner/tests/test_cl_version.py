@@ -32,14 +32,28 @@ def test_cl_version_version_is_non_empty_string():
     assert len(result["version"]) > 0
 
 
-def test_cl_version_tools_count_matches_readme_claim_17():
-    """Pins README:375 'MCP Server (17 tools)' claim to runtime.
-    If the registered tool count drifts away from 17 (either README
-    becomes stale OR a new tool ships without README update), this
-    test fails and forces a sync."""
+def test_cl_version_tools_count_is_positive_integer():
+    """README no longer hard-codes a tool count (founder policy
+    2026-05-03: don't write specific quantities in docs since they
+    drift). cl_version still reports the count for AI clients. This
+    test just sanity-checks the field type + non-emptiness."""
     result = server.cl_version()
-    assert result["tools"] == 17, (
-        f"cl_version reports {result['tools']} tools but README.md:375 "
-        f"claims 17. Either update README or update the cl_version "
-        f"hardcoded constant + register the matching @mcp.tool decorator."
+    assert isinstance(result["tools"], int)
+    assert result["tools"] > 0
+
+
+def test_cl_version_tools_count_matches_registered_decorators():
+    """The number self-declared by cl_version MUST match the actual
+    @mcp.tool() decorator count in server.py. If a new tool is added
+    without updating cl_version's hardcoded count (or vice-versa),
+    this fails and forces a sync."""
+    server_path = os.path.join(SCANNER_ROOT, "server.py")
+    with open(server_path, "r", encoding="utf-8") as f:
+        source = f.read()
+    decorator_count = source.count("@mcp.tool()")
+    reported = server.cl_version()["tools"]
+    assert reported == decorator_count, (
+        f"cl_version reports {reported} tools but server.py has "
+        f"{decorator_count} @mcp.tool() decorators. Update the "
+        f"cl_version count constant to match."
     )
