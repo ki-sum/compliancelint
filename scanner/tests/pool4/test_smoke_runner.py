@@ -406,7 +406,8 @@ def test_matrix_smoke_simple_args_cells(
     raw_response = invoke_tool(cell, ctx=ctx)
     response = json.loads(raw_response)
 
-    expected_status = (cell.expected_response or {}).get("status")
+    expected = cell.expected_response or {}
+    expected_status = expected.get("status")
     if expected_status == "ok":
         assert "error" not in response, (
             f"cell {cell_id} expected status='ok' but response has error: "
@@ -417,6 +418,23 @@ def test_matrix_smoke_simple_args_cells(
             f"cell {cell_id} expected status='error' but response has no "
             f"error field: keys={list(response.keys())}"
         )
+
+    # Subset-match expected_response.body_matches against the parsed
+    # response. Each declared key must equal the response's value at
+    # the same key. Extra response fields are ignored. Catches
+    # silent-shape regressions that the status-only check above misses
+    # (e.g. cl_disconnect returning `{status: not_connected}` when the
+    # cell expects `{status: disconnected}` — both lack an 'error' key,
+    # so the status check passes; only body_matches catches the drift).
+    body_matches = expected.get("body_matches")
+    if body_matches:
+        for key, expected_value in body_matches.items():
+            actual = response.get(key)
+            assert actual == expected_value, (
+                f"cell {cell_id} body_matches.{key}: expected "
+                f"{expected_value!r}, got {actual!r} "
+                f"(response keys: {list(response.keys())})"
+            )
 
 
 def test_loader_rejects_invalid_cells(tmp_path: Path) -> None:
