@@ -816,19 +816,33 @@ def cl_explain(regulation: str = "eu-ai-act", article: int = 0) -> str:
         from core.obligation_lookup import (
             obligations_for_article,
             eur_lex_url_for_article,
+            recitals_for_article,
         )
         payload = explanation.to_dict()
         payload["verbatim_obligations"] = obligations_for_article(article)
         payload["eur_lex_official_url"] = eur_lex_url_for_article(article)
+        # §AD.5 — Recital interpretive layer (added 2026-05-04, see
+        # feedback_recital_text_no_retype.md). Each Recital is verbatim
+        # from docs/sources/eu-ai-act-2024-1689-en.pdf; LLMs never retype.
+        # Per Kisum decision: full text inline (no links), customer's own
+        # AI can interpret further.
+        payload["related_recitals"] = recitals_for_article(article)
         payload["disclaimer"] = (
             "Prose fields (one_sentence, official_summary, recital, "
             "compliance_checklist_summary) are ComplianceLint's "
             "paraphrased summary, NOT verbatim regulation text. The "
             "verbatim EU AI Act text — character-for-character from "
             "EUR-Lex — is in the `verbatim_obligations` array (each "
-            "entry's `source_quote` field). Use `verbatim_obligations` "
-            "as the ground truth when quoting the regulation; consult "
-            "`eur_lex_official_url` for the canonical PDF."
+            "entry's `source_quote` field) and in `related_recitals` "
+            "(drawn from the official Regulation (EU) 2024/1689 PDF). "
+            "Each Recital entry has TWO text fields: prefer "
+            "`source_quote_display` (clean text from pdfplumber's "
+            "layout-aware PDF extraction) for any user-facing rendering; "
+            "`source_quote` is the audit-trail canonical bound to the "
+            "sha256 anchor and may contain pypdf justification artifacts. "
+            "When `display_text_unavailable=true`, the display field "
+            "falls back to the canonical and may show artifacts; in that "
+            "case consult `eur_lex_official_url` for clean text."
         )
         return append_upgrade_hint(
             json.dumps(payload, indent=2, ensure_ascii=False),
@@ -1323,9 +1337,19 @@ def cl_action_guide(obligation_id: str) -> str:
     obl_id = obligation_id.upper()
 
     # Pull verbatim obligation JSON (anti-hallucination payload)
-    from core.obligation_lookup import lookup_obligation, extract_action_guide_fields
+    from core.obligation_lookup import (
+        lookup_obligation,
+        extract_action_guide_fields,
+        recitals_for_article,
+    )
 
     row = lookup_obligation(obl_id)
+
+    # §AD.5b — derive article number from the OID for Recital lookup.
+    # OID validation above already enforced ^ART\d+-OBL-\d+ so this match
+    # cannot fail; we still guard defensively against future format drift.
+    _art_match = re.match(r"^ART(\d+)-", obl_id)
+    _article_num = int(_art_match.group(1)) if _art_match else 0
 
     # Known Human Gate obligations (curated list — these have
     # structured-form support on the SaaS dashboard)
@@ -1373,6 +1397,13 @@ def cl_action_guide(obligation_id: str) -> str:
     if row is not None:
         response.update(extract_action_guide_fields(row))
 
+    # §AD.5b — Recital interpretive layer (added 2026-05-04, see
+    # feedback_recital_text_no_retype.md). Full verbatim Recital text
+    # for the OID's parent article. Empty list when no Recitals reference
+    # the article OR when recitals.json is unavailable.
+    if _article_num:
+        response["related_recitals"] = recitals_for_article(_article_num)
+
     return append_upgrade_hint(json.dumps(response), "cl_action_guide")
 
 
@@ -1415,6 +1446,11 @@ def cl_action_plan(project_path: str, regulation: str = "eu-ai-act", article: in
             "fix": "Scan your project first (cl_scan or cl_scan_all), then request the action plan.",
         })
 
+    # §AD.5b — Recital interpretive layer (full verbatim text, keyed
+    # by article number). Same pattern as cl_explain.related_recitals.
+    from core.obligation_lookup import recitals_for_article
+    related_recitals_by_article: dict[str, list[dict]] = {}
+
     all_actions = []
     articles_covered = []
 
@@ -1436,6 +1472,10 @@ def cl_action_plan(project_path: str, regulation: str = "eu-ai-act", article: in
             plan = mod.action_plan(scan_result)
             all_actions.extend(plan.actions)
             articles_covered.append(f"Art. {art_num} ({mod.article_title})")
+            # §AD.5b — attach Recitals for this article (empty list when none).
+            recitals = recitals_for_article(art_num)
+            if recitals:
+                related_recitals_by_article[str(art_num)] = recitals
         except Exception as e:
             all_actions.append({
                 "priority": "HIGH",
@@ -1465,9 +1505,17 @@ def cl_action_plan(project_path: str, regulation: str = "eu-ai-act", article: in
         "medium": sum(1 for a in action_dicts if a.get("priority") == "MEDIUM"),
         "low": sum(1 for a in action_dicts if a.get("priority") == "LOW"),
         "actions": action_dicts,
+        # §AD.5b — Recital interpretive layer keyed by article number.
+        # Empty dict when no covered article has mapped Recitals OR when
+        # recitals.json is unavailable. Per Kisum decision 2026-05-04:
+        # full Recital text inline (not links).
+        "related_recitals_by_article": related_recitals_by_article,
         "disclaimer": (
             "This action plan is based on ComplianceLint compliance checklist and best practices. "
-            "Official CEN-CENELEC standards (expected Q4 2026) may modify these requirements."
+            "Official CEN-CENELEC standards (expected Q4 2026) may modify these requirements. "
+            "Verbatim EU AI Act Recital text in `related_recitals_by_article` is drawn from "
+            "the official Regulation (EU) 2024/1689 PDF — prefer `source_quote_display` "
+            "(clean text) for rendering; `source_quote` is the audit-trail canonical."
         ),
     }
     return append_upgrade_hint(
@@ -1555,6 +1603,10 @@ def cl_interim_standard(article_number: int) -> str:  # Tool name kept for backw
     if article_number in _modules:
         standard = _modules[article_number].compliance_checklist()
         if standard:
+            # §AD.5b — Recital interpretive layer.
+            from core.obligation_lookup import recitals_for_article as _recitals_lookup
+            _related_recitals = _recitals_lookup(article_number)
+
             # Q2 anti-misinterpretation enrichment: surface the
             # "not official" signal at the TOP LEVEL of the payload,
             # not buried inside _metadata.disclaimer. AI consumers
@@ -1581,6 +1633,10 @@ def cl_interim_standard(article_number: int) -> str:  # Tool name kept for backw
                     or "An official harmonized standard has not been "
                     "announced for this article yet."
                 ),
+                # §AD.5b — Recital interpretive layer (full verbatim
+                # text). Empty list when no Recitals reference this
+                # article OR when recitals.json is unavailable.
+                "related_recitals": _related_recitals,
             }
             # Merge: new top-level fields first so they appear at the
             # head of the JSON, then existing payload (which keeps

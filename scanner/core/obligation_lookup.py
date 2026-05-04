@@ -318,6 +318,94 @@ def eur_lex_url_for_article(article_number: int) -> str:
     )
 
 
+# Module-level cache for recitals.json (loaded lazily; ~250KB).
+_RECITALS_INDEX: Optional[dict[str, dict]] = None
+
+
+def _recitals_path() -> str:
+    """`scanner/data/recitals.json` resolved from THIS module."""
+    here = os.path.abspath(__file__)
+    return os.path.join(os.path.dirname(os.path.dirname(here)), "data", "recitals.json")
+
+
+def _load_recitals() -> dict[str, dict]:
+    """Lazy-load the 180-Recital baseline from scanner/data/recitals.json.
+
+    Returns {} if file missing or unparseable; callers handle gracefully.
+    Per `feedback_recital_text_no_retype.md`, the file is canonical and
+    is populated only by fetch_recitals.py — LLMs never retype Recital text.
+    """
+    global _RECITALS_INDEX
+    if _RECITALS_INDEX is not None:
+        return _RECITALS_INDEX
+    fpath = _recitals_path()
+    if not os.path.isfile(fpath):
+        logger.warning("recitals.json missing at %s", fpath)
+        _RECITALS_INDEX = {}
+        return _RECITALS_INDEX
+    try:
+        with open(fpath, "r", encoding="utf-8") as f:
+            _RECITALS_INDEX = json.load(f)
+    except (OSError, json.JSONDecodeError) as e:
+        logger.warning("recitals.json load failed: %s", e)
+        _RECITALS_INDEX = {}
+    return _RECITALS_INDEX
+
+
+def recitals_for_article(article_number: int) -> list[dict]:
+    """Return the list of Recital entries that reference the given article.
+
+    Each entry's `related_articles[]` is populated by fetch_recitals.py from
+    the verbatim Recital text via Article-N regex. We surface the FULL
+    `source_quote` (200-2000+ words) so the AI consumer has the official
+    interpretive context inline — no further lookup needed.
+
+    Per Kisum decision 2026-05-04: full text inline, NOT links. Customer's
+    own AI can interpret further if needed; that's not our tool's job.
+
+    §AD.* Option D (2026-05-04): each entry now also carries
+    `source_quote_display` — clean Recital text from pdfplumber's
+    layout-aware PDF extraction. The original `source_quote` (pypdf
+    extraction with justification artifacts like "r isk -managem ent")
+    stays untouched as the audit-trail canonical bound to the sha256
+    anchor. AI consumers should prefer `source_quote_display` for
+    presentation; `source_quote` is the immutable audit field.
+
+    Returns [] when no recitals reference this article OR when recitals.json
+    is unavailable. cl_explain handles empty list gracefully.
+    """
+    recitals = _load_recitals()
+    out: list[dict] = []
+    # Iterate by ascending Recital number for stable, predictable order
+    for k in sorted(recitals.keys(), key=lambda x: int(x) if x.isdigit() else 999):
+        entry = recitals[k]
+        if not isinstance(entry, dict):
+            continue
+        related = entry.get("related_articles") or []
+        if article_number not in related:
+            continue
+        out.append({
+            "number": entry.get("number"),
+            "source_quote": entry.get("source_quote", ""),
+            # §AD.* Option D — display field. Falls back to source_quote
+            # when fetch_recitals_display.py hasn't populated it yet
+            # (e.g. fresh checkout before display extractor ran).
+            "source_quote_display": entry.get(
+                "source_quote_display", entry.get("source_quote", "")
+            ),
+            "display_source": entry.get("display_source", "pypdf_fallback"),
+            "display_text_unavailable": bool(
+                entry.get("display_text_unavailable", False)
+            ),
+            "source_pdf": entry.get("source_pdf", ""),
+            "source_url_eur_lex": entry.get("source_url_eur_lex_celex", ""),
+            "source_url_ec": entry.get("source_url_ec", ""),
+            "verified_against": entry.get("verified_against", []),
+            "byte_equal_across_sources": bool(entry.get("byte_equal_across_sources", False)),
+        })
+    return out
+
+
 def extract_action_guide_fields(row: dict) -> dict:
     """Pull the cl_action_guide-relevant fields from an obligation
     row. Defensive against missing/malformed sub-fields — never throws.
