@@ -323,6 +323,134 @@ def test_cl_scan_surfaces_related_recitals_by_article(tmp_path):
     )
 
 
+def test_cl_scan_multi_article_surfaces_related_recitals_by_article(tmp_path):
+    """§AG.2 close-out (2026-05-04 evening) — multi-article cl_scan
+    path also populates related_recitals_by_article. The single-
+    article test above covers the early-return single branch; this
+    test exercises the multi-article aggregation branch where
+    Recitals are gathered across the iterated article list."""
+    from server import cl_scan
+    from core.protocol import BaseArticleModule
+
+    ctx = BaseArticleModule.get_context()
+    answers_with_scope = {
+        **ctx.compliance_answers,
+        "_scope": {
+            "is_ai_system": True,
+            "risk_classification": "high-risk",
+        },
+    }
+    ctx_json = json.dumps(
+        {
+            "primary_language": ctx.primary_language,
+            "risk_classification": ctx.risk_classification,
+            "compliance_answers": answers_with_scope,
+        }
+    )
+
+    # Multi-article path: scan Art 5 + Art 27 + Art 53 (all have
+    # mapped Recitals from the §AD.* batch via recitals.json's
+    # related_articles[] field — which is what recitals_for_article()
+    # consults). NOTE: article_recital_index.json's article_to_recitals
+    # has additional entries from EC co-citation (e.g. Art 12 → R71)
+    # that are NOT mirrored back into recitals.json related_articles[].
+    # The test_2026_05_04_batch_dual_mapping_consistency test in
+    # test_recital_article_mappings.py documents this two-file divergence
+    # as legitimate — only the §AD.* batch is required to round-trip.
+    raw = cl_scan(str(tmp_path), project_context=ctx_json, articles="5,27,53")
+    payload = _parse_tool_output(raw)
+    assert "related_recitals_by_article" in payload, (
+        f"cl_scan multi-article must surface related_recitals_by_article. "
+        f"Keys: {sorted(payload.keys())}"
+    )
+    by_article = payload["related_recitals_by_article"]
+    # All three requested articles must be keyed in the dict
+    assert "5" in by_article, f"Art 5 missing from multi-article scan: {sorted(by_article.keys())}"
+    assert "27" in by_article, f"Art 27 missing: {sorted(by_article.keys())}"
+    assert "53" in by_article, f"Art 53 missing: {sorted(by_article.keys())}"
+    # Art 27 → Recital 96 (FRIA) — the canonical anchor
+    art27_numbers = [r["number"] for r in by_article["27"]]
+    assert 96 in art27_numbers, (
+        f"Art 27 must surface Recital 96 (FRIA): got {art27_numbers}"
+    )
+    # Art 53 → Recital 104-109 cluster (GPAI providers + copyright + training data summary)
+    art53_numbers = [r["number"] for r in by_article["53"]]
+    assert any(n in art53_numbers for n in [104, 105, 106, 107, 108, 109]), (
+        f"Art 53 must surface at least one of R104-R109 (GPAI cluster): got {art53_numbers}"
+    )
+
+
+def test_cl_verify_evidence_surfaces_related_recitals_by_article(tmp_path):
+    """§AG.2 close-out — cl_verify_evidence groups Recitals by article
+    number derived from each evidence item's obligation_id. Without a
+    compliance-evidence.json the tool returns the schema_example shape
+    (no items), so we drop a minimal file to exercise the path."""
+    from server import cl_verify_evidence
+
+    # Drop a minimal compliance-evidence.json with two items pointing
+    # at different articles so we can verify the grouping by article.
+    evidence_path = tmp_path / "compliance-evidence.json"
+    evidence_path.write_text(
+        json.dumps(
+            {
+                "evidence": {
+                    "ART27-OBL-1": {
+                        "storage_kind": "text",
+                        "description": "FRIA documented at docs/fria/v1.md §3 covering 4 risks.",
+                        "provided_by": "Compliance Team",
+                    },
+                    "ART09-OBL-1": {
+                        "storage_kind": "text",
+                        "description": "Risk-management process at docs/risk.md §2 with 7 risks.",
+                        "provided_by": "Compliance Team",
+                    },
+                }
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    raw = cl_verify_evidence(str(tmp_path))
+    payload = _parse_tool_output(raw)
+
+    assert "related_recitals_by_article" in payload, (
+        f"cl_verify_evidence must surface related_recitals_by_article. "
+        f"Keys: {sorted(payload.keys())}"
+    )
+    by_article = payload["related_recitals_by_article"]
+    # Both articles' Recitals must appear (Art 27 → R96 / Art 9 → R64+R65)
+    assert "27" in by_article, f"Art 27 missing: {sorted(by_article.keys())}"
+    assert "9" in by_article, f"Art 9 missing: {sorted(by_article.keys())}"
+    # Verify the canonical anchors made it through
+    art27_numbers = [r["number"] for r in by_article["27"]]
+    art9_numbers = [r["number"] for r in by_article["9"]]
+    assert 96 in art27_numbers, f"Art 27 must surface R96 (FRIA): {art27_numbers}"
+    assert 65 in art9_numbers, f"Art 9 must surface R65 (Risk Mgmt): {art9_numbers}"
+
+    # verification_instructions must mention the new field so AI
+    # consumers know to use it for evidence-adequacy grounding
+    instr = payload.get("verification_instructions", "")
+    assert "related_recitals_by_article" in instr, (
+        f"verification_instructions must reference the new field for "
+        f"AI consumer discoverability: got {instr!r}"
+    )
+
+
+def test_cl_verify_evidence_no_evidence_file_does_not_crash(tmp_path):
+    """§AG.2 close-out — when compliance-evidence.json is absent the
+    Recital wiring path must not run (no items to group). The tool
+    returns the schema_example response unchanged. Defensive guard
+    against the AG.2 `items.append` loop running on undefined data."""
+    from server import cl_verify_evidence
+
+    raw = cl_verify_evidence(str(tmp_path))
+    payload = _parse_tool_output(raw)
+    # No-evidence path — the API returns `found: False` schema_example
+    # without items / related_recitals_by_article. Confirm that.
+    assert payload.get("found") is False
+    assert "related_recitals_by_article" not in payload
+
+
 def test_cl_explain_recital_text_has_no_pypdf_artifacts():
     """Recitals returned by cl_explain MUST NOT show pypdf justification
     artifacts. With pdfplumber as canonical extractor, fragmented words
