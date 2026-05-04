@@ -278,6 +278,51 @@ def test_interim_standard_recital_source_quote_matches_baseline(recitals_baselin
 # ──────────────────────────────────────────────────────────────────────
 
 
+def test_cl_scan_surfaces_related_recitals_by_article(tmp_path):
+    """§AG.2 (2026-05-04 evening) — cl_scan output MUST carry
+    `related_recitals_by_article` keyed by article number, same shape
+    as cl_action_plan. AI consumers reading findings can ground their
+    interpretation in the official Recital text without a separate
+    cl_explain round-trip."""
+    from server import cl_scan
+    from core.protocol import BaseArticleModule
+
+    # Use the autouse minimal_ai_context fixture's compliance_answers
+    # — already populated by tests/conftest.py with all 44 articles
+    # set to None. cl_scan's validation gate requires _scope so we
+    # inject it here; tmp_path is a real dir so cl_scan accepts it.
+    ctx = BaseArticleModule.get_context()
+    answers_with_scope = {
+        **ctx.compliance_answers,
+        "_scope": {
+            "is_ai_system": True,
+            "risk_classification": "high-risk",
+        },
+    }
+    ctx_json = json.dumps(
+        {
+            "primary_language": ctx.primary_language,
+            "risk_classification": ctx.risk_classification,
+            "compliance_answers": answers_with_scope,
+        }
+    )
+
+    raw = cl_scan(str(tmp_path), project_context=ctx_json, articles="5")
+    payload = _parse_tool_output(raw)
+    # Single-article scan path — Recitals injected at top level
+    assert "related_recitals_by_article" in payload, (
+        f"cl_scan must surface related_recitals_by_article (§AG.2). "
+        f"Keys: {sorted(payload.keys())}"
+    )
+    by_article = payload["related_recitals_by_article"]
+    assert isinstance(by_article, dict)
+    # Art 5 has multiple mapped Recitals (15-44 + 176)
+    assert "5" in by_article, (
+        f"Art. 5 should appear in cl_scan related_recitals_by_article; "
+        f"got keys: {sorted(by_article.keys())}"
+    )
+
+
 def test_cl_explain_recital_text_has_no_pypdf_artifacts():
     """Recitals returned by cl_explain MUST NOT show pypdf justification
     artifacts. With pdfplumber as canonical extractor, fragmented words

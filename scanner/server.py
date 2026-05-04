@@ -702,9 +702,32 @@ def cl_scan(
         from core.state import save_metadata
         save_metadata(project_path, ai_provider=ai_provider)
 
+    # §AG.2 (2026-05-04) — Recital interpretive layer surfaced at the
+    # top of cl_scan output. AI consumers reading findings benefit
+    # from the same Recital grounding that cl_explain surfaces, keyed
+    # by article number for quick lookup.
+    from core.obligation_lookup import recitals_for_article as _recitals_for_article
+    related_recitals_by_article: dict[str, list[dict]] = {}
+    for art_num in article_numbers:
+        recs = _recitals_for_article(art_num)
+        if recs:
+            related_recitals_by_article[str(art_num)] = recs
+
     # Single article → return full findings + post-scan hint
     if len(article_numbers) == 1:
         output = _scan_single_article(article_numbers[0], project_path, context=ctx, regulation=regulation)
+        # Inject related_recitals into the single-article JSON so
+        # consumers see the same shape regardless of how many articles
+        # were requested. Defensive parse — if _scan_single_article
+        # returned non-JSON for some reason, leave output unchanged.
+        try:
+            single_payload = json.loads(output)
+            if isinstance(single_payload, dict) and related_recitals_by_article:
+                single_payload["related_recitals_by_article"] = related_recitals_by_article
+                output = json.dumps(single_payload, indent=2, default=str)
+        except json.JSONDecodeError:
+            pass
+
         config = ProjectConfig.load(project_path)
         if config.saas_api_key and config.auto_sync:
             try:
@@ -764,6 +787,10 @@ def cl_scan(
         "regulation": regulation,
         "articles_scanned": article_numbers,
         "results": results,
+        # §AG.2 — Recital interpretive layer keyed by article number
+        # (same shape as cl_action_plan). Empty when no covered article
+        # has mapped Recitals.
+        "related_recitals_by_article": related_recitals_by_article,
     }, indent=2, default=str)
 
     # Post-scan: auto-sync or contextual hint
@@ -1112,6 +1139,13 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
                     "overall": "unable_to_determine",
                 }
 
+    # §AG.2 (2026-05-04 evening) — Recital interpretive layer keyed
+    # by article number. Same pattern as cl_action_plan / cl_scan
+    # (single + multi). AI consumers iterating over results[] gain
+    # the matching Recitals via a sibling top-level dict.
+    from core.obligation_lookup import recitals_for_article as _recitals_for_article
+    related_recitals_by_article: dict[str, list[dict]] = {}
+
     for phase in _PHASE_ORDER:
         for art_num in phase:
             if art_num not in modules_to_scan:
@@ -1125,6 +1159,10 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
             status = summary.get("overall", "error")
             articles_scanned.append(f"Art. {art_num} ({title}): {status}")
             overall_levels.append(summary.get("overall", "unable_to_determine"))
+
+            recs = _recitals_for_article(art_num)
+            if recs:
+                related_recitals_by_article[str(art_num)] = recs
 
             # Note: Art.6 scan checks documentation quality, not risk level.
             # Risk classification comes from AI-provided ctx.risk_classification.
@@ -1191,6 +1229,7 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
             if ctx else None
         ),
         "results": results,
+        "related_recitals_by_article": related_recitals_by_article,
         "next_steps": (
             "IMPORTANT: Do not stop here. Your job is to help the user reach full compliance.\n\n"
             "1. REVIEW the findings above. For each NC or NEEDS_REVIEW article:\n"
@@ -1993,8 +2032,38 @@ def cl_verify_evidence(project_path: str) -> str:
         "Process each item in the 'items' array. Every item carries a "
         "'verification_instruction' field — follow it. Judge adequacy strictly: "
         "reject vague text, accept specific evidence. For url_reference items, "
-        "flag the second-class durability/provenance caveat in your report."
+        "flag the second-class durability/provenance caveat in your report. "
+        "Use related_recitals_by_article for the official interpretive context "
+        "behind each obligation when judging evidence adequacy."
     )
+
+    # §AG.2 (2026-05-04 evening) — Recital interpretive layer keyed
+    # by article number. Each evidence item references an obligation
+    # ID (e.g., "ART13", "ART50-ai-disclosure", "ART12-OBL-6"); we
+    # extract the article number and surface its Recitals so the AI
+    # consumer can ground evidence-adequacy judgement in the official
+    # text instead of guessing what the regulation actually requires.
+    import re as _re
+    from core.obligation_lookup import recitals_for_article as _recitals_for_article
+    related_recitals_by_article: dict[str, list[dict]] = {}
+    items = summary.get("items") or []
+    if isinstance(items, list):
+        article_nums: set[int] = set()
+        for item in items:
+            if not isinstance(item, dict):
+                continue
+            oid = str(item.get("obligation_id") or item.get("id") or "")
+            m = _re.match(r"^ART(\d+)", oid, _re.IGNORECASE)
+            if m:
+                try:
+                    article_nums.add(int(m.group(1)))
+                except ValueError:
+                    pass
+        for art_num in sorted(article_nums):
+            recs = _recitals_for_article(art_num)
+            if recs:
+                related_recitals_by_article[str(art_num)] = recs
+    summary["related_recitals_by_article"] = related_recitals_by_article
 
     return append_upgrade_hint(
         json.dumps(summary, indent=2, ensure_ascii=False),
