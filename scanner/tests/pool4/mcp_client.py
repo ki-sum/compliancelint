@@ -96,12 +96,20 @@ class McpStdioClient:
     def __init__(self, proc: subprocess.Popen[str]) -> None:
         self._proc = proc
         self._next_id = 1
-        self._stderr_lines: list[str] = []
-        self._stderr_lock = threading.Lock()
-        self._stderr_thread = threading.Thread(
-            target=self._drain_stderr, daemon=True,
+        self._stderr_file_path: str | None = None
+        # Dedicated stdout drain thread + queue. On Windows pipes,
+        # a synchronous readline() on the main thread occasionally
+        # won't return the next line after the first request/response
+        # round-trip — even though the bytes ARE in the pipe. The
+        # drain thread reads continuously into a queue; main thread
+        # pops with timeout. Combined with the stderr-to-file fix, this
+        # eliminates the cl_sync 2nd-call hang.
+        import queue as _queue
+        self._stdout_queue: _queue.Queue[str | None] = _queue.Queue()
+        self._stdout_thread = threading.Thread(
+            target=self._drain_stdout, daemon=True,
         )
-        self._stderr_thread.start()
+        self._stdout_thread.start()
 
     @classmethod
     def spawn(
@@ -115,24 +123,44 @@ class McpStdioClient:
         ``cwd`` defaults to the repo root (where ``scanner/`` lives).
         ``env`` extends os.environ; pass values to override (e.g.
         ``PYTHONPATH``). Handshake failure raises ``McpClientError``
-        with the captured stderr for diagnosis.
+        with the captured stderr-file tail for diagnosis.
         """
         run_cwd = cwd if cwd is not None else REPO_ROOT
         run_env = os.environ.copy()
         if env:
             run_env.update(env)
+        # 2026-05-04 fix (root cause of the cl_sync 2nd-call hang): do
+        # NOT use subprocess.PIPE for stderr. The MCP server writes
+        # ~50+ log lines to stderr per cl_sync invocation; on Windows
+        # the pipe buffer (~64 KB) fills after roughly one cl_sync,
+        # and the next stderr.write() in the SECOND cl_sync blocks
+        # forever waiting for the parent to drain the pipe (a daemon
+        # thread can't keep up under GIL contention with the pytest /
+        # main thread). Redirecting stderr to a temp file decouples
+        # the server from any client-side draining: writes always
+        # succeed, and the file content is still readable for failure
+        # diagnostics. See bug doc 2026-05-04-bug-cl-sync-2nd-call-hang.
+        import tempfile
+        stderr_file = tempfile.NamedTemporaryFile(
+            prefix="pool4-mcp-stderr-", suffix=".log",
+            delete=False, mode="wb",
+        )
         proc = subprocess.Popen(
             [sys.executable, "-m", "scanner.server"],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            stderr=stderr_file,
             cwd=str(run_cwd),
             env=run_env,
             text=True,
             encoding="utf-8",
-            bufsize=0,
+            bufsize=1,  # line-buffered
         )
+        # Close our handle to the file — the subprocess inherited it.
+        # We'll re-open for reading when the caller asks for stderr.
+        stderr_file.close()
         client = cls(proc)
+        client._stderr_file_path = stderr_file.name
         try:
             client._handshake(handshake_timeout)
         except Exception:
@@ -207,22 +235,28 @@ class McpStdioClient:
         return text
 
     def close(self) -> None:
-        """Best-effort subprocess shutdown."""
-        if self._proc.poll() is not None:
-            return
-        try:
-            if self._proc.stdin and not self._proc.stdin.closed:
-                self._proc.stdin.close()
-        except OSError:
-            pass
-        try:
-            self._proc.wait(timeout=2.0)
-        except subprocess.TimeoutExpired:
-            self._proc.terminate()
+        """Best-effort subprocess shutdown + stderr-file cleanup."""
+        if self._proc.poll() is None:
+            try:
+                if self._proc.stdin and not self._proc.stdin.closed:
+                    self._proc.stdin.close()
+            except OSError:
+                pass
             try:
                 self._proc.wait(timeout=2.0)
             except subprocess.TimeoutExpired:
-                self._proc.kill()
+                self._proc.terminate()
+                try:
+                    self._proc.wait(timeout=2.0)
+                except subprocess.TimeoutExpired:
+                    self._proc.kill()
+        # Clean up the temp stderr file (subprocess has released it).
+        if self._stderr_file_path:
+            try:
+                os.unlink(self._stderr_file_path)
+            except OSError:
+                pass
+            self._stderr_file_path = None
 
     def _handshake(self, timeout: float) -> None:
         init_id = self._allocate_id()
@@ -298,49 +332,55 @@ class McpStdioClient:
             ) from e
 
     def _read_line(self, timeout: float) -> str | None:
-        """Read one stdout line with a soft timeout.
+        """Pop one stdout line from the drain queue with timeout.
 
-        Python's ``readline`` blocks; for cross-platform compatibility
-        we poll the subprocess and use a short busy-wait when no data
-        is available. Acceptable for test code (called at most a few
-        times per cell). Returns None on timeout, empty string when
-        the pipe closes, or the line contents (without trailing newline).
+        The dedicated stdout-drain thread (started in __init__) reads
+        readline() in a loop and pushes lines onto ``_stdout_queue``.
+        This method just polls the queue with the caller's timeout.
+        Returns None on timeout, empty string on pipe-close (sentinel),
+        or the line contents (without trailing newline).
+
+        Why drain-thread + queue (not direct readline): on Windows
+        pipes, a synchronous readline() on the main thread sometimes
+        won't return the next line after the first round-trip — even
+        though the bytes ARE in the pipe (verified by a parallel drain
+        thread reading them fine). Decoupling read I/O from the
+        request/response loop fixes the 2nd-cl_sync hang.
         """
-        if self._proc.stdout is None:
-            return None
-        deadline = time.monotonic() + timeout
-        while time.monotonic() < deadline:
-            if self._proc.poll() is not None and self._stdout_drained():
-                return ""
-            line = self._proc.stdout.readline()
-            if line:
-                return line.rstrip("\r\n")
-            time.sleep(0.01)
-        return None
-
-    def _stdout_drained(self) -> bool:
-        if self._proc.stdout is None:
-            return True
         try:
-            return self._proc.stdout.peek() == b"" if hasattr(
-                self._proc.stdout, "peek"
-            ) else False
-        except (OSError, ValueError):
-            return True
+            return self._stdout_queue.get(timeout=timeout)
+        except Exception:
+            return None
 
-    def _drain_stderr(self) -> None:
-        if self._proc.stderr is None:
+    def _drain_stdout(self) -> None:
+        """Background pump: push every stdout line onto the queue."""
+        if self._proc.stdout is None:
             return
         try:
-            for line in self._proc.stderr:
-                with self._stderr_lock:
-                    self._stderr_lines.append(line.rstrip("\r\n"))
+            for line in self._proc.stdout:
+                self._stdout_queue.put(line.rstrip("\r\n"))
         except (OSError, ValueError):
             pass
+        finally:
+            # Sentinel — readers know the pipe closed.
+            self._stdout_queue.put("")
 
     def _stderr_snapshot(self) -> str:
-        with self._stderr_lock:
-            tail = self._stderr_lines[-20:]
+        """Return the tail of the stderr-file for diagnostics.
+
+        Stderr is redirected to a temp file at spawn time (see spawn()
+        for the rationale). On error reporting we read the file and
+        return the last ~20 lines. File may not exist if spawn failed
+        before the file was created — return an empty string then.
+        """
+        if not self._stderr_file_path:
+            return ""
+        try:
+            with open(self._stderr_file_path, "r", encoding="utf-8", errors="replace") as f:
+                lines = f.readlines()
+        except OSError:
+            return ""
+        tail = [line.rstrip("\r\n") for line in lines[-20:]]
         return "\n".join(tail)
 
     def _allocate_id(self) -> int:

@@ -54,27 +54,19 @@ SAAS_URL = "http://localhost:3000"
 
 @pytest.mark.requires_dev_server
 @pytest.mark.requires_seeded_users
-@pytest.mark.skip(
-    reason=(
-        "BUG-found-by-pool4: a second cl_sync against the same repo "
-        "with a different first_commit_sha hangs indefinitely. "
-        "Direct-Python probe (without pytest) reproduced 2026-05-04: "
-        "sync 1 returns in 1.5s with status=synced + scan_id; sync 2 "
-        "starts and never returns within 60s (probably way longer — "
-        "killed at 90s outer timeout). Hang is on the scanner-side "
-        "curl POST or the dashboard's fingerprint-mismatch handler. "
-        "Same root cause class as the earlier cl_sync git-regression "
-        "hang (memory bug_mcp_tool_hang); needs scanner.log / dashboard "
-        "log instrumentation to localize. Skipping until fixed; "
-        "fingerprint_set path stays covered by test_cl_sync_fingerprint.py."
-    ),
-)
 def test_cl_sync_fingerprint_change_then_auto_resolved(
     server_reachable: bool,
     seeded_users_present: bool,
 ) -> None:
     """End-to-end: 3 syncs covering set → change → auto_resolved.
-    SKIPPED — see decorator reason; cl_sync 2nd call hangs."""
+
+    Un-skipped 2026-05-04 after fixing the cl_sync 2nd-call hang. Root
+    cause was Pool 4's mcp_client using stderr=subprocess.PIPE — server
+    log writes filled the pipe buffer after one cl_sync's worth of
+    output, blocking the server's next stderr.write() in sync 2. Fix:
+    redirect stderr to a temp file (no buffer limit). See
+    2026-05-04-bug-cl-sync-2nd-call-hang.md for the investigation log.
+    """
     if not server_reachable or not seeded_users_present:
         pytest.skip("server :3000 or seeded users not ready")
 
