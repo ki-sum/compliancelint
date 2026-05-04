@@ -41,16 +41,26 @@ from .mcp_client import McpStdioClient
 
 @pytest.mark.requires_dev_server
 @pytest.mark.requires_seeded_users
-def test_cl_connect_already_connected_business(
+@pytest.mark.parametrize(
+    "persona_key",
+    ["free", "starter", "pro", "business"],
+    ids=lambda k: f"persona-{k}",
+)
+def test_cl_connect_already_connected(
+    persona_key: str,
     server_reachable: bool,
     seeded_users_present: bool,
 ) -> None:
     """End-to-end: rc has valid api_key → cl_connect returns
     already_connected with the right email + dashboard_url.
 
-    Phase 2.C milestone for cl_connect happy path. The 'fresh
-    connect' (device-flow) path stays manual-only until Step 5
-    builds the OAuth-callback simulator.
+    Parametrized across the 4 core seeded personas. The auth/check
+    branch is tier-agnostic (any valid api_key returns its own
+    user's identity), so the assertion reuses the persona's email
+    as the expected value.
+
+    The 'fresh connect' (device-flow) path stays manual-only until
+    Step 5 builds the OAuth-callback simulator.
     """
     if not server_reachable or not seeded_users_present:
         pytest.skip("server :3000 or seeded users not ready")
@@ -59,17 +69,21 @@ def test_cl_connect_already_connected_business(
     if fixture_dir is None or not fixture_dir.is_dir():
         pytest.skip("POOL4_MANUAL_FIXTURE_DIR not set or path missing")
 
-    persona = PERSONAS["business"]
+    persona = PERSONAS[persona_key]
 
-    with pattern_a("business") as fx:
+    with pattern_a(persona_key) as fx:
         client = McpStdioClient.spawn()
         try:
             cell = ToolCell(
-                cell_id="phase2c-cl_connect-already_connected-business",
+                cell_id=f"phase2-cl_connect-already_connected-{persona_key}",
                 tier="S",
                 tool="cl_connect",
                 scenario="already_connected",
-                persona="business",
+                persona=(
+                    persona_key
+                    if persona_key in ("free", "starter", "pro", "business")
+                    else "business"
+                ),
                 preconditions=["seeded_user_business", "rc_has_valid_api_key"],
                 cleanup=["restore_rc"],
                 cleanup_justification=None,
