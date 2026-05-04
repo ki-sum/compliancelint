@@ -42,23 +42,40 @@ from .dispatcher import invoke_tool
 from .mcp_client import McpStdioClient
 
 
+import pytest
+
+from .fixtures import PERSONAS
+
+
+@pytest.mark.parametrize(
+    "persona_key",
+    ["free", "starter", "pro", "business"],
+    ids=lambda k: f"persona-{k}",
+)
 def test_cl_disconnect_strips_dashboard_binding_preserves_other_fields(
+    persona_key: str,
     tmp_path: Path,
 ) -> None:
-    """End-to-end: tmp project with seeded rc → cl_disconnect strips
-    saas_api_key + saas_url + auto_sync, leaves repo_name + scope alone.
+    """End-to-end across personas: tmp project with seeded rc using
+    the persona's api_key → cl_disconnect strips saas_api_key +
+    saas_url + auto_sync, leaves repo_name + scope alone.
+
+    Parametrized: cl_disconnect is tier-agnostic but exercising 4
+    api_keys catches drift if any persona's seeded key shape becomes
+    invalid (e.g., a future seed-demo refactor breaks one tier).
     """
-    project_dir = tmp_path / "pool4-disconnect-fixture"
+    persona = PERSONAS[persona_key]
+    project_dir = tmp_path / f"pool4-disconnect-{persona_key}"
     project_dir.mkdir()
     rc_path = project_dir / ".compliancelintrc"
     rc_path.write_text(
         json.dumps(
             {
-                "purpose": "Pool 4 cl_disconnect fixture",
-                "saas_api_key": "cl_test_key_for_disconnect_smoke",
+                "purpose": f"Pool 4 cl_disconnect fixture ({persona_key})",
+                "saas_api_key": persona.api_key,
                 "saas_url": "http://localhost:3000",
                 "auto_sync": True,
-                "repo_name": "test/disconnect-fixture",
+                "repo_name": f"test/disconnect-{persona_key}-fixture",
                 "scope": {
                     "operator_role": ["provider"],
                     "risk_classification": "high-risk",
@@ -72,11 +89,11 @@ def test_cl_disconnect_strips_dashboard_binding_preserves_other_fields(
     client = McpStdioClient.spawn()
     try:
         cell = ToolCell(
-            cell_id="phase3-cl_disconnect-success",
+            cell_id=f"phase3-cl_disconnect-success-{persona_key}",
             tier="S",
             tool="cl_disconnect",
             scenario="success",
-            persona="business",  # persona moot for local-only tool
+            persona=persona_key,
             preconditions=["fixture_with_seeded_dashboard_binding"],
             cleanup=["tmp_path_auto_cleanup"],
             cleanup_justification=(
@@ -118,7 +135,7 @@ def test_cl_disconnect_strips_dashboard_binding_preserves_other_fields(
             f"rc still contains {field!r} after cl_disconnect; "
             f"rc_after={rc_after}"
         )
-    assert rc_after.get("repo_name") == "test/disconnect-fixture", (
+    assert rc_after.get("repo_name") == f"test/disconnect-{persona_key}-fixture", (
         f"non-binding field repo_name was clobbered; got "
         f"{rc_after.get('repo_name')!r}"
     )
@@ -126,7 +143,7 @@ def test_cl_disconnect_strips_dashboard_binding_preserves_other_fields(
         f"non-binding nested field scope.risk_classification was lost; "
         f"got rc_after.scope={rc_after.get('scope')!r}"
     )
-    assert rc_after.get("purpose") == "Pool 4 cl_disconnect fixture", (
+    assert rc_after.get("purpose") == f"Pool 4 cl_disconnect fixture ({persona_key})", (
         f"non-binding field purpose was lost; got "
         f"{rc_after.get('purpose')!r}"
     )
