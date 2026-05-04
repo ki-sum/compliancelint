@@ -17,7 +17,9 @@
     "byte_equal_across_sources": false,
     "extraction_date": "2026-05-04",
     "number": 10,
-    "related_articles": [],
+    "related_articles": [
+      86
+    ],
     "source_pdf": "docs/sources/eu-ai-act-2024-1689-en.pdf",
     "source_quote": "The fundamental right to the protection of personal data is safeguarded in particular by Regulations (EU) 2016/679 (11) and (EU) 2018/1725 (12) of the European Parliament and of the Council and Directive (EU) 2016/680 of the European Parliament and of the Council (13). Directive 2002/58/EC of the European Parliament and of the Council (14) additionally protects private life and the confidentiality of communications, including by way of providing conditions for any storing of personal and non-personal data in, and access from, terminal equipment. Those Union legal acts provide the basis for sustainable and responsible data processing, including where data sets include a mix of personal and non-personal data. This Regulation does not seek to affect the application of existing Union law governing the processing of personal data, including the tasks and powers of the independent supervisory authorities competent to monitor compliance with those instruments. It also does not affect the obligations of providers and deployers of AI systems in their role as data controllers or processors stemming from Union or national law on the protection of personal data in so far as the design, the development or the use of AI systems involves the processing of personal data. It is also appropriate to clarify that data subjects continue to enjoy all the (7) Regulation (EC) No 765/2008 of the European Parliament and of the Council of 9 July 2008 setting out the requirements for accreditation and repealing Regulation (EEC) No 339/93 (OJ L 218, 13.8.2008, p. 30). (8) Decision No 768/2008/EC of the European Parliament and of the Council of 9 July 2008 on a common framework for the marketing of products, and repealing Council Decision 93/465/EEC (OJ L 218, 13.8.2008, p. 82). (9) Regulation (EU) 2019/1020 of the European Parliament and of the Council of 20 June 2019 on market surveillance and compliance of products and amending Directive 2004/42/EC and Regulations (EC) No 765/2008 and (EU) No 305/2011 (OJ L 169, 25.6.2019, p. 1). (10) Council Directive 85/374/EEC of 25 July 1985 on the approximation of the laws, regulations and administrative provisions of the Member States concerning liability for defective products (OJ L 210, 7.8.1985, p. 29). (11) Regulation (EU) 2016/679 of the European Parliament and of the Council of 27 April 2016 on the protection of natural persons with regard to the processing of personal data and on the free movement of such data, and repealing Directive 95/46/EC (General Data Protection Regulation) (OJ L 119, 4.5.2016, p. 1). (12) Regulation (EU) 2018/1725 of the European Parliament and of the Council of 23 October 2018 on the protection of natural persons with regard to the processing of personal data by the Union institutions, bodies, offices and agencies and on the free movement of such data, and repealing Regulation (EC) No 45/2001 and Decision No 1247/2002/EC (OJ L 295, 21.11.2018, p. 39). (13) Directive (EU) 2016/680 of the European Parliament and of the Council of 27 April 2016 on the protection of natural persons with regard to the processing of personal data by competent authorities for the purposes of the prevention, investigation, detection or prosecution of criminal offences or the execution of criminal penalties, and on the free movement of such data, and repealing Council Framework Decision 2008/977/JHA (OJ L 119, 4.5.2016, p. 89). (14) Directive 2002/58/EC of the European Parliament and of the Council of 12 July 2002 concerning the processing of personal data and the protection of privacy in the electronic communications sector (Directive on privacy and electronic communications) (OJ L 201, 31.7.2002, p. 37). ELI: http://data.europa.eu/eli/reg/2024/1689/oj 3/144 EN OJ L, 12.7.2024 rights and guarantees awarded to them by such Union law, including the rights related to solely automated individual decision-making, including profiling. Harmonised rules for the placing on the market, the putting into service and the use of AI systems established under this Regulation should facilitate the effective implementation and enable the exercise of the data subjects’ rights and other remedies guaranteed under Union law on the protection of personal data and of other fundamental rights.",
     "source_quote_normalized_sha256": "cc88ce8281bae60d5e34d427ab3577d5a03b53bf20a9d7b6cb548d274c21d7bf",
@@ -45,7 +47,9 @@
     "byte_equal_across_sources": false,
     "extraction_date": "2026-05-04",
     "number": 101,
-    "related_articles": [],
+    "related_articles": [
+      53
+    ],
     "source_pdf": "docs/sources/eu-ai-act-2024-1689-en.pdf",
     "source_quote": "Providers of general-purpose AI models have a particular role and responsibility along the AI value chain, as the models they provide may form the basis for a range of downstream systems, often provided by downstream providers that necessitate a good understanding of the models and their capabilities, both to enable the integration of such models into their products, and to fulfil their obligations under this or other regulations. Therefore, proportionate transparency measures should be laid down, including the drawing up and keeping up to date of documentation, and the provision of information on the general-purpose AI model for its usage by the downstream providers. Technical documentation should be prepared and kept up to date by the general-purpose AI model provider for the purpose of making it available, upon request, to the AI Office and the national competent authorities. The minimal set of elements to be included in such documentation should be set out in specific annexes to this Regulation. The Commission should be empowered to amend those annexes by means of delegated acts in light of evolving technological developments.",
     "source_quote_normalized_sha256": "f4b57fac354598eebf8258d519253a855d5e32be9744175c99e20f322ca1ae86",
@@ -88,7 +92,8 @@
     "extraction_date": "2026-05-04",
     "number": 104,
     "related_articles": [
-      4
+      4,
+      53
     ],
     "source_pdf": "docs/sources/eu-ai-act-2024-1689-en.pdf",
     "source_quote": "The providers of general-purpose AI models that are released under a free and open-source licence, and whose parameters, including the weights, the information on the model architecture, and the information on model usage, are made publicly available should be subject to exceptions as regards the transparency-related requirements imposed on general-purpose AI models, unless they can be considered to present a systemic risk, in which case the circumstance that the model is transparent and accompanied by an open-source license should not be considered to be a sufficient reason to exclude compliance with the obligations under this Regulation. In any case, given that the release of general-purpose AI models under free and open-source licence does not necessarily reveal substantial information on the data set used for the training or fine-tuning of the model and on how compliance of copyright law was thereby ensured, the exception provided for general-purpose AI models from compliance with the transparency-related requirements should not concern the obligation to produce a summary about the content used for model training and the obligation to put in place a policy to comply with Union copyright law, in particular to identify and comply with the reservation of rights pursuant to Article 4(3) of Directive (EU) 2019/790 of the European Parliament and of the Council (40).",
@@ -103,7 +108,9 @@
     "byte_equal_across_sources": false,
     "extraction_date": "2026-05-04",
     "number": 105,
-    "related_articles": [],
+    "related_articles": [
+      53
+    ],
     "source_pdf": "docs/sources/eu-ai-act-2024-1689-en.pdf",
     "source_quote": "General-purpose AI models, in particular large generative AI models, capable of generating text, images, and other content, present unique innovation opportunities but also challenges to artists, authors, and other creators and the way their creative content is created, distributed, used and consumed. The development and training of such models require access to vast amounts of text, images, videos and other data. Text and data mining techniques may be used extensively in this context for the retrieval and analysis of such content, which may be protected by copyright and related rights. Any use of copyright protected content requires the authorisation of the rightsholder concerned unless relevant copyright exceptions and limitations apply. Directive (EU) 2019/790 introduced exceptions and limitations allowing reproductions and extractions of works or other subject matter, for the purpose of text and data (40) Directive (EU) 2019/790 of the European Parliament and of the Council of 17 April 2019 on copyright and related rights in the Digital Single Market and amending Directives 96/9/EC and 2001/29/EC (OJ L 130, 17.5.2019, p. 92). ELI: http://data.europa.eu/eli/reg/2024/1689/oj 27/144 EN OJ L, 12.7.2024 mining, under certain conditions. Under these rules, rightsholders may choose to reserve their rights over their works or other subject matter to prevent text and data mining, unless this is done for the purposes of scientific research. Where the rights to opt out has been expressly reserved in an appropriate manner, providers of general-purpose AI models need to obtain an authorisation from rightsholders if they want to carry out text and data mining over such works.",
     "source_quote_normalized_sha256": "66c949d62283fe681b515dbcc98217e742f1abb4affa7fd9b3b8c9828006520e",
@@ -118,7 +125,8 @@
     "extraction_date": "2026-05-04",
     "number": 106,
     "related_articles": [
-      4
+      4,
+      53
     ],
     "source_pdf": "docs/sources/eu-ai-act-2024-1689-en.pdf",
     "source_quote": "Providers that place general-purpose AI models on the Union market should ensure compliance with the relevant obligations in this Regulation. To that end, providers of general-purpose AI models should put in place a policy to comply with Union law on copyright and related rights, in particular to identify and comply with the reservation of rights expressed by rightsholders pursuant to Article 4(3) of Directive (EU) 2019/790. Any provider placing a general-purpose AI model on the Union market should comply with this obligation, regardless of the jurisdiction in which the copyright-relevant acts underpinning the training of those general-purpose AI models take place. This is necessary to ensure a level playing field among providers of general-purpose AI models where no provider should be able to gain a competitive advantage in the Union market by applying lower copyright standards than those provided in the Union.",
@@ -133,7 +141,9 @@
     "byte_equal_across_sources": false,
     "extraction_date": "2026-05-04",
     "number": 107,
-    "related_articles": [],
+    "related_articles": [
+      53
+    ],
     "source_pdf": "docs/sources/eu-ai-act-2024-1689-en.pdf",
     "source_quote": "In order to increase transparency on the data that is used in the pre-training and training of general-purpose AI models, including text and data protected by copyright law, it is adequate that providers of such models draw up and make publicly available a sufficiently detailed summary of the content used for training the general-purpose AI model. While taking into due account the need to protect trade secrets and confidential business information, this summary should be generally comprehensive in its scope instead of technically detailed to facilitate parties with legitimate interests, including copyright holders, to exercise and enforce their rights under Union law, for example by listing the main data collections or sets that went into training the model, such as large private or public databases or data archives, and by providing a narrative explanation about other data sources used. It is appropriate for the AI Office to provide a template for the summary, which should be simple, effective, and allow the provider to provide the required summary in narrative form.",
     "source_quote_normalized_sha256": "4271bf65deb68b562bfef0d9beeb687ee58fa3cd95813547d2a9ba55ec8a3f43",
@@ -147,7 +157,9 @@
     "byte_equal_across_sources": false,
     "extraction_date": "2026-05-04",
     "number": 108,
-    "related_articles": [],
+    "related_articles": [
+      53
+    ],
     "source_pdf": "docs/sources/eu-ai-act-2024-1689-en.pdf",
     "source_quote": "With regard to the obligations imposed on providers of general-purpose AI models to put in place a policy to comply with Union copyright law and make publicly available a summary of the content used for the training, the AI Office should monitor whether the provider has fulfilled those obligations without verifying or proceeding to a work-by-work assessment of the training data in terms of copyright compliance. This Regulation does not affect the enforcement of copyright rules as provided for under Union law.",
     "source_quote_normalized_sha256": "d638cd2ae2145e20e31eebc2123fb75b415ffdcae76596645738566b78ba5e96",
@@ -161,7 +173,9 @@
     "byte_equal_across_sources": false,
     "extraction_date": "2026-05-04",
     "number": 109,
-    "related_articles": [],
+    "related_articles": [
+      53
+    ],
     "source_pdf": "docs/sources/eu-ai-act-2024-1689-en.pdf",
     "source_quote": "Compliance with the obligations applicable to the providers of general-purpose AI models should be commensurate and proportionate to the type of model provider, excluding the need for compliance for persons who develop or use models for non-professional or scientific research purposes, who should nevertheless be encouraged to voluntarily comply with these requirements. Without prejudice to Union copyright law, compliance with those obligations should take due account of the size of the provider and allow simplified ways of compliance for SMEs, including start-ups, that should not represent an excessive cost and not discourage the use of such models. In the case of a modification or fine-tuning of a model, the obligations for providers of general-purpose AI models should be limited to that modification or fine-tuning, for example by complementing the already existing technical documentation with information on the modifications, including new training data sources, as a means to comply with the value chain obligations provided in this Regulation.",
     "source_quote_normalized_sha256": "147569926f87aaaab8904a1d9789e8c04d1dccce3ae7f9af3ae1d0d2042b8ef6",
@@ -358,7 +372,8 @@
     "extraction_date": "2026-05-04",
     "number": 121,
     "related_articles": [
-      2
+      2,
+      41
     ],
     "source_pdf": "docs/sources/eu-ai-act-2024-1689-en.pdf",
     "source_quote": "Standardisation should play a key role to provide technical solutions to providers to ensure compliance with this Regulation, in line with the state of the art, to promote innovation as well as competitiveness and growth in the single market. Compliance with harmonised standards as defined in Article 2, point (1)(c), of Regulation (EU) No 1025/2012 of the European Parliament and of the Council (41), which are normally expected to reflect the state of the art, should be a means for providers to demonstrate conformity with the requirements of this Regulation. A balanced representation of interests involving all relevant stakeholders in the development of standards, in particular SMEs, consumer organisations and environmental and social stakeholders in accordance with Articles 5 and 6 of Regulation (EU) No 1025/2012 should therefore be encouraged. In order to facilitate compliance, the standardisation requests should be issued by the Commission without undue delay. When preparing the standardisation request, the Commission should consult the advisory forum and the Board in order to collect relevant expertise. However, in the absence of relevant references to harmonised standards, the Commission should be able to establish, via implementing acts, and after consultation of the advisory forum, common specifications for certain requirements under this Regulation. The common specification should be an exceptional fall back solution to facilitate the provider’s obligation to comply with the requirements of this Regulation, when the standardisation request has not been accepted by any of the European standardisation organisations, or when the relevant harmonised standards insufficiently address fundamental rights concerns, or when the harmonised standards do not comply with the request, or when there are delays in the adoption of an appropriate harmonised standard. Where such a delay in the adoption of a harmonised standard is due to the technical complexity of that standard, this should (41) Regulation (EU) No 1025/2012 of the European Parliament and of the Council of 25 October 2012 on European standardisation, amending Council Directives 89/686/EEC and 93/15/EEC and Directives 94/9/EC, 94/25/EC, 95/16/EC, 97/23/EC, 98/34/EC, 2004/22/EC, 2007/23/EC, 2009/23/EC and 2009/105/EC of the European Parliament and of the Council and repealing Council Decision 87/95/EEC and Decision No 1673/2006/EC of the European Parliament and of the Council (OJ L 316, 14.11.2012, p. 12). ELI: http://data.europa.eu/eli/reg/2024/1689/oj 31/144 EN OJ L, 12.7.2024 be considered by the Commission before contemplating the establishment of common specifications. When developing common specifications, the Commission is encouraged to cooperate with international partners and international standardisation bodies.",
@@ -389,7 +404,9 @@
     "byte_equal_across_sources": false,
     "extraction_date": "2026-05-04",
     "number": 123,
-    "related_articles": [],
+    "related_articles": [
+      43
+    ],
     "source_pdf": "docs/sources/eu-ai-act-2024-1689-en.pdf",
     "source_quote": "In order to ensure a high level of trustworthiness of high-risk AI systems, those systems should be subject to a conformity assessment prior to their placing on the market or putting into service.",
     "source_quote_normalized_sha256": "4914e72ad563b0c4a84843928adae859cd696339ce5c9d61831d0e48a7177eb1",
@@ -403,7 +420,9 @@
     "byte_equal_across_sources": false,
     "extraction_date": "2026-05-04",
     "number": 124,
-    "related_articles": [],
+    "related_articles": [
+      43
+    ],
     "source_pdf": "docs/sources/eu-ai-act-2024-1689-en.pdf",
     "source_quote": "It is appropriate that, in order to minimise the burden on operators and avoid any possible duplication, for high-risk AI systems related to products which are covered by existing Union harmonisation legislation based on the New Legislative Framework, the compliance of those AI systems with the requirements of this Regulation should be assessed as part of the conformity assessment already provided for in that law. The applicability of the requirements of this Regulation should thus not affect the specific logic, methodology or general structure of conformity assessment under the relevant Union harmonisation legislation.",
     "source_quote_normalized_sha256": "62aba871fdb0799309ee2b11a1ef1f963477e64e0b16d5e85a90e75e62416822",
@@ -417,7 +436,9 @@
     "byte_equal_across_sources": false,
     "extraction_date": "2026-05-04",
     "number": 125,
-    "related_articles": [],
+    "related_articles": [
+      43
+    ],
     "source_pdf": "docs/sources/eu-ai-act-2024-1689-en.pdf",
     "source_quote": "Given the complexity of high-risk AI systems and the risks that are associated with them, it is important to develop an adequate conformity assessment procedure for high-risk AI systems involving notified bodies, so-called third party conformity assessment. However, given the current experience of professional pre-market certifiers in the field of product safety and the different nature of risks involved, it is appropriate to limit, at least in an initial phase of application of this Regulation, the scope of application of third-party conformity assessment for high-risk AI systems other than those related to products. Therefore, the conformity assessment of such systems should be carried out as a general rule by the provider under its own responsibility, with the only exception of AI systems intended to be used for biometrics.",
     "source_quote_normalized_sha256": "c1b3f3139b117d260a52fc587cd1cb13b18904705e5f7cc987f3cc727b86dba7",
@@ -431,7 +452,9 @@
     "byte_equal_across_sources": false,
     "extraction_date": "2026-05-04",
     "number": 126,
-    "related_articles": [],
+    "related_articles": [
+      43
+    ],
     "source_pdf": "docs/sources/eu-ai-act-2024-1689-en.pdf",
     "source_quote": "In order to carry out third-party conformity assessments when so required, notified bodies should be notified under this Regulation by the national competent authorities, provided that they comply with a set of requirements, in particular on independence, competence, absence of conflicts of interests and suitable cybersecurity requirements. Notification of those bodies should be sent by national competent authorities to the Commission and the other Member States by means of the electronic notification tool developed and managed by the Commission pursuant to Article R23 of Annex I to Decision No 768/2008/EC.",
     "source_quote_normalized_sha256": "b1fc5aedce70faa92d5290035e58ac4e5e27aad06764ff3cd6b44fc817308530",
@@ -515,7 +538,10 @@
     "byte_equal_across_sources": false,
     "extraction_date": "2026-05-04",
     "number": 131,
-    "related_articles": [],
+    "related_articles": [
+      49,
+      71
+    ],
     "source_pdf": "docs/sources/eu-ai-act-2024-1689-en.pdf",
     "source_quote": "In order to facilitate the work of the Commission and the Member States in the AI field as well as to increase the transparency towards the public, providers of high-risk AI systems other than those related to products falling within the scope of relevant existing Union harmonisation legislation, as well as providers who consider that an AI system listed in the high-risk use cases in an annex to this Regulation is not high-risk on the basis of a derogation, should be required to register themselves and information about their AI system in an EU database, to be established and managed by the Commission. Before using an AI system listed in the high-risk use cases in an annex to this Regulation, deployers of high-risk AI systems that are public authorities, agencies or bodies, should register themselves in such database and select the system that they envisage to use. Other deployers should be entitled to do so voluntarily. This section of the EU database should be publicly accessible, free of charge, the information should be easily navigable, understandable and machine-readable. The EU database should also be user-friendly, for example by providing search functionalities, including through keywords, allowing the general public to find relevant information to be submitted upon the registration of high-risk AI systems and on the use case of high-risk AI systems, set out in an annex to this Regulation, to which the high-risk AI systems correspond. Any substantial modification of high-risk AI systems should also be registered in the EU database. For high-risk AI systems in the area of law enforcement, migration, asylum and border control management, the registration obligations should be fulfilled in a secure non-public section of the EU database. Access to the secure non-public section should be strictly limited to the Commission as well as to market surveillance authorities with regard to their national section of that database. High-risk AI systems in the area of critical infrastructure should only be registered at national level. The Commission should be the controller of the EU database, in accordance with Regulation (EU) 2018/1725. In order to ensure the full functionality of the EU database, when deployed, the procedure for setting the database should include the development of functional specifications by the Commission and an independent audit report. The Commission should take into account cybersecurity risks when carrying out its tasks as data controller on the EU database. In order to maximise the availability and use of the EU database by the public, the EU database, including the information made available through it, should comply with requirements under the Directive (EU) 2019/882.",
     "source_quote_normalized_sha256": "a7ec322c5eb903c69a11644a607683ad55905ba3365e1611635df46096335143",
@@ -681,7 +707,10 @@
     "byte_equal_across_sources": false,
     "extraction_date": "2026-05-04",
     "number": 141,
-    "related_articles": [],
+    "related_articles": [
+      60,
+      61
+    ],
     "source_pdf": "docs/sources/eu-ai-act-2024-1689-en.pdf",
     "source_quote": "In order to accelerate the process of development and the placing on the market of the high-risk AI systems listed in an annex to this Regulation, it is important that providers or prospective providers of such systems may also benefit from a specific regime for testing those systems in real world conditions, without participating in an AI regulatory sandbox. However, in such cases, taking into account the possible consequences of such testing on individuals, it should be ensured that appropriate and sufficient guarantees and conditions are introduced by this Regulation for providers or prospective providers. Such guarantees should include, inter alia, requesting informed consent of natural persons to participate in testing in real world conditions, with the exception of law enforcement where the seeking of informed consent would prevent the AI system from being tested. Consent of subjects to participate in such testing under this Regulation is distinct from, and without prejudice to, consent of data subjects for the processing of their personal data under the relevant data protection law. It is also important to minimise the risks and enable oversight by competent authorities and therefore require prospective providers to have a real-world testing plan submitted to competent market surveillance authority, register the testing in dedicated sections in the EU database subject to some limited exceptions, set limitations on the period for which the testing can be done and require additional safeguards for persons belonging to certain vulnerable groups, as well as a written agreement defining the roles and responsibilities of prospective providers and deployers and effective oversight by competent personnel involved in the real world testing. Furthermore, it is appropriate to envisage additional safeguards to ensure that the predictions, recommendations or decisions of the AI system can be effectively reversed and disregarded and that personal data is protected and is deleted when the subjects have withdrawn their consent to participate in the testing without prejudice to their rights as data subjects under the Union data protection law. As regards transfer of data, it is also appropriate to envisage that data collected and processed for the purpose of testing in real-world conditions should be transferred to third countries only where appropriate and applicable safeguards under Union law are implemented, in particular in accordance with bases for transfer of personal data under Union law on data protection, while for non-personal data appropriate safeguards are put in place in accordance with Union law, such as Regulations (EU) 2022/868 (42) and (EU) 2023/2854 (43) of the European Parliament and of the Council.",
     "source_quote_normalized_sha256": "d045c771ca19c5a9845b60bb48582d13de205bc293db8f948e31df97a185539a",
@@ -751,7 +780,9 @@
     "byte_equal_across_sources": false,
     "extraction_date": "2026-05-04",
     "number": 146,
-    "related_articles": [],
+    "related_articles": [
+      17
+    ],
     "source_pdf": "docs/sources/eu-ai-act-2024-1689-en.pdf",
     "source_quote": "Moreover, in light of the very small size of some operators and in order to ensure proportionality regarding costs of innovation, it is appropriate to allow microenterprises to fulfil one of the most costly obligations, namely to establish a quality management system, in a simplified manner which would reduce the administrative burden and the costs for those enterprises without affecting the level of protection and the need for compliance with the requirements for high-risk AI systems. The Commission should develop guidelines to specify the elements of the quality management system to be fulfilled in this simplified manner by microenterprises.",
     "source_quote_normalized_sha256": "852e0a0ed15dbc881128c554b7c3ba4a69b1d140c19691a02ba872709a3820c0",
@@ -894,7 +925,11 @@
     "byte_equal_across_sources": false,
     "extraction_date": "2026-05-04",
     "number": 155,
-    "related_articles": [],
+    "related_articles": [
+      20,
+      72,
+      73
+    ],
     "source_pdf": "docs/sources/eu-ai-act-2024-1689-en.pdf",
     "source_quote": "In order to ensure that providers of high-risk AI systems can take into account the experience on the use of high-risk AI systems for improving their systems and the design and development process or can take any possible corrective action in a timely manner, all providers should have a post-market monitoring system in place. Where relevant, post-market monitoring should include an analysis of the interaction with other AI systems including other devices and software. Post-market monitoring should not cover sensitive operational data of deployers which are law enforcement authorities. This system is also key to ensure that the possible risks emerging from AI systems which continue to ‘learn’ after being placed on the market or put into service can be more efficiently and timely addressed. In this context, providers should also be required to have a system in place to report to the relevant authorities any serious incidents resulting from the use of their AI systems, meaning incident or malfunctioning leading to death or serious damage to health, serious and irreversible disruption of the management and operation of critical infrastructure, infringements of obligations under Union law intended to protect fundamental rights or serious damage to property or the environment.",
     "source_quote_normalized_sha256": "747d41378cd98d176b0f64002e8b029ba1ce652fd088d375862476d1a9704c9e",
@@ -1022,7 +1057,9 @@
     "byte_equal_across_sources": false,
     "extraction_date": "2026-05-04",
     "number": 163,
-    "related_articles": [],
+    "related_articles": [
+      91
+    ],
     "source_pdf": "docs/sources/eu-ai-act-2024-1689-en.pdf",
     "source_quote": "With a view to complementing the governance systems for general-purpose AI models, the scientific panel should support the monitoring activities of the AI Office and may, in certain cases, provide qualified alerts to the AI Office which trigger follow-ups, such as investigations. This should be the case where the scientific panel has reason to suspect that a general-purpose AI model poses a concrete and identifiable risk at Union level. Furthermore, this should be the case where the scientific panel has reason to suspect that a general-purpose AI model meets the criteria that would lead to a classification as general-purpose AI model with systemic risk. To equip the scientific panel with the information necessary for the performance of those tasks, there should be a mechanism whereby the scientific panel can request the Commission to require documentation or information from a provider.",
     "source_quote_normalized_sha256": "9ba1ed35e23ff8833031f200bcf1b7399a2b46a8585b31ee81342bfd1c64716e",
@@ -1037,7 +1074,9 @@
     "extraction_date": "2026-05-04",
     "number": 164,
     "related_articles": [
-      18
+      18,
+      91,
+      92
     ],
     "source_pdf": "docs/sources/eu-ai-act-2024-1689-en.pdf",
     "source_quote": "The AI Office should be able to take the necessary actions to monitor the effective implementation of and compliance with the obligations for providers of general-purpose AI models laid down in this Regulation. The AI Office should be able to investigate possible infringements in accordance with the powers provided for in this Regulation, including by requesting documentation and information, by conducting evaluations, as well as by requesting measures from providers of general-purpose AI models. When conducting evaluations, in order to make use of independent expertise, the AI Office should be able to involve independent experts to carry out the evaluations on its behalf. Compliance with the obligations should be enforceable, inter alia, through requests to take appropriate measures, including risk mitigation measures in the case of identified systemic risks as well as restricting the making available on the market, withdrawing or recalling the model. As a safeguard, where needed beyond the procedural rights provided for in this Regulation, providers of general-purpose AI models should have the procedural rights provided for in Article 18 of Regulation (EU) 2019/1020, which should apply mutatis mutandis, without prejudice to more specific procedural rights provided for by this Regulation.",
@@ -1250,7 +1289,9 @@
     "byte_equal_across_sources": false,
     "extraction_date": "2026-05-04",
     "number": 178,
-    "related_articles": [],
+    "related_articles": [
+      111
+    ],
     "source_pdf": "docs/sources/eu-ai-act-2024-1689-en.pdf",
     "source_quote": "Providers of high-risk AI systems are encouraged to start to comply, on a voluntary basis, with the relevant obligations of this Regulation already during the transitional period.",
     "source_quote_normalized_sha256": "e1f3edc18689bde9e2e6ef40f6c7d930c45f46df4dff14599b1b0fd8ce290f57",
@@ -1867,7 +1908,8 @@
     "number": 53,
     "related_articles": [
       3,
-      4
+      4,
+      80
     ],
     "source_pdf": "docs/sources/eu-ai-act-2024-1689-en.pdf",
     "source_quote": "It is also important to clarify that there may be specific cases in which AI systems referred to in pre-defined areas specified in this Regulation do not lead to a significant risk of harm to the legal interests protected under those areas because they do not materially influence the decision-making or do not harm those interests substantially. For the purposes of this Regulation, an AI system that does not materially influence the outcome of decision-making should be understood to be an AI system that does not have an impact on the substance, and thereby the outcome, of decision-making, whether human or automated. An AI system that does not materially influence the outcome of decision-making could include situations in which one or more of the following conditions are fulfilled. The first such condition should be that the AI system is intended to perform a narrow procedural task, such as an AI system that transforms unstructured data into structured data, an AI system that classifies incoming documents into categories or an AI system that is used to detect duplicates among a large number of applications. Those tasks are of such narrow and limited nature that they pose only limited risks which are not increased through the use of an AI system in a context that is listed as a high-risk use in an annex to this Regulation. The second condition should be (30) Regulation (EU) 2018/1139 of the European Parliament and of the Council of 4 July 2018 on common rules in the field of civil aviation and establishing a European Union Aviation Safety Agency, and amending Regulations (EC) No 2111/2005, (EC) No 1008/2008, (EU) No 996/2010, (EU) No 376/2014 and Directives 2014/30/EU and 2014/53/EU of the European Parliament and of the Council, and repealing Regulations (EC) No 552/2004 and (EC) No 216/2008 of the European Parliament and of the Council and Council Regulation (EEC) No 3922/91 (OJ L 212, 22.8.2018, p. 1). (31) Regulation (EU) 2019/2144 of the European Parliament and of the Council of 27 November 2019 on type-approval requirements for motor vehicles and their trailers, and systems, components and separate technical units intended for such vehicles, as regards their general safety and the protection of vehicle occupants and vulnerable road users, amending Regulation (EU) 2018/858 of the European Parliament and of the Council and repealing Regulations (EC) No 78/2009, (EC) No 79/2009 and (EC) No 661/2009 of the European Parliament and of the Council and Commission Regulations (EC) No 631/2009, (EU) No 406/2010, (EU) No 672/2010, (EU) No 1003/2010, (EU) No 1005/2010, (EU) No 1008/2010, (EU) No 1009/2010, (EU) No 19/2011, (EU) No 109/2011, (EU) No 458/2011, (EU) No 65/2012, (EU) No 130/2012, (EU) No 347/2012, (EU) No 351/2012, (EU) No 1230/2012 and (EU) 2015/166 (OJ L 325, 16.12.2019, p. 1). 14/144 ELI: http://data.europa.eu/eli/reg/2024/1689/oj EN OJ L, 12.7.2024 that the task performed by the AI system is intended to improve the result of a previously completed human activity that may be relevant for the purposes of the high-risk uses listed in an annex to this Regulation. Considering those characteristics, the AI system provides only an additional layer to a human activity with consequently lowered risk. That condition would, for example, apply to AI systems that are intended to improve the language used in previously drafted documents, for example in relation to professional tone, academic style of language or by aligning text to a certain brand messaging. The third condition should be that the AI system is intended to detect decision-making patterns or deviations from prior decision-making patterns. The risk would be lowered because the use of the AI system follows a previously completed human assessment which it is not meant to replace or influence, without proper human review. Such AI systems include for instance those that, given a certain grading pattern of a teacher, can be used to check ex post whether the teacher may have deviated from the grading pattern so as to flag potential inconsistencies or anomalies. The fourth condition should be that the AI system is intended to perform a task that is only preparatory to an assessment relevant for the purposes of the AI systems listed in an annex to this Regulation, thus making the possible impact of the output of the system very low in terms of representing a risk for the assessment to follow. That condition covers, inter alia, smart solutions for file handling, which include various functions from indexing, searching, text and speech processing or linking data to other data sources, or AI systems used for translation of initial documents. In any case, AI systems used in high-risk use-cases listed in an annex to this Regulation should be considered to pose significant risks of harm to the health, safety or fundamental rights if the AI system implies profiling within the meaning of Article 4, point (4) of Regulation (EU) 2016/679 or Article 3, point (4) of Directive (EU) 2016/680 or Article 3, point (5) of Regulation (EU) 2018/1725. To ensure traceability and transparency, a provider who considers that an AI system is not high-risk on the basis of the conditions referred to above should draw up documentation of the assessment before that system is placed on the market or put into service and should provide that documentation to national competent authorities upon request. Such a provider should be obliged to register the AI system in the EU database established under this Regulation. With a view to providing further guidance for the practical implementation of the conditions under which the AI systems listed in an annex to this Regulation are, on an exceptional basis, non-high-risk, the Commission should, after consulting the Board, provide guidelines specifying that practical implementation, completed by a comprehensive list of practical examples of use cases of AI systems that are high-risk and use cases that are not.",
@@ -2043,7 +2085,9 @@
     "byte_equal_across_sources": false,
     "extraction_date": "2026-05-04",
     "number": 64,
-    "related_articles": [],
+    "related_articles": [
+      9
+    ],
     "source_pdf": "docs/sources/eu-ai-act-2024-1689-en.pdf",
     "source_quote": "To mitigate the risks from high-risk AI systems placed on the market or put into service and to ensure a high level of trustworthiness, certain mandatory requirements should apply to high-risk AI systems, taking into account the intended purpose and the context of use of the AI system and according to the risk-management system to be established by the provider. The measures adopted by the providers to comply with the mandatory requirements of this Regulation should take into account the generally acknowledged state of the art on AI, be proportionate and effective to meet the objectives of this Regulation. Based on the New Legislative Framework, as clarified in Commission notice ‘The “Blue Guide” on the implementation of EU product rules 2022’, the general rule is that more than one legal act of Union harmonisation legislation may be applicable to one product, since the making available or putting into service can take place only when the product complies with all applicable Union harmonisation legislation. The hazards of AI systems covered by the requirements of this Regulation concern different aspects than the existing Union harmonisation legislation and therefore the requirements of this Regulation would complement the existing body of the Union harmonisation legislation. For example, machinery or medical devices products incorporating an AI system might present risks not addressed by the essential health and safety (32) Regulation (EC) No 810/2009 of the European Parliament and of the Council of 13 July 2009 establishing a Community Code on Visas (Visa Code) (OJ L 243, 15.9.2009, p. 1). (33) Directive 2013/32/EU of the European Parliament and of the Council of 26 June 2013 on common procedures for granting and withdrawing international protection (OJ L 180, 29.6.2013, p. 60). (34) Regulation (EU) 2024/900 of the European parliament and of the Council of 13 March 2024 on the transparency and targeting of political advertising (OJ L, 2024/900, 20.3.2024, ELI: http://data.europa.eu/eli/reg/2024/900/oj). 18/144 ELI: http://data.europa.eu/eli/reg/2024/1689/oj EN OJ L, 12.7.2024 requirements set out in the relevant Union harmonised legislation, as that sectoral law does not deal with risks specific to AI systems. This calls for a simultaneous and complementary application of the various legislative acts. To ensure consistency and to avoid an unnecessary administrative burden and unnecessary costs, providers of a product that contains one or more high-risk AI system, to which the requirements of this Regulation and of the Union harmonisation legislation based on the New Legislative Framework and listed in an annex to this Regulation apply, should have flexibility with regard to operational decisions on how to ensure compliance of a product that contains one or more AI systems with all the applicable requirements of that Union harmonised legislation in an optimal manner. That flexibility could mean, for example a decision by the provider to integrate a part of the necessary testing and reporting processes, information and documentation required under this Regulation into already existing documentation and procedures required under existing Union harmonisation legislation based on the New Legislative Framework and listed in an annex to this Regulation. This should not, in any way, undermine the obligation of the provider to comply with all the applicable requirements.",
     "source_quote_normalized_sha256": "aef896419ea10e94659c05e6aa6a93ca266e7cada670dbef045ce2252a13ef45",
@@ -2057,7 +2101,9 @@
     "byte_equal_across_sources": false,
     "extraction_date": "2026-05-04",
     "number": 65,
-    "related_articles": [],
+    "related_articles": [
+      9
+    ],
     "source_pdf": "docs/sources/eu-ai-act-2024-1689-en.pdf",
     "source_quote": "The risk-management system should consist of a continuous, iterative process that is planned and run throughout the entire lifecycle of a high-risk AI system. That process should be aimed at identifying and mitigating the relevant risks of AI systems on health, safety and fundamental rights. The risk-management system should be regularly reviewed and updated to ensure its continuing effectiveness, as well as justification and documentation of any significant decisions and actions taken subject to this Regulation. This process should ensure that the provider identifies risks or adverse impacts and implements mitigation measures for the known and reasonably foreseeable risks of AI systems to the health, safety and fundamental rights in light of their intended purpose and reasonably foreseeable misuse, including the possible risks arising from the interaction between the AI system and the environment within which it operates. The risk-management system should adopt the most appropriate risk-management measures in light of the state of the art in AI. When identifying the most appropriate risk-management measures, the provider should document and explain the choices made and, when relevant, involve experts and external stakeholders. In identifying the reasonably foreseeable misuse of high-risk AI systems, the provider should cover uses of AI systems which, while not directly covered by the intended purpose and provided for in the instruction for use may nevertheless be reasonably expected to result from readily predictable human behaviour in the context of the specific characteristics and use of a particular AI system. Any known or foreseeable circumstances related to the use of the high-risk AI system in accordance with its intended purpose or under conditions of reasonably foreseeable misuse, which may lead to risks to the health and safety or fundamental rights should be included in the instructions for use that are provided by the provider. This is to ensure that the deployer is aware and takes them into account when using the high-risk AI system. Identifying and implementing risk mitigation measures for foreseeable misuse under this Regulation should not require specific additional training for the high-risk AI system by the provider to address foreseeable misuse. The providers however are encouraged to consider such additional training measures to mitigate reasonable foreseeable misuses as necessary and appropriate.",
     "source_quote_normalized_sha256": "7dd3ae940d7af0ed078341f416d54e68b45e7538a54fc86f01dfe6ea85cc21ce",
@@ -2071,7 +2117,10 @@
     "byte_equal_across_sources": false,
     "extraction_date": "2026-05-04",
     "number": 66,
-    "related_articles": [],
+    "related_articles": [
+      13,
+      15
+    ],
     "source_pdf": "docs/sources/eu-ai-act-2024-1689-en.pdf",
     "source_quote": "Requirements should apply to high-risk AI systems as regards risk management, the quality and relevance of data sets used, technical documentation and record-keeping, transparency and the provision of information to deployers, human oversight, and robustness, accuracy and cybersecurity. Those requirements are necessary to effectively mitigate the risks for health, safety and fundamental rights. As no other less trade restrictive measures are reasonably available those requirements are not unjustified restrictions to trade.",
     "source_quote_normalized_sha256": "62edca56411275713971a78c95d95728b9e58f02bc89ef930cc6777a14397fdf",
@@ -2085,7 +2134,9 @@
     "byte_equal_across_sources": false,
     "extraction_date": "2026-05-04",
     "number": 67,
-    "related_articles": [],
+    "related_articles": [
+      10
+    ],
     "source_pdf": "docs/sources/eu-ai-act-2024-1689-en.pdf",
     "source_quote": "High-quality data and access to high-quality data plays a vital role in providing structure and in ensuring the performance of many AI systems, especially when techniques involving the training of models are used, with a view to ensure that the high-risk AI system performs as intended and safely and it does not become a source of discrimination prohibited by Union law. High-quality data sets for training, validation and testing require the implementation of appropriate data governance and management practices. Data sets for training, validation and testing, including the labels, should be relevant, sufficiently representative, and to the best extent possible free of errors and complete in view of the intended purpose of the system. In order to facilitate compliance with Union data protection law, such as Regulation (EU) 2016/679, data governance and management practices should include, in the case of personal data, transparency about the original purpose of the data collection. The data sets should also have the appropriate statistical properties, including as regards the persons or groups of persons in relation to whom the high-risk AI system is intended to be used, with specific attention to the mitigation of possible biases in the data sets, that are likely to affect the health and safety of persons, have a negative impact on fundamental rights or lead to discrimination prohibited under Union law, especially where data outputs influence inputs for future operations ELI: http://data.europa.eu/eli/reg/2024/1689/oj 19/144 EN OJ L, 12.7.2024 (feedback loops). Biases can for example be inherent in underlying data sets, especially when historical data is being used, or generated when the systems are implemented in real world settings. Results provided by AI systems could be influenced by such inherent biases that are inclined to gradually increase and thereby perpetuate and amplify existing discrimination, in particular for persons belonging to certain vulnerable groups, including racial or ethnic groups. The requirement for the data sets to be to the best extent possible complete and free of errors should not affect the use of privacy-preserving techniques in the context of the development and testing of AI systems. In particular, data sets should take into account, to the extent required by their intended purpose, the features, characteristics or elements that are particular to the specific geographical, contextual, behavioural or functional setting which the AI system is intended to be used. The requirements related to data governance can be complied with by having recourse to third parties that offer certified compliance services including verification of data governance, data set integrity, and data training, validation and testing practices, as far as compliance with the data requirements of this Regulation are ensured.",
     "source_quote_normalized_sha256": "857a8034349a3cbb31e419c6eddbb798b274db905170ef1811288d7e23edba5b",
@@ -2099,7 +2150,9 @@
     "byte_equal_across_sources": false,
     "extraction_date": "2026-05-04",
     "number": 68,
-    "related_articles": [],
+    "related_articles": [
+      10
+    ],
     "source_pdf": "docs/sources/eu-ai-act-2024-1689-en.pdf",
     "source_quote": "For the development and assessment of high-risk AI systems, certain actors, such as providers, notified bodies and other relevant entities, such as European Digital Innovation Hubs, testing experimentation facilities and researchers, should be able to access and use high-quality data sets within the fields of activities of those actors which are related to this Regulation. European common data spaces established by the Commission and the facilitation of data sharing between businesses and with government in the public interest will be instrumental to provide trustful, accountable and non-discriminatory access to high-quality data for the training, validation and testing of AI systems. For example, in health, the European health data space will facilitate non-discriminatory access to health data and the training of AI algorithms on those data sets, in a privacy-preserving, secure, timely, transparent and trustworthy manner, and with an appropriate institutional governance. Relevant competent authorities, including sectoral ones, providing or supporting the access to data may also support the provision of high-quality data for the training, validation and testing of AI systems.",
     "source_quote_normalized_sha256": "5ca9fc5f3c01cb8a2c6ce5d7546c9c2942e1f6d4acf6d2ae3007789ea90a0356",
@@ -2113,7 +2166,9 @@
     "byte_equal_across_sources": false,
     "extraction_date": "2026-05-04",
     "number": 69,
-    "related_articles": [],
+    "related_articles": [
+      10
+    ],
     "source_pdf": "docs/sources/eu-ai-act-2024-1689-en.pdf",
     "source_quote": "The right to privacy and to protection of personal data must be guaranteed throughout the entire lifecycle of the AI system. In this regard, the principles of data minimisation and data protection by design and by default, as set out in Union data protection law, are applicable when personal data are processed. Measures taken by providers to ensure compliance with those principles may include not only anonymisation and encryption, but also the use of technology that permits algorithms to be brought to the data and allows training of AI systems without the transmission between parties or copying of the raw or structured data themselves, without prejudice to the requirements on data governance provided for in this Regulation.",
     "source_quote_normalized_sha256": "d4570adacea8776f857fd23540ad5755f6c563decea4f36ae807a41037d296a6",
@@ -2158,7 +2213,10 @@
     "byte_equal_across_sources": false,
     "extraction_date": "2026-05-04",
     "number": 71,
-    "related_articles": [],
+    "related_articles": [
+      11,
+      19
+    ],
     "source_pdf": "docs/sources/eu-ai-act-2024-1689-en.pdf",
     "source_quote": "Having comprehensible information on how high-risk AI systems have been developed and how they perform throughout their lifetime is essential to enable traceability of those systems, verify compliance with the requirements under this Regulation, as well as monitoring of their operations and post market monitoring. This requires keeping records and the availability of technical documentation, containing information which is necessary to assess the compliance of the AI system with the relevant requirements and facilitate post market monitoring. Such information should include the general characteristics, capabilities and limitations of the system, algorithms, data, training, testing and validation processes used as well as documentation on the relevant risk-management system and drawn in a clear and comprehensive form. The technical documentation should be kept up to date, appropriately throughout the lifetime of the AI system. Furthermore, high-risk AI systems should technically allow for the automatic recording of events, by means of logs, over the duration of the lifetime of the system. 20/144 ELI: http://data.europa.eu/eli/reg/2024/1689/oj EN OJ L, 12.7.2024",
     "source_quote_normalized_sha256": "4ab5170e7bfe417756b1fa952f381340c858ba480d7f8c3e30839269819f0f9f",
@@ -2172,7 +2230,9 @@
     "byte_equal_across_sources": false,
     "extraction_date": "2026-05-04",
     "number": 72,
-    "related_articles": [],
+    "related_articles": [
+      13
+    ],
     "source_pdf": "docs/sources/eu-ai-act-2024-1689-en.pdf",
     "source_quote": "To address concerns related to opacity and complexity of certain AI systems and help deployers to fulfil their obligations under this Regulation, transparency should be required for high-risk AI systems before they are placed on the market or put it into service. High-risk AI systems should be designed in a manner to enable deployers to understand how the AI system works, evaluate its functionality, and comprehend its strengths and limitations. High-risk AI systems should be accompanied by appropriate information in the form of instructions of use. Such information should include the characteristics, capabilities and limitations of performance of the AI system. Those would cover information on possible known and foreseeable circumstances related to the use of the high-risk AI system, including deployer action that may influence system behaviour and performance, under which the AI system can lead to risks to health, safety, and fundamental rights, on the changes that have been pre-determined and assessed for conformity by the provider and on the relevant human oversight measures, including the measures to facilitate the interpretation of the outputs of the AI system by the deployers. Transparency, including the accompanying instructions for use, should assist deployers in the use of the system and support informed decision making by them. Deployers should, inter alia, be in a better position to make the correct choice of the system that they intend to use in light of the obligations applicable to them, be educated about the intended and precluded uses, and use the AI system correctly and as appropriate. In order to enhance legibility and accessibility of the information included in the instructions of use, where appropriate, illustrative examples, for instance on the limitations and on the intended and precluded uses of the AI system, should be included. Providers should ensure that all documentation, including the instructions for use, contains meaningful, comprehensive, accessible and understandable information, taking into account the needs and foreseeable knowledge of the target deployers. Instructions for use should be made available in a language which can be easily understood by target deployers, as determined by the Member State concerned.",
     "source_quote_normalized_sha256": "009723e6242aed869c9b33cb564e284c217f1ab7ffe8fd7b2f421a82170cb811",
@@ -2200,7 +2260,9 @@
     "byte_equal_across_sources": false,
     "extraction_date": "2026-05-04",
     "number": 74,
-    "related_articles": [],
+    "related_articles": [
+      15
+    ],
     "source_pdf": "docs/sources/eu-ai-act-2024-1689-en.pdf",
     "source_quote": "High-risk AI systems should perform consistently throughout their lifecycle and meet an appropriate level of accuracy, robustness and cybersecurity, in light of their intended purpose and in accordance with the generally acknowledged state of the art. The Commission and relevant organisations and stakeholders are encouraged to take due consideration of the mitigation of risks and the negative impacts of the AI system. The expected level of performance metrics should be declared in the accompanying instructions of use. Providers are urged to communicate that information to deployers in a clear and easily understandable way, free of misunderstandings or misleading statements. Union law on legal metrology, including Directives 2014/31/EU (35) and 2014/32/EU (36) of the European Parliament and of the Council, aims to ensure the accuracy of measurements and to help the transparency and fairness of commercial transactions. In that context, in cooperation with relevant stakeholders and organisation, such as metrology and benchmarking authorities, the Commission should encourage, as appropriate, the development of benchmarks and measurement methodologies for AI systems. In doing so, the Commission should take note and collaborate with international partners working on metrology and relevant measurement indicators relating to AI. (35) Directive 2014/31/EU of the European Parliament and of the Council of 26 February 2014 on the harmonisation of the laws of the Member States relating to the making available on the market of non-automatic weighing instruments (OJ L 96, 29.3.2014, p. 107). (36) Directive 2014/32/EU of the European Parliament and of the Council of 26 February 2014 on the harmonisation of the laws of the Member States relating to the making available on the market of measuring instruments (OJ L 96, 29.3.2014, p. 149). ELI: http://data.europa.eu/eli/reg/2024/1689/oj 21/144 EN OJ L, 12.7.2024",
     "source_quote_normalized_sha256": "5e898edcdd6ab7c6136ea24c848a1a3f8bdffd41911d78db6464d4e47f1c9b33",
@@ -2228,7 +2290,9 @@
     "byte_equal_across_sources": false,
     "extraction_date": "2026-05-04",
     "number": 76,
-    "related_articles": [],
+    "related_articles": [
+      15
+    ],
     "source_pdf": "docs/sources/eu-ai-act-2024-1689-en.pdf",
     "source_quote": "Cybersecurity plays a crucial role in ensuring that AI systems are resilient against attempts to alter their use, behaviour, performance or compromise their security properties by malicious third parties exploiting the system’s vulnerabilities. Cyberattacks against AI systems can leverage AI specific assets, such as training data sets (e.g. data poisoning) or trained models (e.g. adversarial attacks or membership inference), or exploit vulnerabilities in the AI system’s digital assets or the underlying ICT infrastructure. To ensure a level of cybersecurity appropriate to the risks, suitable measures, such as security controls, should therefore be taken by the providers of high-risk AI systems, also taking into account as appropriate the underlying ICT infrastructure.",
     "source_quote_normalized_sha256": "3ef364a157249eb502dae580d1faeadfe82f886719bcd2b6207957d1e866d649",
@@ -2242,7 +2306,10 @@
     "byte_equal_across_sources": false,
     "extraction_date": "2026-05-04",
     "number": 77,
-    "related_articles": [],
+    "related_articles": [
+      15,
+      47
+    ],
     "source_pdf": "docs/sources/eu-ai-act-2024-1689-en.pdf",
     "source_quote": "Without prejudice to the requirements related to robustness and accuracy set out in this Regulation, high-risk AI systems which fall within the scope of a regulation of the European Parliament and of the Council on horizontal cybersecurity requirements for products with digital elements, in accordance with that regulation may demonstrate compliance with the cybersecurity requirements of this Regulation by fulfilling the essential cybersecurity requirements set out in that regulation. When high-risk AI systems fulfil the essential requirements of a regulation of the European Parliament and of the Council on horizontal cybersecurity requirements for products with digital elements, they should be deemed compliant with the cybersecurity requirements set out in this Regulation in so far as the achievement of those requirements is demonstrated in the EU declaration of conformity or parts thereof issued under that regulation. To that end, the assessment of the cybersecurity risks, associated to a product with digital elements classified as high-risk AI system according to this Regulation, carried out under a regulation of the European Parliament and of the Council on horizontal cybersecurity requirements for products with digital elements, should consider risks to the cyber resilience of an AI system as regards attempts by unauthorised third parties to alter its use, behaviour or performance, including AI specific vulnerabilities such as data poisoning or adversarial attacks, as well as, as relevant, risks to fundamental rights as required by this Regulation.",
     "source_quote_normalized_sha256": "2f59020e514b12c3cd5706659bba9947998f9bc5862cc0a02e1ddb5871a8fca6",
@@ -2312,7 +2379,10 @@
     "byte_equal_across_sources": false,
     "extraction_date": "2026-05-04",
     "number": 81,
-    "related_articles": [],
+    "related_articles": [
+      17,
+      72
+    ],
     "source_pdf": "docs/sources/eu-ai-act-2024-1689-en.pdf",
     "source_quote": "The provider should establish a sound quality management system, ensure the accomplishment of the required conformity assessment procedure, draw up the relevant documentation and establish a robust post-market monitoring system. Providers of high-risk AI systems that are subject to obligations regarding quality management systems under relevant sectoral Union law should have the possibility to include the elements of the quality management system provided for in this Regulation as part of the existing quality management system provided for in that other sectoral Union law. The complementarity between this Regulation and existing sectoral Union law should also be taken into account in future standardisation activities or guidance adopted by the Commission. Public authorities which put into service high-risk AI systems for their own use may adopt and implement the rules for the quality management system as part of the quality management system adopted at a national or regional level, as appropriate, taking into account the specificities of the sector and the competences and organisation of the public authority concerned.",
     "source_quote_normalized_sha256": "7d13858b764197dd9e81af5f201163589a447d68a3c959d360859b72b59cdfe8",
@@ -2326,7 +2396,10 @@
     "byte_equal_across_sources": false,
     "extraction_date": "2026-05-04",
     "number": 82,
-    "related_articles": [],
+    "related_articles": [
+      22,
+      54
+    ],
     "source_pdf": "docs/sources/eu-ai-act-2024-1689-en.pdf",
     "source_quote": "To enable enforcement of this Regulation and create a level playing field for operators, and, taking into account the different forms of making available of digital products, it is important to ensure that, under all circumstances, a person established in the Union can provide authorities with all the necessary information on the compliance of an AI system. Therefore, prior to making their AI systems available in the Union, providers established in third countries should, by written mandate, appoint an authorised representative established in the Union. This authorised representative plays a pivotal role in ensuring the compliance of the high-risk AI systems placed on the market or put into service in the Union by those providers who are not established in the Union and in serving as their contact person established in the Union.",
     "source_quote_normalized_sha256": "7368305ba52b886ffe2f3c93a71ff3a54ea59b4dfcfc49069a780fcdb0248d81",
@@ -2340,7 +2413,9 @@
     "byte_equal_across_sources": false,
     "extraction_date": "2026-05-04",
     "number": 83,
-    "related_articles": [],
+    "related_articles": [
+      23
+    ],
     "source_pdf": "docs/sources/eu-ai-act-2024-1689-en.pdf",
     "source_quote": "In light of the nature and complexity of the value chain for AI systems and in line with the New Legislative Framework, it is essential to ensure legal certainty and facilitate the compliance with this Regulation. Therefore, it is necessary to clarify the role and the specific obligations of relevant operators along that value chain, such as importers and distributors who may contribute to the development of AI systems. In certain situations those operators could act in more than one role at the same time and should therefore fulfil cumulatively all relevant obligations associated with those roles. For example, an operator could act as a distributor and an importer at the same time.",
     "source_quote_normalized_sha256": "89b1a29da1b53196607031188adc478c75afc19ae344f50c1945fea73282034c",
@@ -2355,7 +2430,8 @@
     "extraction_date": "2026-05-04",
     "number": 84,
     "related_articles": [
-      16
+      16,
+      23
     ],
     "source_pdf": "docs/sources/eu-ai-act-2024-1689-en.pdf",
     "source_quote": "To ensure legal certainty, it is necessary to clarify that, under certain specific conditions, any distributor, importer, deployer or other third-party should be considered to be a provider of a high-risk AI system and therefore assume all the relevant obligations. This would be the case if that party puts its name or trademark on a high-risk AI system already placed on the market or put into service, without prejudice to contractual arrangements stipulating that the obligations are allocated otherwise. This would also be the case if that party makes a substantial modification to a high-risk AI system that has already been placed on the market or has already been put into service in a way that it remains a high-risk AI system in accordance with this Regulation, or if it modifies the intended purpose of an AI system, including a general-purpose AI system, which has not been classified as high-risk and has already been placed on the market or put into service, in a way that the AI system becomes a high-risk AI system in accordance with this Regulation. Those provisions should apply without prejudice to more specific provisions established in certain Union harmonisation legislation based on the New Legislative Framework, together with which this (38) Directive (EU) 2016/2102 of the European Parliament and of the Council of 26 October 2016 on the accessibility of the websites and mobile applications of public sector bodies (OJ L 327, 2.12.2016, p. 1). ELI: http://data.europa.eu/eli/reg/2024/1689/oj 23/144 EN OJ L, 12.7.2024 Regulation should apply. For example, Article 16(2) of Regulation (EU) 2017/745, establishing that certain changes should not be considered to be modifications of a device that could affect its compliance with the applicable requirements, should continue to apply to high-risk AI systems that are medical devices within the meaning of that Regulation.",
@@ -2543,7 +2619,9 @@
     "byte_equal_across_sources": false,
     "extraction_date": "2026-05-04",
     "number": 96,
-    "related_articles": [],
+    "related_articles": [
+      27
+    ],
     "source_pdf": "docs/sources/eu-ai-act-2024-1689-en.pdf",
     "source_quote": "In order to efficiently ensure that fundamental rights are protected, deployers of high-risk AI systems that are bodies governed by public law, or private entities providing public services and deployers of certain high-risk AI systems listed in an annex to this Regulation, such as banking or insurance entities, should carry out a fundamental rights impact assessment prior to putting it into use. Services important for individuals that are of public nature may also be provided by private entities. Private entities providing such public services are linked to tasks in the public interest such as in the areas of education, healthcare, social services, housing, administration of justice. The aim of the fundamental rights impact assessment is for the deployer to identify the specific risks to the rights of individuals or groups of individuals likely to be affected, identify measures to be taken in the case of a materialisation of those risks. The impact assessment should be performed prior to deploying the high-risk AI system, and should be updated (39) Directive 2002/14/EC of the European Parliament and of the Council of 11 March 2002 establishing a general framework for informing and consulting employees in the European Community (OJ L 80, 23.3.2002, p. 29). ELI: http://data.europa.eu/eli/reg/2024/1689/oj 25/144 EN OJ L, 12.7.2024 when the deployer considers that any of the relevant factors have changed. The impact assessment should identify the deployer’s relevant processes in which the high-risk AI system will be used in line with its intended purpose, and should include a description of the period of time and frequency in which the system is intended to be used as well as of specific categories of natural persons and groups who are likely to be affected in the specific context of use. The assessment should also include the identification of specific risks of harm likely to have an impact on the fundamental rights of those persons or groups. While performing this assessment, the deployer should take into account information relevant to a proper assessment of the impact, including but not limited to the information given by the provider of the high-risk AI system in the instructions for use. In light of the risks identified, deployers should determine measures to be taken in the case of a materialisation of those risks, including for example governance arrangements in that specific context of use, such as arrangements for human oversight according to the instructions of use or, complaint handling and redress procedures, as they could be instrumental in mitigating risks to fundamental rights in concrete use-cases. After performing that impact assessment, the deployer should notify the relevant market surveillance authority. Where appropriate, to collect relevant information necessary to perform the impact assessment, deployers of high-risk AI system, in particular when AI systems are used in the public sector, could involve relevant stakeholders, including the representatives of groups of persons likely to be affected by the AI system, independent experts, and civil society organisations in conducting such impact assessments and designing measures to be taken in the case of materialisation of the risks. The European Artificial Intelligence Office (AI Office) should develop a template for a questionnaire in order to facilitate compliance and reduce the administrative burden for deployers.",
     "source_quote_normalized_sha256": "62b2e0baae545138df7ff72445a8045006ea30df6ac623401a9f7af053ebd449",
@@ -2557,7 +2635,9 @@
     "byte_equal_across_sources": false,
     "extraction_date": "2026-05-04",
     "number": 97,
-    "related_articles": [],
+    "related_articles": [
+      53
+    ],
     "source_pdf": "docs/sources/eu-ai-act-2024-1689-en.pdf",
     "source_quote": "The notion of general-purpose AI models should be clearly defined and set apart from the notion of AI systems to enable legal certainty. The definition should be based on the key functional characteristics of a general-purpose AI model, in particular the generality and the capability to competently perform a wide range of distinct tasks. These models are typically trained on large amounts of data, through various methods, such as self-supervised, unsupervised or reinforcement learning. General-purpose AI models may be placed on the market in various ways, including through libraries, application programming interfaces (APIs), as direct download, or as physical copy. These models may be further modified or fine-tuned into new models. Although AI models are essential components of AI systems, they do not constitute AI systems on their own. AI models require the addition of further components, such as for example a user interface, to become AI systems. AI models are typically integrated into and form part of AI systems. This Regulation provides specific rules for general-purpose AI models and for general-purpose AI models that pose systemic risks, which should apply also when these models are integrated or form part of an AI system. It should be understood that the obligations for the providers of general-purpose AI models should apply once the general-purpose AI models are placed on the market. When the provider of a general-purpose AI model integrates an own model into its own AI system that is made available on the market or put into service, that model should be considered to be placed on the market and, therefore, the obligations in this Regulation for models should continue to apply in addition to those for AI systems. The obligations laid down for models should in any case not apply when an own model is used for purely internal processes that are not essential for providing a product or a service to third parties and the rights of natural persons are not affected. Considering their potential significantly negative effects, the general-purpose AI models with systemic risk should always be subject to the relevant obligations under this Regulation. The definition should not cover AI models used before their placing on the market for the sole purpose of research, development and prototyping activities. This is without prejudice to the obligation to comply with this Regulation when, following such activities, a model is placed on the market.",
     "source_quote_normalized_sha256": "dced301937c9badc8ce850f708c26789a706c3bef428e7b0537c71a1cab9fe34",
