@@ -32,7 +32,10 @@ jobs:
         working-directory: scanner
         # --ignore=tests/e2e: cross-system flows that require a deployed
         # dashboard + MCP server are run separately, out of scope for CI.
-        run: python -m pytest tests/ -v --tb=short --ignore=tests/e2e
+        # --ignore=tests/pool4: private-repo territory — module-level
+        # `import yaml` in cell_loader.py would block collection on
+        # PUBLIC CI where pyyaml is not a declared dep.
+        run: python -m pytest tests/ -v --tb=short --ignore=tests/e2e --ignore=tests/pool4
 
       - name: Verify all modules load
         working-directory: scanner

@@ -1,0 +1,37 @@
+# gitleaks configuration for ComplianceLint public repo.
+#
+# Why this file exists: scanner/tests/ uses a deterministic
+# `cl_*_key_*` / `cl_test_key` / `cl_saved_key_NNN` naming convention
+# for test-fixture API keys. These are NOT real secrets — they're
+# expected dev/test values that match the dashboard's seeded test
+# users (e.g. cl_test_pro_key_for_development is the API key for the
+# `pro` test persona seeded via dashboard/scripts/seed-demo.ts).
+#
+# Without this allowlist, gitleaks/gitleaks-action@v2's default
+# `generic-api-key` rule flags every test fixture and the daily
+# scheduled secret-scan workflow goes red. Surfaced 2026-05-04
+# during §2.J self-audit (public CI sweep).
+#
+# Production / dashboard secrets DO NOT match this pattern (they're
+# either ephemeral cls_* session tokens or LemonSqueezy LS_* /
+# Sentry tokens routed through env vars, never literal strings in
+# scanner/tests/).
+
+title = "ComplianceLint gitleaks config"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Test-fixture API keys in scanner/tests/ (cl_*_key_* convention — never real secrets)"
+paths = [
+  '''scanner/tests/.*\.py$''',
+]
+regexes = [
+  # Generic dev/test cl_* keys used as fixture inputs.
+  # Matches: cl_test_pro_key_for_development, cl_saved_key_123,
+  # cl_test_key, cl_test_business_invited_key_for_development, etc.
+  '''cl_[a-zA-Z0-9_]+_key[a-zA-Z0-9_]*''',
+  '''cl_test_key''',
+  '''cl_saved_key_\d+''',
+]

@@ -40,5 +40,10 @@ jobs:
       # editable + pytest-only test deps explicitly.
       - run: pip install -e . pytest pytest-timeout pytest-asyncio
       # --ignore=tests/e2e: cross-system flows requiring deployed dashboard
+      # --ignore=tests/pool4: Pool 4 cross-system real-flow tests are
+      #   private-repo territory (gated by POOL4_CELLS_DIR + dashboard
+      #   dev server on :3000). The cell_loader.py module-level
+      #   `import yaml` would fail at pytest collection on PUBLIC CI
+      #   where pyyaml is not a declared dep, blocking ALL scanner tests.
       # Run from project root so scanner/tests/ resolves cleanly.
-      - run: python -m pytest scanner/tests/ -x --tb=short --ignore=scanner/tests/e2e
+      - run: python -m pytest scanner/tests/ -x --tb=short --ignore=scanner/tests/e2e --ignore=scanner/tests/pool4

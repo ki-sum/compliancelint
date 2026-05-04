@@ -42,7 +42,12 @@ jobs:
         uses: ./.github/actions/sarif-export
         with:
           api-key: ${{ secrets.COMPLIANCELINT_API_KEY }}
-          level: ${{ inputs.level }}
+          # `inputs.level` is only populated on workflow_dispatch
+          # invocations; on the scheduled cron trigger it's an empty
+          # string (NOT the workflow_dispatch default), and the action
+          # validates `level ∈ {status-summary, scan, full}` → exit 1.
+          # Fall back to "full" so the daily run keeps working.
+          level: ${{ inputs.level || 'full' }}
 
       - name: Echo result count
         run: |
