@@ -91,7 +91,7 @@ def test_action_guide_returns_related_recitals_field():
 
 
 def test_action_guide_recital_entries_have_required_fields():
-    """Each related_recitals entry MUST carry the 7 fields the SaaS
+    """Each related_recitals entry MUST carry the fields the SaaS
     consumer relies on for citation rendering + provenance display."""
     from server import cl_action_guide
 
@@ -107,6 +107,10 @@ def test_action_guide_recital_entries_have_required_fields():
     required = {
         "number",
         "source_quote",
+        # §AD.* Option D — display fields (Kisum 2026-05-04)
+        "source_quote_display",
+        "display_source",
+        "display_text_unavailable",
         "source_pdf",
         "source_url_eur_lex",
         "source_url_ec",
@@ -120,7 +124,11 @@ def test_action_guide_recital_entries_have_required_fields():
         )
         assert isinstance(entry["number"], int)
         assert isinstance(entry["source_quote"], str)
+        assert isinstance(entry["source_quote_display"], str)
+        assert entry["display_source"] in {"pdf_pdfplumber", "pypdf_fallback"}
+        assert isinstance(entry["display_text_unavailable"], bool)
         assert len(entry["source_quote"]) > 30
+        assert len(entry["source_quote_display"]) > 30
         assert entry["source_pdf"].endswith(".pdf")
 
 
@@ -271,3 +279,54 @@ def test_interim_standard_recital_source_quote_matches_baseline(recitals_baselin
         assert entry["source_quote"] == baseline_quote, (
             f"Recital {n} drift in cl_interim_standard for Art 5"
         )
+
+
+# ──────────────────────────────────────────────────────────────────────
+# 5. §AD.* Option D — display field correctness (Kisum 2026-05-04)
+# ──────────────────────────────────────────────────────────────────────
+
+
+def test_clean_display_recital_has_no_pypdf_artifacts():
+    """Recitals returned by cl_explain with display_source='pdf_pdfplumber'
+    MUST NOT show pypdf justification artifacts in source_quote_display.
+
+    Sentinel check: AI consumers presenting the cleaned Recital text to
+    end users should never see strings like "r isk -managem ent".
+    """
+    from server import cl_explain
+
+    raw = cl_explain(article=5)
+    payload = _parse_tool_output(raw)
+    recitals = payload.get("related_recitals", [])
+
+    artifacts = ["r isk", "syste m", "tec hnical", "managem ent"]
+    bad: list[tuple[int, str]] = []
+    for entry in recitals:
+        if entry.get("display_source") != "pdf_pdfplumber":
+            continue
+        text = entry.get("source_quote_display", "")
+        for art in artifacts:
+            if art in text:
+                bad.append((entry["number"], art))
+                break
+    assert not bad, (
+        f"cl_explain Art 5 surfaces pypdf artifacts in clean display text: {bad[:3]}"
+    )
+
+
+def test_action_guide_display_field_falls_back_to_canonical():
+    """When display_text_unavailable=True, source_quote_display equals
+    source_quote (graceful fallback). Tools never return empty display."""
+    from server import cl_action_guide
+
+    raw = cl_action_guide("ART05-OBL-1")
+    payload = _parse_tool_output(raw)
+    recitals = payload.get("related_recitals", [])
+
+    for entry in recitals:
+        if entry.get("display_text_unavailable"):
+            assert entry["source_quote_display"] == entry["source_quote"], (
+                f"Recital {entry['number']}: display_text_unavailable=True but "
+                f"source_quote_display differs from source_quote — invariant "
+                f"violation. Tools must always return a populated display."
+            )

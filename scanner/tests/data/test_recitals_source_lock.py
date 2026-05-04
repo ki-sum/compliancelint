@@ -141,3 +141,81 @@ def test_pdf_extraction_matches_baseline_sample(recitals):
             drift.append((n, f"PDF hash {pdf_hash[:12]} != baseline {baseline_hash[:12]}"))
 
     assert not drift, f"PDF source drift: {drift}"
+
+
+# ─────────────────────────────────────────────────────────────────────
+# §AD.* Option D — display field integrity (Kisum 2026-05-04)
+# ─────────────────────────────────────────────────────────────────────
+
+
+def test_each_has_display_field(recitals):
+    """Every Recital MUST have source_quote_display + display_source.
+
+    Falls back to source_quote when pdfplumber extractor hasn't run, so
+    the field is ALWAYS populated. Tools surface this to AI consumers
+    as the user-facing text; source_quote stays as the audit canonical.
+    """
+    missing_display = [n for n, r in recitals.items() if not r.get("source_quote_display")]
+    assert not missing_display, (
+        f"Recitals without source_quote_display: {missing_display[:10]}"
+    )
+    missing_source = [n for n, r in recitals.items() if not r.get("display_source")]
+    assert not missing_source, (
+        f"Recitals without display_source: {missing_source[:10]}"
+    )
+
+
+def test_display_source_values_are_known(recitals):
+    """display_source MUST be one of the documented values."""
+    KNOWN = {"pdf_pdfplumber", "pypdf_fallback"}
+    bad = [
+        (n, r.get("display_source"))
+        for n, r in recitals.items()
+        if r.get("display_source") not in KNOWN
+    ]
+    assert not bad, f"Unknown display_source values: {bad[:5]}"
+
+
+def test_display_coverage_minimum(recitals):
+    """At least 50% of Recitals MUST have clean (pdfplumber) display text.
+
+    The current pdfplumber extractor reaches ~73% (131/180). We assert a
+    floor of 50% so a future regression in the extractor surfaces here
+    rather than silently degrading user-visible quality. Bump this floor
+    after refining boundary detection for the remaining ~27%.
+    """
+    clean = sum(
+        1 for r in recitals.values()
+        if r.get("display_source") == "pdf_pdfplumber"
+    )
+    coverage = clean / len(recitals)
+    assert coverage >= 0.50, (
+        f"Display coverage regression: only {clean}/{len(recitals)} "
+        f"({coverage:.1%}) Recitals have clean display text. Re-run "
+        f"the display extractor or investigate parser drift."
+    )
+
+
+def test_clean_display_text_has_no_pypdf_artifacts(recitals):
+    """Recitals with display_source='pdf_pdfplumber' MUST NOT contain
+    common pypdf justification artifacts. This guards against pdfplumber
+    regression — if pdfplumber starts producing the same artifacts as
+    pypdf, we lose the whole point of Option D.
+    """
+    # Sentinel artifacts seen in pypdf output
+    artifact_substrings = [
+        "r isk", "syste m", "tec hnical", "AI syst em",
+        "managem ent", "documen tation",
+    ]
+    bad: list[tuple[str, str]] = []
+    for n, r in recitals.items():
+        if r.get("display_source") != "pdf_pdfplumber":
+            continue  # fallbacks legitimately have artifacts
+        text = r.get("source_quote_display", "")
+        for art in artifact_substrings:
+            if art in text:
+                bad.append((n, art))
+                break
+    assert not bad, (
+        f"Clean display text has pypdf artifacts (regression in pdfplumber): {bad[:5]}"
+    )
