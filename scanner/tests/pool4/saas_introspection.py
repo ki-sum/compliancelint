@@ -237,12 +237,29 @@ def fetch_repo_by_name(
 ) -> dict[str, Any] | None:
     """Look up a repo row by name. Used to resolve fixture project
     name → repo.id when no other handle is available.
+
+    Schema note: repos.user_id (not owner_user_id) is the FK to users.id.
+    Verified against current dev DB on 2026-05-04.
     """
     row = conn.execute(
-        "SELECT id, name, owner_user_id FROM repos WHERE name = ? LIMIT 1",
+        "SELECT id, name, user_id FROM repos WHERE name = ? LIMIT 1",
         (repo_name,),
     ).fetchone()
     return dict(row) if row else None
+
+
+def fetch_repos_for_user(
+    conn: sqlite3.Connection,
+    user_id: str,
+) -> list[dict[str, Any]]:
+    """List all repos owned by a user. Used by cleanup paths to purge
+    test-fixture repos at end of test.
+    """
+    rows = conn.execute(
+        "SELECT id, name FROM repos WHERE user_id = ? ORDER BY created_at",
+        (user_id,),
+    ).fetchall()
+    return [dict(r) for r in rows]
 
 
 def now_iso() -> str:

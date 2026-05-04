@@ -203,7 +203,7 @@ def pattern_a(
     rc_path.write_text(json.dumps(overlay, indent=2) + "\n", encoding="utf-8")
 
     handle = FixtureHandle(
-        project_path=MANUAL_FIXTURE_DIR,
+        project_path=fixture_dir,
         repo_name=overlay.get("repo_name", original.get("repo_name", "")),
         pattern="A",
     )
