@@ -263,11 +263,22 @@ def fetch_repos_for_user(
 
 
 def now_iso() -> str:
-    """ISO timestamp suitable for ``AuditLogQuery.created_at_min``.
+    """SQL-compatible UTC timestamp for ``AuditLogQuery.created_at_min``.
+
+    Returns ``YYYY-MM-DD HH:MM:SS`` (no T, no microseconds, no
+    timezone marker) to match the format the dashboard's drizzle
+    migrations write into ``audit_logs.created_at``. ISO 8601 with
+    the T separator and TZ suffix lex-compares incorrectly against
+    the DB-stored ``space + no-tz`` form (T=0x54 > space=0x20), so
+    a freshly captured ISO timestamp would falsely exclude the row
+    that was inserted milliseconds later.
 
     Asserters call this BEFORE invoking the MCP tool, then pass the
     result to ``count_audit_logs`` AFTER the tool returns, so the
-    count covers only the invoke window.
+    count covers only the invoke window. Subtract 1 second to
+    forgive clock-skew between the python process and SQLite's
+    CURRENT_TIMESTAMP (both use system time but are not lock-step).
     """
-    from datetime import datetime, timezone
-    return datetime.now(tz=timezone.utc).isoformat()
+    from datetime import datetime, timedelta, timezone
+    moment = datetime.now(tz=timezone.utc) - timedelta(seconds=1)
+    return moment.strftime("%Y-%m-%d %H:%M:%S")
