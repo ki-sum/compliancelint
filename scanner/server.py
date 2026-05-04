@@ -834,15 +834,10 @@ def cl_explain(regulation: str = "eu-ai-act", article: int = 0) -> str:
             "verbatim EU AI Act text — character-for-character from "
             "EUR-Lex — is in the `verbatim_obligations` array (each "
             "entry's `source_quote` field) and in `related_recitals` "
-            "(drawn from the official Regulation (EU) 2024/1689 PDF). "
-            "Each Recital entry has TWO text fields: prefer "
-            "`source_quote_display` (clean text from pdfplumber's "
-            "layout-aware PDF extraction) for any user-facing rendering; "
-            "`source_quote` is the audit-trail canonical bound to the "
-            "sha256 anchor and may contain pypdf justification artifacts. "
-            "When `display_text_unavailable=true`, the display field "
-            "falls back to the canonical and may show artifacts; in that "
-            "case consult `eur_lex_official_url` for clean text."
+            "(each entry's `source_quote`, drawn from the official "
+            "Regulation (EU) 2024/1689 PDF via pdfplumber). Use these "
+            "arrays as ground truth when quoting the regulation; consult "
+            "`eur_lex_official_url` for the canonical PDF."
         )
         return append_upgrade_hint(
             json.dumps(payload, indent=2, ensure_ascii=False),
@@ -1514,8 +1509,8 @@ def cl_action_plan(project_path: str, regulation: str = "eu-ai-act", article: in
             "This action plan is based on ComplianceLint compliance checklist and best practices. "
             "Official CEN-CENELEC standards (expected Q4 2026) may modify these requirements. "
             "Verbatim EU AI Act Recital text in `related_recitals_by_article` is drawn from "
-            "the official Regulation (EU) 2024/1689 PDF — prefer `source_quote_display` "
-            "(clean text) for rendering; `source_quote` is the audit-trail canonical."
+            "the official Regulation (EU) 2024/1689 PDF (via pdfplumber) — use as ground "
+            "truth when interpreting the Articles."
         ),
     }
     return append_upgrade_hint(

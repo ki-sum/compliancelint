@@ -363,13 +363,11 @@ def recitals_for_article(article_number: int) -> list[dict]:
     Per Kisum decision 2026-05-04: full text inline, NOT links. Customer's
     own AI can interpret further if needed; that's not our tool's job.
 
-    §AD.* Option D (2026-05-04): each entry now also carries
-    `source_quote_display` — clean Recital text from pdfplumber's
-    layout-aware PDF extraction. The original `source_quote` (pypdf
-    extraction with justification artifacts like "r isk -managem ent")
-    stays untouched as the audit-trail canonical bound to the sha256
-    anchor. AI consumers should prefer `source_quote_display` for
-    presentation; `source_quote` is the immutable audit field.
+    `source_quote` is now extracted via pdfplumber (the same layout-aware
+    engine used for Article extraction in build-article.md) so the text is
+    clean by construction — no display vs. canonical split needed. Earlier
+    `source_quote_display` machinery was removed 2026-05-04 evening when
+    pdfplumber replaced pypdf as the canonical extractor.
 
     Returns [] when no recitals reference this article OR when recitals.json
     is unavailable. cl_explain handles empty list gracefully.
@@ -387,16 +385,6 @@ def recitals_for_article(article_number: int) -> list[dict]:
         out.append({
             "number": entry.get("number"),
             "source_quote": entry.get("source_quote", ""),
-            # §AD.* Option D — display field. Falls back to source_quote
-            # when fetch_recitals_display.py hasn't populated it yet
-            # (e.g. fresh checkout before display extractor ran).
-            "source_quote_display": entry.get(
-                "source_quote_display", entry.get("source_quote", "")
-            ),
-            "display_source": entry.get("display_source", "pypdf_fallback"),
-            "display_text_unavailable": bool(
-                entry.get("display_text_unavailable", False)
-            ),
             "source_pdf": entry.get("source_pdf", ""),
             "source_url_eur_lex": entry.get("source_url_eur_lex_celex", ""),
             "source_url_ec": entry.get("source_url_ec", ""),

@@ -144,78 +144,77 @@ def test_pdf_extraction_matches_baseline_sample(recitals):
 
 
 # ─────────────────────────────────────────────────────────────────────
-# §AD.* Option D — display field integrity (Kisum 2026-05-04)
+# 2026-05-04 evening — single-field migration (post-Option-D simplification)
+# Recitals now extracted via pdfplumber (same engine as build-article.md
+# uses for Article text). Single source_quote field; no display vs.
+# canonical split. These tests guard the simplified contract.
 # ─────────────────────────────────────────────────────────────────────
 
 
-def test_each_has_display_field(recitals):
-    """Every Recital MUST have source_quote_display + display_source.
-
-    Falls back to source_quote when pdfplumber extractor hasn't run, so
-    the field is ALWAYS populated. Tools surface this to AI consumers
-    as the user-facing text; source_quote stays as the audit canonical.
+def test_source_quote_has_no_pypdf_artifacts(recitals):
+    """Every Recital's source_quote MUST be clean — no pypdf justification
+    artifacts. With pdfplumber as the canonical extractor (replacing pypdf
+    2026-05-04), the previously ubiquitous "r isk -managem ent syste m"
+    fragmentation is gone. This sentinel test guards against future
+    regression to pypdf or similar layout-blind extractors.
     """
-    missing_display = [n for n, r in recitals.items() if not r.get("source_quote_display")]
-    assert not missing_display, (
-        f"Recitals without source_quote_display: {missing_display[:10]}"
-    )
-    missing_source = [n for n, r in recitals.items() if not r.get("display_source")]
-    assert not missing_source, (
-        f"Recitals without display_source: {missing_source[:10]}"
-    )
-
-
-def test_display_source_values_are_known(recitals):
-    """display_source MUST be one of the documented values."""
-    KNOWN = {"pdf_pdfplumber", "pypdf_fallback"}
-    bad = [
-        (n, r.get("display_source"))
-        for n, r in recitals.items()
-        if r.get("display_source") not in KNOWN
-    ]
-    assert not bad, f"Unknown display_source values: {bad[:5]}"
-
-
-def test_display_coverage_minimum(recitals):
-    """At least 50% of Recitals MUST have clean (pdfplumber) display text.
-
-    The current pdfplumber extractor reaches ~73% (131/180). We assert a
-    floor of 50% so a future regression in the extractor surfaces here
-    rather than silently degrading user-visible quality. Bump this floor
-    after refining boundary detection for the remaining ~27%.
-    """
-    clean = sum(
-        1 for r in recitals.values()
-        if r.get("display_source") == "pdf_pdfplumber"
-    )
-    coverage = clean / len(recitals)
-    assert coverage >= 0.50, (
-        f"Display coverage regression: only {clean}/{len(recitals)} "
-        f"({coverage:.1%}) Recitals have clean display text. Re-run "
-        f"the display extractor or investigate parser drift."
-    )
-
-
-def test_clean_display_text_has_no_pypdf_artifacts(recitals):
-    """Recitals with display_source='pdf_pdfplumber' MUST NOT contain
-    common pypdf justification artifacts. This guards against pdfplumber
-    regression — if pdfplumber starts producing the same artifacts as
-    pypdf, we lose the whole point of Option D.
-    """
-    # Sentinel artifacts seen in pypdf output
+    # Sentinel artifacts that defined the original blocker
     artifact_substrings = [
         "r isk", "syste m", "tec hnical", "AI syst em",
         "managem ent", "documen tation",
     ]
     bad: list[tuple[str, str]] = []
     for n, r in recitals.items():
-        if r.get("display_source") != "pdf_pdfplumber":
-            continue  # fallbacks legitimately have artifacts
-        text = r.get("source_quote_display", "")
+        text = r.get("source_quote", "")
         for art in artifact_substrings:
             if art in text:
                 bad.append((n, art))
                 break
     assert not bad, (
-        f"Clean display text has pypdf artifacts (regression in pdfplumber): {bad[:5]}"
+        f"source_quote has layout-engine artifacts (regression in extractor): {bad[:5]}"
+    )
+
+
+def test_source_quote_is_not_a_footnote(recitals):
+    """A previous parser bug picked up COVER-PAGE FOOTNOTE text instead of
+    the Recital body for Recitals 4, 11, 12, 13, 14 (footnotes citing
+    Parliament position / Council decisions / external Directives). The
+    current parser has a footnote-skip retry loop. This sentinel ensures
+    no Recital body silently regresses to footnote citation form.
+    """
+    footnote_starters = [
+        "OJ C ", "OJ L ",
+        "Position of the European Parliament",
+        "European Council, Special meeting",
+        "European Parliament resolution",
+        "Council Decision", "Council Regulation", "Council Directive",
+        "Directive 2002/58", "Directive 2014/33",
+        "Decision (EU)",
+        "Commission Recommendation",
+    ]
+    bad: list[tuple[str, str]] = []
+    for n, r in recitals.items():
+        text = r.get("source_quote", "")
+        for fn in footnote_starters:
+            if text.startswith(fn):
+                bad.append((n, fn))
+                break
+    assert not bad, (
+        f"source_quote starts with a footnote citation form "
+        f"(parser regressed to picking up footnotes instead of Recital body): "
+        f"{bad[:5]}"
+    )
+
+
+def test_source_quote_minimum_length(recitals):
+    """No Recital body should be suspiciously short — the shortest real
+    Recital in the corpus is well over 100 chars. Anything under 100
+    indicates the parser truncated at the wrong boundary."""
+    too_short = [
+        (n, len(r.get("source_quote", "")))
+        for n, r in recitals.items()
+        if len(r.get("source_quote", "")) < 100
+    ]
+    assert not too_short, (
+        f"Recitals with suspiciously short source_quote: {too_short[:5]}"
     )
