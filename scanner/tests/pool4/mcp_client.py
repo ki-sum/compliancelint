@@ -38,6 +38,30 @@ from typing import Any
 REPO_ROOT = Path(__file__).resolve().parents[3]
 
 
+def parse_first_json(raw: str) -> dict:
+    """Decode the leading JSON object from a tool response and discard
+    any trailing text.
+
+    Some scanner tools (cl_scan / cl_scan_all observed 2026-05-04)
+    append a marketing/hint footer ("--- Compliance Tracking ---..."
+    + "💡 hint...") AFTER the JSON envelope. ``json.loads`` rejects
+    that with ``Extra data`` because the response is JSON + plain
+    text concatenated, not pure JSON.
+
+    Use this when you know the tool may emit extra text. For tools
+    that return pure JSON (cl_version / cl_explain / cl_sync / etc.)
+    keep using ``json.loads(raw)`` so unexpected garbage still fails.
+    """
+    decoder = json.JSONDecoder()
+    obj, _end = decoder.raw_decode(raw.lstrip())
+    if not isinstance(obj, dict):
+        raise McpClientError(
+            f"parse_first_json: leading value is {type(obj).__name__}, "
+            f"expected dict"
+        )
+    return obj
+
+
 class McpClientError(RuntimeError):
     """Raised when the MCP subprocess misbehaves (handshake fail, no
     response, JSON-RPC error envelope, dead pipe, etc.).
