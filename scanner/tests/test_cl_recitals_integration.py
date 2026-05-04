@@ -348,16 +348,15 @@ def test_cl_scan_multi_article_surfaces_related_recitals_by_article(tmp_path):
         }
     )
 
-    # Multi-article path: scan Art 5 + Art 27 + Art 53 (all have
-    # mapped Recitals from the §AD.* batch via recitals.json's
-    # related_articles[] field — which is what recitals_for_article()
-    # consults). NOTE: article_recital_index.json's article_to_recitals
-    # has additional entries from EC co-citation (e.g. Art 12 → R71)
-    # that are NOT mirrored back into recitals.json related_articles[].
-    # The test_2026_05_04_batch_dual_mapping_consistency test in
-    # test_recital_article_mappings.py documents this two-file divergence
-    # as legitimate — only the §AD.* batch is required to round-trip.
-    raw = cl_scan(str(tmp_path), project_context=ctx_json, articles="5,27,53")
+    # Multi-article path: scan Art 5 + Art 12 + Art 27. All three have
+    # mapped Recitals after the 2026-05-04 evening reconciliation pass
+    # (`reconcile_recital_article_index.py`) which round-tripped 69
+    # EC-co-citation pairs from article_recital_index.json BACK into
+    # recitals.json's related_articles[] field. Art 12 → R71 was the
+    # canonical case that exposed the gap (R71 IS the record-keeping
+    # Recital but pre-reconcile, recitals_for_article(12) returned 0
+    # entries because R71's related_articles[] only listed [11, 19]).
+    raw = cl_scan(str(tmp_path), project_context=ctx_json, articles="5,12,27")
     payload = _parse_tool_output(raw)
     assert "related_recitals_by_article" in payload, (
         f"cl_scan multi-article must surface related_recitals_by_article. "
@@ -366,17 +365,24 @@ def test_cl_scan_multi_article_surfaces_related_recitals_by_article(tmp_path):
     by_article = payload["related_recitals_by_article"]
     # All three requested articles must be keyed in the dict
     assert "5" in by_article, f"Art 5 missing from multi-article scan: {sorted(by_article.keys())}"
+    assert "12" in by_article, (
+        f"Art 12 missing from multi-article scan — proves reconciliation "
+        f"didn't run / regressed. Run the reconcile script "
+        f"(reconcile_recital_article_index.py in the alignment-audit "
+        f"toolkit) to re-bridge index ↔ recitals.json. Got keys: "
+        f"{sorted(by_article.keys())}"
+    )
     assert "27" in by_article, f"Art 27 missing: {sorted(by_article.keys())}"
-    assert "53" in by_article, f"Art 53 missing: {sorted(by_article.keys())}"
-    # Art 27 → Recital 96 (FRIA) — the canonical anchor
+    # Art 12 → Recital 71 (record-keeping Recital, EC-co-citation anchor)
+    art12_numbers = [r["number"] for r in by_article["12"]]
+    assert 71 in art12_numbers, (
+        f"Art 12 must surface Recital 71 (record-keeping per EC co-citation): "
+        f"got {art12_numbers}"
+    )
+    # Art 27 → Recital 96 (FRIA) — the canonical §AD.* batch anchor
     art27_numbers = [r["number"] for r in by_article["27"]]
     assert 96 in art27_numbers, (
         f"Art 27 must surface Recital 96 (FRIA): got {art27_numbers}"
-    )
-    # Art 53 → Recital 104-109 cluster (GPAI providers + copyright + training data summary)
-    art53_numbers = [r["number"] for r in by_article["53"]]
-    assert any(n in art53_numbers for n in [104, 105, 106, 107, 108, 109]), (
-        f"Art 53 must surface at least one of R104-R109 (GPAI cluster): got {art53_numbers}"
     )
 
 
