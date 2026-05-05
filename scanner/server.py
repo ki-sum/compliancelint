@@ -2708,12 +2708,19 @@ def cl_sync(project_path: str, regulation: str = "") -> str:
         f"STEP 7d: first commit sha = {first_commit_sha[:12] if first_commit_sha else 'none'} (from cache)"
     )
 
-    # Build payload matching the API schema
+    # Build payload matching the API schema.
+    # COMPLIANCELINT_SCANNER_VERSION_OVERRIDE env var is a TEST-ONLY hook
+    # for Pool 4 §X schema_drift cells — lets tests simulate an "old
+    # scanner" hitting the dashboard's 426 gate without rebuilding the
+    # MCP package at a different version. NEVER set in production.
+    _scanner_version_for_body = os.environ.get(
+        "COMPLIANCELINT_SCANNER_VERSION_OVERRIDE", CL_VERSION,
+    )
     payload = {
         "project_id": project_id,
         "repo": repo_name,
         "scanned_at": state.get("last_scan", datetime.now(timezone.utc).isoformat()),
-        "scanner_version": CL_VERSION,
+        "scanner_version": _scanner_version_for_body,
         "regulation": state.get("regulation", "eu-ai-act"),
         "ai_provider": _read_ai_provider(project_path),
         "changes_summary": changes_summary or None,
@@ -2788,6 +2795,36 @@ def cl_sync(project_path: str, regulation: str = "") -> str:
                 f"Dashboard returned HTTP 403: {detail}",
                 request_id=sync_request_id,
                 fix=f"Upgrade your plan at {settings_url}",
+            )
+        # 426 Upgrade Required — schema_drift gate. Dashboard rejects the
+        # scan because this scanner's version is below the dashboard's
+        # min_scanner_version. Surface a clear upgrade-required message
+        # rather than the generic 4xx fallback so the AI client can nudge
+        # the user to actually run pip install -U.
+        if http_code == 426:
+            try:
+                resp_json = json.loads(body_str)
+                upgrade_command = resp_json.get(
+                    "upgrade_command",
+                    "pip install -U compliancelint",
+                )
+                detail = resp_json.get("error", body_str)
+                your_version = resp_json.get("your_version", CL_VERSION)
+                min_required = resp_json.get("min_required", "unknown")
+            except Exception:
+                upgrade_command = "pip install -U compliancelint"
+                detail = body_str
+                your_version = CL_VERSION
+                min_required = "unknown"
+            return dump_error(
+                f"Scanner upgrade required: dashboard accepts >= {min_required} "
+                f"but this scanner is {your_version}. {detail}",
+                request_id=sync_request_id,
+                fix=(
+                    f"Upgrade ComplianceLint and retry: {upgrade_command}. "
+                    "After upgrading, restart your IDE / MCP server."
+                ),
+                details=body_str[:500],
             )
         if http_code >= 400:
             return dump_error(
