@@ -355,8 +355,8 @@ The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard
 | Evidence — `url_reference` (external pointer — content not captured, may link-rot) | — | ✓ | ✓ | ✓ | ✓ |
 | Evidence — `repo_file` upload from dashboard (bytes relayed to your git repo) | — | — | ✓ | ✓ | ✓ |
 | Human Gates questionnaires | — | — | ✓ | ✓ | ✓ |
-| SARIF export | — | — | ✓ | ✓ | ✓ |
-| CI/CD quality gate | — | — | ✓ | ✓ | ✓ |
+| SARIF export — via [GitHub Action composite](https://compliancelint.dev/ci-cd) (no dashboard button; uploads to GitHub Code Scanning) | — | — | ✓ | ✓ | ✓ |
+| CI/CD quality gate — runs in your CI runner; any AI driver via MCP, see [/ci-cd](https://compliancelint.dev/ci-cd) for the platform-agnostic prompt | — | — | ✓ | ✓ | ✓ |
 | Multi-framework mapping (ISO 42001, NIST AI RMF) | — | — | — | ✓ | ✓ |
 | Regulation updates timeline (in-app) — current EU AI Act milestones; email digest is roadmap | — | — | — | ✓ | ✓ |
 | Compliance All-in-One Pack (audit-grade snapshot zip) | — | — | — | ✓ | ✓ |
@@ -388,7 +388,7 @@ The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard
 - [x] Directory v2 — local cache (`.compliancelint/local/`, gitignored) vs committed evidence (`.compliancelint/evidence/` + `manifest.json`) split
 - [x] Cross-OS CI matrix (Ubuntu, macOS, Windows × Python 3.10–3.13)
 - [x] Profiling Wizard — answer a series of questions about your AI system (EU establishment, Annex III category, training data, GPAI status, value-chain role, Art. 2 carve-outs) and the 247-obligation matrix is filtered down to the ones that actually apply to you (Starter+)
-- [x] **Public EU AI Act browser at [`/eu-ai-act`](https://compliancelint.dev/eu-ai-act)** — full text of 44 articles + 13 annexes + searchable across 247 obligations, **no signup required**. Browse legal text + search "biometric" / "logging" / "human oversight" instantly
+- [x] **EU AI Act browser at [`/dashboard/regulations/eu-ai-act`](https://compliancelint.dev/dashboard/regulations/eu-ai-act)** — full text of 44 articles + 13 annexes + searchable across 247 obligations. **Free tier includes the full browser after a free sign-up** (no credit card). Browse legal text + search "biometric" / "logging" / "human oversight" instantly
 
 ### Pre-launch
 
