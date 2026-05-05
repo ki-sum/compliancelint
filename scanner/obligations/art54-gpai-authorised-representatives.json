@@ -110,7 +110,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "full"
+        "level": "manual"
       }
     },
     {
@@ -170,9 +170,9 @@
       "provider": 6
     },
     "automation_breakdown": {
-      "full": 2,
+      "full": 1,
       "partial": 2,
-      "manual": 2
+      "manual": 3
     }
   }
 }

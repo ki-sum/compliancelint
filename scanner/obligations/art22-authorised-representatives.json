@@ -146,7 +146,7 @@
         }
       ],
       "automation_assessment": {
-        "level": "full"
+        "level": "manual"
       },
       "scope_limitation": "Only applies to providers established in third countries",
       "context_skip_field": "is_eu_established_provider"
@@ -162,9 +162,9 @@
       "authorised_representative": 1
     },
     "automation_breakdown": {
-      "full": 1,
+      "full": 0,
       "partial": 1,
-      "manual": 2
+      "manual": 3
     }
   }
 }
