@@ -126,21 +126,22 @@ def test_cl_delete_target_dashboard_from_member_returns_403(
 
     response = json.loads(raw)
 
-    # Audit-first observation 2026-05-04: cl_delete does NOT return a
-    # top-level error envelope when the dashboard sub-operation fails
-    # with 403. Instead the structure is:
+    # Response shape (post 2026-05-04 fix):
     #   {
-    #     "status": "deleted",
+    #     "status": "failed",
     #     "results": {"dashboard": "error: Only the repo owner can…"}
     #   }
-    # The dashboard sub-result is a STRING prefixed with "error:". The
-    # top-level status="deleted" is misleading for a fully-failed
-    # target=dashboard call (no actual deletion happened) — flagged in
-    # the Pool 4 plan close-out as a possible product issue worth
-    # reviewing post-launch. The cell pins TODAY's real shape so a
-    # silent shape change in the future surfaces here.
+    # Status is now derived from per-target results — a target=dashboard
+    # call where the only sub-target fully failed with "error: …" gets
+    # status="failed" (not "deleted" as before the fix). The cell pins
+    # the corrected behavior so a silent regression surfaces here.
     assert "results" in response, (
         f"cl_delete should return a per-target results dict; got {response}"
+    )
+    assert response.get("status") == "failed", (
+        f"cl_delete with target=dashboard fully failing 403 should "
+        f"surface top-level status='failed' (post 2026-05-04 fix); "
+        f"got status={response.get('status')!r}, response={response}"
     )
     dashboard_result = (response.get("results") or {}).get("dashboard", "")
     assert isinstance(dashboard_result, str), (

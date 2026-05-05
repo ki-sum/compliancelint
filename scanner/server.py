@@ -3705,7 +3705,28 @@ def cl_delete(
                 results["dashboard"] = f"error: {e}"
             slog.info("cl_delete: dashboard purge result=%s", results.get("dashboard"))
 
-    return json.dumps({"status": "deleted", "results": results})
+    # Derive top-level status from per-sub-target results so a fully-
+    # failed call doesn't claim success. Pool 4 audit-first 2026-05-04
+    # surfaced cl_delete returning {"status": "deleted", "results":
+    # {"dashboard": "error: …"}} when target=dashboard's only sub-call
+    # fully failed with 403 — misleading for AI consumers reading the
+    # top-level status. Logic:
+    #   - all values clean (no "error:" prefix) → "deleted"
+    #   - some errors, some not → "partial"
+    #   - every value is "error: …" → "failed"
+    # "not_found:" prefix is NOT treated as an error (semantically
+    # "nothing to delete because nothing was there" is a graceful
+    # outcome, not a failure).
+    sub_values = [v for v in results.values() if isinstance(v, str)]
+    error_count = sum(1 for v in sub_values if v.startswith("error:"))
+    if error_count == 0:
+        derived_status = "deleted"
+    elif error_count == len(sub_values):
+        derived_status = "failed"
+    else:
+        derived_status = "partial"
+
+    return json.dumps({"status": derived_status, "results": results})
 
 
 @mcp.tool()
