@@ -357,7 +357,7 @@ The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard
 | SARIF export — via [GitHub Action composite](https://compliancelint.dev/ci-cd) (no dashboard button; uploads to GitHub Code Scanning) | — | — | ✓ | ✓ | ✓ |
 | CI/CD quality gate — runs in your CI runner; any AI driver via MCP, see [/ci-cd](https://compliancelint.dev/ci-cd) for the platform-agnostic prompt | — | — | ✓ | ✓ | ✓ |
 | Multi-framework mapping (ISO 42001, NIST AI RMF) | — | — | — | ✓ | ✓ |
-| Regulation updates timeline (in-app) — current EU AI Act milestones; email digest is roadmap | — | — | — | ✓ | ✓ |
+| Regulation updates timeline (in-app) — current EU AI Act milestones; email digest is Business+ roadmap | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Compliance All-in-One Pack (audit-grade snapshot zip) | — | — | — | ✓ | ✓ |
 | SSO / SAML / on-prem | — | — | — | — | ✓ |
 
