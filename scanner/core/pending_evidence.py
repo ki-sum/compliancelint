@@ -162,7 +162,7 @@ def is_valid_git_sha(sha: str) -> bool:
     return sha == sha.lower()
 
 
-def is_sha_on_remote(project_path: str, sha: str, timeout: float = 3.0) -> bool:
+def is_sha_on_remote(project_path: str, sha: str, timeout: float = 10.0) -> bool:
     """Return True if `sha` is reachable from any remote-tracking branch.
 
     Uses `git branch -r --contains <sha>` — read-only, no network access
@@ -202,7 +202,7 @@ def is_sha_on_remote(project_path: str, sha: str, timeout: float = 3.0) -> bool:
         return False
 
 
-def get_committed_sha(project_path: str, repo_path: str, timeout: float = 3.0) -> Optional[str]:
+def get_committed_sha(project_path: str, repo_path: str, timeout: float = 10.0) -> Optional[str]:
     """Return the sha of the most recent commit that touched `repo_path`
     AND is reachable from at least one remote-tracking branch, or None.
 
