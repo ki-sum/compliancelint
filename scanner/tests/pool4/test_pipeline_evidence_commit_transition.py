@@ -245,23 +245,6 @@ def _read_evidence_state(db_path: str, evidence_item_id: str) -> dict | None:
         conn.close()
 
 
-@pytest.mark.skip(
-    reason=(
-        "DEFERRED 2026-05-05: cell structure is sound (encryption, "
-        "bare-remote setup, assertions, cleanup all correct) but the "
-        "MCP subprocess on Windows takes >10s for the is_sha_on_remote() "
-        "check inside cl_sync STEP 11, hitting the (already-bumped) "
-        "10s timeout. Standalone Python invocation of the same git "
-        "ops takes ~0.13s, so the issue is specifically the MCP-"
-        "subprocess + Windows-curl-spawn-overhead combination. "
-        "Investigation needs strace-style instrumentation to localise. "
-        "Un-skip when (a) the slow MCP-subprocess git path is fixed OR "
-        "(b) the test infrastructure runs on Linux (typical CI). "
-        "The 10s timeout bump in scanner/core/pending_evidence.py "
-        "(get_committed_sha + is_sha_on_remote) is a real product "
-        "improvement that ships independently of this cell."
-    )
-)
 @pytest.mark.requires_dev_server
 @pytest.mark.requires_seeded_users
 def test_pipeline_evidence_commit_transition_via_real_mcp(

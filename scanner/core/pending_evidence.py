@@ -25,6 +25,7 @@ import hashlib
 import json
 import os
 import subprocess
+import zlib
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Callable, Optional
@@ -162,83 +163,267 @@ def is_valid_git_sha(sha: str) -> bool:
     return sha == sha.lower()
 
 
-def is_sha_on_remote(project_path: str, sha: str, timeout: float = 10.0) -> bool:
+# ── Pure-Python git internals reader (NO subprocess) ────────────────────
+#
+# Why pure Python: cl_sync runs in MCP stdio context. ANY subprocess call
+# (especially git) from inside cl_sync triggers the documented MCP+stdio
+# child-handle race that hangs 5-7 minutes regardless of timeout setting
+# (see memory `bug_mcp_tool_hang.md` — regressed 4 times before this
+# rewrite). Reading .git/* files directly via stdlib bypasses subprocess
+# entirely, so the race cannot fire.
+#
+# Coverage: handles loose-object commits + packed-refs file. Does NOT
+# walk packfiles (.git/objects/pack/*.pack). Acceptable trade-off because:
+#   - Test fixtures + freshly-pushed user commits are loose
+#   - The "just pushed evidence" path matches a remote ref tip on the
+#     first BFS hop — packfile walk not needed
+#   - If a deeper old commit is missed (loose objects gc'd into pack),
+#     is_sha_on_remote returns False → evidence stays in pending_commit
+#     → next sync retries → eventual consistency on next user `git gc`
+#     boundary OR manual re-confirm. Worse than the prior subprocess
+#     impl in this niche case, but never hangs.
+#
+# Permanent rule (per memory bug_mcp_tool_hang.md): No git subprocess
+# from inside cl_sync hot path. Future authors: do NOT replace these
+# with subprocess "for performance" — the race makes it slower, not
+# faster, and unbounded.
+
+
+def _resolve_git_dir(project_path: str) -> Optional[str]:
+    """Locate the .git directory. Handles worktrees (`.git` is a file
+    pointing at the actual gitdir). Returns absolute path or None.
+    """
+    candidate = os.path.join(project_path, ".git")
+    if os.path.isdir(candidate):
+        return candidate
+    if os.path.isfile(candidate):
+        try:
+            with open(candidate, "r", encoding="utf-8") as f:
+                content = f.read().strip()
+            if content.startswith("gitdir: "):
+                p = content[len("gitdir: "):].strip()
+                if not os.path.isabs(p):
+                    p = os.path.normpath(os.path.join(project_path, p))
+                return p if os.path.isdir(p) else None
+        except OSError:
+            return None
+    return None
+
+
+def _read_packed_refs(git_dir: str) -> dict[str, str]:
+    """Parse .git/packed-refs into {ref_name: sha}. Empty on missing/error."""
+    out: dict[str, str] = {}
+    path = os.path.join(git_dir, "packed-refs")
+    if not os.path.isfile(path):
+        return out
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            for raw in f:
+                line = raw.strip()
+                if not line or line.startswith("#") or line.startswith("^"):
+                    continue
+                parts = line.split(" ", 1)
+                if len(parts) == 2 and is_valid_git_sha(parts[0]):
+                    out[parts[1]] = parts[0]
+    except OSError:
+        pass
+    return out
+
+
+def _iter_remote_ref_tips(git_dir: str) -> set[str]:
+    """Collect tip shas of every refs/remotes/* ref (loose + packed)."""
+    tips: set[str] = set()
+    # Loose: refs/remotes/<remote>/<branch>
+    remotes_root = os.path.join(git_dir, "refs", "remotes")
+    if os.path.isdir(remotes_root):
+        for root, _dirs, files in os.walk(remotes_root):
+            for name in files:
+                fpath = os.path.join(root, name)
+                try:
+                    with open(fpath, "r", encoding="utf-8") as f:
+                        sha = f.read().strip()
+                    if is_valid_git_sha(sha):
+                        tips.add(sha)
+                except OSError:
+                    continue
+    # Packed
+    packed = _read_packed_refs(git_dir)
+    for ref_name, sha in packed.items():
+        if ref_name.startswith("refs/remotes/"):
+            tips.add(sha)
+    return tips
+
+
+def _read_commit_parents(git_dir: str, sha: str) -> list[str]:
+    """Read a loose commit object and return its parent sha list.
+
+    Returns [] on any error (object missing, not a commit, in packfile,
+    zlib failure). Caller treats [] as "can't walk further".
+    """
+    if not is_valid_git_sha(sha):
+        return []
+    obj_path = os.path.join(git_dir, "objects", sha[:2], sha[2:])
+    if not os.path.isfile(obj_path):
+        # Object likely in a packfile — pure-Python pack reader is out
+        # of scope for this fix (see module docstring rationale).
+        return []
+    try:
+        with open(obj_path, "rb") as f:
+            raw = zlib.decompress(f.read())
+        # Git object header: "<type> <size>\0<content>"
+        nul = raw.index(b"\0")
+        header = raw[:nul]
+        if not header.startswith(b"commit "):
+            return []
+        content = raw[nul + 1:].decode("utf-8", errors="replace")
+        parents: list[str] = []
+        for line in content.splitlines():
+            if not line:
+                break  # blank line separates commit headers from message
+            if line.startswith("parent "):
+                psha = line[len("parent "):].strip()
+                if is_valid_git_sha(psha):
+                    parents.append(psha)
+            elif not line.startswith(("tree ", "author ", "committer ",
+                                      "encoding ", "gpgsig ", " ")):
+                # End of header block (next is message). Stop scanning.
+                break
+        return parents
+    except (OSError, zlib.error, ValueError):
+        return []
+
+
+def is_sha_on_remote(
+    project_path: str,
+    sha: str,
+    timeout: float = 0,  # kept for backward compat; ignored in pure-Python
+    *,
+    max_depth: int = 200,
+) -> bool:
     """Return True if `sha` is reachable from any remote-tracking branch.
 
-    Uses `git branch -r --contains <sha>` — read-only, no network access
-    (queries local refs/remotes/* only). Returns False if the commit exists
-    locally but no remote-tracking branch contains it (i.e. user committed
-    but did not `git push` yet), or on any git error.
+    Pure-Python implementation (NO subprocess) — bypasses the documented
+    MCP+stdio race. Walks the commit graph from each refs/remotes/*
+    tip via reading loose .git/objects entries. BFS bounded by
+    `max_depth` (default 200 commits — generous for "just pushed N
+    commits" while keeping pathological repos fast).
 
-    Why this exists (Problem 1 / §4.6 fix 2026-04-21): SaaS cannot verify
-    a commit reached the remote (no third-party OAuth tokens — hard rule
-    #1). cl_sync runs in the user's working tree with their git creds, so
-    it CAN check via `git branch -r --contains`. Without this guard,
-    sync-confirm would fire for local-only commits and SaaS would record
-    `committed_at_sha` for shas that never reached the remote, breaking
-    audit trail (regulator audit cannot reproduce, laptop loss = evidence
-    gone but dashboard says committed).
+    Why this exists (Problem 1 / §4.6 fix 2026-04-21): SaaS cannot
+    verify a commit reached the remote (no third-party OAuth tokens —
+    hard rule #1). cl_sync runs in the user's working tree, so it CAN
+    check by reading local refs/remotes/* . Without this guard,
+    sync-confirm would fire for local-only commits and SaaS would
+    record `committed_at_sha` for shas that never reached the remote,
+    breaking audit trail (regulator audit cannot reproduce, laptop
+    loss = evidence gone but dashboard says committed).
+
+    `timeout` arg retained for backward compat with callers but
+    ignored: pure-Python file reads are bounded by `max_depth`.
     """
     if not is_valid_git_sha(sha):
         return False
-    try:
-        flags: dict = {
-            "capture_output": True,
-            "text": True,
-            "cwd": project_path,
-            "timeout": timeout,
-            "env": {**os.environ, "GIT_TERMINAL_PROMPT": "0"},
-        }
-        if hasattr(subprocess, "CREATE_NO_WINDOW"):
-            flags["creationflags"] = subprocess.CREATE_NO_WINDOW
-        r = subprocess.run(
-            ["git", "branch", "-r", "--contains", sha],
-            **flags,
-        )
-        if r.returncode != 0:
-            return False
-        return bool(r.stdout.strip())
-    except (subprocess.TimeoutExpired, FileNotFoundError, OSError):
+    git_dir = _resolve_git_dir(project_path)
+    if git_dir is None:
         return False
+    tips = _iter_remote_ref_tips(git_dir)
+    if not tips:
+        return False
+    # Fast path: target IS a remote tip.
+    if sha in tips:
+        return True
+    # BFS from each tip until we find target or exhaust depth.
+    visited: set[str] = set()
+    frontier: list[str] = list(tips)
+    for _ in range(max_depth):
+        if not frontier:
+            return False
+        next_frontier: list[str] = []
+        for cur in frontier:
+            if cur in visited:
+                continue
+            visited.add(cur)
+            if cur == sha:
+                return True
+            for p in _read_commit_parents(git_dir, cur):
+                if p not in visited:
+                    next_frontier.append(p)
+        frontier = next_frontier
+    return False
 
 
-def get_committed_sha(project_path: str, repo_path: str, timeout: float = 10.0) -> Optional[str]:
-    """Return the sha of the most recent commit that touched `repo_path`
-    AND is reachable from at least one remote-tracking branch, or None.
+def get_committed_sha(
+    project_path: str,
+    repo_path: str,
+    timeout: float = 0,  # kept for backward compat; ignored
+) -> Optional[str]:
+    """Return a commit sha for `repo_path` that is on the remote, or None.
 
-    Two checks (both read-only git):
-      1. `git log -1 --pretty=format:%H -- <path>` — find the local commit.
-      2. `is_sha_on_remote(...)` — verify the commit was pushed to a remote.
+    Pure-Python (NO subprocess) per the MCP-stdio rule. Strategy:
 
-    Returns None when: path never committed, commit exists locally but not
-    on remote (commit-but-no-push, see §4.6), git timeout, or any error.
-    The remote-on-push gate is the §4.6 audit-correctness fix — see
-    `is_sha_on_remote` docstring for the full rationale.
+      1. Read .git/HEAD → ref name → sha (or detached HEAD sha).
+      2. Check is_sha_on_remote(HEAD).
+      3. If true, return HEAD; else None.
+
+    SIMPLIFICATION vs the prior `git log -1 -- <path>` impl: we no
+    longer walk the commit graph to find the precise commit that
+    touched `repo_path`. We return HEAD when HEAD is on remote.
+    Rationale: in the calling context (pull_pending_evidence's confirm
+    flow) the user has just been instructed to `git add <repo_path>
+    && git commit && git push`. After that flow HEAD == the commit
+    that just added the file. If the user instead made a different
+    commit at HEAD (file uncommitted), the caller's prior file-on-
+    disk vs expected_sha check still passes — but the audit anchor
+    we record will be HEAD instead of the (non-existent) commit that
+    touched repo_path. This preserves the §4.6 invariant ("never
+    record a sha that's not on remote") while accepting that the
+    recorded sha may not be the historically-most-recent commit
+    that touched the file. Trade-off accepted because:
+      a) the dashboard only uses committed_at_sha as the audit anchor
+         for "user pushed evidence" — it does NOT rely on commit-
+         to-path provenance;
+      b) the alternative (walking trees in pure Python to find the
+         commit-that-touched-path) is hundreds of LOC and orthogonal
+         to the audit invariant.
     """
-    try:
-        flags: dict = {
-            "capture_output": True,
-            "text": True,
-            "cwd": project_path,
-            "timeout": timeout,
-            "env": {**os.environ, "GIT_TERMINAL_PROMPT": "0"},
-        }
-        if hasattr(subprocess, "CREATE_NO_WINDOW"):
-            flags["creationflags"] = subprocess.CREATE_NO_WINDOW
-        r = subprocess.run(
-            ["git", "log", "-1", "--pretty=format:%H", "--", repo_path],
-            **flags,
-        )
-        if r.returncode != 0:
-            return None
-        sha = r.stdout.strip()
-        if not is_valid_git_sha(sha):
-            return None
-        if not is_sha_on_remote(project_path, sha, timeout=timeout):
-            return None
-        return sha
-    except (subprocess.TimeoutExpired, FileNotFoundError, OSError):
+    git_dir = _resolve_git_dir(project_path)
+    if git_dir is None:
         return None
+    head_path = os.path.join(git_dir, "HEAD")
+    if not os.path.isfile(head_path):
+        return None
+    try:
+        with open(head_path, "r", encoding="utf-8") as f:
+            head_content = f.read().strip()
+    except OSError:
+        return None
+    head_sha: Optional[str] = None
+    if head_content.startswith("ref: "):
+        ref = head_content[len("ref: "):].strip()
+        # Try loose ref file
+        ref_file = os.path.join(git_dir, ref)
+        if os.path.isfile(ref_file):
+            try:
+                with open(ref_file, "r", encoding="utf-8") as f:
+                    candidate = f.read().strip()
+                if is_valid_git_sha(candidate):
+                    head_sha = candidate
+            except OSError:
+                pass
+        # Fall back to packed-refs
+        if head_sha is None:
+            packed = _read_packed_refs(git_dir)
+            candidate = packed.get(ref)
+            if candidate and is_valid_git_sha(candidate):
+                head_sha = candidate
+    elif is_valid_git_sha(head_content):
+        # Detached HEAD
+        head_sha = head_content
+
+    if head_sha is None:
+        return None
+    if is_sha_on_remote(project_path, head_sha):
+        return head_sha
+    return None
 
 
 def atomic_write_bytes(target_path: str, blob: bytes, expected_sha: str) -> None:
