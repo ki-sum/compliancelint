@@ -23,6 +23,29 @@ _DEFAULT_AUDIT_TOOLS = os.path.normpath(
 if not os.environ.get("COMPLIANCELINT_AUDIT_TOOLS") and os.path.isdir(_DEFAULT_AUDIT_TOOLS):
     os.environ["COMPLIANCELINT_AUDIT_TOOLS"] = _DEFAULT_AUDIT_TOOLS
 
+# Default CL_CLASSIFICATION_FIXTURE_DIR to the in-repo SaaS classification
+# fixture dir (per-article JSON mirroring what the production
+# /api/v1/regulations/eu-ai-act/articles/N/classifications endpoint
+# returns). Used by test_cl_action_guide_enriched.py to populate the 5
+# SaaS-only Option C fields (detection_method / rationale / what_to_scan /
+# confidence / human_judgment_needed) without standing up a SaaS server.
+# Public-repo-only checkouts leave this unset and the test file's
+# pytestmark.skipif fires with the existing remediation message.
+# Test-side joins env value with `<scanner>/..` — passing an absolute
+# path bypasses that join (os.path.join discards the prefix when the
+# next component is absolute), so the env var works regardless of cwd.
+_DEFAULT_CLASS_FIXTURE = os.path.normpath(
+    os.path.join(
+        SCANNER_ROOT, "..",
+        "private", "dashboard", "src", "data", "obligation-classifications",
+    )
+)
+if (
+    not os.environ.get("CL_CLASSIFICATION_FIXTURE_DIR")
+    and os.path.isdir(_DEFAULT_CLASS_FIXTURE)
+):
+    os.environ["CL_CLASSIFICATION_FIXTURE_DIR"] = _DEFAULT_CLASS_FIXTURE
+
 
 @pytest.fixture(autouse=True)
 def minimal_ai_context():
