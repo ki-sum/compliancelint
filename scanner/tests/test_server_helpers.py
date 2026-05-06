@@ -129,7 +129,13 @@ class TestFormatFingerprintWarning:
                                            "previous_first_commit_sha": "a" * 40,
                                            "current_first_commit_sha": "b" * 40}]
         msg = _format_fingerprint_warning(warnings, self._SAAS, self._REPO)
-        assert msg is not None  # the one valid dict is still picked up
+        # Junk entries (string + None) are filtered; the one valid dict
+        # produces a message containing both SHA prefixes (proves it was
+        # parsed, not silently discarded with the junk).
+        assert msg is not None
+        assert "Fingerprint changed" in msg
+        assert ("a" * 6) in msg  # previous SHA prefix preserved
+        assert ("b" * 6) in msg  # current SHA prefix preserved
 
     def test_returns_first_matching_warning_when_multiple(self):
         warnings = [
