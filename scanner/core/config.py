@@ -134,40 +134,89 @@ class ProjectConfig:
     def derive_git_identity(self, project_path: str) -> None:
         """Derive repo_name + project_id from git. Sets self.repo_name and self.project_id.
 
-        Safe to call in MCP context: uses timeout=2, GIT_TERMINAL_PROMPT=0, CREATE_NO_WINDOW.
+        Uses asyncio subprocess (post 2026-05-06 hypothesis-C verification:
+        asyncio.create_subprocess_exec on Windows uses ProactorEventLoop's
+        IOCP machinery, NOT subject to the documented MCP+subprocess.run
+        race per memory bug_mcp_tool_hang.md).
+
         Only runs git if repo_name or project_id are not already set.
         """
         if self.repo_name and self.project_id:
             return  # Already have both, skip git
 
-        import subprocess
+        import asyncio as _asyncio
         import hashlib
+        import subprocess as _sp
+        import sys as _sys
+
+        async def _run(*args: str) -> tuple[int, str]:
+            creationflags = 0
+            if hasattr(_sp, "CREATE_NO_WINDOW"):
+                creationflags = _sp.CREATE_NO_WINDOW
+            try:
+                proc = await _asyncio.create_subprocess_exec(
+                    "git", *args,
+                    cwd=project_path,
+                    stdout=_asyncio.subprocess.PIPE,
+                    stderr=_asyncio.subprocess.PIPE,
+                    creationflags=creationflags,
+                    env={**os.environ, "GIT_TERMINAL_PROMPT": "0"},
+                )
+            except (FileNotFoundError, OSError):
+                return -1, ""
+            try:
+                stdout, _stderr = await _asyncio.wait_for(
+                    proc.communicate(), timeout=5.0,
+                )
+            except _asyncio.TimeoutError:
+                try:
+                    proc.kill()
+                    await proc.communicate()
+                except Exception:
+                    pass
+                return -1, ""
+            return (
+                proc.returncode if proc.returncode is not None else -1,
+                stdout.decode("utf-8", errors="replace"),
+            )
+
+        async def _gather():
+            url_rc, url_out = await _run("remote", "get-url", "origin")
+            url = url_out.strip() if url_rc == 0 else ""
+            root_hash = ""
+            if url:
+                root_rc, root_out = await _run("rev-list", "--max-parents=0", "HEAD")
+                if root_rc == 0:
+                    lines = [ln for ln in root_out.splitlines() if ln.strip()]
+                    root_hash = lines[0] if lines else ""
+            return url, root_hash
+
         try:
-            git_flags = {"capture_output": True, "text": True, "cwd": project_path, "timeout": 2,
-                         "env": {**os.environ, "GIT_TERMINAL_PROMPT": "0"}}
-            if hasattr(subprocess, "CREATE_NO_WINDOW"):
-                git_flags["creationflags"] = subprocess.CREATE_NO_WINDOW
-
-            r = subprocess.run(["git", "remote", "get-url", "origin"], **git_flags)
-            if r.returncode == 0:
-                url = r.stdout.strip()
-                # Derive repo_name from remote URL
-                if not self.repo_name:
-                    if ":" in url and "@" in url:
-                        self.repo_name = url.split(":")[-1].replace(".git", "")
-                    elif "/" in url:
-                        parts = url.rstrip("/").replace(".git", "").split("/")
-                        if len(parts) >= 2:
-                            self.repo_name = f"{parts[-2]}/{parts[-1]}"
-
-                # Derive project_id: SHA256(remote_url:root_commit)
-                if not self.project_id and url:
-                    r2 = subprocess.run(["git", "rev-list", "--max-parents=0", "HEAD"], **git_flags)
-                    root_hash = r2.stdout.strip().split("\n")[0] if r2.returncode == 0 else ""
-                    material = f"{url}:{root_hash}"
-                    self.project_id = f"git-{hashlib.sha256(material.encode()).hexdigest()[:16]}"
+            if _sys.platform == "win32" and hasattr(
+                _asyncio, "WindowsProactorEventLoopPolicy",
+            ):
+                try:
+                    _asyncio.set_event_loop_policy(
+                        _asyncio.WindowsProactorEventLoopPolicy()
+                    )
+                except Exception:
+                    pass
+            url, root_hash = _asyncio.run(_gather())
         except Exception:
-            pass
+            url, root_hash = "", ""
+
+        if url:
+            if not self.repo_name:
+                if ":" in url and "@" in url:
+                    self.repo_name = url.split(":")[-1].replace(".git", "")
+                elif "/" in url:
+                    parts = url.rstrip("/").replace(".git", "").split("/")
+                    if len(parts) >= 2:
+                        self.repo_name = f"{parts[-2]}/{parts[-1]}"
+
+            if not self.project_id:
+                material = f"{url}:{root_hash}"
+                self.project_id = f"git-{hashlib.sha256(material.encode()).hexdigest()[:16]}"
 
         if not self.repo_name:
             self.repo_name = os.path.basename(os.path.normpath(project_path))

@@ -10,6 +10,7 @@ Architecture:
   - server.py provides the MCP interface, modules provide the logic
 """
 
+import asyncio
 import importlib.util
 import json
 import logging
@@ -2983,143 +2984,135 @@ def cl_sync(project_path: str, regulation: str = "") -> str:
     return result
 
 
-def _safely_derive_with_timeout(fn, *args, timeout_sec: float = 3.0, slog=None):
-    """Run a git-subprocess-using helper with a HARD timeout via daemon thread.
+async def _async_run_git_in_server(
+    *args: str, cwd: str, timeout: float = 5.0,
+) -> tuple[int, str]:
+    """Run `git <args>` via asyncio.create_subprocess_exec.
 
-    Why this wrapper exists (per memory bug_mcp_tool_hang.md):
-        On Windows MCP stdio context, ANY git subprocess can hang 5-7
-        minutes because the subprocess child handle interacts badly
-        with the asyncio event loop — `subprocess.run(timeout=N)` does
-        NOT fire reliably.
+    Hypothesis C verified 2026-05-06 (commit `f9d2698`): asyncio
+    subprocess on Windows uses ProactorEventLoop's IOCP machinery for
+    child handles, which is NOT subject to the documented MCP +
+    subprocess.run race (memory bug_mcp_tool_hang.md). Replaces the
+    prior `subprocess.run` + daemon-thread-leak workaround with a
+    clean async/await.
 
-    Why DAEMON THREAD specifically (not ThreadPoolExecutor):
-        First implementation used `concurrent.futures.ThreadPoolExecutor`
-        with `.result(timeout=N)`. The `.result(timeout)` DID fire — but
-        exiting the `with executor:` block calls `shutdown(wait=True)`
-        by default, which BLOCKS waiting for the stuck git subprocess to
-        complete. Result: tool hangs anyway, just inside a different
-        function.
-
-        Daemon thread is the bulletproof fix:
-        - We start a daemon thread that runs the git call
-        - We wait on a `threading.Event` with a timeout
-        - On timeout: return None and DON'T join the thread (it stays
-          stuck in git subprocess until Windows eventually reaps it)
-        - Daemon flag = the leaked thread doesn't prevent Python exit
-
-        Worst case: 1 leaked daemon thread per timeout. Acceptable —
-        a hang every cl_scan_all is much worse than a leaked thread
-        that gets cleaned up at Python exit.
-
-    Args:
-        fn: function to call (e.g. _derive_head_commit_sha)
-        args: positional args to pass
-        timeout_sec: hard timeout in seconds (default 3 — git ops are
-            ~100ms when healthy; 3s is generous slack for cold disk)
-        slog: optional logger for warning on timeout/error
-
-    Returns:
-        Whatever fn returns, or None on timeout/error.
+    Returns (returncode, stdout) — stderr discarded for brevity.
+    Returns (-1, "") on timeout / spawn error.
     """
-    import threading
-
-    holder = {"result": None, "error": None}
-    done = threading.Event()
-
-    def _runner():
+    import subprocess as _sp
+    creationflags = 0
+    if hasattr(_sp, "CREATE_NO_WINDOW"):
+        creationflags = _sp.CREATE_NO_WINDOW
+    try:
+        proc = await asyncio.create_subprocess_exec(
+            "git", *args,
+            cwd=cwd,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+            creationflags=creationflags,
+            env={**os.environ, "GIT_TERMINAL_PROMPT": "0"},
+        )
+    except (FileNotFoundError, OSError):
+        return -1, ""
+    try:
+        stdout, _stderr = await asyncio.wait_for(
+            proc.communicate(), timeout=timeout,
+        )
+    except asyncio.TimeoutError:
         try:
-            holder["result"] = fn(*args)
-        except Exception as e:
-            holder["error"] = e
-        finally:
-            done.set()
+            proc.kill()
+            await proc.communicate()
+        except Exception:
+            pass
+        return -1, ""
+    return (
+        proc.returncode if proc.returncode is not None else -1,
+        stdout.decode("utf-8", errors="replace"),
+    )
 
-    t = threading.Thread(target=_runner, daemon=True, name=f"safe-git-{fn.__name__}")
-    t.start()
 
-    if not done.wait(timeout=timeout_sec):
-        # Timed out — leak the daemon thread, return None
+def _run_async_git_sync(args: list[str], cwd: str, timeout: float = 5.0) -> tuple[int, str]:
+    """Sync-context wrapper for `_async_run_git_in_server`.
+
+    Forces WindowsProactorEventLoopPolicy on win32 (default in Python
+    3.8+ but be defensive on edge environments). asyncio.run() creates
+    a fresh loop per call — fine because we're called from FastMCP's
+    sync worker (to_thread.run_sync), not the MCP event loop itself.
+    """
+    try:
+        if sys.platform == "win32" and hasattr(
+            asyncio, "WindowsProactorEventLoopPolicy",
+        ):
+            try:
+                asyncio.set_event_loop_policy(
+                    asyncio.WindowsProactorEventLoopPolicy()
+                )
+            except Exception:
+                pass
+        return asyncio.run(
+            _async_run_git_in_server(*args, cwd=cwd, timeout=timeout),
+        )
+    except Exception:
+        return -1, ""
+
+
+# Legacy compat — `_safely_derive_with_timeout` was the daemon-thread
+# workaround for the MCP+subprocess.run race. asyncio bypasses the race
+# entirely (commit f9d2698), so derivers no longer need a hard-timeout
+# wrapper. Keep the name as a thin pass-through so existing callers
+# (cl_scan_all line ~1183-1184) keep working without edit churn.
+def _safely_derive_with_timeout(fn, *args, timeout_sec: float = 5.0, slog=None):
+    """Pass-through to fn(*args). Retained for caller backward compat
+    after the asyncio refactor (2026-05-06). The daemon-thread + leak
+    workaround is no longer needed because asyncio bypasses the race.
+    """
+    try:
+        return fn(*args)
+    except Exception as e:
         if slog:
-            slog.warning(
-                f"{fn.__name__}: hard timeout after {timeout_sec}s "
-                f"(MCP stdio + git subprocess race) — leaking thread, returning None"
-            )
+            slog.warning(f"{fn.__name__}: error {type(e).__name__}: {e}")
         return None
-
-    if holder["error"] is not None:
-        if slog:
-            slog.warning(
-                f"{fn.__name__}: error {type(holder['error']).__name__}: {holder['error']}"
-            )
-        return None
-
-    return holder["result"]
 
 
 def _derive_head_commit_sha(project_path: str) -> str | None:
     """Return current git HEAD SHA (40-char lowercase hex), or None.
 
-    Used as the stale-detection anchor (Track 4a). Safe in MCP: timeout=2,
-    GIT_TERMINAL_PROMPT=0, CREATE_NO_WINDOW. Returns None on any error so
-    cl_sync still proceeds when the project isn't a git repo.
+    Uses asyncio subprocess (no MCP+subprocess.run race per
+    bug_mcp_tool_hang.md hypothesis C verification 2026-05-06).
+    Returns None on any error so cl_sync still proceeds when the
+    project isn't a git repo.
     """
-    import subprocess
-    try:
-        flags = {
-            "capture_output": True,
-            "text": True,
-            "cwd": project_path,
-            "timeout": 2,
-            "env": {**os.environ, "GIT_TERMINAL_PROMPT": "0"},
-        }
-        if hasattr(subprocess, "CREATE_NO_WINDOW"):
-            flags["creationflags"] = subprocess.CREATE_NO_WINDOW
-        r = subprocess.run(["git", "rev-parse", "HEAD"], **flags)
-        if r.returncode != 0:
-            return None
-        sha = r.stdout.strip()
-        if len(sha) == 40 and all(c in "0123456789abcdef" for c in sha):
-            return sha
+    rc, out = _run_async_git_sync(
+        ["rev-parse", "HEAD"], cwd=project_path, timeout=5.0,
+    )
+    if rc != 0:
         return None
-    except (subprocess.TimeoutExpired, FileNotFoundError, OSError):
-        return None
+    sha = out.strip()
+    if len(sha) == 40 and all(c in "0123456789abcdef" for c in sha):
+        return sha
+    return None
 
 
 def _derive_first_commit_sha(project_path: str) -> str | None:
     """Return the oldest root commit SHA (40-char lowercase hex), or None.
 
-    Used as the project-identity fingerprint (v4 §1.2/§1.3). `git rev-list
-    --max-parents=0 HEAD` lists root commits; for the single-root case
-    (typical), that's one line. For multi-root repos (grafted, unrelated
-    histories merged), we take the first line for determinism — any stable
-    selector works since the dashboard compares reported-vs-stored, not
-    across scanners.
+    Uses asyncio subprocess (no MCP+subprocess.run race). For multi-
+    root repos we take the first line for determinism.
     """
-    import subprocess
-    try:
-        flags = {
-            "capture_output": True,
-            "text": True,
-            "cwd": project_path,
-            "timeout": 2,
-            "env": {**os.environ, "GIT_TERMINAL_PROMPT": "0"},
-        }
-        if hasattr(subprocess, "CREATE_NO_WINDOW"):
-            flags["creationflags"] = subprocess.CREATE_NO_WINDOW
-        r = subprocess.run(
-            ["git", "rev-list", "--max-parents=0", "HEAD"], **flags,
-        )
-        if r.returncode != 0:
-            return None
-        lines = [ln for ln in r.stdout.splitlines() if ln.strip()]
-        if not lines:
-            return None
-        sha = lines[0].strip()
-        if len(sha) == 40 and all(c in "0123456789abcdef" for c in sha):
-            return sha
+    rc, out = _run_async_git_sync(
+        ["rev-list", "--max-parents=0", "HEAD"],
+        cwd=project_path,
+        timeout=5.0,
+    )
+    if rc != 0:
         return None
-    except (subprocess.TimeoutExpired, FileNotFoundError, OSError):
+    lines = [ln for ln in out.splitlines() if ln.strip()]
+    if not lines:
         return None
+    sha = lines[0].strip()
+    if len(sha) == 40 and all(c in "0123456789abcdef" for c in sha):
+        return sha
+    return None
 
 
 def _format_fingerprint_warning(
