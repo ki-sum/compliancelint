@@ -97,8 +97,34 @@ def test_hash_matches_text(recitals):
 
 
 def test_pdf_source_present():
-    """PDF canonical source file must exist."""
-    assert PDF_PATH.is_file(), f"missing canonical PDF: {PDF_PATH}"
+    """PDF canonical source file must exist (when downloaded locally).
+
+    The PDF is git-ignored per .gitignore:50 ("Legal source documents,
+    copyrighted, not distributable" — OPOCE typesetting copyright on
+    EUR-Lex PDF renders). It's downloaded by developers manually and
+    is also not present on CI runners.
+
+    When PDF is absent, this test skips with a clear remediation hint.
+    The 4 lighter sister tests in this file (count, source_quote,
+    sha256 anchor, no-pypdf-artifacts) still validate the baseline
+    JSON Source Lock contract from `feedback_recital_text_no_retype.md`
+    without needing the PDF — those run unconditionally everywhere.
+
+    The deeper PDF-hash-resampling check
+    (test_pdf_extraction_matches_baseline_sample, line 106) is gated
+    by COMPLIANCELINT_AUDIT_TOOLS env var and skips identically; this
+    test mirrors that pattern so the file behaves consistently.
+    """
+    if not PDF_PATH.is_file():
+        pytest.skip(
+            f"Canonical PDF not present at {PDF_PATH} — gitignored per "
+            f".gitignore:50 (legal/redistribution policy). To run "
+            f"locally: download from EUR-Lex CELEX:32024R1689 "
+            f"(https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri="
+            f"OJ:L_202401689) into docs/sources/. The 4 sister tests "
+            f"in this file validate the baseline JSON contract without "
+            f"needing the PDF."
+        )
     # Sanity: PDF should be ~2.5 MB (Regulation (EU) 2024/1689)
     assert PDF_PATH.stat().st_size > 1_000_000, "PDF suspiciously small — wrong file?"
 
