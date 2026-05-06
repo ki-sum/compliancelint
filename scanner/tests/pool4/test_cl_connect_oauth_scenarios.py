@@ -107,47 +107,17 @@ def _purge_connect_token(db_path: str, token: str) -> None:
 
 
 def _resolve_db_path() -> Optional[str]:
-    """Return the dev DB path from env or skip the test."""
-    return os.environ.get(DB_PATH_ENV)
+    """Return the dev DB path from env or skip the test.
 
-
-def _resolve_connect_tokens_db_path() -> Optional[str]:
-    """Return the DB path that the dev server's connect-tokens lib
-    actually writes to.
-
-    Discovered drift (2026-05-06): the SaaS dashboard's connect-tokens
-    module hardcodes ``path.join(process.cwd(), "data",
-    "compliancelint.db")`` and does NOT honor ``DATABASE_URL``, while
-    the rest of the dashboard (db/index.ts) does. The dev server is
-    typically launched from a standalone build dir, so its
-    ``connect_tokens`` rows go to
-    ``<standalone>/data/compliancelint.db``, NOT the ``DATABASE_URL``
-    DB that ``POOL4_DB_PATH`` points at.
-
-    The drift is a real dashboard bug (the lib's docstring promises
-    "same DB as the rest of the app" but the code diverges). Fixing
-    it requires a dashboard rebuild + server restart, which is too
-    big a blast radius for this Pool 4 cell. Tracked separately;
-    this helper encodes the observed behavior:
-
-      <repo>/<dashboard>/data/compliancelint.db
-        ->  <repo>/<dashboard>/.next/standalone/data/compliancelint.db
+    Pre-2026-05-06 a sibling helper (`_resolve_connect_tokens_db_path`)
+    pointed at a different file because the SaaS dashboard's
+    connect-tokens lib didn't honor DATABASE_URL — connect_tokens
+    rows lived under the standalone build dir while the rest of the
+    DB lived where DATABASE_URL pointed. That drift was fixed in the
+    same commit that simplified this helper; both connect_tokens and
+    the rest of the dashboard tables now share the DATABASE_URL DB.
     """
-    db_url = os.environ.get("POOL4_CONNECT_TOKENS_DB_PATH")
-    if db_url:
-        return db_url
-    base = _resolve_db_path()
-    if not base:
-        return None
-    base_path = Path(base)
-    if base_path.parent.name == "data":
-        candidate = (
-            base_path.parent.parent / ".next" / "standalone" / "data"
-            / base_path.name
-        )
-        if candidate.is_file():
-            return str(candidate)
-    return base
+    return os.environ.get(DB_PATH_ENV)
 
 
 def _resolve_browser_env() -> dict[str, str]:
@@ -172,9 +142,9 @@ def test_oauth_callback_success(
     if not server_reachable:
         pytest.skip("server :3000 not ready")
 
-    db_path = _resolve_connect_tokens_db_path()
+    db_path = _resolve_db_path()
     if not db_path:
-        pytest.skip(f"{DB_PATH_ENV} not set or connect_tokens DB unresolvable")
+        pytest.skip(f"{DB_PATH_ENV} not set")
 
     project_dir = tmp_path / "project"
     project_dir.mkdir()
@@ -260,9 +230,9 @@ def test_oauth_canceled(
     if not server_reachable:
         pytest.skip("server :3000 not ready")
 
-    db_path = _resolve_connect_tokens_db_path()
+    db_path = _resolve_db_path()
     if not db_path:
-        pytest.skip(f"{DB_PATH_ENV} not set or connect_tokens DB unresolvable")
+        pytest.skip(f"{DB_PATH_ENV} not set")
 
     project_dir = tmp_path / "project"
     project_dir.mkdir()
@@ -350,9 +320,9 @@ def test_repo_binding_race(
     if not server_reachable:
         pytest.skip("server :3000 not ready")
 
-    db_path = _resolve_connect_tokens_db_path()
+    db_path = _resolve_db_path()
     if not db_path:
-        pytest.skip(f"{DB_PATH_ENV} not set or connect_tokens DB unresolvable")
+        pytest.skip(f"{DB_PATH_ENV} not set")
 
     suffix = str(int(time.time() * 1000) % 1_000_000_000)
 
