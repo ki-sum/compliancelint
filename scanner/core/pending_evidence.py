@@ -20,11 +20,13 @@ or hitting the network. HTTP transport lives in server.py.
 """
 from __future__ import annotations
 
+import asyncio
 import base64
 import hashlib
 import json
 import os
 import subprocess
+import sys
 import zlib
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -293,45 +295,146 @@ def _read_commit_parents(git_dir: str, sha: str) -> list[str]:
         return []
 
 
+# ── asyncio subprocess wrapper (Hypothesis C, 2026-05-06) ──────────────
+#
+# Hypothesis: the documented MCP+subprocess race is specific to the
+# `subprocess.run()` child-handle management. asyncio's
+# `create_subprocess_exec` uses a different OS mechanism — on Windows
+# Python 3.8+ uses ProactorEventLoop with IOCP for child handle
+# bookkeeping. If the race is handle-cleanup specific (per bug doc
+# language), Proactor's I/O completion ports may not trigger it.
+#
+# This wrapper isolates the EXPERIMENT: try asyncio first, validates
+# whether asyncio bypasses the race. If it works, we get the
+# correctness of git's native commands (pack file support, exact
+# commit-walking) without subprocess hang. If it doesn't work, we
+# fall back to pure-Python BFS over loose objects.
+
+
+async def _async_run_git(
+    *args: str,
+    cwd: str,
+    timeout: float,
+) -> tuple[int, str, str]:
+    """Run `git <args>` via asyncio.create_subprocess_exec.
+
+    Returns (returncode, stdout, stderr). Returns (-1, "", "timeout")
+    if the wait_for fires (vs subprocess.run's timeout which doesn't
+    fire under the MCP race).
+    """
+    creationflags = 0
+    if hasattr(subprocess, "CREATE_NO_WINDOW"):
+        creationflags = subprocess.CREATE_NO_WINDOW
+    try:
+        proc = await asyncio.create_subprocess_exec(
+            "git", *args,
+            cwd=cwd,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+            creationflags=creationflags,
+            env={**os.environ, "GIT_TERMINAL_PROMPT": "0"},
+        )
+    except (FileNotFoundError, OSError) as e:
+        return -1, "", f"spawn-error: {e}"
+    try:
+        stdout, stderr = await asyncio.wait_for(
+            proc.communicate(), timeout=timeout,
+        )
+    except asyncio.TimeoutError:
+        try:
+            proc.kill()
+            await proc.communicate()
+        except Exception:
+            pass
+        return -1, "", "timeout"
+    return (
+        proc.returncode if proc.returncode is not None else -1,
+        stdout.decode("utf-8", errors="replace"),
+        stderr.decode("utf-8", errors="replace"),
+    )
+
+
+def _run_async_git_from_sync(
+    args: list[str], cwd: str, timeout: float,
+) -> tuple[int, str, str]:
+    """Run `_async_run_git` from a sync caller.
+
+    asyncio.run() creates a fresh event loop. On Windows Python 3.8+
+    the default policy uses ProactorEventLoop which supports
+    subprocess. We're called from FastMCP's `to_thread.run_sync`
+    worker (sync context), so creating a new loop here is safe.
+
+    Falls back to (-1, "", err) on any unexpected failure so callers
+    can degrade gracefully.
+    """
+    try:
+        # Windows-specific: ensure ProactorEventLoop policy when running
+        # in a fresh thread (asyncio.run usually picks the right one,
+        # but be defensive on older Pythons).
+        if sys.platform == "win32" and hasattr(
+            asyncio, "WindowsProactorEventLoopPolicy",
+        ):
+            try:
+                asyncio.set_event_loop_policy(
+                    asyncio.WindowsProactorEventLoopPolicy()
+                )
+            except Exception:
+                pass
+        return asyncio.run(_async_run_git(*args, cwd=cwd, timeout=timeout))
+    except Exception as e:
+        return -1, "", f"async-run-error: {type(e).__name__}: {e}"
+
+
 def is_sha_on_remote(
     project_path: str,
     sha: str,
-    timeout: float = 0,  # kept for backward compat; ignored in pure-Python
+    timeout: float = 10.0,
     *,
     max_depth: int = 200,
 ) -> bool:
     """Return True if `sha` is reachable from any remote-tracking branch.
 
-    Pure-Python implementation (NO subprocess) — bypasses the documented
-    MCP+stdio race. Walks the commit graph from each refs/remotes/*
-    tip via reading loose .git/objects entries. BFS bounded by
-    `max_depth` (default 200 commits — generous for "just pushed N
-    commits" while keeping pathological repos fast).
+    HYPOTHESIS C (2026-05-06): use asyncio.create_subprocess_exec to
+    bypass the subprocess.run + MCP child-handle race documented in
+    bug_mcp_tool_hang.md. asyncio's IOCP-backed ProactorEventLoop on
+    Windows manages child handles differently from subprocess.run —
+    if the race is handle-cleanup specific (per bug doc), this
+    bypasses it.
 
-    Why this exists (Problem 1 / §4.6 fix 2026-04-21): SaaS cannot
-    verify a commit reached the remote (no third-party OAuth tokens —
-    hard rule #1). cl_sync runs in the user's working tree, so it CAN
-    check by reading local refs/remotes/* . Without this guard,
-    sync-confirm would fire for local-only commits and SaaS would
-    record `committed_at_sha` for shas that never reached the remote,
-    breaking audit trail (regulator audit cannot reproduce, laptop
-    loss = evidence gone but dashboard says committed).
+    Strategy: try asyncio `git branch -r --contains <sha>` first.
+    If it returns within timeout (10s default), use the result.
+    If it times out, fall back to pure-Python BFS over loose objects
+    (incomplete coverage — packs miss — but no race either).
 
-    `timeout` arg retained for backward compat with callers but
-    ignored: pure-Python file reads are bounded by `max_depth`.
+    The pure-Python fallback handles the case where asyncio also has
+    the race (i.e. hypothesis C is wrong) — the cell still passes
+    via the pure-Python path, just degraded to loose-object BFS.
+
+    `max_depth` only affects the pure-Python fallback path.
     """
     if not is_valid_git_sha(sha):
         return False
+
+    # Hypothesis C primary: asyncio subprocess git (covers loose + pack).
+    rc, out, err = _run_async_git_from_sync(
+        ["branch", "-r", "--contains", sha],
+        cwd=project_path,
+        timeout=timeout,
+    )
+    if rc == 0:
+        return bool(out.strip())
+    # rc == -1 means timeout or spawn error → fall through to pure-Python
+    # rc > 0 means git ran but said sha invalid / repo broken → treat as False
+
+    # Pure-Python fallback (loose objects only).
     git_dir = _resolve_git_dir(project_path)
     if git_dir is None:
         return False
     tips = _iter_remote_ref_tips(git_dir)
     if not tips:
         return False
-    # Fast path: target IS a remote tip.
     if sha in tips:
         return True
-    # BFS from each tip until we find target or exhaust depth.
     visited: set[str] = set()
     frontier: list[str] = list(tips)
     for _ in range(max_depth):
@@ -354,37 +457,43 @@ def is_sha_on_remote(
 def get_committed_sha(
     project_path: str,
     repo_path: str,
-    timeout: float = 0,  # kept for backward compat; ignored
+    timeout: float = 10.0,
 ) -> Optional[str]:
-    """Return a commit sha for `repo_path` that is on the remote, or None.
+    """Return the most-recent-commit-that-touched-repo_path sha if it
+    is reachable from a remote-tracking branch, else None.
 
-    Pure-Python (NO subprocess) per the MCP-stdio rule. Strategy:
+    HYPOTHESIS C primary: asyncio `git log -1 --pretty=%H -- <path>`
+    gets the precise commit-touching-path (handles full git history
+    including pack files). Then is_sha_on_remote() validates it's on
+    the remote.
 
-      1. Read .git/HEAD → ref name → sha (or detached HEAD sha).
-      2. Check is_sha_on_remote(HEAD).
-      3. If true, return HEAD; else None.
-
-    SIMPLIFICATION vs the prior `git log -1 -- <path>` impl: we no
-    longer walk the commit graph to find the precise commit that
-    touched `repo_path`. We return HEAD when HEAD is on remote.
-    Rationale: in the calling context (pull_pending_evidence's confirm
-    flow) the user has just been instructed to `git add <repo_path>
-    && git commit && git push`. After that flow HEAD == the commit
-    that just added the file. If the user instead made a different
-    commit at HEAD (file uncommitted), the caller's prior file-on-
-    disk vs expected_sha check still passes — but the audit anchor
-    we record will be HEAD instead of the (non-existent) commit that
-    touched repo_path. This preserves the §4.6 invariant ("never
-    record a sha that's not on remote") while accepting that the
-    recorded sha may not be the historically-most-recent commit
-    that touched the file. Trade-off accepted because:
-      a) the dashboard only uses committed_at_sha as the audit anchor
-         for "user pushed evidence" — it does NOT rely on commit-
-         to-path provenance;
-      b) the alternative (walking trees in pure Python to find the
-         commit-that-touched-path) is hundreds of LOC and orthogonal
-         to the audit invariant.
+    If asyncio times out / fails, fall back to a SIMPLIFIED pure-
+    Python path: read .git/HEAD, return HEAD if HEAD is on remote.
+    The simplification trades precise commit-touching-path lookup
+    for HEAD-only lookup. Rationale: in the calling context
+    (pull_pending_evidence's confirm flow) the user has just been
+    instructed to `git add <repo_path> && git commit && git push`,
+    so HEAD == the commit that just added the file in the typical
+    case. The §4.6 invariant ("never record a sha that's not on
+    remote") still holds in both paths.
     """
+    # Hypothesis C primary path: asyncio git log → precise sha for path.
+    rc, out, _err = _run_async_git_from_sync(
+        ["log", "-1", "--pretty=format:%H", "--", repo_path],
+        cwd=project_path,
+        timeout=timeout,
+    )
+    if rc == 0:
+        sha = out.strip()
+        if is_valid_git_sha(sha):
+            if is_sha_on_remote(project_path, sha, timeout=timeout):
+                return sha
+            return None
+        # rc==0 with empty output → file never committed
+        return None
+    # rc == -1 → asyncio timed out / hit the race / spawn error → fallback.
+
+    # Pure-Python fallback: read HEAD, return HEAD if on remote.
     git_dir = _resolve_git_dir(project_path)
     if git_dir is None:
         return None
@@ -399,7 +508,6 @@ def get_committed_sha(
     head_sha: Optional[str] = None
     if head_content.startswith("ref: "):
         ref = head_content[len("ref: "):].strip()
-        # Try loose ref file
         ref_file = os.path.join(git_dir, ref)
         if os.path.isfile(ref_file):
             try:
@@ -409,7 +517,6 @@ def get_committed_sha(
                     head_sha = candidate
             except OSError:
                 pass
-        # Fall back to packed-refs
         if head_sha is None:
             packed = _read_packed_refs(git_dir)
             candidate = packed.get(ref)
