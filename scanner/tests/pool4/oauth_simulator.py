@@ -66,55 +66,64 @@ class OAuthSimulator:
                    )"""
             )
             conn.commit()
-        self._baseline: set[str] = self._snapshot_tokens()
+        # Time-anchor: only consider rows whose created_at is at or
+        # after this simulator's birth time. Anchors at -100ms to
+        # tolerate clock skew between this Python process and the
+        # node dashboard process. Replaces the older "diff against a
+        # baseline token set" approach which was brittle when prior
+        # failed runs left stale empty-api_key rows in the DB.
+        self.created_at_threshold_ms: int = int(time.time() * 1000) - 100
+        # Tokens this simulator has already returned/acted on, so
+        # ``wait_for_n_pending_tokens`` calls don't double-count
+        # rows that ``wait_for_pending_token`` already consumed.
+        self._consumed: set[str] = set()
 
-    def _snapshot_tokens(self) -> set[str]:
+    def _query_new_pending(self) -> list[tuple[str, int]]:
+        """Return (token, created_at_ms) for pending rows newer than
+        this simulator's anchor and not yet consumed."""
         with sqlite3.connect(self.db_path) as conn:
-            return {
-                row[0]
-                for row in conn.execute(
-                    "SELECT token FROM connect_tokens"
-                ).fetchall()
-            }
+            rows = conn.execute(
+                "SELECT token, created_at FROM connect_tokens "
+                "WHERE api_key = '' AND created_at >= ? "
+                "ORDER BY created_at ASC",
+                (self.created_at_threshold_ms,),
+            ).fetchall()
+        return [(r[0], r[1]) for r in rows if r[0] not in self._consumed]
 
     def wait_for_pending_token(
         self,
         timeout: float = 15.0,
         poll_interval: float = 0.2,
     ) -> str:
-        """Poll until exactly one new pending row appears (api_key='')
-        whose token wasn't in the baseline. Returns the token. Raises
+        """Poll until exactly one new pending row appears (api_key='',
+        created_at >= simulator anchor). Returns the token. Raises
         OAuthSimulatorError on timeout or on more than one new row
         (parallel-test contamination — caller should ensure isolation).
         """
         deadline = time.monotonic() + timeout
         last_seen: list[str] = []
         while time.monotonic() < deadline:
-            with sqlite3.connect(self.db_path) as conn:
-                rows = conn.execute(
-                    "SELECT token FROM connect_tokens "
-                    "WHERE api_key = '' "
-                    "ORDER BY created_at DESC"
-                ).fetchall()
-            new = [r[0] for r in rows if r[0] not in self._baseline]
+            new = self._query_new_pending()
             if len(new) == 1:
-                # Add to baseline so subsequent waits don't double-pick.
-                self._baseline.add(new[0])
-                return new[0]
+                token = new[0][0]
+                self._consumed.add(token)
+                return token
             if len(new) > 1:
                 raise OAuthSimulatorError(
                     f"more than one new pending token observed "
                     f"({len(new)}); test isolation broken — only one "
                     f"cl_connect should be in flight per simulator. "
-                    f"tokens={new[:5]}"
+                    f"tokens={[t for t, _ in new][:5]}"
                 )
-            last_seen = [r[0] for r in rows]
+            last_seen = [t for t, _ in new]
             time.sleep(poll_interval)
         raise OAuthSimulatorError(
             f"timed out after {timeout}s waiting for new pending "
-            f"connect_tokens row. The scanner's webbrowser hook may "
-            f"not be GET-ing /api/v1/auth/connect. Pending rows in "
-            f"DB at timeout: {last_seen[:5]}"
+            f"connect_tokens row (anchor "
+            f"created_at>={self.created_at_threshold_ms}). The "
+            f"scanner's webbrowser hook may not be GET-ing "
+            f"/api/v1/auth/connect. New pending rows seen at "
+            f"timeout: {last_seen[:5]}"
         )
 
     def wait_for_n_pending_tokens(
@@ -123,9 +132,10 @@ class OAuthSimulator:
         timeout: float = 20.0,
         poll_interval: float = 0.2,
     ) -> list[str]:
-        """Wait until exactly N new pending rows appear (api_key='').
-        Returns the tokens in oldest-first order so caller can pair
-        them with concurrent cl_connect invocations deterministically.
+        """Wait until exactly N new pending rows appear (api_key='',
+        created_at >= simulator anchor). Returns the tokens in
+        oldest-first order so caller can pair them with concurrent
+        cl_connect invocations deterministically.
 
         Used by the repo_binding_race cell where two cl_connects fire
         in parallel and both should be observed before either is
@@ -133,26 +143,24 @@ class OAuthSimulator:
         """
         deadline = time.monotonic() + timeout
         while time.monotonic() < deadline:
-            with sqlite3.connect(self.db_path) as conn:
-                rows = conn.execute(
-                    "SELECT token, created_at FROM connect_tokens "
-                    "WHERE api_key = '' "
-                    "ORDER BY created_at ASC"
-                ).fetchall()
-            new = [r for r in rows if r[0] not in self._baseline]
+            new = self._query_new_pending()
             if len(new) == n:
-                tokens = [r[0] for r in new]
-                self._baseline.update(tokens)
+                tokens = [t for t, _ in new]
+                self._consumed.update(tokens)
                 return tokens
             if len(new) > n:
                 raise OAuthSimulatorError(
                     f"observed {len(new)} new tokens, expected {n}. "
-                    f"Sibling test bleed-over? tokens={[r[0] for r in new][:6]}"
+                    f"Sibling test bleed-over? "
+                    f"tokens={[t for t, _ in new][:6]}"
                 )
             time.sleep(poll_interval)
+        # Surface what we DID see at timeout for debuggability.
+        last = self._query_new_pending()
         raise OAuthSimulatorError(
             f"timed out after {timeout}s waiting for {n} new pending "
-            f"connect_tokens rows; got {len(new)}"
+            f"connect_tokens rows; got {len(last)} "
+            f"(tokens={[t for t, _ in last][:6]})"
         )
 
     def complete(self, token: str, api_key: str, email: str) -> None:
