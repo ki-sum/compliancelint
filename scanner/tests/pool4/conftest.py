@@ -32,6 +32,7 @@ fixture-builder hooks, persona orphan-row teardown).
 """
 from __future__ import annotations
 
+import os
 import socket
 import time
 import urllib.error
@@ -42,11 +43,14 @@ import pytest
 
 from .fixtures import (
     PERSONAS,
+    REPO_ROOT,
     FixtureError,
     PersonaCreds,
     assert_no_committed_dev_fields,
     manual_fixture_dir,
 )
+
+
 from .mcp_client import McpStdioClient
 from .saas_introspection import (
     SaasIntrospectionError,
@@ -54,6 +58,17 @@ from .saas_introspection import (
     lookup_user_id_by_email,
     open_readonly,
 )
+
+
+# Default POOL4_CELLS_DIR to the canonical in-repo cells dir when present
+# in this checkout. Public-only checkouts (no internal cell tree) leave
+# the env unset, and the smoke runner skips cleanly via the existing
+# remediation message. Explicit env var always wins.
+_DEFAULT_CELLS_DIR = REPO_ROOT.joinpath(
+    *("private", "audit", "pool4", "cells"),
+)
+if not os.environ.get("POOL4_CELLS_DIR") and _DEFAULT_CELLS_DIR.is_dir():
+    os.environ["POOL4_CELLS_DIR"] = str(_DEFAULT_CELLS_DIR)
 
 
 if TYPE_CHECKING:

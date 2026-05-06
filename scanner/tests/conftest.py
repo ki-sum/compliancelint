@@ -12,6 +12,18 @@ SCANNER_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, SCANNER_ROOT)
 
 
+# Default COMPLIANCELINT_AUDIT_TOOLS to the in-repo audit-tools dir when
+# running inside an internal-repo checkout. Public-repo-only checkouts
+# leave it unset, and tests that need it (e.g. the deep PDF re-extract
+# in tests/data/test_recitals_source_lock.py) skip cleanly with a
+# remediation message. Explicit env var still wins.
+_DEFAULT_AUDIT_TOOLS = os.path.normpath(
+    os.path.join(SCANNER_ROOT, "..", "private", "scripts", "eu_official_alignment_audit")
+)
+if not os.environ.get("COMPLIANCELINT_AUDIT_TOOLS") and os.path.isdir(_DEFAULT_AUDIT_TOOLS):
+    os.environ["COMPLIANCELINT_AUDIT_TOOLS"] = _DEFAULT_AUDIT_TOOLS
+
+
 @pytest.fixture(autouse=True)
 def minimal_ai_context():
     """Provide a minimal AI context for all tests.
