@@ -90,6 +90,12 @@ class EvidenceRow:
     repo_path: str
     health_status: str = "ok"          # current value server-side, for logging
     content_sha256: str = ""
+    # Surfaced by the SaaS GET /evidence endpoint; used by the orphaned-
+    # commit check so a force-push that rewrites the commit out of any
+    # remote-tracking ref flips health_status ok -> broken_link even
+    # though the file is still on disk.
+    commit_status: str = ""            # "" | "pending_commit" | "committed"
+    committed_at_sha: str = ""         # 40-char hex when commit_status == "committed"
 
 
 @dataclass
@@ -133,17 +139,53 @@ def build_reports(
     rows: list[EvidenceRow],
     checked_at_sha: Optional[str],
     checked_at: Optional[str] = None,
+    *,
+    is_sha_orphaned: Optional[Callable[[str, str], bool]] = None,
 ) -> list[HealthReport]:
-    """Check file existence per row, return reports. Pure function."""
+    """Check file existence + (optional) commit-reachability per row.
+
+    Two failure modes flip a row to broken_link:
+
+    1. File-on-disk missing — `check_file_exists_secure` returns False.
+    2. File-on-disk present BUT `commit_status == "committed"` AND
+       `committed_at_sha` is no longer reachable from any remote-tracking
+       ref. Caused by `git push --force` rewriting history out from
+       under previously-committed evidence. The row's `committed_at_sha`
+       is stale and the audit trail no longer points at a recoverable
+       commit.
+
+    `is_sha_orphaned(project_path, sha)` should return True iff the
+    project has at least one remote-tracking ref AND the sha is not
+    reachable from any of them. Repos without remotes (local-only)
+    must return False — there's no remote to compare against, and we
+    can't tell the difference between "never pushed" and "force-pushed
+    away". The wrapper in scanner/core/pending_evidence.py
+    (`is_committed_orphaned`) implements this correctly.
+
+    Pure function — `is_sha_orphaned` is the ONLY side-effecting hook
+    (it shells out to git via the wrapper). Default None disables the
+    orphaned-commit check entirely, keeping unit tests fast.
+    """
     ts = checked_at or datetime.now(timezone.utc).isoformat()
     out: list[HealthReport] = []
     for row in rows:
         exists = check_file_exists_secure(project_path, row.repo_path)
+        if not exists:
+            health = "broken_link"
+        elif (
+            is_sha_orphaned is not None
+            and row.commit_status == "committed"
+            and row.committed_at_sha
+            and is_sha_orphaned(project_path, row.committed_at_sha)
+        ):
+            health = "broken_link"
+        else:
+            health = "ok"
         out.append(
             HealthReport(
                 evidence_item_id=row.evidence_item_id,
                 repo_path=row.repo_path,
-                health_status="ok" if exists else "broken_link",
+                health_status=health,
                 checked_at_sha=checked_at_sha,
                 checked_at=ts,
             )
@@ -168,16 +210,25 @@ def run_broken_link_check(
     checked_at: Optional[str] = None,
     max_pages: int = 50,
     logger=None,
+    *,
+    is_sha_orphaned: Optional[Callable[[str, str], bool]] = None,
 ) -> CheckSummary:
     """End-to-end broken_link sweep. Pure orchestration — HTTP injected.
 
     1. Page through GET /api/v1/repos/{repoId}/evidence?storage_kind=git_path
-    2. Check file existence for each row
+    2. Check file existence for each row, plus (when `is_sha_orphaned`
+       is provided) commit-reachability for committed rows
     3. Single batch POST to /evidence-health with all reports
     4. Return summary counting ok/broken/transitioned/unchanged
 
     `max_pages` is a safety ceiling; at limit=500 rows/page that's 25,000
     rows cap, far above any realistic repo.
+
+    `is_sha_orphaned` is plumbed through to ``build_reports`` — see its
+    docstring. Default None preserves pre-2026-05-06 behavior (file-only
+    check); the cl_sync glue passes
+    ``pending_evidence.is_committed_orphaned`` to enable force-push
+    detection in production.
     """
     summary = CheckSummary()
 
@@ -221,6 +272,8 @@ def run_broken_link_check(
                 repo_path=rp,
                 health_status=row.get("health_status") or "ok",
                 content_sha256=row.get("content_sha256") or "",
+                commit_status=row.get("commit_status") or "",
+                committed_at_sha=row.get("committed_at_sha") or "",
             ))
         cursor = payload.get("next_cursor")
         if not cursor:
@@ -230,8 +283,11 @@ def run_broken_link_check(
         _log("info", "broken_link: no git_path evidence to check")
         return summary
 
-    # Pass 2: file-existence check per row.
-    reports = build_reports(project_path, rows, checked_at_sha, checked_at)
+    # Pass 2: file-existence + (optional) commit-reachability check per row.
+    reports = build_reports(
+        project_path, rows, checked_at_sha, checked_at,
+        is_sha_orphaned=is_sha_orphaned,
+    )
     summary.checked = len(reports)
     summary.ok = sum(1 for r in reports if r.health_status == "ok")
     summary.broken = sum(1 for r in reports if r.health_status == "broken_link")

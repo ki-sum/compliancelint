@@ -40,6 +40,8 @@ from core.pending_evidence import (  # noqa: E402
     build_human_prompt,
     clear_cached_repo_id,
     get_committed_sha,
+    has_remote_tracking_refs,
+    is_committed_orphaned,
     is_sha_on_remote,
     is_valid_git_sha,
     pull_pending_evidence,
@@ -743,6 +745,100 @@ class TestIsShaOnRemote:
         assert local_sha != initial, "sanity: new commit must have different sha"
         assert is_sha_on_remote(tmp_project, local_sha) is False, \
             "§4.6 fix: local-only commit must NOT report as on-remote"
+
+
+class TestHasRemoteTrackingRefs:
+    def test_returns_false_for_non_git_dir(self, tmp_project):
+        assert has_remote_tracking_refs(tmp_project) is False
+
+    def test_returns_false_for_local_only_repo(self, tmp_project):
+        _git_run(tmp_project, "init")
+        _git_run(tmp_project, "symbolic-ref", "HEAD", "refs/heads/master")
+        _git_run(tmp_project, "config", "user.email", "test@example.com")
+        _git_run(tmp_project, "config", "user.name", "Test")
+        with open(os.path.join(tmp_project, "f"), "w") as f:
+            f.write("x")
+        _git_run(tmp_project, "add", "f")
+        _git_run(tmp_project, "commit", "-m", "no-remote")
+        assert has_remote_tracking_refs(tmp_project) is False
+
+    def test_returns_true_after_first_push(self, tmp_project):
+        _init_repo_with_remote(tmp_project)
+        assert has_remote_tracking_refs(tmp_project) is True
+
+
+class TestIsCommittedOrphaned:
+    """Force-push detection — broken_link sweep's commit-reachability hook."""
+
+    def test_returns_false_for_non_git_dir(self, tmp_project):
+        # No git repo at all → can't make a judgement → not orphaned
+        assert is_committed_orphaned(tmp_project, "a" * 40) is False
+
+    def test_returns_false_for_local_only_repo(self, tmp_project):
+        # No remote refs to compare against → conservatively not orphaned
+        # (the alternative would falsely flag every committed evidence
+        # row in a local-only repo as broken_link).
+        _git_run(tmp_project, "init")
+        _git_run(tmp_project, "symbolic-ref", "HEAD", "refs/heads/master")
+        _git_run(tmp_project, "config", "user.email", "test@example.com")
+        _git_run(tmp_project, "config", "user.name", "Test")
+        with open(os.path.join(tmp_project, "f"), "w") as f:
+            f.write("x")
+        _git_run(tmp_project, "add", "f")
+        _git_run(tmp_project, "commit", "-m", "local-only")
+        sha = _git_run(tmp_project, "log", "-1", "--pretty=format:%H").strip()
+        assert is_committed_orphaned(tmp_project, sha) is False
+
+    def test_returns_false_when_sha_is_on_remote(self, tmp_project):
+        _init_repo_with_remote(tmp_project)
+        sha = _git_run(tmp_project, "log", "-1", "--pretty=format:%H").strip()
+        assert is_committed_orphaned(tmp_project, sha) is False
+
+    def test_returns_true_after_force_push_orphans_sha(self, tmp_project):
+        # Realistic flow: commit + push, capture sha, then reset+force-push
+        # to rewrite history. The first sha is now reachable from no
+        # remote-tracking ref → orphaned.
+        _init_repo_with_remote(tmp_project)
+
+        # Commit + push something we'll later orphan.
+        with open(os.path.join(tmp_project, "evidence.txt"), "w") as f:
+            f.write("doomed\n")
+        _git_run(tmp_project, "add", "evidence.txt")
+        _git_run(tmp_project, "commit", "-m", "evidence v1 (about to be orphaned)")
+        _git_run(tmp_project, "push", "origin", "master")
+        doomed_sha = _git_run(tmp_project, "log", "-1", "--pretty=format:%H").strip()
+
+        # Sanity: doomed_sha is on remote at this point.
+        assert is_sha_on_remote(tmp_project, doomed_sha) is True
+
+        # Force-push: reset back to initial commit + replace history.
+        initial = _git_run(
+            tmp_project, "rev-list", "--max-parents=0", "HEAD",
+        ).strip()
+        _git_run(tmp_project, "reset", "--hard", initial)
+        with open(os.path.join(tmp_project, "evidence.txt"), "w") as f:
+            f.write("replaced\n")
+        _git_run(tmp_project, "add", "evidence.txt")
+        _git_run(tmp_project, "commit", "-m", "evidence v2 (replaces v1)")
+        _git_run(tmp_project, "push", "--force", "origin", "master")
+
+        # The original doomed_sha is no longer reachable from any
+        # remote-tracking ref. Refresh the local view of remotes (not
+        # strictly needed for `--force` push but defensive).
+        _git_run(tmp_project, "fetch", "origin", "--prune")
+
+        assert is_committed_orphaned(tmp_project, doomed_sha) is True, (
+            f"sha {doomed_sha[:12]} should be orphaned after force-push "
+            f"replaces it on origin"
+        )
+
+    def test_returns_false_for_invalid_sha(self, tmp_project):
+        _init_repo_with_remote(tmp_project)
+        # is_sha_on_remote rejects invalid → returns False → orphaned
+        # would be True (not on remote). Defensive check: invalid sha
+        # syntax SHOULD propagate to "not orphaned" so we don't flag
+        # malformed DB rows as broken. Caller should validate upstream.
+        assert is_committed_orphaned(tmp_project, "not-a-sha") is False
 
 
 class TestGetCommittedShaProblem1:

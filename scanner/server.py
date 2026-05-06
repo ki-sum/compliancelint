@@ -3406,6 +3406,7 @@ def _run_broken_link_check(project_path: str, saas_url: str, api_key: str,
     Returns a dict summary suitable for the cl_sync result payload.
     """
     from core.broken_link import run_broken_link_check
+    from core.pending_evidence import is_committed_orphaned
 
     def http_get_json(url: str) -> dict | None:
         code, body = _curl_json("GET", url, api_key, timeout=15)
@@ -3447,6 +3448,7 @@ def _run_broken_link_check(project_path: str, saas_url: str, api_key: str,
         http_post_json=http_post_json,
         checked_at_sha=checked_at_sha,
         logger=slog,
+        is_sha_orphaned=is_committed_orphaned,
     )
     return summary.to_dict()
 

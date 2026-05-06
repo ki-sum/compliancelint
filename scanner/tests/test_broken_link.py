@@ -182,6 +182,147 @@ class TestBuildReports:
         assert reports[0].checked_at_sha is None
 
 
+# ── build_reports — orphaned-commit (force-push) detection ─────────────
+
+
+class TestBuildReportsOrphanedCommit:
+    """Force-push variant: file still on disk, but its committed_at_sha
+    is no longer reachable from any remote-tracking ref. The new
+    `is_sha_orphaned` hook must flip such rows from ok -> broken_link.
+    """
+
+    @staticmethod
+    def _present_row(repo_path: str, **kwargs) -> "bl.EvidenceRow":
+        return bl.EvidenceRow(
+            evidence_item_id=kwargs.pop("evidence_item_id", "e1"),
+            finding_id=kwargs.pop("finding_id", "f1"),
+            repo_path=repo_path,
+            **kwargs,
+        )
+
+    def _seed_present_file(self, project: str, rel: str) -> None:
+        full = os.path.join(project, rel)
+        os.makedirs(os.path.dirname(full), exist_ok=True)
+        open(full, "w").write("present")
+
+    def test_committed_with_orphaned_sha_marks_broken_link(self, project):
+        self._seed_present_file(project, "evidence/x.txt")
+        rows = [self._present_row(
+            repo_path="evidence/x.txt",
+            commit_status="committed",
+            committed_at_sha="a" * 40,
+        )]
+        # Stub: this sha IS orphaned.
+        called_with = []
+
+        def is_orphaned(p: str, sha: str) -> bool:
+            called_with.append((p, sha))
+            return True
+
+        reports = bl.build_reports(
+            project, rows, checked_at_sha=None,
+            is_sha_orphaned=is_orphaned,
+        )
+        assert reports[0].health_status == "broken_link"
+        assert called_with == [(project, "a" * 40)]
+
+    def test_committed_with_reachable_sha_stays_ok(self, project):
+        self._seed_present_file(project, "evidence/x.txt")
+        rows = [self._present_row(
+            repo_path="evidence/x.txt",
+            commit_status="committed",
+            committed_at_sha="a" * 40,
+        )]
+
+        def is_orphaned(p: str, sha: str) -> bool:
+            return False
+
+        reports = bl.build_reports(
+            project, rows, checked_at_sha=None,
+            is_sha_orphaned=is_orphaned,
+        )
+        assert reports[0].health_status == "ok"
+
+    def test_pending_commit_skips_orphan_check(self, project):
+        # commit_status='pending_commit' means the user hasn't committed
+        # yet; we MUST NOT call is_sha_orphaned (committed_at_sha is empty
+        # in this state, but defensive even if a stale sha is present).
+        self._seed_present_file(project, "evidence/x.txt")
+        rows = [self._present_row(
+            repo_path="evidence/x.txt",
+            commit_status="pending_commit",
+            committed_at_sha="a" * 40,  # stale leftover
+        )]
+        called = [0]
+
+        def is_orphaned(p: str, sha: str) -> bool:
+            called[0] += 1
+            return True
+
+        reports = bl.build_reports(
+            project, rows, checked_at_sha=None,
+            is_sha_orphaned=is_orphaned,
+        )
+        assert reports[0].health_status == "ok"
+        assert called[0] == 0, "is_sha_orphaned must not be called for pending_commit rows"
+
+    def test_empty_committed_at_sha_skips_orphan_check(self, project):
+        # commit_status='committed' but no sha recorded — legacy/malformed
+        # row. Must not call is_sha_orphaned (would invoke git for nothing).
+        self._seed_present_file(project, "evidence/x.txt")
+        rows = [self._present_row(
+            repo_path="evidence/x.txt",
+            commit_status="committed",
+            committed_at_sha="",
+        )]
+        called = [0]
+
+        def is_orphaned(p: str, sha: str) -> bool:
+            called[0] += 1
+            return True
+
+        reports = bl.build_reports(
+            project, rows, checked_at_sha=None,
+            is_sha_orphaned=is_orphaned,
+        )
+        assert reports[0].health_status == "ok"
+        assert called[0] == 0, "is_sha_orphaned must not be called when committed_at_sha is empty"
+
+    def test_orphan_check_disabled_when_kwarg_omitted(self, project):
+        # Pre-2026-05-06 behaviour preserved: omit is_sha_orphaned and
+        # the function falls back to file-existence-only.
+        self._seed_present_file(project, "evidence/x.txt")
+        rows = [self._present_row(
+            repo_path="evidence/x.txt",
+            commit_status="committed",
+            committed_at_sha="a" * 40,
+        )]
+        reports = bl.build_reports(project, rows, checked_at_sha=None)
+        assert reports[0].health_status == "ok"
+
+    def test_missing_file_takes_precedence_over_orphan_check(self, project):
+        # File MISSING + committed_at_sha set: file-missing wins
+        # regardless of orphan check (and is_sha_orphaned must not be
+        # called — file-missing short-circuits).
+        rows = [self._present_row(
+            repo_path="evidence/gone.txt",
+            commit_status="committed",
+            committed_at_sha="a" * 40,
+        )]
+        called = [0]
+
+        def is_orphaned(p: str, sha: str) -> bool:
+            called[0] += 1
+            return True
+
+        reports = bl.build_reports(
+            project, rows, checked_at_sha=None,
+            is_sha_orphaned=is_orphaned,
+        )
+        assert reports[0].health_status == "broken_link"
+        assert called[0] == 0, "missing-file should short-circuit orphan check"
+
+
 # ── run_broken_link_check orchestrator ─────────────────────────────────
 
 
@@ -408,3 +549,64 @@ class TestRunBrokenLinkCheck:
         _, payload = http.posted[0]
         assert len(payload["reports"]) == 1
         assert payload["reports"][0]["evidence_item_id"] == "good"
+
+    def test_passes_orphan_predicate_through_and_uses_committed_fields(
+        self, project,
+    ):
+        """Force-push variant orchestrator wiring: server returns
+        commit_status + committed_at_sha, orchestrator builds an
+        EvidenceRow with those fields, build_reports calls the injected
+        is_sha_orphaned predicate, broken_link gets POSTed."""
+        # File present on disk so missing-file branch doesn't fire.
+        os.makedirs(os.path.join(project, "evidence"))
+        open(os.path.join(project, "evidence", "still-here.txt"), "w").write("x")
+
+        http = FakeHttp()
+        list_url = f"{SAAS}/api/v1/repos/{REPO_ID}/evidence?storage_kind=git_path&limit=500"
+        http.get_responses[list_url] = {
+            "evidence": [
+                {
+                    "evidence_item_id": "e1",
+                    "finding_id": "f1",
+                    "storage_kind": "git_path",
+                    "repo_path": "evidence/still-here.txt",
+                    "health_status": "ok",
+                    "commit_status": "committed",
+                    "committed_at_sha": "f" * 40,
+                },
+            ],
+            "next_cursor": None,
+            "total_matched": 1,
+        }
+        post_url = f"{SAAS}/api/v1/repos/{REPO_ID}/evidence-health"
+        http.post_responses[post_url] = {
+            "transitioned": 1, "unchanged": 0, "skipped": 0,
+            "skipped_details": [],
+        }
+
+        orphan_calls: list[tuple[str, str]] = []
+
+        def fake_orphan(p: str, sha: str) -> bool:
+            orphan_calls.append((p, sha))
+            return True  # force-push case
+
+        summary = bl.run_broken_link_check(
+            project_path=project,
+            saas_url=SAAS,
+            repo_id=REPO_ID,
+            http_get_json=http.get,
+            http_post_json=http.post,
+            checked_at_sha="d" * 40,
+            is_sha_orphaned=fake_orphan,
+        )
+
+        # Predicate received the right inputs (project_path + sha).
+        assert orphan_calls == [(project, "f" * 40)], (
+            f"is_sha_orphaned should be called once with the row's "
+            f"committed_at_sha; got {orphan_calls}"
+        )
+        # File-on-disk + orphaned sha → broken_link in the report.
+        _, payload = http.posted[0]
+        assert payload["reports"][0]["health_status"] == "broken_link"
+        assert summary.broken == 1
+        assert summary.ok == 0

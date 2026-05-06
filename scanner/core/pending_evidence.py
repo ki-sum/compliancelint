@@ -454,6 +454,53 @@ def is_sha_on_remote(
     return False
 
 
+def has_remote_tracking_refs(project_path: str) -> bool:
+    """Return True if the repo has at least one refs/remotes/* tip
+    (loose or packed). False for non-git directories and for repos
+    that have a configured remote but no tracking branch yet (i.e.
+    `git remote add origin` followed by no fetch/push).
+    """
+    git_dir = _resolve_git_dir(project_path)
+    if git_dir is None:
+        return False
+    return bool(_iter_remote_ref_tips(git_dir))
+
+
+def is_committed_orphaned(
+    project_path: str,
+    sha: str,
+    timeout: float = 10.0,
+) -> bool:
+    """Return True iff the repo has remote-tracking refs AND `sha` is
+    not reachable from any of them — the canonical "force-push made
+    this commit unrecoverable from origin" predicate.
+
+    Returns False (not orphaned) for:
+      - non-git directories (no answer to give)
+      - repos with no remote-tracking refs (local-only repos and
+        freshly-added remotes that haven't fetched/pushed yet —
+        we can't tell "never pushed" from "force-pushed away", so
+        we conservatively don't flag)
+      - shas that ARE reachable on remote (the normal good case)
+      - invalid sha strings (defensive — `is_sha_on_remote` rejects
+        them upstream)
+
+    Used by the broken_link sweep (scanner/core/broken_link.py) to
+    flip ok -> broken_link when a previously-committed git_path
+    evidence file is still on disk but its `committed_at_sha` is
+    no longer reachable from origin.
+    """
+    if not is_valid_git_sha(sha):
+        # Malformed DB rows shouldn't be flagged as orphaned —
+        # syntactically-invalid shas can't be on any remote, but
+        # treating them as "orphaned" would mass-flip every legacy
+        # row with a stale or empty sha to broken_link.
+        return False
+    if not has_remote_tracking_refs(project_path):
+        return False
+    return not is_sha_on_remote(project_path, sha, timeout=timeout)
+
+
 def get_committed_sha(
     project_path: str,
     repo_path: str,
