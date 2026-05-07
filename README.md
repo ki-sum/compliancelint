@@ -244,7 +244,7 @@ All obligations verified against EUR-Lex source text.
 
 **Why 44 of 113 articles?** The EU AI Act contains 113 articles. ComplianceLint covers the 44 that impose technical or organizational obligations on AI providers, deployers, and distributors. The remaining articles define terminology (Art. 1–3), establish governance bodies (Art. 28–40, 56–59, 64–70), set penalties (Art. 83–85, 99), and contain procedural/transitional provisions — none of which create scannable compliance requirements for software teams.
 
-Not all 44 articles apply to every project. The applicable obligations depend on your role (provider, deployer, authorised representative, importer, distributor) and risk classification. Configure your role in the [dashboard](https://compliancelint.dev) for accurate scoring.
+Not all 44 articles apply to every project. The applicable obligations depend on your role (provider, deployer, importer, distributor, authorised representative, product manufacturer) and risk classification. Configure your role in the [dashboard](https://compliancelint.dev) for accurate scoring.
 
 ---
 
@@ -398,7 +398,7 @@ The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard
 - [ ] OAuth direct-commit integration — dashboard can commit evidence to cloud git without requiring MCP to be running (GitHub first, GitLab second; together they cover ~80% of cloud git users)
 - [ ] GitHub Marketplace App (discovery + one-click install)
 - [ ] **EU regulation expansion — "five-pillar" coverage roadmap** (expanding beyond EU AI Act, architecture-reuse-driven so each new regulation is ~3–4 weeks instead of starting from zero)
-  - [ ] **Phase 2 — GDPR** (Regulation (EU) 2016/679, ~99 articles): personal-data processing for any SaaS handling EU users. Reuses our deontic-decomposition engine + Three Locks + Human Gates. Differentiator vs incumbent GDPR tools (Vanta / Drata / OneTrust): ComplianceLint runs *in your IDE* and auto-collects code-level evidence, instead of vendor-management questionnaires.
+  - [ ] **Phase 2 — GDPR** (Regulation (EU) 2016/679, ~99 articles): personal-data processing for any SaaS handling EU users. Reuses the same scanner + Human Gates architecture, so each new regulation ships in weeks rather than months. Differentiator vs incumbent GDPR tools (Vanta / Drata / OneTrust): ComplianceLint runs *in your IDE* and auto-collects code-level evidence, instead of vendor-management questionnaires.
   - [ ] **Phase 3 — CRA** (Cyber Resilience Act, Reg (EU) 2024/2847, ~85 articles, full effect 2027): security-by-design + vulnerability handling + CE marking for any software product placed on the EU market. Highest market-fit for our IDE-attached architecture; very few code-level tools exist today.
   - [ ] **Phase 4 — NIS2** (Directive (EU) 2022/2555, ~46 articles): cybersecurity for "essential" + "important" entities (digital service providers, MSPs, healthcare, energy, etc.). Risk management, incident reporting, supply-chain security obligations.
   - [ ] **Phase 4 — DORA** (Reg (EU) 2022/2554, ~64 articles, in force 2025): ICT operational resilience for the financial sector. Incident reporting, third-party-risk register, threat-led penetration testing.
