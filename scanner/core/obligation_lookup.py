@@ -131,8 +131,7 @@ def _build_index() -> dict[str, dict]:
             # Cross-reference policy: an OID may appear in multiple
             # article JSONs (e.g. ART19-OBL-2 lives in art19 but is
             # mirrored into art12 because it directly extends Art. 12
-            # logging requirements — see art12-consensus-lock-2026-03-20.md
-            # for the design decision). When that happens, both copies
+            # logging requirements). When that happens, both copies
             # MUST share the same verbatim source_quote — otherwise the
             # cross-reference has drifted from EUR-Lex and we cannot
             # safely pick a winner without a human reconciling.

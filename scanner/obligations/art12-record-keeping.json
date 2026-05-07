@@ -247,7 +247,7 @@
       "deontic_type": "obligation",
       "modality": "shall",
       "addressee": "provider",
-      "note": "Cross-referenced from Art. 19(1) second clause — included here because Art. 12 (record-keeping) defines the logging lifecycle that Art. 19 retention extends. Canonical definition lives in art19-automatically-generated-logs.json as ART19-OBL-1b; this entry mirrors it verbatim. See art12-consensus-lock-2026-03-20.md for the original cross-reference design decision and the 2026-04-30 OID alignment fix (ART19-OBL-1 → OBL-1b) that resolved a same-OID-different-content drift introduced by the 2026-04-04 art19 split.",
+      "note": "Cross-referenced from Art. 19(1) second clause — included here because Art. 12 (record-keeping) defines the logging lifecycle that Art. 19 retention extends. Canonical definition lives in art19-automatically-generated-logs.json as ART19-OBL-1b; this entry mirrors it verbatim.",
       "decomposed_atoms": [
         {
           "atom": "logs_retained_minimum_six_months",

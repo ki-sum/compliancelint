@@ -33,7 +33,7 @@ Track compliance across all your AI systems. Export audit-ready PDF reports. [Tr
 
 ### Documentation
 
-Full user manual at **[compliancelint.dev/docs](https://compliancelint.dev/docs/quick-start)** — 30 chapters covering setup, daily use, persona-specific reference (Provider / Deployer / Authorised Representative / Importer / Distributor / Product Manufacturer), and troubleshooting.
+Full user manual at **[compliancelint.dev/docs](https://compliancelint.dev/docs/quick-start)** — 30 chapters covering setup, daily use, persona-specific reference (Provider / Product Manufacturer / Deployer / Importer / Distributor / Authorised Representative), and troubleshooting.
 
 ---
 
@@ -151,7 +151,7 @@ Track compliance over time at **[compliancelint.dev](https://compliancelint.dev)
 - **Attestation** — record human review decisions with evidence (cl_update_finding)
 - **Evidence stays in your repo** — upload files from the dashboard; bytes commit to `.compliancelint/evidence/` in your git repo. We relay transiently, never hold your files.
 - **Human Gates** — guided questionnaires for obligations that require human verification (DPIA, oversight assignments, worker notifications)
-- **Role selection** — filter obligations by your EU AI Act role (Provider, Deployer, Authorised Representative, Importer, Distributor, Product Manufacturer) for accurate scoring
+- **Role selection** — filter obligations by your EU AI Act role (Provider, Product Manufacturer, Deployer, Importer, Distributor, Authorised Representative) for accurate scoring
 
 ```
 "Connect to ComplianceLint dashboard and sync my scan results."
@@ -244,7 +244,7 @@ All obligations verified against EUR-Lex source text.
 
 **Why 44 of 113 articles?** The EU AI Act contains 113 articles. ComplianceLint covers the 44 that impose technical or organizational obligations on AI providers, deployers, and distributors. The remaining articles define terminology (Art. 1–3), establish governance bodies (Art. 28–40, 56–59, 64–70), set penalties (Art. 83–85, 99), and contain procedural/transitional provisions — none of which create scannable compliance requirements for software teams.
 
-Not all 44 articles apply to every project. The applicable obligations depend on your role (provider, deployer, importer, distributor, authorised representative, product manufacturer) and risk classification. Configure your role in the [dashboard](https://compliancelint.dev) for accurate scoring.
+Not all 44 articles apply to every project. The applicable obligations depend on your role (provider, product manufacturer, deployer, importer, distributor, authorised representative) and risk classification. Configure your role in the [dashboard](https://compliancelint.dev) for accurate scoring.
 
 ---
 
@@ -376,7 +376,7 @@ The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard
 - [x] Audit-ready exports — Compliance Journey PDF, Human Gates per-article PDFs (Declaration of Conformity at Art. 47, Technical Documentation at Art. 11, per-article evidence packs), and Compliance All-in-One Pack ZIP (Business+)
 - [x] Attestation system (evidence, rebuttals, acknowledgements, defer, questionnaire response)
 - [x] `npx compliancelint init` — one-line setup
-- [x] Role-based obligation filtering (Provider, Deployer, Authorised Representative, Importer, Distributor, Product Manufacturer)
+- [x] Role-based obligation filtering (Provider, Product Manufacturer, Deployer, Importer, Distributor, Authorised Representative)
 - [x] Human Gates — guided questionnaires for manual obligations
 - [x] Settings audit trail — track who changed compliance settings
 - [x] Evidence v4 deferred-path (browser upload → `.compliancelint/evidence/` → cl_sync pulls → user commits)

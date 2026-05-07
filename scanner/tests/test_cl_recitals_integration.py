@@ -14,10 +14,10 @@ Post-fix contract:
   - cl_action_plan(path, article)  → response.related_recitals_by_article (dict)
   - cl_interim_standard(article)   → response.related_recitals (list)
 
-Source-Lock invariant: Each entry's `source_quote` MUST byte-match the
-corresponding entry in scanner/data/recitals.json (already enforced by
-test_recitals_source_lock.py). This file only checks WIRING — that the
-3 tools surface the data, not that the data itself is authentic.
+Byte-equality invariant: each entry's `source_quote` MUST byte-match
+the corresponding entry in scanner/data/recitals.json (already enforced
+by test_recitals_baseline_integrity.py). This file only checks WIRING —
+that the 3 tools surface the data, not that the data itself is authentic.
 
 Test articles chosen for stable Recital coverage:
   - Article 5 (Prohibited Practices) — 14 Recitals (15-44 incl 176)

@@ -1,7 +1,8 @@
-"""Source Lock test for the 180 Recital baseline (§AD.4).
+"""Recital baseline integrity test — verifies the 180-entry baseline
+matches the EUR-Lex source byte-for-byte.
 
-Per `feedback_recital_text_no_retype.md` HARD RULE: no LLM ever retypes
-Recital text. This test enforces that:
+Recital text is fetched programmatically from EUR-Lex / EC, never
+LLM-retyped. This test enforces that:
 
   1. scanner/data/recitals.json has exactly 180 entries (numbered 1-180)
   2. Each entry has a source_quote ≥ 30 chars (sanity)
@@ -12,8 +13,8 @@ Recital text. This test enforces that:
       test runtime under 30s)
 
 If this test fails after manual edit to recitals.json: that edit
-violated the HARD RULE. Re-run the canonical fetch_recitals.py audit
-tool to regenerate from PDF + EC sources.
+violated the HARD RULE. Re-run the canonical fetch tooling to
+regenerate from PDF + EC sources.
 """
 
 from __future__ import annotations
@@ -107,8 +108,8 @@ def test_pdf_source_present():
     When PDF is absent, this test skips with a clear remediation hint.
     The 4 lighter sister tests in this file (count, source_quote,
     sha256 anchor, no-pypdf-artifacts) still validate the baseline
-    JSON Source Lock contract from `feedback_recital_text_no_retype.md`
-    without needing the PDF — those run unconditionally everywhere.
+    baseline JSON integrity contract without needing the PDF — those
+    run unconditionally everywhere.
 
     The deeper PDF-hash-resampling check
     (test_pdf_extraction_matches_baseline_sample, line 106) is gated

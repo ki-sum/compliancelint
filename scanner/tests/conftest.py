@@ -15,7 +15,7 @@ sys.path.insert(0, SCANNER_ROOT)
 # Default COMPLIANCELINT_AUDIT_TOOLS to the in-repo audit-tools dir when
 # running inside an internal-repo checkout. Public-repo-only checkouts
 # leave it unset, and tests that need it (e.g. the deep PDF re-extract
-# in tests/data/test_recitals_source_lock.py) skip cleanly with a
+# in tests/data/test_recitals_baseline_integrity.py) skip cleanly with a
 # remediation message. Explicit env var still wins.
 _DEFAULT_AUDIT_TOOLS = os.path.normpath(
     os.path.join(SCANNER_ROOT, "..", "private", "scripts", "eu_official_alignment_audit")
