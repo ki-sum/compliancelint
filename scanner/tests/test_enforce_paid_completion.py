@@ -198,11 +198,15 @@ def test_strict_mode_with_missing_evidence_returns_pending_signal():
     assert result.pending[0]["obligation_id"] == "ART9-OBL-1"
     assert result.pending[0]["expected"] == 1
     assert result.pending[0]["actual"] == 0
-    # Spec §H — structured AI-first prompt fields
+    # Spec §H — structured AI-first prompt fields. The auto_action_on_yes
+    # and then_continue fields ARE tool names (API contract for AI tool
+    # selection); the prompt_to_user text was reframed to natural language
+    # in §31 (2026-05-08) — it now says "sync" (the action) instead of
+    # "cl_sync" (the tool name) so users see MCP-friendly conversation.
     assert result.auto_action_on_yes == "cl_sync"
     assert result.then_continue == "cl_scan_all"
     assert "ART9-OBL-1" in result.prompt_to_user
-    assert "cl_sync" in result.prompt_to_user.lower()
+    assert "sync" in result.prompt_to_user.lower()
 
 
 def test_strict_mode_with_partial_evidence_returns_pending(
