@@ -77,7 +77,7 @@ No extra API key needed — uses your existing AI subscription.
 
 > "Connect to ComplianceLint dashboard."
 
-Opens browser, links your scanner to [compliancelint.dev](https://compliancelint.dev) with a free account. **Free sign-up enables full scanning** — the 5 detection-related fields (`detection_method`, `what_to_scan`, `confidence`, `human_judgment_needed`, `rationale`) live SaaS-side and are fetched per article at scan time. Without `cl_connect`, the scanner runs in degraded mode: obligation list + automation `level` browsable, but no detection logic. The BSL source remains usable as an obligation browser; sign-up unlocks the methodology layer.
+Opens browser, links your scanner to [compliancelint.dev](https://compliancelint.dev) with a free account. **Free sign-up enables full scanning** — the 5 detection-related fields (`detection_method`, `what_to_scan`, `confidence`, `human_judgment_needed`, `rationale`) live SaaS-side and are fetched per article at scan time. Until your scanner is connected to the dashboard, it runs in degraded mode: obligation list + automation `level` browsable, but no detection logic. The BSL source remains usable as an obligation browser; sign-up unlocks the methodology layer.
 
 ### Track over time (optional, paid tiers)
 
@@ -148,7 +148,7 @@ Track compliance over time at **[compliancelint.dev](https://compliancelint.dev)
 - **Tasks** — prioritized remediation to-do list with severity and effort estimates
 - **Scan History** — full audit trail of every scan, with diff between consecutive scans
 - **PDF reports** — export audit-ready reports with legal citations
-- **Attestation** — record human review decisions with evidence (cl_update_finding)
+- **Attestation** — record human review decisions with evidence directly in the dashboard, or ask your AI to submit evidence via natural-language conversation
 - **Evidence stays in your repo** — upload files from the dashboard; bytes commit to `.compliancelint/evidence/` in your git repo. We relay transiently, never hold your files.
 - **Human Gates** — guided questionnaires for obligations that require human verification (DPIA, oversight assignments, worker notifications)
 - **Role selection** — filter obligations by your EU AI Act role (Provider, Product Manufacturer, Deployer, Importer, Distributor, Authorised Representative) for accurate scoring
@@ -307,7 +307,7 @@ not our SaaS. Five architectural commitments:
 
 2. **MCP never runs git on your behalf.** No auto-commit, no auto-push,
    no auto-revert. Every commit is your decision. If you commit locally
-   without pushing, `cl_sync` waits until you push.
+   without pushing, the next sync waits until you push.
 
 3. **Git-host neutral.** Works with GitHub, GitLab, Bitbucket, Gitea,
    Azure DevOps, self-hosted, or a purely local repo. MCP commits
@@ -317,7 +317,7 @@ not our SaaS. Five architectural commitments:
    convenience; the MCP path always remains supported.
 
 4. **Force-push aware.** If you rewrite history and erase an evidence
-   commit, the next `cl_sync` detects the missing file and flags it on
+   commit, the next sync detects the missing file and flags it on
    the dashboard (`health_status='broken_link'`). The forensic record
    stays — who uploaded, when, at which sha — even after the bytes
    are gone from git.
@@ -379,9 +379,9 @@ The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard
 - [x] Role-based obligation filtering (Provider, Product Manufacturer, Deployer, Importer, Distributor, Authorised Representative)
 - [x] Human Gates — guided questionnaires for manual obligations
 - [x] Settings audit trail — track who changed compliance settings
-- [x] Evidence v4 deferred-path (browser upload → `.compliancelint/evidence/` → cl_sync pulls → user commits)
+- [x] Evidence v4 deferred-path (browser upload → `.compliancelint/evidence/` → next sync pulls → user commits)
 - [x] Project fingerprint detection (first_commit_sha mismatch → owner acknowledge)
-- [x] Force-push broken_link detection (evidence health sweep on every cl_sync)
+- [x] Force-push broken_link detection (evidence health sweep on every sync)
 - [x] Stale-evidence banners (finding + repo level)
 - [x] Snapshot ledger (deterministic state hash on every scan)
 - [x] Directory v2 — local cache (`.compliancelint/local/`, gitignored) vs committed evidence (`.compliancelint/evidence/` + `manifest.json`) split
@@ -404,7 +404,7 @@ The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard
   - [ ] **Phase 4 — DORA** (Reg (EU) 2022/2554, ~64 articles, in force 2025): ICT operational resilience for the financial sector. Incident reporting, third-party-risk register, threat-led penetration testing.
   - The five pillars (EU AI Act + GDPR + CRA + NIS2 + DORA) cover the legal stack a typical EU SaaS / regulated-industry deployment must satisfy. No existing tool we are aware of bundles all five at the code level.
 - [ ] OSCAL export format (Business+ tier) — structured compliance data for enterprise audit workflows
-- [ ] **Incremental scanning** — only re-scan obligations whose underlying code changed since the last `cl_scan_all`, instead of running every article every time. Demand-driven, triggered post-launch when usage warrants the optimization.
+- [ ] **Incremental scanning** — only re-scan obligations whose underlying code changed since the last full scan, instead of running every article every time. Demand-driven, triggered post-launch when usage warrants the optimization.
 - [ ] **Human Gates evidence verifier** (`cl_verify_human_gates`) — AI cross-checks each questionnaire answer against the obligation's `source_quote` requirements; flags vague text, missing answers, and cross-obligation contradictions before re-scan promotes evidence to COMPLIANT.
 - [ ] **All-in-One Pack `dashboard_state.json`** (post-launch, possibly tier-gated) — extend the export zip with a serialized snapshot of the dashboard's KPI cards, penalty calculation, role/risk-classification context, and per-article status matrix. Today the zip contains the legal artefacts (PDFs + manifest); this adds the *interpretive layer* the dashboard provides. Consumed by the offline viewer below.
 - [ ] **Public All-in-One Pack viewer** (`/viewer`, post-launch, possibly tier-gated) — public, no-login web page where an auditor or external lawyer drag-drops a Compliance All-in-One Pack zip and the page renders the same KPI cards, penalty estimates, and article-status visualisations as the live dashboard, all client-side from the zip's `dashboard_state.json`. No backend hit. Closes the gap that today's zip is "audit-ready files" but not "audit-ready *interface*". Pricing tier and exact UX still TBD.
@@ -432,7 +432,7 @@ All obligation logic is tested against 12 synthetic project archetypes — simul
 - **AI-dependent scanning.** Scan quality depends on the AI model used (Claude, GPT, etc.). The scanner's obligation engine is deterministic, but the AI's code understanding may vary.
 - **EU AI Act only (currently).** Additional regulations are on the roadmap.
 - **High-risk focus.** Many obligations (Art. 9–27) apply primarily to high-risk AI systems. Non-high-risk systems may show NOT_APPLICABLE for those obligations.
-- **No runtime monitoring.** ComplianceLint scans source code and documentation. It does not monitor running AI systems. For ongoing compliance assurance, schedule periodic scans via CI/CD and use `cl_sync` to maintain an auditable trail of compliance progress over time.
+- **No runtime monitoring.** ComplianceLint scans source code and documentation. It does not monitor running AI systems. For ongoing compliance assurance, schedule periodic scans via CI/CD and ask your AI to sync results after each scan to maintain an auditable trail of compliance progress over time.
 - **English legal citations.** Obligation definitions and source quotes are in English (from the official EUR-Lex publication). However, since ComplianceLint runs inside AI-powered IDEs, the AI will naturally converse, explain regulations, and generate reports in your preferred language.
 
 ---
@@ -443,8 +443,8 @@ ComplianceLint is designed with human oversight at every stage:
 
 1. **Human initiates scans** — the AI never scans autonomously; the user explicitly requests each scan
 2. **Human reviews findings** — all findings are presented for human judgment before any action
-3. **Human submits evidence** — `cl_update_finding` allows users to acknowledge, rebut, defer, or provide evidence for any finding
-4. **Human controls sync** — scan results are only uploaded to the dashboard when the user explicitly runs `cl_sync`
+3. **Human submits evidence** — users acknowledge, rebut, defer, or provide evidence for any finding via natural-language conversation with their AI (which invokes `cl_update_finding` on their behalf)
+4. **Human controls sync** — scan results are only uploaded to the dashboard when the user explicitly asks the AI to sync
 5. **No autonomous decisions** — ComplianceLint never makes compliance determinations without human review
 
 The user can stop any MCP tool call at any time by pressing Stop in their IDE.

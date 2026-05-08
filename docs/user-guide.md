@@ -18,7 +18,7 @@ Ask your AI assistant:
 Please scan my project at /path/to/project for EU AI Act compliance.
 ```
 
-Your AI assistant will call `cl_scan_all` once and return a report.
+Your AI assistant will run a full project scan once and return a report.
 **Downside**: No visible progress. You won't know if the scan is working or stuck.
 
 ---
@@ -33,7 +33,7 @@ Requirements:
 - Before each article, tell me which files you are reading
 - Describe what you found in natural language
 - After each article, give me a brief summary (compliant/partial/non-compliant)
-- After all 44 articles, use cl_sync to upload results to your ComplianceLint dashboard
+- After all 44 articles, sync the results to my ComplianceLint dashboard
 ```
 
 **Why this works**: the AI reads files using Read/Grep tools (visible to you),
@@ -79,7 +79,7 @@ trail regulators expect.
 
 ... (continues for all 44 articles)
 
-📋 [cl_sync uploads results to ComplianceLint dashboard for PDF export]
+📋 [scanner uploads results to ComplianceLint dashboard for PDF export]
 ```
 
 ---
