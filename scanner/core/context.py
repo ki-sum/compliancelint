@@ -642,14 +642,15 @@ def analyze_project_metadata(project_path: str) -> dict:
     setup_warnings = []
     if not config.saas_api_key:
         setup_warnings.append(
-            "No dashboard connection. Run cl_connect() to link your project "
-            "to the ComplianceLint dashboard for tracking and reporting."
+            "No dashboard connection. Ask your AI: \"Set up ComplianceLint "
+            "for this project\" to link to the dashboard for tracking and "
+            "reporting."
         )
     if not config.attester_name or not config.attester_email:
         setup_warnings.append(
             "No attester identity configured. This is needed for submitting "
-            "evidence (cl_update_finding). It will be auto-set when you run "
-            "cl_connect(), or you can add attester_name and attester_email "
+            "evidence. It will be auto-set when you connect this project to "
+            "the dashboard, or you can add attester_name and attester_email "
             "to .compliancelintrc manually."
         )
 

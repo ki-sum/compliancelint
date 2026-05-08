@@ -58,9 +58,9 @@ TOOL_HINTS: Final[dict[str, dict]] = {
     },
     "cl_scan": {
         "free_message": (
-            "Single-article scan. Run cl_scan_all + Connect to Starter+ "
-            "to see only the articles applicable to YOUR system, with "
-            "per-obligation questionnaires."
+            "Single-article scan. Ask your AI for a full project scan and "
+            "connect to Starter+ to see only the articles applicable to "
+            "YOUR system, with per-obligation questionnaires."
         ),
         "missing_features": ["scope_narrowing", "questionnaire"],
     },

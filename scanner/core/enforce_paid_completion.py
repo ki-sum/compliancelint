@@ -207,28 +207,27 @@ def _build_prompt(pending: list[dict]) -> str:
         if miss == "answer":
             return (
                 f"{oid} is missing its questionnaire answer. "
-                f"Want me to pull the latest from your dashboard via cl_sync?"
+                f"Want me to sync the latest from your dashboard?"
             )
         if miss == "both":
             return (
                 f"{oid} is missing both its questionnaire answer and "
-                f"evidence. Want me to run cl_sync to pull from your "
+                f"evidence. Want me to sync to pull both from your "
                 f"dashboard?"
             )
         return (
             f"{oid} needs evidence on file before this scan can run. "
-            f"Want me to run cl_sync to pull it from your dashboard?"
+            f"Want me to sync to pull it from your dashboard?"
         )
 
     if has_answer_missing:
         return (
             f"{n} obligations are missing questionnaire answers and/or "
-            f"evidence. Want me to run cl_sync to pull the latest from "
-            f"your dashboard?"
+            f"evidence. Want me to sync the latest from your dashboard?"
         )
     return (
         f"{n} obligations need evidence on file before this scan can run. "
-        f"Want me to run cl_sync to pull them from your dashboard?"
+        f"Want me to sync to pull them from your dashboard?"
     )
 
 

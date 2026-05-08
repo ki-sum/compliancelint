@@ -174,8 +174,9 @@ def emit_degraded_notice_once() -> None:
         "⚠ Offline mode: 247 obligations loaded, but classification "
         "metadata\n"
         "  (detection_method, rationale, etc.) unavailable.\n"
-        "  Run `cl_connect` to enable scanning. "
-        "Free at compliancelint.dev.\n"
+        "  Ask your AI to set up ComplianceLint for this project to "
+        "enable scanning.\n"
+        "  Free at compliancelint.dev.\n"
     )
 
 
