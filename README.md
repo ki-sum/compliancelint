@@ -272,6 +272,22 @@ Not all 44 articles apply to every project. The applicable obligations depend on
 
 All scanning tools accept a `regulation` parameter (default: `"eu-ai-act"`), designed to support multiple regulations as they are added.
 
+### Auto-discoverable — zero-config setup
+
+Point any MCP-compatible client at `compliancelint.dev` and it auto-detects our MCP server via the standard discovery endpoint:
+
+```
+https://compliancelint.dev/.well-known/mcp/server-card.json
+```
+
+Returns server metadata, tool catalogue, transport types, and auth flow — the same pattern OAuth uses (`/.well-known/oauth-authorization-server`). Implementation per [SEP-2127](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2127).
+
+No manual JSON config required for clients that support discovery (Claude Desktop, Claude Code, Cursor, Windsurf, Cline, ChatGPT, Goose). Verify the endpoint yourself:
+
+```sh
+curl https://compliancelint.dev/.well-known/mcp/server-card.json | jq .
+```
+
 ---
 
 ## Project Structure
@@ -388,6 +404,7 @@ The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard
 - [x] Cross-OS CI matrix (Ubuntu, macOS, Windows × Python 3.10–3.13)
 - [x] Profiling Wizard — answer a series of questions about your AI system (EU establishment, Annex III category, training data, GPAI status, value-chain role, Art. 2 carve-outs) and the 247-obligation matrix is filtered down to the ones that actually apply to you (Starter+)
 - [x] **EU AI Act browser at [`/dashboard/regulations/eu-ai-act`](https://compliancelint.dev/dashboard/regulations/eu-ai-act)** — full text of 44 articles + 13 annexes + searchable across 247 obligations. **Free tier includes the full browser after a free sign-up** (no credit card). Browse legal text + search "biometric" / "logging" / "human oversight" instantly
+- [x] **Auto-discovery endpoint** — `.well-known/mcp/server-card.json` ([SEP-2127](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2127)) for zero-config Claude Desktop / Cursor / Windsurf / ChatGPT onboarding
 
 ### Pre-launch
 
@@ -408,6 +425,7 @@ The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard
 - [ ] **Human Gates evidence verifier** (`cl_verify_human_gates`) — AI cross-checks each questionnaire answer against the obligation's `source_quote` requirements; flags vague text, missing answers, and cross-obligation contradictions before re-scan promotes evidence to COMPLIANT.
 - [ ] **All-in-One Pack `dashboard_state.json`** (post-launch, possibly tier-gated) — extend the export zip with a serialized snapshot of the dashboard's KPI cards, penalty calculation, role/risk-classification context, and per-article status matrix. Today the zip contains the legal artefacts (PDFs + manifest); this adds the *interpretive layer* the dashboard provides. Consumed by the offline viewer below.
 - [ ] **Public All-in-One Pack viewer** (`/viewer`, post-launch, possibly tier-gated) — public, no-login web page where an auditor or external lawyer drag-drops a Compliance All-in-One Pack zip and the page renders the same KPI cards, penalty estimates, and article-status visualisations as the live dashboard, all client-side from the zip's `dashboard_state.json`. No backend hit. Closes the gap that today's zip is "audit-ready files" but not "audit-ready *interface*". Pricing tier and exact UX still TBD.
+- [ ] **MCP Apps** (interactive UI widgets) — render scan results as a sandboxed dashboard, action plans as drag-drop card stacks, and explanations as 3-pane source-quote/atoms/recitals views directly inside Claude / ChatGPT / Cursor conversations. Per the [MCP Apps spec](https://github.com/modelcontextprotocol/ext-apps) (shipped Jan 2026, first official MCP extension). Phased rollout: Phase A on `cl_scan` + `cl_action_plan` + `cl_explain` (highest-value, ~3–4 days), Phase B on multi-step workflows, Phase C on advanced visualisations.
 
 ---
 
