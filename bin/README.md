@@ -60,4 +60,4 @@ If `.mcp.json` already exists with other servers, ComplianceLint is merged in wi
 
 1. Restart your AI IDE (Claude Code, Cursor, Windsurf)
 2. Ask your AI: "Scan this project for EU AI Act compliance"
-3. Run `cl_connect()` to link your dashboard at [compliancelint.dev](https://compliancelint.dev)
+3. Ask your AI: "Connect to ComplianceLint dashboard" to link your scanner at [compliancelint.dev](https://compliancelint.dev)

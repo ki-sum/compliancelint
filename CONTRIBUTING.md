@@ -24,8 +24,9 @@ proceed.
 
 The fastest path:
 
-1. Run `cl_report_bug` from your MCP client. This creates a local
-   bug-report file (`~/compliancelint-bugreport-{timestamp}.md`)
+1. From your MCP client, ask your AI: "Generate a ComplianceLint bug
+   report bundle" (your AI invokes `cl_report_bug`). This creates a
+   local bug-report file (`~/compliancelint-bugreport-{timestamp}.md`)
    containing diagnostic metadata, scanner logs, version information,
    and environment details. The tool is **designed to exclude** project
    source code, secrets, request bodies, and customer datasets, but
