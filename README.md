@@ -375,6 +375,8 @@ The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard
 | Multi-framework mapping (ISO 42001, NIST AI RMF) | — | — | — | ✓ | ✓ |
 | Regulation updates timeline (in-app) — current EU AI Act milestones; email digest is Business+ roadmap | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Compliance All-in-One Pack (audit-grade snapshot zip) | — | — | — | ✓ | ✓ |
+| OSCAL export — structured compliance data (NIST OSCAL JSON) for GRC / audit ingestion | — | — | — | — | ✓ |
+| Cryptographically signed Compliance All-in-One Pack — tamper-evident audit chain | — | — | — | — | ✓ |
 | SSO / SAML / on-prem | — | — | — | — | ✓ |
 
 **Evidence stays in your repo.** Upload files from the dashboard — bytes commit to `.compliancelint/evidence/` in your git repo. We relay transiently. We never hold your files.
@@ -420,7 +422,8 @@ The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard
   - [ ] **Phase 4 — NIS2** (Directive (EU) 2022/2555, ~46 articles): cybersecurity for "essential" + "important" entities (digital service providers, MSPs, healthcare, energy, etc.). Risk management, incident reporting, supply-chain security obligations.
   - [ ] **Phase 4 — DORA** (Reg (EU) 2022/2554, ~64 articles, in force 2025): ICT operational resilience for the financial sector. Incident reporting, third-party-risk register, threat-led penetration testing.
   - The five pillars (EU AI Act + GDPR + CRA + NIS2 + DORA) cover the legal stack a typical EU SaaS / regulated-industry deployment must satisfy. No existing tool we are aware of bundles all five at the code level.
-- [ ] OSCAL export format (Business+ tier) — structured compliance data for enterprise audit workflows
+- [ ] OSCAL export (Enterprise — sales-scoped) — structured NIST OSCAL JSON for GRC ingestion. Listed in the Enterprise tier alongside SSO / SAML / on-prem; built per engagement when an enterprise customer asks for it.
+- [ ] Cryptographically signed Compliance All-in-One Pack (Enterprise — sales-scoped) — ed25519 signature over the canonicalised pack so external auditors can verify the bundle was not modified after export.
 - [ ] **Incremental scanning** — only re-scan obligations whose underlying code changed since the last full scan, instead of running every article every time. Demand-driven, triggered post-launch when usage warrants the optimization.
 - [ ] **Human Gates evidence verifier** (`cl_verify_human_gates`) — AI cross-checks each questionnaire answer against the obligation's `source_quote` requirements; flags vague text, missing answers, and cross-obligation contradictions before re-scan promotes evidence to COMPLIANT.
 - [ ] **All-in-One Pack `dashboard_state.json`** (post-launch, possibly tier-gated) — extend the export zip with a serialized snapshot of the dashboard's KPI cards, penalty calculation, role/risk-classification context, and per-article status matrix. Today the zip contains the legal artefacts (PDFs + manifest); this adds the *interpretive layer* the dashboard provides. Consumed by the offline viewer below.
