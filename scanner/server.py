@@ -490,9 +490,17 @@ _WIZARD_TO_SCANNER_FIELDS: dict = {
     "euEstablished": [
         ("art22", "is_eu_established_provider"),
     ],
-    "hasArt25Responsibilities": [
-        ("art25", "is_safety_component_annex_i"),
-    ],
+    # §AT.19 Phase 2f (2026-05-13) — hasArt25Responsibilities REMOVED
+    # from mapping. The wizard question covers Art.25(1)(supplier),
+    # Art.25(2), Art.25(3)(safety component), Art.25(4)(component
+    # supplier) — a BROAD union. Scanner field
+    # `is_safety_component_annex_i` only matches Art.25(3) specifically.
+    # Conflating broad "any Art.25" with narrow "safety component" was
+    # misleading. Only 1 obligation (ART25-CLS-3) cascades on this
+    # field; AI variance impact is minimal. Let AI answer naturally.
+    #
+    # If we add a wizard question specifically about Art.25(3) in
+    # future, restore the mapping here.
     # §AT.19 Phase 2c (2026-05-13) — wizard expansion +2 questions
     "isGpaiWithSystemicRisk": [
         ("_scope", "is_gpai_with_systemic_risk"),
@@ -595,9 +603,25 @@ def _apply_wizard_overrides_to_answers(
 
     Idempotent: calling twice with the same wizard payload produces the
     same result.
+
+    §AT.19 Phase 2f (2026-05-13) — defensive shape check: if an article
+    key in compliance_answers is not a dict (data corruption from AI
+    sending a string), the value is overwritten with a fresh dict
+    containing the override. Without this guard, override would raise
+    TypeError on non-dict values. Trade-off: silently overwriting may
+    lose AI's prior intent for that article, but the only call path
+    is post-validation_gate which already coerces dict shapes.
     """
     if not wizard_answers:
         return compliance_answers
+
+    def _safe_subdict(art_key: str) -> dict:
+        """Get-or-create an article subdict. Replaces non-dict values
+        defensively (Phase 2f)."""
+        existing = compliance_answers.get(art_key)
+        if not isinstance(existing, dict):
+            compliance_answers[art_key] = {}
+        return compliance_answers[art_key]
 
     # Standard direct-copy overrides.
     for wizard_key, mappings in _WIZARD_TO_SCANNER_FIELDS.items():
@@ -605,7 +629,7 @@ def _apply_wizard_overrides_to_answers(
         if val is None:
             continue
         for art_key, field_name in mappings:
-            article_dict = compliance_answers.setdefault(art_key, {})
+            article_dict = _safe_subdict(art_key)
             article_dict[field_name] = bool(val)
 
     # Inverse: is_third_country_provider = NOT euEstablished.
@@ -613,7 +637,7 @@ def _apply_wizard_overrides_to_answers(
     # outside the EU AND must appoint an authorised representative.
     eu = wizard_answers.get("euEstablished")
     if eu is not None:
-        art54 = compliance_answers.setdefault("art54", {})
+        art54 = _safe_subdict("art54")
         art54["is_third_country_provider"] = not bool(eu)
 
     # §AT.19 Phase 2c (2026-05-13) — derive biometric scope from wizard
@@ -627,11 +651,24 @@ def _apply_wizard_overrides_to_answers(
     # answer; the user must affirm them per-obligation in HG attestation.
     annex_iii_cat = wizard_answers.get("annexIIICategory")
     if annex_iii_cat is not None:
-        scope = compliance_answers.setdefault("_scope", {})
+        scope = _safe_subdict("_scope")
         # Explicit biometric annex → is_biometric_system = true.
         # Any other annex value → is_biometric_system = false (narrowed
         # out by structural answer).
-        scope["is_biometric_system"] = (annex_iii_cat == "annex_iii_pt1_biometrics")
+        is_biometric = (annex_iii_cat == "annex_iii_pt1_biometrics")
+        scope["is_biometric_system"] = is_biometric
+
+        # §AT.19 Phase 2f (2026-05-13) — narrower art50 booleans
+        # also derive from the broad biometric category. The Annex III
+        # §1 enum covers "remote biometric ID / categorisation / emotion
+        # recognition" — same enum value, narrower scanner flags. We
+        # set them to the SAME truth as is_biometric_system because the
+        # wizard's single category answer is what the user explicitly
+        # affirmed; narrower self-attestation per Art.50(3) happens via
+        # the HG wizard's section.show_when (which uses the same gate).
+        art50 = _safe_subdict("art50")
+        art50["is_emotion_recognition_system"] = is_biometric
+        art50["is_biometric_categorization_system"] = is_biometric
 
     return compliance_answers
 

@@ -183,17 +183,15 @@ class TestNoCrashOnMalformedInputs:
     """Robustness: weird inputs from SaaS shouldn't crash scanner."""
 
     def test_compliance_answers_with_non_dict_article_value(self):
-        """If AI sends a string instead of dict for an article key (data
-        corruption), the implementation trusts the caller's data shape
-        and will raise TypeError. This test documents that trust boundary
-        — validation_gate.run_gate() coerces malformed inputs upstream,
-        so by the time _apply_wizard_overrides runs, the shape is dict-
-        of-dicts. No need to defensively re-validate here."""
-        import pytest
+        """§AT.19 Phase 2f: defensive _safe_subdict replaces non-dict
+        values with a fresh dict before writing override. No exception
+        raised; the malformed string is silently replaced."""
         answers = {"art51": "this is not a dict"}
         wizard = {"isGpai": False}
-        with pytest.raises(TypeError):
-            _apply_wizard_overrides_to_answers(answers, wizard)
+        _apply_wizard_overrides_to_answers(answers, wizard)
+        # Defensive replacement: string discarded, dict created.
+        assert isinstance(answers["art51"], dict)
+        assert answers["art51"]["is_gpai_model"] is False
 
     def test_wizard_with_extra_keys_silently_ignored(self):
         """Wizard payload from a newer SaaS that knows more fields than

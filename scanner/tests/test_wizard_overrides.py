@@ -236,15 +236,64 @@ class TestAnnexIIICategoryDerivations:
         # null means wizard not answered → AI's prior True stays
         assert compliance_answers["_scope"]["is_biometric_system"] is True
 
-    def test_art50_narrower_booleans_NOT_auto_derived(self):
-        """is_emotion_recognition_system + is_biometric_categorization_system
-        are narrower than the wizard's annex_iii_pt1_biometrics — user
-        must affirm per-obligation in HG attestation."""
+    def test_art50_narrower_booleans_auto_derived_phase2f(self):
+        """§AT.19 Phase 2f: art50.is_emotion_recognition_system +
+        is_biometric_categorization_system NOW auto-derived from
+        annex_iii_pt1_biometrics. Same enum covers all three
+        (remote biometric ID + categorisation + emotion recognition)."""
         compliance_answers = {"art50": {"is_emotion_recognition_system": None}}
         wizard = {"annexIIICategory": "annex_iii_pt1_biometrics"}
         _apply_wizard_overrides_to_answers(compliance_answers, wizard)
-        # art50 narrower fields stay None (AI/HG territory)
-        assert compliance_answers["art50"]["is_emotion_recognition_system"] is None
+        assert compliance_answers["art50"]["is_emotion_recognition_system"] is True
+        assert compliance_answers["art50"]["is_biometric_categorization_system"] is True
+
+    def test_non_biometric_annex_sets_art50_narrower_to_false(self):
+        compliance_answers = {}
+        wizard = {"annexIIICategory": "annex_iii_pt4_employment"}
+        _apply_wizard_overrides_to_answers(compliance_answers, wizard)
+        assert compliance_answers["art50"]["is_emotion_recognition_system"] is False
+        assert compliance_answers["art50"]["is_biometric_categorization_system"] is False
+
+
+class TestPhase2fDefensiveShape:
+    """§AT.19 Phase 2f — _safe_subdict defensively replaces non-dict
+    values in compliance_answers (previously raised TypeError)."""
+
+    def test_non_dict_article_value_silently_replaced(self):
+        """If AI sends a string for art51 (data corruption), override
+        replaces with fresh dict containing the override value."""
+        compliance_answers = {"art51": "this is not a dict"}
+        wizard = {"isGpai": False}
+        _apply_wizard_overrides_to_answers(compliance_answers, wizard)
+        # Replaced with dict containing the override
+        assert isinstance(compliance_answers["art51"], dict)
+        assert compliance_answers["art51"]["is_gpai_model"] is False
+
+    def test_none_article_value_replaced(self):
+        """If AI sends None for an article (legitimate "not answered"),
+        override creates a fresh dict — preserves intent that user did
+        not fill that article, but wizard scope still pins."""
+        compliance_answers = {"art23": None}
+        wizard = {"isImporter": True}
+        _apply_wizard_overrides_to_answers(compliance_answers, wizard)
+        assert isinstance(compliance_answers["art23"], dict)
+        assert compliance_answers["art23"]["is_importer"] is True
+
+
+class TestPhase2fArt25MappingRemoved:
+    """§AT.19 Phase 2f — hasArt25Responsibilities removed from mapping.
+    The wizard answer is broader than the scanner field; conflating
+    them was misleading."""
+
+    def test_hasArt25Responsibilities_no_longer_overrides_art25_field(self):
+        """Wizard hasArt25Responsibilities=true used to set
+        art25.is_safety_component_annex_i=true. Now that mapping is
+        removed — AI keeps answering this field naturally."""
+        compliance_answers = {"art25": {"is_safety_component_annex_i": None}}
+        wizard = {"hasArt25Responsibilities": True}
+        _apply_wizard_overrides_to_answers(compliance_answers, wizard)
+        # Field NOT pinned by wizard — AI's None stays
+        assert compliance_answers["art25"]["is_safety_component_annex_i"] is None
 
 
 class TestWizardOverridesIdempotent:
