@@ -493,6 +493,19 @@ _WIZARD_TO_SCANNER_FIELDS: dict = {
     "hasArt25Responsibilities": [
         ("art25", "is_safety_component_annex_i"),
     ],
+    # §AT.19 Phase 2c (2026-05-13) — wizard expansion +2 questions
+    "isGpaiWithSystemicRisk": [
+        ("_scope", "is_gpai_with_systemic_risk"),
+        # Also pinned at article level for 4 ART52 obligations that
+        # cascade their NA on this field via context_skip_field.
+        ("art52", "is_gpai_with_systemic_risk"),
+    ],
+    "claimsArt63Exception": [
+        ("_scope", "claims_art6_3_exception"),
+        # ART49-OBL-2 cascades on this. Scanner JSON's context_skip_field
+        # is "claims_art6_3_exception" (snake_case, art6_3 not art63).
+        ("art49", "claims_art6_3_exception"),
+    ],
 }
 
 

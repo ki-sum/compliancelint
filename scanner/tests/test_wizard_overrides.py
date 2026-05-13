@@ -170,6 +170,36 @@ class TestWizardOverridesDoNotBreakHybridHuman:
         assert compliance_answers["art50"]["disclosure_evidence"] == ["disclosed.md"]
 
 
+class TestPhase2cWizardExpansion:
+    """§AT.19 Phase 2c (2026-05-13) — 2 new wizard fields added."""
+
+    def test_isGpaiWithSystemicRisk_overrides_scope_and_art52(self):
+        compliance_answers = {
+            "_scope": {"is_gpai_with_systemic_risk": True},
+            "art52": {"is_gpai_with_systemic_risk": True},
+        }
+        wizard = {"isGpaiWithSystemicRisk": False}
+        _apply_wizard_overrides_to_answers(compliance_answers, wizard)
+        assert compliance_answers["_scope"]["is_gpai_with_systemic_risk"] is False
+        assert compliance_answers["art52"]["is_gpai_with_systemic_risk"] is False
+
+    def test_claimsArt63Exception_overrides_scope_and_art49(self):
+        compliance_answers = {}
+        wizard = {"claimsArt63Exception": True}
+        _apply_wizard_overrides_to_answers(compliance_answers, wizard)
+        assert compliance_answers["_scope"]["claims_art6_3_exception"] is True
+        assert compliance_answers["art49"]["claims_art6_3_exception"] is True
+
+    def test_null_systemic_risk_leaves_AI_untouched(self):
+        """Wizard didn't answer (e.g. isGpai was false → systemic_risk hidden)
+        → AI's prior value stays. This is the show_when conditional flow's
+        graceful handling at the override layer."""
+        compliance_answers = {"_scope": {"is_gpai_with_systemic_risk": True}}
+        wizard = {"isGpaiWithSystemicRisk": None}
+        _apply_wizard_overrides_to_answers(compliance_answers, wizard)
+        assert compliance_answers["_scope"]["is_gpai_with_systemic_risk"] is True
+
+
 class TestAnnexIIICategoryDerivations:
     """§AT.19 Phase 2c — annexIIICategory enum derives _scope.is_biometric_system.
 
