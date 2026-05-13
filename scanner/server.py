@@ -1980,6 +1980,33 @@ def cl_update_finding(
     It accepts article-level evidence (one file covers all findings in an article)
     and requires only one user approval for the entire batch.
 
+    HOW USERS INVOKE THIS — natural-language prompts in their MCP IDE.
+    The AI is responsible for translating the user's intent into a
+    correctly-formed cl_update_finding call. Users do NOT type the
+    function name themselves.
+
+    Example user prompts that should result in cl_update_finding calls:
+      • "I have evidence for Art.50 transparency in docs/transparency.md
+         — please update the finding"
+         → AI calls cl_update_finding(<path>, "ART50-OBL-1",
+           "provide_evidence", "repo_file", "docs/transparency.md")
+
+      • "Mark ART51-OBL-1 as not applicable — we are not a GPAI provider"
+         → AI calls cl_update_finding(<path>, "ART51-OBL-1", "rebut",
+           justification="System is not a GPAI model per Art. 3(63)
+           definition. Narrow task-specific recommender, no general
+           capability across distinct tasks.")
+
+      • "Defer ART9-OBL-1 risk-management documentation until Q3"
+         → AI calls cl_update_finding(<path>, "ART09-OBL-1", "defer",
+           justification="Targeted Q3 2026 — risk-management process
+           formalization underway, draft in docs/risk/")
+
+      • "We already addressed the ART12 logging gap — file is
+         src/logging.py line 34"
+         → AI calls cl_update_finding(<path>, "ART12-OBL-1",
+           "provide_evidence", "git_path", "src/logging.py:34")
+
     IMPORTANT — AI MUST VERIFY EVIDENCE BEFORE CALLING THIS TOOL:
 
     Before calling cl_update_finding with action="provide_evidence", you MUST:
