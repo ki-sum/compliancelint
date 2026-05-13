@@ -2425,14 +2425,13 @@ def _scan_single_article(article_number: int, project_path: str, context=None, r
 
     data = result.to_dict()
 
-    # §AT.19 Phase 2d (2026-05-13) — Approach (b) post-process. Rewrite
-    # every hybrid (automation_level="partial") obligation finding to
-    # UTD + HG hint regardless of what the module's scan() decided.
-    # AI cannot reliably judge the legal-interpretation half of a hybrid
-    # obligation; user must attest via cl_update_finding or SaaS HG
-    # wizard. Pinned by tests/test_approach_b_post_process.py.
-    if isinstance(data.get("findings"), list):
-        _apply_approach_b_post_process(data["findings"])
+    # §AT.19 Phase 2d revision (2026-05-13): Approach (b) post-process
+    # MOVED to cl_sync (server.py:cl_sync) so the IDE AI client sees the
+    # art module's original verdict (preserves AI-hypothesis UX), while
+    # SaaS dashboard receives post-process'd UTD+HG-hint findings (Bug 2
+    # structural fix). This way the IDE experience stays informative
+    # (user can read "AI thinks X but you should attest") and the
+    # dashboard enforces attestation discipline.
 
     # Apply evidence annotations — evidence may explain non-compliant findings
     evidence = load_evidence(project_path)
@@ -2985,6 +2984,31 @@ def cl_sync(project_path: str, regulation: str = "") -> str:
                     finding["level"] = "not_applicable"
                 elif finding.get("evidence") and len(finding["evidence"]) > 0:
                     finding["level"] = "compliant"
+
+    # §AT.19 Phase 2d (2026-05-13) — Approach (b) post-process at sync
+    # boundary. Hybrid (automation_level=partial) findings rewritten to
+    # UTD+HG hint BEFORE pushing to SaaS, so the dashboard enforces
+    # human attestation. The IDE AI client kept the original verdict
+    # (it's seen via cl_scan_all return value); only what gets persisted
+    # to SaaS dashboard is rewritten. This split preserves UX (AI can
+    # tell user "my hypothesis is X") while ensuring compliance state
+    # of record always comes from explicit user attestation.
+    for _art_key, art_data in articles_data.items():
+        findings_dict = art_data.get("findings") or {}
+        # Wrap into list shape that _apply_approach_b_post_process expects,
+        # operate in-place by mapping back.
+        finding_list = []
+        for obl_id, finding in findings_dict.items():
+            if isinstance(finding, dict):
+                # Inject obligation_id since _apply_approach_b_post_process
+                # reads it; the stored shape uses dict keys for IDs.
+                finding["_obligation_id_for_post_process"] = obl_id
+                finding["obligation_id"] = obl_id
+                finding_list.append(finding)
+        _apply_approach_b_post_process(finding_list)
+        # Cleanup helper key so we don't ship it to SaaS.
+        for finding in finding_list:
+            finding.pop("_obligation_id_for_post_process", None)
 
     # Read cached commit SHAs from metadata.json (cl_scan_all wrote these).
     #
