@@ -423,6 +423,126 @@ def _apply_saas_settings_to_scope(scope: dict, saas_settings: dict) -> dict:
     return scope
 
 
+# §AT.19 Phase 2 (2026-05-13) — wizard answers override AI scope answers.
+#
+# Bug 2 root cause: AI's `compliance_answers` for scope questions
+# (`is_gpai_model`, `is_annex_i_product`, `is_importer`, etc.) is
+# non-deterministic. Same code, different runs → different answers →
+# ±20-50% finding count variance for real paid users (kisum's daily
+# routine had this masked by prompt-pinning but real users don't).
+#
+# Phase 2 fix: when SaaS sends `wizard_answers` in scan-settings response,
+# scanner overrides AI's answers for scope fields with the wizard's
+# authoritative values BEFORE `run_gate` validation. Wizard is the single
+# source of truth for SCOPE; AI is authoritative only for EVIDENCE.
+#
+# Free tier (no wizard_answers) → no override → AI variance persists.
+# This is the Phase 2 §B legal-asymmetry sentinel: legal-safety requires
+# free users to "see everything", so we don't constrain their scope
+# answers either.
+#
+# Hybrid/human article functionality (HG hints, evidence upload, git-path
+# resolution, AI guidance — all in scanner/core/obligation_engine.py:189
+# + scanner/core/evidence.py:276) is OBLIGATION-LEVEL, not SCOPE-level.
+# Wizard overrides touch only `compliance_answers` scope fields, never
+# the obligation JSON registry or evidence pipeline. Pinned by
+# tests/test_wizard_overrides.py::TestWizardOverridesDoNotBreakHybridHuman.
+
+# Map: wizard answer key → list of (article_key, scanner_field_name) pairs
+# to override when the wizard has answered. Per-wizard-field mappings are
+# centralised here (scanner-side) because the scanner-side schema is the
+# authority for what fields exist in compliance_answers.
+#
+# Inverse fields (e.g. is_third_country_provider = !euEstablished) are
+# handled separately below — they need polarity flip not direct copy.
+_WIZARD_TO_SCANNER_FIELDS: dict = {
+    "isAnnexIProduct": [
+        ("art8", "is_annex_i_product"),
+        ("art11", "is_annex_i_product"),
+    ],
+    "isGpai": [
+        ("_scope", "is_gpai_provider"),
+        ("art51", "is_gpai_model"),
+    ],
+    "isImporter": [
+        ("_scope", "is_importer"),
+        ("art23", "is_importer"),
+    ],
+    "isDistributor": [
+        ("_scope", "is_distributor"),
+        ("art24", "is_distributor"),
+    ],
+    "isAuthorisedRepresentative": [
+        ("_scope", "is_authorised_representative"),
+    ],
+    "isOpenSource": [
+        ("_scope", "is_open_source"),
+    ],
+    "isMilitaryDefense": [
+        ("_scope", "is_military_defense"),
+    ],
+    "isResearchOnly": [
+        ("_scope", "is_research_only"),
+    ],
+    "territorialScopeApplies": [
+        ("_scope", "territorial_scope_applies"),
+    ],
+    "euEstablished": [
+        ("art22", "is_eu_established_provider"),
+    ],
+    "hasArt25Responsibilities": [
+        ("art25", "is_safety_component_annex_i"),
+    ],
+}
+
+
+def _apply_wizard_overrides_to_answers(
+    compliance_answers: dict, wizard_answers: dict | None,
+) -> dict:
+    """Override AI's scope answers with wizard truth.
+
+    Mutates compliance_answers in place AND returns it. For each wizard
+    field that has a non-null answer, writes the value to every
+    (article, field) mapping listed in `_WIZARD_TO_SCANNER_FIELDS`.
+
+    Inverse semantics handled inline (currently: euEstablished →
+    is_third_country_provider on art54). Add more inverse cases below
+    if future wizard fields need polarity flip.
+
+    Free tier path: when `wizard_answers` is None or empty, this is a
+    no-op — AI's scope answers stand. Preserves Phase 2 §B legal-
+    asymmetry sentinel.
+
+    Per-field null in wizard means "user did not answer" → leave AI's
+    value. This is intentional: wizard is authoritative ONLY for fields
+    the user explicitly answered.
+
+    Idempotent: calling twice with the same wizard payload produces the
+    same result.
+    """
+    if not wizard_answers:
+        return compliance_answers
+
+    # Standard direct-copy overrides.
+    for wizard_key, mappings in _WIZARD_TO_SCANNER_FIELDS.items():
+        val = wizard_answers.get(wizard_key)
+        if val is None:
+            continue
+        for art_key, field_name in mappings:
+            article_dict = compliance_answers.setdefault(art_key, {})
+            article_dict[field_name] = bool(val)
+
+    # Inverse: is_third_country_provider = NOT euEstablished.
+    # Art 54 obligations only apply when the provider is established
+    # outside the EU AND must appoint an authorised representative.
+    eu = wizard_answers.get("euEstablished")
+    if eu is not None:
+        art54 = compliance_answers.setdefault("art54", {})
+        art54["is_third_country_provider"] = not bool(eu)
+
+    return compliance_answers
+
+
 def _check_paid_completion_gate(ctx, project_path: str):
     """Phase 4 Task 12b — Evidence completeness gate (post-2026-04-29).
 
@@ -948,6 +1068,20 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
             scope = ctx.compliance_answers.get("_scope", {})
             _apply_saas_settings_to_scope(scope, saas_settings)
             ctx.compliance_answers["_scope"] = scope
+            # §AT.19 Phase 2 (2026-05-13) — wizard answers override AI's
+            # non-deterministic scope answers. Wizard is the single source
+            # of truth for scope fields the user explicitly answered;
+            # AI variance on those fields is structurally eliminated.
+            # Free tier / unanswered fields fall back to AI's value.
+            wizard_answers = saas_settings.get("wizard_answers")
+            if wizard_answers:
+                _apply_wizard_overrides_to_answers(
+                    ctx.compliance_answers, wizard_answers,
+                )
+                logger.info(
+                    "cl_scan_all — wizard overrides applied: %d fields",
+                    sum(1 for v in wizard_answers.values() if v is not None),
+                )
             logger.info(
                 "cl_scan_all — SaaS settings applied: roles=%s, risk=%s",
                 saas_settings.get("roles"),
