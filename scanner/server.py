@@ -509,6 +509,69 @@ _WIZARD_TO_SCANNER_FIELDS: dict = {
 }
 
 
+def _apply_approach_b_post_process(findings: list) -> list:
+    """§AT.19 Phase 2d (2026-05-13) — Approach (b) post-process.
+
+    Hybrid obligations (`automation_level == "partial"`) should NOT
+    consume AI's compliance answers to determine COMPLIANT/NC status,
+    because:
+      1. AI judgment on legal-interpretation half is non-deterministic
+         (Bug 2 root cause for the 176 hybrid obligations).
+      2. HG attestation flow (cl_update_finding + SaaS HG wizard) is
+         the legally-correct completion path — user must explicitly
+         affirm with evidence.
+
+    Per-obligation logic:
+      - Look up obligation's automation_level via obligation_lookup.
+      - If level == "partial", rewrite the finding to UTD + HG hint.
+      - If level == "full" or "manual" or unknown → leave finding as-is.
+        (full = AI is authoritative for code detection;
+         manual = already emits UTD+HG via gap_findings.)
+
+    Mutates findings list IN PLACE and also returns it (caller convenience).
+
+    Pinned by tests/test_approach_b_post_process.py.
+    """
+    from core.obligation_lookup import lookup_obligation
+    HG_HINT = (
+        "Complete this Human Gate at "
+        "https://compliancelint.dev/dashboard → Human Gates "
+        "(your dashboard renders this as a clickable link). "
+        "Or in your MCP IDE, ask your AI: "
+        "\"Update compliance for {obl_id} — I have evidence at <path>\" "
+        "(your AI calls cl_update_finding under the hood)."
+    )
+    for f in findings:
+        if not isinstance(f, dict):
+            continue
+        oid = f.get("obligation_id", "")
+        if not oid:
+            continue
+        row = lookup_obligation(oid)
+        if not row:
+            continue
+        auto = row.get("automation_assessment", {}) or {}
+        level = auto.get("level", "")
+        if level != "partial":
+            continue
+        # Rewrite to UTD + HG hint. Preserve original obligation_id +
+        # source_quote + article (already part of f). Replace level,
+        # description, human_gate_hint.
+        f["level"] = "unable_to_determine"
+        f["description"] = (
+            f"[HYBRID — needs Human Gates attestation] {row.get('source', oid)}: "
+            f"This obligation requires both code-level evidence AND human "
+            f"legal-interpretation judgment. AI cannot determine compliance "
+            f"unilaterally. Provide evidence + attestation via "
+            f"cl_update_finding('{oid}', 'provide_evidence', ...) "
+            f"in your MCP IDE, or the SaaS Human Gates wizard."
+        )
+        f["human_gate_hint"] = HG_HINT.replace("{obl_id}", oid)
+        # Clear stale C/NC confidence — UTD means "we don't know".
+        f["confidence"] = "low"
+    return findings
+
+
 def _apply_wizard_overrides_to_answers(
     compliance_answers: dict, wizard_answers: dict | None,
 ) -> dict:
@@ -2297,6 +2360,15 @@ def _scan_single_article(article_number: int, project_path: str, context=None, r
     logger.info("Art. %d — scan complete: %s, %d findings", article_number, result.overall_level.value, len(result.findings))
 
     data = result.to_dict()
+
+    # §AT.19 Phase 2d (2026-05-13) — Approach (b) post-process. Rewrite
+    # every hybrid (automation_level="partial") obligation finding to
+    # UTD + HG hint regardless of what the module's scan() decided.
+    # AI cannot reliably judge the legal-interpretation half of a hybrid
+    # obligation; user must attest via cl_update_finding or SaaS HG
+    # wizard. Pinned by tests/test_approach_b_post_process.py.
+    if isinstance(data.get("findings"), list):
+        _apply_approach_b_post_process(data["findings"])
 
     # Apply evidence annotations — evidence may explain non-compliant findings
     evidence = load_evidence(project_path)
