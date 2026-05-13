@@ -540,6 +540,23 @@ def _apply_wizard_overrides_to_answers(
         art54 = compliance_answers.setdefault("art54", {})
         art54["is_third_country_provider"] = not bool(eu)
 
+    # §AT.19 Phase 2c (2026-05-13) — derive biometric scope from wizard
+    # annexIIICategory enum. The wizard's "annex_iii_pt1_biometrics"
+    # covers Annex III §1 = remote biometric ID + biometric
+    # categorisation + emotion recognition. Setting the broader
+    # `_scope.is_biometric_system` from this enum is safe (6 obligations
+    # in ART12 cascade their NA on it). Narrower art50 booleans
+    # (is_emotion_recognition_system, is_biometric_categorization_system)
+    # are deliberately NOT auto-set — they are subsets of the wizard
+    # answer; the user must affirm them per-obligation in HG attestation.
+    annex_iii_cat = wizard_answers.get("annexIIICategory")
+    if annex_iii_cat is not None:
+        scope = compliance_answers.setdefault("_scope", {})
+        # Explicit biometric annex → is_biometric_system = true.
+        # Any other annex value → is_biometric_system = false (narrowed
+        # out by structural answer).
+        scope["is_biometric_system"] = (annex_iii_cat == "annex_iii_pt1_biometrics")
+
     return compliance_answers
 
 

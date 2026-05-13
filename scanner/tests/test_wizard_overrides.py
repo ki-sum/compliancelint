@@ -170,6 +170,53 @@ class TestWizardOverridesDoNotBreakHybridHuman:
         assert compliance_answers["art50"]["disclosure_evidence"] == ["disclosed.md"]
 
 
+class TestAnnexIIICategoryDerivations:
+    """§AT.19 Phase 2c — annexIIICategory enum derives _scope.is_biometric_system.
+
+    The user wizard answer "annex_iii_pt1_biometrics" (Annex III §1)
+    structurally implies the system is a biometric system, which gates
+    6 ART12 obligations' NA decisions. Pre-Phase-2c, AI had to guess
+    is_biometric_system — high variance. Now derived from wizard.
+    """
+
+    def test_annex_iii_pt1_biometrics_sets_is_biometric_system_true(self):
+        compliance_answers = {}
+        wizard = {"annexIIICategory": "annex_iii_pt1_biometrics"}
+        _apply_wizard_overrides_to_answers(compliance_answers, wizard)
+        assert compliance_answers["_scope"]["is_biometric_system"] is True
+
+    def test_other_annex_value_sets_is_biometric_system_false(self):
+        """Picking a non-biometric Annex III category (e.g. recruitment)
+        structurally rules out biometric system."""
+        compliance_answers = {}
+        wizard = {"annexIIICategory": "annex_iii_pt4_employment"}
+        _apply_wizard_overrides_to_answers(compliance_answers, wizard)
+        assert compliance_answers["_scope"]["is_biometric_system"] is False
+
+    def test_not_annex_iii_sets_is_biometric_system_false(self):
+        compliance_answers = {}
+        wizard = {"annexIIICategory": "not_annex_iii"}
+        _apply_wizard_overrides_to_answers(compliance_answers, wizard)
+        assert compliance_answers["_scope"]["is_biometric_system"] is False
+
+    def test_null_annex_leaves_is_biometric_system_untouched(self):
+        compliance_answers = {"_scope": {"is_biometric_system": True}}
+        wizard = {"annexIIICategory": None}
+        _apply_wizard_overrides_to_answers(compliance_answers, wizard)
+        # null means wizard not answered → AI's prior True stays
+        assert compliance_answers["_scope"]["is_biometric_system"] is True
+
+    def test_art50_narrower_booleans_NOT_auto_derived(self):
+        """is_emotion_recognition_system + is_biometric_categorization_system
+        are narrower than the wizard's annex_iii_pt1_biometrics — user
+        must affirm per-obligation in HG attestation."""
+        compliance_answers = {"art50": {"is_emotion_recognition_system": None}}
+        wizard = {"annexIIICategory": "annex_iii_pt1_biometrics"}
+        _apply_wizard_overrides_to_answers(compliance_answers, wizard)
+        # art50 narrower fields stay None (AI/HG territory)
+        assert compliance_answers["art50"]["is_emotion_recognition_system"] is None
+
+
 class TestWizardOverridesIdempotent:
     """Calling override twice must be idempotent."""
 
