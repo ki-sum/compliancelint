@@ -1707,6 +1707,78 @@ def cl_action_guide(obligation_id: str) -> str:
 
 
 @mcp.tool()
+def _fetch_effective_status_from_saas(project_path: str) -> dict[str, str]:
+    """§AT.19 Phase 4 (2026-05-13) — cross-surface consistency overlay.
+
+    Fetches per-obligation EFFECTIVE compliance status from the SaaS
+    dashboard's `/api/v1/projects/{project_id}/effective-status` endpoint
+    so `cl_action_plan` (and any other scanner tool that calls this) can
+    agree with what the user sees in the dashboard.
+
+    Pre-Phase-4 drift: `cl_action_plan` returned raw scanner verdicts,
+    ignoring SaaS-side `finding_responses` (Mark as Compliant
+    attestations, evidence uploads, rebuts). A user who attested to
+    ART10-OBL-1 in the dashboard's HG wizard saw COMPLIANT there but
+    still got "do ART10-OBL-1" in the IDE AI's `cl_action_plan` output.
+
+    Returns:
+        Map of obligation_id → effective status string. Empty dict when:
+          - No api_key configured (caller should degrade silently)
+          - Project not registered on SaaS
+          - HTTP error / network failure (best-effort overlay)
+          - No scan exists yet
+
+    Never raises — overlay is best-effort and must not block the action
+    plan if the dashboard is unreachable.
+    """
+    try:
+        config = ProjectConfig.load(project_path)
+        if not config.saas_api_key:
+            return {}
+        if not config.project_id:
+            # Fall back to project.json cache (same lookup cl_sync uses)
+            from core import paths as cl_paths
+            pj_file = cl_paths.project_file_str(project_path)
+            if os.path.isfile(pj_file):
+                try:
+                    with open(pj_file, "r", encoding="utf-8") as _f:
+                        config.project_id = json.load(_f).get("project_id", "")
+                except Exception:
+                    pass
+        if not config.project_id:
+            return {}
+
+        saas_url = config.saas_url or "https://compliancelint.dev"
+        url = f"{saas_url}/api/v1/projects/{config.project_id}/effective-status"
+        import subprocess as _sp
+        curl_flags = {}
+        if hasattr(_sp, "CREATE_NO_WINDOW"):
+            curl_flags["creationflags"] = _sp.CREATE_NO_WINDOW
+        result = _sp.run(
+            [
+                "curl", "-s", "-S", "--max-time", "8",
+                "-X", "GET", url,
+                "-H", f"Authorization: Bearer {config.saas_api_key}",
+                "-w", "\n%{http_code}",
+            ],
+            capture_output=True, text=True, timeout=10, **curl_flags,
+        )
+        lines = result.stdout.strip().rsplit("\n", 1)
+        body_str = lines[0] if len(lines) > 1 else ""
+        http_code = int(lines[-1]) if lines[-1].isdigit() else 0
+        if http_code != 200 or not body_str:
+            return {}
+        body = json.loads(body_str)
+        obligations = body.get("obligations") or {}
+        if not isinstance(obligations, dict):
+            return {}
+        # Type guard — accept only string values.
+        return {str(k): str(v) for k, v in obligations.items() if isinstance(v, str)}
+    except Exception:
+        # Network / parse / config failure — overlay is best-effort.
+        return {}
+
+
 def cl_action_plan(project_path: str, regulation: str = "eu-ai-act", article: int = 0) -> str:
     """Generate a human action plan for compliance.
 
@@ -1720,6 +1792,15 @@ def cl_action_plan(project_path: str, regulation: str = "eu-ai-act", article: in
     those fields are empty strings — the plan degrades to "scan all,
     review all" without specific detection guidance. Free sign-up at
     compliancelint.dev.
+
+    §AT.19 Phase 4 (2026-05-13) — cross-surface overlay: actions whose
+    obligation_id is already COMPLIANT or NOT_APPLICABLE in the SaaS
+    dashboard (via Mark as Compliant attestation / evidence upload /
+    rebut) are downgraded to LOW priority + tagged
+    `already_attested_in_dashboard=true`. The user sees these
+    "done elsewhere" entries instead of being told to redo work they
+    already attested to. Mismatch is logged in
+    `dashboard_overlay_summary` for debugging.
 
     Args:
         project_path: Absolute path to the project directory.
@@ -1785,14 +1866,60 @@ def cl_action_plan(project_path: str, regulation: str = "eu-ai-act", article: in
                 "action_type": "error",
             })
 
-    # Sort by priority
-    priority_order = {"CRITICAL": 0, "HIGH": 1, "MEDIUM": 2, "LOW": 3}
+    # Convert action objects to dicts first (uniform shape for overlay).
     action_dicts = []
     for a in all_actions:
         if hasattr(a, "to_dict"):
             action_dicts.append(a.to_dict())
         elif isinstance(a, dict):
             action_dicts.append(a)
+
+    # §AT.19 Phase 4 (2026-05-13) — Cross-surface overlay. Fetch
+    # effective status from SaaS dashboard (Channel B overlay applied)
+    # so actions whose obligation_id is COMPLIANT / NOT_APPLICABLE in
+    # the dashboard are downgraded + tagged. Without this, AI in the
+    # IDE keeps nagging users about obligations they already attested
+    # to in the dashboard HG wizard.
+    saas_status_map = _fetch_effective_status_from_saas(project_path)
+    overlay_summary = {
+        "fetched_from_dashboard": bool(saas_status_map),
+        "actions_marked_already_attested": 0,
+        "actions_marked_na_in_dashboard": 0,
+    }
+    if saas_status_map:
+        for action_dict in action_dicts:
+            oid = action_dict.get("obligation_id") or action_dict.get("obligationId")
+            if not oid or not isinstance(oid, str):
+                continue
+            dashboard_status = saas_status_map.get(oid)
+            if dashboard_status == "COMPLIANT":
+                action_dict["already_attested_in_dashboard"] = True
+                action_dict["dashboard_status"] = "COMPLIANT"
+                action_dict["priority"] = "LOW"
+                action_dict["details"] = (
+                    (action_dict.get("details") or "")
+                    + " | NOTE: This obligation is already marked COMPLIANT in the "
+                    "ComplianceLint dashboard (via Mark as Compliant attestation, "
+                    "evidence upload, or other Channel B attestation). The user "
+                    "judged this complete — do not nag them to redo it. Surface "
+                    "this entry to confirm the attestation is still appropriate "
+                    "given current code, but do not treat it as outstanding work."
+                ).strip(" |")
+                overlay_summary["actions_marked_already_attested"] += 1
+            elif dashboard_status == "NOT_APPLICABLE":
+                action_dict["already_attested_in_dashboard"] = True
+                action_dict["dashboard_status"] = "NOT_APPLICABLE"
+                action_dict["priority"] = "LOW"
+                action_dict["details"] = (
+                    (action_dict.get("details") or "")
+                    + " | NOTE: This obligation has been marked NOT_APPLICABLE "
+                    "in the dashboard (user rebut / wizard scope flip). Skip it "
+                    "unless the user's profile has changed since the attestation."
+                ).strip(" |")
+                overlay_summary["actions_marked_na_in_dashboard"] += 1
+
+    # Sort by priority (overlay-downgraded actions now bucket to LOW).
+    priority_order = {"CRITICAL": 0, "HIGH": 1, "MEDIUM": 2, "LOW": 3}
     action_dicts.sort(key=lambda x: priority_order.get(x.get("priority", "LOW"), 4))
 
     combined_plan = {
@@ -1804,6 +1931,11 @@ def cl_action_plan(project_path: str, regulation: str = "eu-ai-act", article: in
         "medium": sum(1 for a in action_dicts if a.get("priority") == "MEDIUM"),
         "low": sum(1 for a in action_dicts if a.get("priority") == "LOW"),
         "actions": action_dicts,
+        # §AT.19 Phase 4 (2026-05-13) — overlay diagnostics. Tells the AI
+        # client whether dashboard overlay was applied + how many actions
+        # were downgraded. Empty / zero values when api_key missing or
+        # SaaS unreachable; AI should fall back to raw scanner verdicts.
+        "dashboard_overlay_summary": overlay_summary,
         # §AD.5b — Recital interpretive layer keyed by article number.
         # Empty dict when no covered article has mapped Recitals OR when
         # recitals.json is unavailable. Per Kisum decision 2026-05-04:
