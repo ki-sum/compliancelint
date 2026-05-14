@@ -562,6 +562,18 @@ def _apply_approach_b_post_process(findings: list) -> list:
         level = auto.get("level", "")
         if level != "partial":
             continue
+        # §AT.19 root cause fix (2026-05-14) — preserve NOT_APPLICABLE
+        # emitted by scanner modules. NA is a deterministic
+        # context-driven decision (module's context_skip_field /
+        # prerequisites matched the user's profile), not AI variance.
+        # Rewriting it to UTD made non-high-risk providers see Art
+        # 41/43/47/49/60/61/71/72/73/82/86/111 as "needs Human Gate"
+        # when they should stay NA.
+        #
+        # Variance-elimination intent preserved for C/NC/UTD where AI
+        # judgment legitimately fluctuates between scans.
+        if f.get("level") == "not_applicable":
+            continue
         # Rewrite to UTD + HG hint. Preserve original obligation_id +
         # source_quote + article (already part of f). Replace level,
         # description, human_gate_hint.

@@ -55,17 +55,36 @@ class TestPostProcessRewritesHybrid:
         assert findings[0]["level"] == "unable_to_determine"
         assert "human_gate_hint" in findings[0]
 
-    def test_hybrid_NOT_APPLICABLE_becomes_UTD(self):
-        """Even when scanner decided NA, hybrid needs attestation to confirm."""
+    def test_hybrid_NOT_APPLICABLE_preserved(self):
+        """§AT.19 root cause fix (2026-05-14) — NA emitted by scanner
+        modules is deterministic (driven by context_skip_field /
+        prerequisites matching the user's profile), NOT AI variance.
+
+        Pre-fix this rewrote NA → UTD, causing non-high-risk providers
+        to see Art 41/43/47/49/60/61/71/72/73/82/86/111 as "needs
+        Human Gate" attestation in the dashboard. The articles should
+        stay NA because the user's profile structurally excludes them.
+
+        Variance elimination (test_three_AI_runs_on_hybrid_OID_*)
+        still fires for C/NC/UTD where AI judgment legitimately
+        fluctuates between scans.
+        """
         findings = [
             {
                 "obligation_id": "ART50-OBL-3",
                 "level": "not_applicable",
-                "description": "AI says no emotion system",
+                "description": "Skipped: user profile excludes emotion system",
             },
         ]
         _apply_approach_b_post_process(findings)
-        assert findings[0]["level"] == "unable_to_determine"
+        assert findings[0]["level"] == "not_applicable", (
+            "NA must be preserved — scanner modules' deterministic NA "
+            "decisions are not AI variance"
+        )
+        # Description should NOT be rewritten either — preserve scanner intent.
+        assert "Skipped" in findings[0]["description"]
+        # No HG hint should be added — NA means it doesn't apply at all.
+        assert "human_gate_hint" not in findings[0]
 
 
 class TestPostProcessLeavesCodeAndManualAlone:
@@ -151,7 +170,12 @@ class TestPostProcessVarianceElimination:
 
     def test_three_AI_runs_on_hybrid_OID_all_collapse_to_UTD(self):
         """Simulate AI run-1 said COMPLIANT, run-2 said NC, run-3 said UTD.
-        Post-process makes all three identical UTD outcomes."""
+        Post-process makes all three identical UTD outcomes.
+
+        Excludes NA — NA is a deterministic context-skip decision (not
+        AI variance) and is intentionally preserved (see
+        test_hybrid_NOT_APPLICABLE_preserved).
+        """
         runs = []
         for original_level in ("compliant", "non_compliant", "unable_to_determine"):
             findings = [
@@ -167,3 +191,28 @@ class TestPostProcessVarianceElimination:
         # All three runs produce identical post-process state.
         assert runs[0] == runs[1] == runs[2]
         assert runs[0] == ("unable_to_determine", "low")
+
+    def test_three_scans_all_emit_NA_preserve_NA(self):
+        """§AT.19 root cause fix (2026-05-14) — three scans against the
+        same hybrid obligation that all emit NA (because the user's
+        profile structurally excludes the obligation) MUST preserve NA
+        across all three runs. This is determinism in the OPPOSITE
+        direction from the C/NC/UTD variance — NA is already
+        deterministic, post-process must not perturb it.
+        """
+        runs = []
+        for description in (
+            "Skipped: not_high_risk_provider",
+            "Skipped: not_high_risk_provider",
+            "Skipped: not_high_risk_provider",
+        ):
+            findings = [
+                {
+                    "obligation_id": "ART50-OBL-3",
+                    "level": "not_applicable",
+                    "description": description,
+                },
+            ]
+            _apply_approach_b_post_process(findings)
+            runs.append(findings[0]["level"])
+        assert runs == ["not_applicable", "not_applicable", "not_applicable"]
