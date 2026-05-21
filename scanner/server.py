@@ -2132,13 +2132,36 @@ def cl_update_finding(
       ai_answer_why:  2-4 sentence explanation (MIN 20 chars enforced
                       server-side; anti-laziness invariant)
 
-    Anti-hallucination cross-verify: before writing your judgment, the
-    MCP fetches the prior AI observation for this finding (if any) and
-    augments the prompt with "Prior observation said X because: Y. You
-    said Z, explain why your judgment changed." Your new ai_answer_why
-    MUST explain any change. Per kisum 2026-05-21 design decisions A
-    (min 20 chars), C (one obligation per call), D (replace + cross-
-    verify), F (ai_choose + ai_answer_why naming).
+    Anti-hallucination cross-verify — AI-First flow YOU (the IDE AI)
+    must follow (the MCP is a thin protocol layer, NOT an AI invoker):
+
+      1. BEFORE forming your judgment, call cl_get_ai_observation
+         (project_path, obligation_id=...) to fetch any prior AI
+         observation for this obligation. This issues a GET to the
+         SaaS endpoint — no AI invocation, just a read.
+      2. IF a prior observation exists AND your judgment will differ
+         from it, fold the prior into your own reasoning prompt:
+         "Prior observation said {prior.ai_choose} because:
+          {prior.ai_answer_why}. I'm about to write {new.ai_choose}.
+          Why did my judgment change?" — and answer that question
+         honestly in your ai_answer_why.
+      3. Call cl_update_finding with your new ai_choose +
+         ai_answer_why. Your ai_answer_why MUST acknowledge the prior
+         when you're flipping a verdict (mention "previously",
+         "earlier", "now", "reconsider", "changed", "updated", or
+         similar). An ai_answer_why that silently flips a verdict
+         without acknowledging the prior reasoning is the exact
+         hallucination failure mode this surface exists to prevent.
+      4. The SaaS POST response ALSO returns the prior + a `changed`
+         flag (in result["ai_observation"]["prior"] +
+         result["ai_observation"]["changed"]) — useful as
+         after-the-fact confirmation that your pre-write cross-verify
+         saw the same prior as the server.
+
+    Per kisum 2026-05-21 design decisions A (min 20 chars), C (one
+    obligation per call), D (REPLACE on UPSERT — no history kept;
+    cross-verify reads current row each write), F (ai_choose +
+    ai_answer_why naming).
 
     ── Phase 4 (2026-05-21): URL / file:// evidence handling (AI-First) ──
     When the evidence the user is citing is a URL (https://, http://) or
@@ -2328,6 +2351,9 @@ def _post_ai_observation(
     Validation duplicated client-side for fast-fail / better error msg
     (server still re-validates — defense in depth).
     """
+    import urllib.request
+    import urllib.error
+
     if ai_choose not in {"yes", "no", "needs_review"}:
         logger.warning(
             "cl_update_finding: invalid ai_choose=%r (must be yes/no/needs_review) — observation NOT posted",
@@ -2396,6 +2422,132 @@ def _post_ai_observation(
 
 
 @mcp.tool()
+def cl_get_ai_observation(
+    project_path: str,
+    obligation_id: str = "",
+) -> str:
+    """Phase 3 (2026-05-21) — read AI Observation(s) for an obligation.
+
+    The cross-verify counterpart of cl_update_finding's ai_choose /
+    ai_answer_why params. Use this BEFORE forming a new judgment for
+    an obligation so you can detect prior reasoning + augment your own
+    judgment with the prior context (per the AI-First cross-verify
+    flow documented in cl_update_finding).
+
+    Args:
+        project_path: Absolute path to the project directory.
+        obligation_id: Optional. If provided, returns ONLY that
+            obligation's observation (or null if none). If omitted,
+            returns the FULL map { obligation_id: observation } for
+            every obligation in the latest scan that has an
+            ai_observation row.
+
+    Returns: JSON. Two shapes depending on obligation_id:
+      - Single (obligation_id given):
+          { "project_id": "...", "obligation_id": "...",
+            "observation": { ai_choose, ai_answer_why, source,
+                             finding_id, updated_at } | null }
+      - Map (obligation_id omitted):
+          { "project_id": "...", "scan_id": "...",
+            "observations": { "<oid>": { ai_choose, ... }, ... } }
+
+    Graceful degradation (returns null observation / empty map):
+      - cl_connect not run (no saas_url / saas_api_key)
+      - cl_sync never ran for this project (no project_id in meta)
+      - SaaS POST endpoint unreachable / 4xx-5xx
+    None of these are errors — the IDE AI should treat absence as
+    "no prior to cross-verify against" and proceed to form a fresh
+    judgment without prior context.
+    """
+    import re as _re
+    import urllib.request
+    import urllib.error
+
+    if obligation_id and not _re.match(r"^ART\d+-[A-Z]+-\w+", obligation_id):
+        return json.dumps({
+            "error": f"Invalid obligation_id format: '{obligation_id}'.",
+            "details": "Expected format: ART{N}-OBL-{N} (e.g. ART12-OBL-1).",
+        })
+
+    # Read project_id from local meta.json (set by first cl_sync).
+    from core.config import ProjectConfig
+    config = ProjectConfig.load(project_path)
+    saas_url = (config.saas_url or "").rstrip("/")
+    saas_api_key = config.saas_api_key
+    if not saas_url or not saas_api_key:
+        # cl_connect not run — return empty graceful result so the
+        # IDE AI can proceed as "no prior context available".
+        return json.dumps({
+            "project_id": None,
+            "observations": {} if not obligation_id else None,
+            "observation": None if obligation_id else None,
+            "note": "SaaS not configured (cl_connect not run) — no prior observation lookup possible",
+        })
+
+    meta_path = os.path.join(project_path, ".compliancelint", "local", "meta.json")
+    try:
+        with open(meta_path, "r", encoding="utf-8") as fp:
+            meta = json.load(fp)
+        project_id = meta.get("project_id")
+    except (OSError, json.JSONDecodeError):
+        project_id = None
+
+    if not project_id:
+        return json.dumps({
+            "project_id": None,
+            "observations": {} if not obligation_id else None,
+            "observation": None if obligation_id else None,
+            "note": "No project_id in meta.json — run cl_sync first to register the project",
+        })
+
+    url = f"{saas_url}/api/v1/projects/{project_id}/ai-observation"
+    req = urllib.request.Request(
+        url,
+        method="GET",
+        headers={
+            "Authorization": f"Bearer {saas_api_key}",
+            "Accept": "application/json",
+        },
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            if resp.status != 200:
+                logger.warning(
+                    "cl_get_ai_observation: SaaS GET returned HTTP %d (returning empty)",
+                    resp.status,
+                )
+                return json.dumps({
+                    "project_id": project_id,
+                    "observations": {} if not obligation_id else None,
+                    "observation": None if obligation_id else None,
+                })
+            body = json.loads(resp.read().decode("utf-8"))
+    except (urllib.error.URLError, urllib.error.HTTPError, OSError, json.JSONDecodeError) as e:
+        logger.warning("cl_get_ai_observation: SaaS GET failed: %s (returning empty)", e)
+        return json.dumps({
+            "project_id": project_id,
+            "observations": {} if not obligation_id else None,
+            "observation": None if obligation_id else None,
+        })
+
+    observations = body.get("observations", {}) if isinstance(body, dict) else {}
+
+    if obligation_id:
+        single = observations.get(obligation_id)
+        return json.dumps({
+            "project_id": project_id,
+            "obligation_id": obligation_id,
+            "observation": single,  # dict or None
+        }, indent=2)
+
+    return json.dumps({
+        "project_id": project_id,
+        "scan_id": body.get("scan_id") if isinstance(body, dict) else None,
+        "observations": observations,
+    }, indent=2)
+
+
+@mcp.tool()
 def cl_update_finding_batch(
     project_path: str,
     updates: str,
@@ -2422,11 +2574,21 @@ def cl_update_finding_batch(
     Phase 3 (2026-05-21): each per-obligation item MAY also include
     `ai_choose` ("yes"/"no"/"needs_review") + `ai_answer_why` (2-4 sentence
     explanation, min 20 chars). When present, the MCP POSTs an AI
-    observation to SaaS after the local update succeeds. Cross-verify
-    anti-hallucination: the SaaS endpoint returns the prior observation
-    + a `changed` flag so the IDE AI can detect a judgment flip and
-    explain it. Article-level items DO NOT auto-mint observations — the
-    AI must classify each expanded obligation separately if needed.
+    observation to SaaS after the local update succeeds.
+
+    Cross-verify anti-hallucination flow — AI-First (per cl_update_finding
+    docstring): YOU (IDE AI) should fetch prior observations via
+    cl_get_ai_observation BEFORE forming new judgments, so you can
+    augment your own reasoning when flipping a verdict. The SaaS POST
+    response ALSO returns prior + a `changed` flag (in each item of
+    result["ai_observations"]) — useful as after-the-fact confirmation
+    that your pre-write fetch saw the same prior as the server. An
+    ai_answer_why that silently flips a verdict without acknowledging
+    the prior reasoning is the exact failure mode this surface exists
+    to prevent.
+
+    Article-level items DO NOT auto-mint observations — the AI must
+    classify each expanded obligation separately if needed.
 
     Example with AI observation:
     [
