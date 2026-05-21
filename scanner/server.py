@@ -1144,6 +1144,111 @@ def cl_explain(regulation: str = "eu-ai-act", article: int = 0) -> str:
 
 
 
+def _build_ai_classification_guidance(
+    results: dict,
+    saas_configured: bool,
+) -> dict | None:
+    """Phase 3 (2026-05-21) — pure helper for cl_scan_all guidance block.
+
+    Returns a guidance dict telling the IDE AI to follow up with
+    per-obligation classification via cl_update_finding_batch (with
+    ai_choose + ai_answer_why per item), OR None when guidance
+    shouldn't surface (saas not configured, no candidate obligations).
+
+    Walks the cl_scan_all `results` dict (`{"article_N": {...}}`) and
+    extracts obligation_ids from non-NA findings. NA findings are
+    skipped because applicability engine already determined they don't
+    apply — per-obligation AI judgment on NA obligations is wasted work.
+
+    Pure function (no side effects, no IO) so it's unit-testable in
+    isolation without standing up the full cl_scan_all path.
+    """
+    if not saas_configured:
+        # No cl_connect → no SaaS endpoint to land observations →
+        # don't nudge the AI to do classification work that has
+        # nowhere to go. Returns None so cl_scan_all omits the
+        # guidance section entirely (graceful absence).
+        return None
+
+    candidate_obligation_ids: list[str] = []
+    try:
+        for _art_key, art_summary in results.items():
+            if not isinstance(art_summary, dict):
+                continue
+            art_findings = art_summary.get("findings", [])
+            if not isinstance(art_findings, list):
+                continue
+            for f in art_findings:
+                if not isinstance(f, dict):
+                    continue
+                obl_id = f.get("obligation_id", "")
+                if not obl_id:
+                    continue
+                # Skip pure NA findings — applicability engine has
+                # already determined these obligations don't apply,
+                # so per-obligation AI judgment is wasted work.
+                level = (f.get("level") or "").lower()
+                if level == "not_applicable":
+                    continue
+                candidate_obligation_ids.append(obl_id)
+    except (AttributeError, TypeError) as e:
+        # Defensive: a malformed result shouldn't blow up the
+        # whole scan report. Log + return None to omit guidance.
+        logger.warning("ai_classification_guidance build failed: %s", e)
+        return None
+
+    if not candidate_obligation_ids:
+        return None
+
+    return {
+        "next_step_for_ai": (
+            "Per-obligation AI classification (Phase 3 2026-05-21). "
+            "After reviewing the scan findings above, form a per-obligation "
+            "judgment for each finding in `results.article_N.findings[]` and "
+            "write all judgments to the dashboard so the user sees your view "
+            "alongside their wizard answers."
+        ),
+        "step_1_cross_verify_fetch": (
+            "BEFORE forming each judgment, call cl_get_ai_observation"
+            "(project_path, obligation_id=...) to fetch any prior AI "
+            "observation. If your new judgment differs from prior, your "
+            "ai_answer_why MUST acknowledge the change (use words like "
+            "'previously', 'earlier', 'now', 'reconsider', 'changed')."
+        ),
+        "step_2_form_judgment": (
+            "Read source_quote + decomposed_atoms (in scanner obligation "
+            "JSONs) + the scanner's evidence_summary on this finding + any "
+            "URL/file evidence the user cited (FETCH IT YOURSELF via your "
+            "WebFetch/Read tool — see cl_update_finding docstring for the "
+            "AI-First URL handling rule). Form ai_choose: 'yes' if evidence "
+            "specifically + sufficiently satisfies obligation, 'no' if "
+            "evidence contradicts or clearly fails, 'needs_review' if "
+            "vague/partial/unreachable."
+        ),
+        "step_3_batch_write": (
+            "Call cl_update_finding_batch with one item per obligation. "
+            "Each item must include action + obligation_id + ai_choose + "
+            "ai_answer_why (min 20 chars; explain WHY based on evidence)."
+        ),
+        "batch_call_template": [
+            {
+                "obligation_id": "<from finding.obligation_id>",
+                "action": "acknowledge",
+                "ai_choose": "yes|no|needs_review",
+                "ai_answer_why": "<2-4 sentences, MIN 20 chars, "
+                                 "evidence-grounded reasoning>",
+            }
+        ],
+        "candidate_obligation_ids": candidate_obligation_ids,
+        "scope_note": (
+            f"{len(candidate_obligation_ids)} obligations have findings in "
+            f"this scan and would benefit from per-obligation AI judgment. "
+            f"Obligations the applicability engine already marked NA are "
+            f"excluded (no point classifying things that don't apply)."
+        ),
+    }
+
+
 @mcp.tool()
 def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str = "", regulation: str = "eu-ai-act") -> str:
     """Scan a project for ALL available compliance checks in a regulation.
@@ -1548,6 +1653,19 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
             f"Use the required_schema in each error entry as your template.\n\n"
         )
         report["next_steps"] = fix_instruction + report["next_steps"]
+
+    # Phase 3 (2026-05-21) — AI classification guidance for IDE AI.
+    # Built via pure helper `_build_ai_classification_guidance` so the
+    # logic is unit-testable in isolation (without standing up a full
+    # cl_scan_all integration). Helper returns None when guidance
+    # shouldn't surface (saas not configured, or no candidate
+    # obligations); cl_scan_all attaches to report only when present.
+    guidance = _build_ai_classification_guidance(
+        results=results,
+        saas_configured=bool(config.saas_api_key and config.saas_url),
+    )
+    if guidance is not None:
+        report["ai_classification_guidance"] = guidance
 
     output = json.dumps(report, indent=2, default=str)
 

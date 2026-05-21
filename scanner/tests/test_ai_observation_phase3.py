@@ -617,3 +617,162 @@ def test_cl_get_ai_observation_docstring_explains_graceful_degradation():
         "docstring must document graceful-absence semantics so IDE AI"
         " doesn't treat absence-of-prior as an error"
     )
+
+
+# ── _build_ai_classification_guidance (cl_scan_all guidance block) ──
+
+
+def _mk_results(*per_article_findings: list[dict]) -> dict:
+    """Build a results dict in the shape cl_scan_all produces internally.
+    Each positional arg is the findings list for one article."""
+    return {
+        f"article_{idx}": {"overall": "non_compliant", "findings": findings}
+        for idx, findings in enumerate(per_article_findings, start=1)
+    }
+
+
+def test_guidance_returns_none_when_saas_not_configured():
+    """No cl_connect → no guidance (no place for ai_observations to land)."""
+    results = _mk_results([{"obligation_id": "ART09-OBL-1", "level": "non_compliant"}])
+    out = server._build_ai_classification_guidance(results=results, saas_configured=False)
+    assert out is None
+
+
+def test_guidance_returns_none_when_no_candidate_obligations():
+    """SaaS configured but every finding is NA → nothing to classify → None."""
+    results = _mk_results(
+        [
+            {"obligation_id": "ART51-OBL-1", "level": "not_applicable"},
+            {"obligation_id": "ART52-OBL-1", "level": "not_applicable"},
+        ],
+    )
+    out = server._build_ai_classification_guidance(results=results, saas_configured=True)
+    assert out is None
+
+
+def test_guidance_returns_none_when_results_empty():
+    out = server._build_ai_classification_guidance(results={}, saas_configured=True)
+    assert out is None
+
+
+def test_guidance_includes_candidate_obligation_ids_for_non_na_findings():
+    results = _mk_results(
+        [
+            {"obligation_id": "ART09-OBL-1", "level": "non_compliant"},
+            {"obligation_id": "ART09-OBL-2", "level": "needs_review"},
+        ],
+        [{"obligation_id": "ART10-OBL-1", "level": "compliant"}],
+    )
+    out = server._build_ai_classification_guidance(results=results, saas_configured=True)
+    assert out is not None
+    assert "ART09-OBL-1" in out["candidate_obligation_ids"]
+    assert "ART09-OBL-2" in out["candidate_obligation_ids"]
+    assert "ART10-OBL-1" in out["candidate_obligation_ids"]
+    assert len(out["candidate_obligation_ids"]) == 3
+
+
+def test_guidance_skips_not_applicable_findings():
+    """NA findings excluded — applicability engine already determined
+    these don't apply, so classification is wasted work."""
+    results = _mk_results(
+        [
+            {"obligation_id": "ART09-OBL-1", "level": "non_compliant"},  # included
+            {"obligation_id": "ART51-OBL-1", "level": "not_applicable"},  # excluded
+        ],
+    )
+    out = server._build_ai_classification_guidance(results=results, saas_configured=True)
+    assert out is not None
+    assert "ART09-OBL-1" in out["candidate_obligation_ids"]
+    assert "ART51-OBL-1" not in out["candidate_obligation_ids"]
+
+
+def test_guidance_handles_case_insensitive_not_applicable():
+    """level field can be 'NOT_APPLICABLE' or 'not_applicable' depending
+    on producer — both should be excluded."""
+    results = _mk_results(
+        [
+            {"obligation_id": "ART51-OBL-1", "level": "NOT_APPLICABLE"},
+            {"obligation_id": "ART52-OBL-1", "level": "not_applicable"},
+            {"obligation_id": "ART09-OBL-1", "level": "non_compliant"},
+        ],
+    )
+    out = server._build_ai_classification_guidance(results=results, saas_configured=True)
+    assert out is not None
+    assert out["candidate_obligation_ids"] == ["ART09-OBL-1"]
+
+
+def test_guidance_includes_all_3_step_instructions():
+    """The guidance block walks the IDE AI through 3 steps:
+    (1) cross-verify fetch (cl_get_ai_observation) BEFORE forming judgment,
+    (2) form judgment from source_quote + atoms + evidence,
+    (3) batch write via cl_update_finding_batch.
+    Pin all 3 so a refactor that drops a step fires loud."""
+    results = _mk_results([{"obligation_id": "ART09-OBL-1", "level": "non_compliant"}])
+    out = server._build_ai_classification_guidance(results=results, saas_configured=True)
+    assert out is not None
+    assert "step_1_cross_verify_fetch" in out
+    assert "cl_get_ai_observation" in out["step_1_cross_verify_fetch"]
+    assert "step_2_form_judgment" in out
+    assert "source_quote" in out["step_2_form_judgment"]
+    assert "step_3_batch_write" in out
+    assert "cl_update_finding_batch" in out["step_3_batch_write"]
+
+
+def test_guidance_provides_batch_call_template():
+    """Template must include all 4 required fields per item so AI can
+    construct a valid call without guessing the schema."""
+    results = _mk_results([{"obligation_id": "ART09-OBL-1", "level": "non_compliant"}])
+    out = server._build_ai_classification_guidance(results=results, saas_configured=True)
+    assert isinstance(out["batch_call_template"], list)
+    assert len(out["batch_call_template"]) == 1
+    template_item = out["batch_call_template"][0]
+    for field in ("obligation_id", "action", "ai_choose", "ai_answer_why"):
+        assert field in template_item, f"template missing required field: {field}"
+
+
+def test_guidance_scope_note_mentions_count():
+    """scope_note tells the AI how many obligations need classification
+    so it can plan + show progress to the user."""
+    results = _mk_results(
+        [
+            {"obligation_id": "ART09-OBL-1", "level": "non_compliant"},
+            {"obligation_id": "ART09-OBL-2", "level": "needs_review"},
+            {"obligation_id": "ART09-OBL-3", "level": "compliant"},
+        ],
+    )
+    out = server._build_ai_classification_guidance(results=results, saas_configured=True)
+    assert "3 obligations" in out["scope_note"]
+    # Must also call out the NA exclusion semantics so the AI doesn't
+    # ask the user "what about the NA ones".
+    assert "NA" in out["scope_note"] or "not apply" in out["scope_note"]
+
+
+def test_guidance_defensive_on_malformed_results():
+    """A non-dict article summary, a non-list findings field, or a non-
+    dict finding should NOT crash the guidance build. Returns None
+    (omits guidance) rather than raising."""
+    malformed = {
+        "article_1": "not a dict",  # bad shape
+        "article_2": {"findings": "not a list"},
+        "article_3": {"findings": [{"obligation_id": "ART09-OBL-1", "level": "non_compliant"}]},
+        "article_4": {"findings": [None, "string finding", {"no_obl_id": True}]},
+    }
+    out = server._build_ai_classification_guidance(results=malformed, saas_configured=True)
+    # The one well-formed finding in article_3 should still surface
+    assert out is not None
+    assert "ART09-OBL-1" in out["candidate_obligation_ids"]
+    assert len(out["candidate_obligation_ids"]) == 1
+
+
+def test_guidance_skips_findings_without_obligation_id():
+    """A finding missing obligation_id is unusable — skip it silently
+    rather than including an empty-string key in candidates."""
+    results = _mk_results(
+        [
+            {"obligation_id": "", "level": "non_compliant"},  # no id
+            {"level": "non_compliant"},  # no id at all
+            {"obligation_id": "ART09-OBL-1", "level": "non_compliant"},
+        ],
+    )
+    out = server._build_ai_classification_guidance(results=results, saas_configured=True)
+    assert out["candidate_obligation_ids"] == ["ART09-OBL-1"]
