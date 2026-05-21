@@ -2140,6 +2140,34 @@ def cl_update_finding(
     (min 20 chars), C (one obligation per call), D (replace + cross-
     verify), F (ai_choose + ai_answer_why naming).
 
+    ── Phase 4 (2026-05-21): URL / file:// evidence handling (AI-First) ──
+    When the evidence the user is citing is a URL (https://, http://) or
+    a local file path (file://, /abs/path, relative repo path that you
+    haven't already read), YOU (the IDE AI) MUST fetch / read it
+    YOURSELF using your built-in WebFetch / Read tools BEFORE forming
+    ai_choose + ai_answer_why. Per kisum 2026-05-21 design decision:
+    URL fetching is the IDE AI's native capability (with its own user-
+    consent dialog + context-window management); MCP does NOT
+    re-implement it. AI-First principle — don't duplicate what the
+    host AI already does.
+
+    Flow:
+      1. User cites URL/file as evidence
+      2. You (IDE AI) call your WebFetch/Read tool — the IDE prompts the
+         user for permission (same UX as any other fetch/read)
+      3. User approves → you analyse the fetched content
+      4. You call cl_update_finding with ai_choose + ai_answer_why
+         based on what you actually read
+      5. If user DECLINES the fetch (or URL is unreachable):
+         ai_choose="needs_review",
+         ai_answer_why="Evidence URL not fetched (user declined or
+                       unreachable: {short reason}). Cannot verify
+                       whether content satisfies obligation."
+
+    Do NOT form an ai_choose="yes" verdict on URL/file evidence you
+    haven't actually read — that's hallucinated attestation, which is
+    the exact failure mode the AI Observation surface exists to prevent.
+
     HOW USERS INVOKE THIS — natural-language prompts in their MCP IDE.
     The AI is responsible for translating the user's intent into a
     correctly-formed cl_update_finding call. Users do NOT type the
@@ -2407,6 +2435,17 @@ def cl_update_finding_batch(
        "ai_choose": "yes",
        "ai_answer_why": "docs/risk-management.md Section 2 lists 7 identified risks with mitigations and is dated 2026-04, satisfying the continuous risk management requirement of Art 9(1)."}
     ]
+
+    Phase 4 (2026-05-21): URL / file:// evidence — AI-First. Same rule
+    as cl_update_finding: YOU (IDE AI) must fetch/read the URL or file
+    YOURSELF before forming ai_choose. Use your WebFetch / Read tool
+    (which prompts the user for consent through the IDE's standard
+    dialog). If the user declines or fetch fails:
+      "ai_choose": "needs_review",
+      "ai_answer_why": "Evidence URL not fetched (user declined or
+                       unreachable: {reason}). Cannot verify."
+    Do NOT hallucinate ai_choose="yes" on unread URLs — that's the
+    exact failure mode this surface exists to prevent.
 
     Mode 2: Article-level evidence (recommended for bulk evidence)
     Use "article" instead of "obligation_id" — one piece of evidence auto-applies
