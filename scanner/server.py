@@ -1728,10 +1728,10 @@ def _fetch_effective_status_from_saas(project_path: str) -> dict[str, str]:
     agree with what the user sees in the dashboard.
 
     Pre-Phase-4 drift: `cl_action_plan` returned raw scanner verdicts,
-    ignoring SaaS-side `finding_responses` (Mark as Compliant
-    attestations, evidence uploads, rebuts). A user who attested to
-    ART10-OBL-1 in the dashboard's HG wizard saw COMPLIANT there but
-    still got "do ART10-OBL-1" in the IDE AI's `cl_action_plan` output.
+    ignoring SaaS-side `finding_responses` (wizard attestations,
+    evidence uploads, rebuts). A user who attested to ART10-OBL-1 in
+    the dashboard's HG wizard saw COMPLIANT there but still got
+    "do ART10-OBL-1" in the IDE AI's `cl_action_plan` output.
 
     Returns:
         Map of obligation_id → effective status string. Empty dict when:
@@ -1807,8 +1807,8 @@ def cl_action_plan(project_path: str, regulation: str = "eu-ai-act", article: in
 
     §AT.19 Phase 4 (2026-05-13) — cross-surface overlay: actions whose
     obligation_id is already COMPLIANT or NOT_APPLICABLE in the SaaS
-    dashboard (via Mark as Compliant attestation / evidence upload /
-    rebut) are downgraded to LOW priority + tagged
+    dashboard (via wizard attestation / evidence upload / rebut) are
+    downgraded to LOW priority + tagged
     `already_attested_in_dashboard=true`. The user sees these
     "done elsewhere" entries instead of being told to redo work they
     already attested to. Mismatch is logged in
@@ -1911,11 +1911,11 @@ def cl_action_plan(project_path: str, regulation: str = "eu-ai-act", article: in
                 action_dict["details"] = (
                     (action_dict.get("details") or "")
                     + " | NOTE: This obligation is already marked COMPLIANT in the "
-                    "ComplianceLint dashboard (via Mark as Compliant attestation, "
-                    "evidence upload, or other Channel B attestation). The user "
-                    "judged this complete — do not nag them to redo it. Surface "
-                    "this entry to confirm the attestation is still appropriate "
-                    "given current code, but do not treat it as outstanding work."
+                    "ComplianceLint dashboard (via wizard attestation, evidence "
+                    "upload, or other Channel B attestation). The user judged "
+                    "this complete — do not nag them to redo it. Surface this "
+                    "entry to confirm the attestation is still appropriate given "
+                    "current code, but do not treat it as outstanding work."
                 ).strip(" |")
                 overlay_summary["actions_marked_already_attested"] += 1
             elif dashboard_status == "NOT_APPLICABLE":
@@ -2479,7 +2479,7 @@ def cl_verify_evidence(project_path: str) -> str:
         "'placeholder pending', 'WIP', 'temporary', 'will replace', "
         "'see also: missing doc') BUT the finding is marked COMPLIANT, "
         "flag this as an INCONSISTENCY in your final report. The user "
-        "may have clicked 'Mark as Compliant' prematurely — surface "
+        "may have clicked Save with an incomplete attestation — surface "
         "this so they can either complete the upload or downgrade the "
         "status. Same applies to placeholder content like 'TBD', "
         "'lorem ipsum', or single-line summaries claiming to cover "
