@@ -2117,12 +2117,28 @@ def cl_update_finding(
     evidence_type: str = "",
     evidence_value: str = "",
     justification: str = "",
+    ai_choose: str = "",
+    ai_answer_why: str = "",
 ) -> str:
     """Update a single compliance finding with evidence, rebuttal, or status change.
 
     ⚠️  If you need to update more than 3 findings, use cl_update_finding_batch instead.
     It accepts article-level evidence (one file covers all findings in an article)
     and requires only one user approval for the entire batch.
+
+    ── Phase 3 (2026-05-21): AI Observation per finding ──
+    When you (the IDE AI) form a per-obligation judgment, ALSO pass:
+      ai_choose:      "yes" | "no" | "needs_review"
+      ai_answer_why:  2-4 sentence explanation (MIN 20 chars enforced
+                      server-side; anti-laziness invariant)
+
+    Anti-hallucination cross-verify: before writing your judgment, the
+    MCP fetches the prior AI observation for this finding (if any) and
+    augments the prompt with "Prior observation said X because: Y. You
+    said Z, explain why your judgment changed." Your new ai_answer_why
+    MUST explain any change. Per kisum 2026-05-21 design decisions A
+    (min 20 chars), C (one obligation per call), D (replace + cross-
+    verify), F (ai_choose + ai_answer_why naming).
 
     HOW USERS INVOKE THIS — natural-language prompts in their MCP IDE.
     The AI is responsible for translating the user's intent into a
@@ -2248,7 +2264,107 @@ def cl_update_finding(
         justification=justification,
         attester=attester,
     )
+
+    # Phase 3 (2026-05-21): AI Observation per finding. POST to SaaS endpoint
+    # AFTER local update succeeds. Fire-and-warn: a SaaS-side failure is
+    # logged but does NOT fail the local update — graceful degradation if
+    # the user is offline or saas_url is unreachable.
+    if ai_choose and ai_answer_why:
+        ai_obs_result = _post_ai_observation(
+            project_path=project_path,
+            obligation_id=obligation_id,
+            ai_choose=ai_choose,
+            ai_answer_why=ai_answer_why,
+            source="mcp_update",
+        )
+        if ai_obs_result is not None:
+            result["ai_observation"] = ai_obs_result
+
     return json.dumps(result, indent=2, default=str)
+
+
+def _post_ai_observation(
+    project_path: str,
+    obligation_id: str,
+    ai_choose: str,
+    ai_answer_why: str,
+    source: str,
+) -> dict | None:
+    """Phase 3 (2026-05-21) — POST one AI observation to SaaS.
+
+    Reads project_id + saas config from .compliancelint/local/meta.json.
+    Returns the SaaS response dict (with prior + changed flag for cross-
+    verify bookkeeping) on success, None on any failure (logged silently;
+    the local update succeeds regardless).
+
+    Validation duplicated client-side for fast-fail / better error msg
+    (server still re-validates — defense in depth).
+    """
+    if ai_choose not in {"yes", "no", "needs_review"}:
+        logger.warning(
+            "cl_update_finding: invalid ai_choose=%r (must be yes/no/needs_review) — observation NOT posted",
+            ai_choose,
+        )
+        return None
+    if len(ai_answer_why.strip()) < 20:
+        logger.warning(
+            "cl_update_finding: ai_answer_why too short (%d chars, min 20) — observation NOT posted",
+            len(ai_answer_why.strip()),
+        )
+        return None
+
+    from core.config import ProjectConfig
+    config = ProjectConfig.load(project_path)
+    saas_url = (config.saas_url or "").rstrip("/")
+    saas_api_key = config.saas_api_key
+    if not saas_url or not saas_api_key:
+        logger.debug("cl_update_finding: no SaaS configured (cl_connect not run) — ai_observation skipped")
+        return None
+
+    # Resolve project_id from local meta.json (set by first cl_sync).
+    meta_path = os.path.join(project_path, ".compliancelint", "local", "meta.json")
+    try:
+        with open(meta_path, "r", encoding="utf-8") as fp:
+            meta = json.load(fp)
+        project_id = meta.get("project_id")
+    except (OSError, json.JSONDecodeError):
+        project_id = None
+    if not project_id:
+        logger.debug("cl_update_finding: no project_id in meta.json — ai_observation skipped (run cl_sync first)")
+        return None
+
+    url = f"{saas_url}/api/v1/projects/{project_id}/ai-observation"
+    body = json.dumps(
+        {
+            "obligation_id": obligation_id,
+            "ai_choose": ai_choose,
+            "ai_answer_why": ai_answer_why.strip(),
+            "source": source,
+        },
+        ensure_ascii=True,
+    ).encode("utf-8")
+    req = urllib.request.Request(
+        url,
+        data=body,
+        method="POST",
+        headers={
+            "Content-Type": "application/json; charset=utf-8",
+            "Authorization": f"Bearer {saas_api_key}",
+            "Accept": "application/json",
+        },
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            if resp.status == 200:
+                return json.loads(resp.read().decode("utf-8"))
+            logger.warning(
+                "cl_update_finding: ai_observation POST returned HTTP %d (continuing without)",
+                resp.status,
+            )
+            return None
+    except (urllib.error.URLError, urllib.error.HTTPError, OSError, json.JSONDecodeError) as e:
+        logger.warning("cl_update_finding: ai_observation POST failed: %s (continuing without)", e)
+        return None
 
 
 @mcp.tool()
@@ -2273,6 +2389,23 @@ def cl_update_finding_batch(
        "evidence_type": "repo_file", "evidence_value": "docs/risk-management.md"},
       {"obligation_id": "ART50-EXC-1", "action": "rebut",
        "justification": "System is not deployed in biometric context"}
+    ]
+
+    Phase 3 (2026-05-21): each per-obligation item MAY also include
+    `ai_choose` ("yes"/"no"/"needs_review") + `ai_answer_why` (2-4 sentence
+    explanation, min 20 chars). When present, the MCP POSTs an AI
+    observation to SaaS after the local update succeeds. Cross-verify
+    anti-hallucination: the SaaS endpoint returns the prior observation
+    + a `changed` flag so the IDE AI can detect a judgment flip and
+    explain it. Article-level items DO NOT auto-mint observations — the
+    AI must classify each expanded obligation separately if needed.
+
+    Example with AI observation:
+    [
+      {"obligation_id": "ART09-OBL-1", "action": "provide_evidence",
+       "evidence_type": "repo_file", "evidence_value": "docs/risk-management.md",
+       "ai_choose": "yes",
+       "ai_answer_why": "docs/risk-management.md Section 2 lists 7 identified risks with mitigations and is dated 2026-04, satisfying the continuous risk management requirement of Art 9(1)."}
     ]
 
     Mode 2: Article-level evidence (recommended for bulk evidence)
@@ -2377,6 +2510,32 @@ def cl_update_finding_batch(
             "article_items_received": len(article_items),
             "obligations_expanded": len(expanded_from_articles),
         }
+
+    # Phase 3 (2026-05-21): per-item AI Observation. Each batch item may
+    # include `ai_choose` + `ai_answer_why`. For items that do, POST one
+    # ai_observation per (obligation_id) to SaaS after the local batch
+    # update succeeds. Article-level items don't get observations here —
+    # observations are per-obligation, and article-level evidence is
+    # auto-expanded above; the AI would need to classify each expanded
+    # obligation separately (which it can via a separate batch).
+    ai_observation_results: list[dict] = []
+    for upd in obligation_items:
+        obl_id = upd.get("obligation_id", "")
+        ai_choose_val = upd.get("ai_choose", "")
+        ai_answer_why_val = upd.get("ai_answer_why", "")
+        if not (obl_id and ai_choose_val and ai_answer_why_val):
+            continue
+        posted = _post_ai_observation(
+            project_path=project_path,
+            obligation_id=obl_id,
+            ai_choose=ai_choose_val,
+            ai_answer_why=ai_answer_why_val,
+            source="mcp_update",
+        )
+        if posted is not None:
+            ai_observation_results.append(posted)
+    if ai_observation_results:
+        result["ai_observations"] = ai_observation_results
 
     return json.dumps(result, indent=2, default=str)
 
