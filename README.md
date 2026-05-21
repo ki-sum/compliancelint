@@ -11,7 +11,13 @@ From EU AI Act code to audit-ready evidence — in one workflow, inside the tool
 
 Scan, attest, and document EU AI Act compliance without leaving your IDE. The scanner catches code-verifiable violations; Human Gates capture human attestations (with AI-assisted evidence collection along the way) — all with audit trail. Your code never leaves your machine.
 
-> **2026-08-02** — EU AI Act high-risk requirements become enforceable. ComplianceLint helps you prepare now.
+> **EU AI Act enforcement timeline**:
+> - **2025-02-02** — Art. 5 prohibited practices + Art. 99 penalty regime in force
+> - **2025-08-02** — Art. 51-55 GPAI obligations in force
+> - **2026-08-02** *(original)* — Art. 6-27 high-risk obligations were due to become enforceable
+> - **2026-05-07** — Council + Parliament reached political agreement on the Digital Omnibus delaying high-risk obligations to **2027-12-02** (standalone Annex III systems) and **2028-08-02** (embedded in Annex I products). Provisional pending formal adoption; if not adopted before 2026-08-02, the original timeline applies. GenAI watermarking for pre-Aug-2026 models delayed to 2026-12-02.
+>
+> Track current status in-app: [compliancelint.dev/dashboard/regulations/eu-ai-act](https://compliancelint.dev/dashboard/regulations/eu-ai-act).
 
 > **Note:** ComplianceLint is a compliance engineering tool, not a law firm. It gives you a structured, evidence-based path toward compliance — but final legal decisions should always involve qualified legal counsel.
 
