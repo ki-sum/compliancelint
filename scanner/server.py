@@ -41,6 +41,18 @@ from core.upgrade_hint import (
     get_cached_tier,
 )
 
+# Optional MCP telemetry — silent no-op unless the user has explicitly
+# opted in via cl_connect (writes ~/.compliancelint/sentry.json).
+# Phase 1 (2026-05-22): init wiring. Phase 2 will add the cl_connect
+# prompt + DSN fetch + file write. Phase 3 will add scrubbing + Tier 1
+# filter list. Wrapped in try/except: telemetry MUST NEVER break the
+# server, even if sentry-sdk import / init goes sideways.
+try:
+    from core.telemetry import init_if_opted_in
+    init_if_opted_in()
+except Exception:  # noqa: BLE001
+    pass
+
 mcp = FastMCP("compliancelint")
 
 # ── Module Registry ──

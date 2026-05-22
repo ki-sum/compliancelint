@@ -27,6 +27,14 @@ classifiers = [
 ]
 dependencies = [
     "mcp>=1.0",
+    # Optional telemetry — initialised only when the user opts in via
+    # cl_connect (writes ~/.compliancelint/sentry.json). When that file
+    # is absent, sentry_sdk is imported lazily and otherwise idle.
+    # Kept as a regular dep (not extras_require) so the cl_connect
+    # opt-in flow doesn't need to instruct users to run a second
+    # pip install — keeps the consent UX one prompt instead of two.
+    # See scanner/core/telemetry.py for the full opt-in / scrub design.
+    "sentry-sdk>=2.0",
 ]
 
 [project.scripts]
