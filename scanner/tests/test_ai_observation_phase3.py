@@ -597,11 +597,14 @@ def test_cl_update_finding_docstring_instructs_ai_first_url_fetch():
     )
 
 
-def test_cl_update_finding_docstring_documents_cross_verify_flow():
-    """Pin: docstring must accurately describe the AI-First cross-verify
-    flow (use cl_get_ai_observation BEFORE forming judgment, then call
-    cl_update_finding). Catches a regression where docstring drifts
-    back to falsely claiming 'MCP fetches prior' (which it doesn't)."""
+def test_cl_update_finding_docstring_documents_prior_fetch_flow():
+    """Pin: docstring must accurately describe the AI-First prior-fetch
+    read-back convention (use cl_get_ai_observation BEFORE forming
+    judgment, then call cl_update_finding). Catches a regression where
+    docstring drifts back to falsely claiming 'MCP fetches prior' (which
+    it doesn't) or 'server enforces acknowledgement keywords' (which it
+    no longer does — the cross_verify_warning helper was removed
+    2026-05-22 as YAGNI; AI-vs-user red dot is the user-facing signal)."""
     doc = server.cl_update_finding.__doc__ or ""
     assert "cl_get_ai_observation" in doc, (
         "docstring must point IDE AI at cl_get_ai_observation for prior fetch"
@@ -703,15 +706,19 @@ def test_guidance_handles_case_insensitive_not_applicable():
 
 def test_guidance_includes_all_3_step_instructions():
     """The guidance block walks the IDE AI through 3 steps:
-    (1) cross-verify fetch (cl_get_ai_observation) BEFORE forming judgment,
+    (1) prior-observation read-back (cl_get_ai_observation) BEFORE forming
+        judgment — renamed from `step_1_cross_verify_fetch` 2026-05-22
+        after the server-side cross_verify_warning helper was removed
+        (the key name was implying server enforcement that no longer
+        exists; "read prior observation" is the honest description),
     (2) form judgment from source_quote + atoms + evidence,
     (3) batch write via cl_update_finding_batch.
     Pin all 3 so a refactor that drops a step fires loud."""
     results = _mk_results([{"obligation_id": "ART09-OBL-1", "level": "non_compliant"}])
     out = server._build_ai_classification_guidance(results=results, saas_configured=True)
     assert out is not None
-    assert "step_1_cross_verify_fetch" in out
-    assert "cl_get_ai_observation" in out["step_1_cross_verify_fetch"]
+    assert "step_1_read_prior_observation" in out
+    assert "cl_get_ai_observation" in out["step_1_read_prior_observation"]
     assert "step_2_form_judgment" in out
     assert "source_quote" in out["step_2_form_judgment"]
     assert "step_3_batch_write" in out

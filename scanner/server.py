@@ -1220,12 +1220,14 @@ def _build_ai_classification_guidance(
             "write all judgments to the dashboard so the user sees your view "
             "alongside their wizard answers."
         ),
-        "step_1_cross_verify_fetch": (
+        "step_1_read_prior_observation": (
             "BEFORE forming each judgment, call cl_get_ai_observation"
             "(project_path, obligation_id=...) to fetch any prior AI "
-            "observation. If your new judgment differs from prior, your "
-            "ai_answer_why MUST acknowledge the change (use words like "
-            "'previously', 'earlier', 'now', 'reconsider', 'changed')."
+            "observation. If your new judgment differs from prior, "
+            "explain WHY it changed in your ai_answer_why so the user can "
+            "follow your reasoning (convention only — there is no "
+            "server-side check that flags un-acknowledged flips; the "
+            "AI-vs-user red dot is the real safety signal)."
         ),
         "step_2_form_judgment": (
             "Read source_quote + decomposed_atoms (in scanner obligation "
@@ -2262,35 +2264,35 @@ def cl_update_finding(
       ai_answer_why:  2-4 sentence explanation (MIN 20 chars enforced
                       server-side; anti-laziness invariant)
 
-    Anti-hallucination cross-verify — AI-First flow YOU (the IDE AI)
-    must follow (the MCP is a thin protocol layer, NOT an AI invoker):
+    Prior-observation read-back convention — AI-First flow YOU (the IDE
+    AI) should follow (the MCP is a thin protocol layer, NOT an AI invoker):
 
       1. BEFORE forming your judgment, call cl_get_ai_observation
          (project_path, obligation_id=...) to fetch any prior AI
          observation for this obligation. This issues a GET to the
          SaaS endpoint — no AI invocation, just a read.
       2. IF a prior observation exists AND your judgment will differ
-         from it, fold the prior into your own reasoning prompt:
+         from it, fold the prior into your own reasoning:
          "Prior observation said {prior.ai_choose} because:
           {prior.ai_answer_why}. I'm about to write {new.ai_choose}.
           Why did my judgment change?" — and answer that question
-         honestly in your ai_answer_why.
+         honestly in your ai_answer_why so the user can follow your
+         reasoning when they next open the dashboard.
       3. Call cl_update_finding with your new ai_choose +
-         ai_answer_why. Your ai_answer_why MUST acknowledge the prior
-         when you're flipping a verdict (mention "previously",
-         "earlier", "now", "reconsider", "changed", "updated", or
-         similar). An ai_answer_why that silently flips a verdict
-         without acknowledging the prior reasoning is the exact
-         hallucination failure mode this surface exists to prevent.
+         ai_answer_why. There is NO server-side check that flags an
+         un-acknowledged flip — the AI-vs-user red dot (Phase 3) is
+         the user-facing safety signal that catches divergence between
+         your judgment and the user's wizard answer. Explaining a
+         self-flip in ai_answer_why is convention, not enforcement.
       4. The SaaS POST response ALSO returns the prior + a `changed`
          flag (in result["ai_observation"]["prior"] +
          result["ai_observation"]["changed"]) — useful as
-         after-the-fact confirmation that your pre-write cross-verify
-         saw the same prior as the server.
+         after-the-fact confirmation that the prior you read in step 1
+         matches the prior the server had at write time.
 
     Per kisum 2026-05-21 design decisions A (min 20 chars), C (one
     obligation per call), D (REPLACE on UPSERT — no history kept;
-    cross-verify reads current row each write), F (ai_choose +
+    prior-fetch reads current row before each write), F (ai_choose +
     ai_answer_why naming).
 
     ── Phase 4 (2026-05-21): URL / file:// evidence handling (AI-First) ──
@@ -2558,11 +2560,11 @@ def cl_get_ai_observation(
 ) -> str:
     """Phase 3 (2026-05-21) — read AI Observation(s) for an obligation.
 
-    The cross-verify counterpart of cl_update_finding's ai_choose /
+    The prior-fetch counterpart of cl_update_finding's ai_choose /
     ai_answer_why params. Use this BEFORE forming a new judgment for
     an obligation so you can detect prior reasoning + augment your own
-    judgment with the prior context (per the AI-First cross-verify
-    flow documented in cl_update_finding).
+    judgment with the prior context (per the AI-First read-back
+    convention documented in cl_update_finding).
 
     Args:
         project_path: Absolute path to the project directory.
@@ -2586,8 +2588,8 @@ def cl_get_ai_observation(
       - cl_sync never ran for this project (no project_id in meta)
       - SaaS POST endpoint unreachable / 4xx-5xx
     None of these are errors — the IDE AI should treat absence as
-    "no prior to cross-verify against" and proceed to form a fresh
-    judgment without prior context.
+    "no prior to read back" and proceed to form a fresh judgment
+    without prior context.
     """
     import re as _re
     import urllib.request
