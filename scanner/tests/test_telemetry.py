@@ -510,6 +510,59 @@ def test_scrub_handles_windows_backslash_paths(monkeypatch: pytest.MonkeyPatch) 
     assert frame["abs_path"].startswith("<home>/")
 
 
+def test_scrub_home_dir_replaced_when_embedded_mid_string(monkeypatch: pytest.MonkeyPatch) -> None:
+    """REGRESSION 2026-05-22 smoke test bug: when home path appears in the
+    MIDDLE of an exception message (not at start), it must STILL be
+    scrubbed. Original _scrub_string used startswith(home_norm) which
+    silently missed mid-string occurrences — leaking the literal
+    C:\\Users\\<name>\\... into Sentry events.
+
+    Fix: replace-anywhere instead of startswith-only."""
+    monkeypatch.setattr(Path, "home", classmethod(lambda _: Path("C:\\Users\\Kisum")))
+    from scanner.core.telemetry import _scrub_and_filter_before_send  # noqa: PLC2701
+    # Simulate the actual failure mode from the smoke test: message
+    # contains "path=<home>/secret/x.py" embedded mid-text.
+    event = {
+        "exception": {
+            "values": [{
+                "type": "ValueError",
+                "value": "scan failed at path=C:\\Users\\Kisum\\secret\\x.py because reasons",
+            }],
+        },
+    }
+    result = _scrub_and_filter_before_send(event, {})
+    scrubbed = result["exception"]["values"][0]["value"]
+    # Home path replaced even though it's mid-string.
+    assert "C:/Users/Kisum" not in scrubbed
+    assert "C:\\Users\\Kisum" not in scrubbed
+    assert "<home>" in scrubbed
+    assert "/secret/x.py" in scrubbed
+
+
+def test_scrub_handles_mixed_slash_path_mid_string(monkeypatch: pytest.MonkeyPatch) -> None:
+    """REGRESSION 2026-05-22 smoke test bug exact reproducer: f-string
+    concatenating Path.home() (backslashes on Windows) with literal
+    forward-slash suffix produces mixed-slash paths like
+    `C:\\Users\\User/secret/x.py`. After backslash-normalisation +
+    replace-anywhere this still scrubs to `<home>/secret/x.py`."""
+    monkeypatch.setattr(Path, "home", classmethod(lambda _: Path("C:\\Users\\User")))
+    from scanner.core.telemetry import _scrub_and_filter_before_send  # noqa: PLC2701
+    event = {
+        "exception": {
+            "values": [{
+                "type": "ValueError",
+                "value": "MCP smoke test [SCRUB-TEST] path=C:\\Users\\User/secret/x.py email=alice@example.test",
+            }],
+        },
+    }
+    result = _scrub_and_filter_before_send(event, {})
+    scrubbed = result["exception"]["values"][0]["value"]
+    assert "C:/Users/User" not in scrubbed
+    assert "C:\\Users\\User" not in scrubbed
+    assert "<home>/secret/x.py" in scrubbed
+    assert "<email>" in scrubbed
+
+
 def test_scrub_replaces_email_in_exception_value() -> None:
     """Defence-in-depth — exception.value containing an email gets scrubbed."""
     from scanner.core.telemetry import _scrub_and_filter_before_send  # noqa: PLC2701

@@ -206,16 +206,26 @@ def _scrub_string(s: str, home_norm: str) -> str:
     """Apply path / email / IPv4 scrub to a single string.
 
     Order matters:
-      1. Normalise backslashes so Windows paths match home_norm uniformly
-      2. Replace user home prefix with <home> (privacy-friendly placeholder)
+      1. Normalise backslashes so Windows paths match home_norm uniformly.
+      2. Replace user home dir occurrences with the <home> sentinel.
+         Use replace-ANYWHERE (not just startswith) — exception messages
+         and breadcrumb text routinely embed paths mid-sentence
+         (e.g. "path=C:/Users/X/secret/x.py email=..."), which a
+         startswith check would silently miss. Stack-frame abs_path
+         fields still scrub cleanly because abs_path is itself a path
+         starting with home_norm.
+         Smoke-test bug 2026-05-22: previous startswith implementation
+         left "C:\\Users\\User\\..." un-scrubbed when it appeared mid-
+         text. This sub-replace catches that path even when not at the
+         string's start.
       3. Replace emails and IPv4 with sentinels (defence-in-depth even
-         though we set send_default_pii=False)
+         though we set send_default_pii=False).
     """
     if not s:
         return s
-    s_norm = s.replace("\\", "/")
-    if home_norm and s_norm.startswith(home_norm):
-        s = "<home>" + s_norm[len(home_norm):]
+    s = s.replace("\\", "/")
+    if home_norm:
+        s = s.replace(home_norm, "<home>")
     s = _EMAIL_RE.sub("<email>", s)
     s = _IPV4_RE.sub("<ip>", s)
     return s
