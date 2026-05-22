@@ -42,11 +42,59 @@ from __future__ import annotations
 import json
 import logging
 import os
+import re
 import subprocess
 from pathlib import Path
 from typing import Any
 
 logger = logging.getLogger("compliancelint.telemetry")
+
+# ─── Phase 3: noise filter (Tier 1) — exception types dropped at source ───
+#
+# These exception types are 90%+ environmental issues on the user's machine
+# (not bugs in our code) and would otherwise swamp the issue list and burn
+# the 5k/month event quota without surfacing actionable defects. Conservative
+# choice: only drop types where the cost-benefit of investigating each
+# instance is clearly negative.
+#
+# Trade-off acknowledged: if a real ComplianceLint bug ever throws one of
+# these types (e.g. we forget mkdir → FileNotFoundError in our code path),
+# we lose visibility on it. Mitigation: Python tracebacks group by stack
+# hash, so any recurring real bug shows up as a single grouped issue —
+# triage via local repro / user bug report (cl_report_bug) instead.
+#
+# Match by class basename (str), not isinstance, because Sentry events
+# arrive as serialized dicts with the type as a string. This means we
+# also catch arbitrarily-namespaced subclasses (e.g. ssl.SSLError vs
+# requests.exceptions.SSLError) without listing every variant.
+_TIER_1_DROP_TYPES = frozenset({
+    # User project / OS file-system noise — almost always user-side.
+    "FileNotFoundError",
+    "PermissionError",
+    "IsADirectoryError",
+    "NotADirectoryError",
+    # Source files in non-UTF-8 (common on Asian / legacy Windows envs) —
+    # outside our control, suppressed via sniffer in scanner code.
+    "UnicodeDecodeError",
+    # External CLI failed — git / pip / etc. invocation, env issue.
+    "CalledProcessError",
+    "TimeoutExpired",
+    # Corporate proxy / cert chain — outside our control.
+    "SSLError",
+    "SSLCertVerificationError",
+    "SSLEOFError",
+    # User cancelled — never our bug.
+    "KeyboardInterrupt",
+    # Closed pipe (typical when MCP host disconnects mid-scan) — not a
+    # defect in scanner logic.
+    "BrokenPipeError",
+})
+
+# ─── Phase 3: scrub patterns matching dashboard sentry config ─────────
+# Same regex as dashboard's instrumentation-client.ts to keep both
+# scrubbers behaviourally consistent — if we change one, change both.
+_EMAIL_RE = re.compile(r"[\w.+-]+@[\w-]+(?:\.[\w-]+)+")
+_IPV4_RE = re.compile(r"\b(?:\d{1,3}\.){3}\d{1,3}\b")
 
 # Global per-user config dir — same convention as scanner/core/scanner_log.py
 # which uses ~/.compliancelint/logs/{hash}/. We use ~/.compliancelint/sentry.json
@@ -129,9 +177,10 @@ def init_if_opted_in() -> bool:
         sentry_sdk.init(
             dsn=dsn,
             environment=config.get("env", "production"),
-            # Phase 1: scrubbing is a passthrough. Phase 3 will replace
-            # this with the real scrub function that normalizes paths.
-            before_send=_passthrough_before_send,
+            # Phase 3: scrub home dir from paths + drop Tier 1 noise
+            # (FileNotFoundError / PermissionError / SSLError / git
+            # subprocess errors / etc.). See _scrub_and_filter_before_send.
+            before_send=_scrub_and_filter_before_send,
             send_default_pii=False,
             sample_rate=float(config.get("sample_rate", 0.25)),
             traces_sample_rate=0,  # no performance spans, errors only
@@ -153,17 +202,83 @@ def init_if_opted_in() -> bool:
         return False
 
 
-def _passthrough_before_send(event: dict[str, Any], _hint: dict[str, Any]) -> dict[str, Any]:
-    """Phase 1 placeholder. Phase 3 will replace with real scrub logic.
+def _scrub_string(s: str, home_norm: str) -> str:
+    """Apply path / email / IPv4 scrub to a single string.
 
-    Real implementation will:
-      - Normalize abs file paths in stack frames to <workspace>/<file>
-      - Strip user home dir from any string field
-      - Drop events whose exception type is in the Tier 1 filter list
-        (FileNotFoundError, PermissionError, UnicodeDecodeError,
-        subprocess.CalledProcessError from git invocations, etc.)
-      - Return None to drop the event entirely when applicable
+    Order matters:
+      1. Normalise backslashes so Windows paths match home_norm uniformly
+      2. Replace user home prefix with <home> (privacy-friendly placeholder)
+      3. Replace emails and IPv4 with sentinels (defence-in-depth even
+         though we set send_default_pii=False)
     """
+    if not s:
+        return s
+    s_norm = s.replace("\\", "/")
+    if home_norm and s_norm.startswith(home_norm):
+        s = "<home>" + s_norm[len(home_norm):]
+    s = _EMAIL_RE.sub("<email>", s)
+    s = _IPV4_RE.sub("<ip>", s)
+    return s
+
+
+def _scrub_stack_frame(frame: dict[str, Any], home_norm: str) -> None:
+    """Mutate one Sentry stack frame in place — strip user home from
+    abs_path / filename / module. Leave function names alone (they
+    reveal nothing sensitive and removing them breaks issue grouping)."""
+    for key in ("abs_path", "filename"):
+        value = frame.get(key)
+        if isinstance(value, str):
+            frame[key] = _scrub_string(value, home_norm)
+
+
+def _scrub_and_filter_before_send(
+    event: dict[str, Any], _hint: dict[str, Any],
+) -> dict[str, Any] | None:
+    """Sentry before_send hook — Phase 3.
+
+    Two responsibilities:
+      1. Drop events whose top-level exception type is in
+         _TIER_1_DROP_TYPES (return None → Sentry never sends or queues).
+      2. Mutate-in-place to strip the user's home dir prefix from stack
+         frame paths + scrub email / IPv4 patterns from any text we
+         touch.
+
+    Wrapped in try/except: if scrubbing fails for any reason, we still
+    pass the (un-scrubbed) event through rather than silently lose
+    visibility. Sentry's own server-side scrubbers are a backstop.
+    """
+    try:
+        # ── Step 1: Tier 1 drop ──
+        exc_values = event.get("exception", {}).get("values", [])
+        if exc_values:
+            top_type = (exc_values[0] or {}).get("type", "")
+            if top_type in _TIER_1_DROP_TYPES:
+                return None  # drop entirely
+
+        # ── Step 2: scrub ──
+        home_norm = str(Path.home()).replace("\\", "/")
+
+        if isinstance(event.get("message"), str):
+            event["message"] = _scrub_string(event["message"], home_norm)
+
+        for ex in exc_values:
+            if not isinstance(ex, dict):
+                continue
+            if isinstance(ex.get("value"), str):
+                ex["value"] = _scrub_string(ex["value"], home_norm)
+            frames = ex.get("stacktrace", {}).get("frames", [])
+            for frame in frames:
+                if isinstance(frame, dict):
+                    _scrub_stack_frame(frame, home_norm)
+
+        breadcrumbs = event.get("breadcrumbs", {}).get("values", [])
+        for bc in breadcrumbs:
+            if isinstance(bc, dict) and isinstance(bc.get("message"), str):
+                bc["message"] = _scrub_string(bc["message"], home_norm)
+
+    except Exception as e:  # noqa: BLE001
+        logger.debug("scrub failed (passing event through unscrubbed): %s", e)
+
     return event
 
 

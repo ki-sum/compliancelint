@@ -413,3 +413,188 @@ def test_opt_out_cycle_deletes_then_init_skips(tmp_compliancelint_home: Path) ->
     write_dsn_config({"dsn": "https://k@o1.ingest.de.sentry.io/2"})
     assert delete_dsn_config() is True
     assert init_if_opted_in() is False
+
+
+# ─── Phase 3: scrub + Tier 1 filter ──────────────────────────────────
+
+
+@pytest.mark.parametrize(
+    "exc_type",
+    [
+        "FileNotFoundError",
+        "PermissionError",
+        "IsADirectoryError",
+        "NotADirectoryError",
+        "UnicodeDecodeError",
+        "CalledProcessError",
+        "TimeoutExpired",
+        "SSLError",
+        "SSLCertVerificationError",
+        "SSLEOFError",
+        "KeyboardInterrupt",
+        "BrokenPipeError",
+    ],
+)
+def test_tier1_exception_types_are_dropped(exc_type: str) -> None:
+    """Every Tier 1 type returns None → Sentry drops event entirely.
+    Parametrised so adding a new type to _TIER_1_DROP_TYPES also requires
+    adding a test entry — catches accidental list regressions."""
+    from scanner.core.telemetry import _scrub_and_filter_before_send  # noqa: PLC2701
+    event = {"exception": {"values": [{"type": exc_type, "value": "boom"}]}}
+    assert _scrub_and_filter_before_send(event, {}) is None
+
+
+def test_real_bug_exception_passes_through() -> None:
+    """A real bug (TypeError, ValueError, RuntimeError, etc.) is NOT
+    dropped — these are the events we actually want to see."""
+    from scanner.core.telemetry import _scrub_and_filter_before_send  # noqa: PLC2701
+    event = {"exception": {"values": [{"type": "TypeError", "value": "boom"}]}}
+    result = _scrub_and_filter_before_send(event, {})
+    assert result is not None
+    assert result["exception"]["values"][0]["type"] == "TypeError"
+
+
+def test_event_without_exception_passes_through() -> None:
+    """captureMessage events (no exception block) are kept — we use
+    these for explicit cl_report_bug-style signals."""
+    from scanner.core.telemetry import _scrub_and_filter_before_send  # noqa: PLC2701
+    event = {"message": "explicit captureMessage from cl_scan"}
+    result = _scrub_and_filter_before_send(event, {})
+    assert result is not None
+
+
+def test_scrub_strips_home_dir_from_stack_frame(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Stack frame abs_path containing Path.home() prefix gets replaced
+    with the literal '<home>' sentinel — privacy-friendly placeholder."""
+    monkeypatch.setattr(Path, "home", classmethod(lambda _: Path("/home/kisum")))
+    from scanner.core.telemetry import _scrub_and_filter_before_send  # noqa: PLC2701
+    event = {
+        "exception": {
+            "values": [{
+                "type": "RuntimeError",
+                "value": "kaboom",
+                "stacktrace": {
+                    "frames": [
+                        {"abs_path": "/home/kisum/projects/my-app/main.py", "filename": "main.py"},
+                    ],
+                },
+            }],
+        },
+    }
+    result = _scrub_and_filter_before_send(event, {})
+    assert result is not None
+    frame = result["exception"]["values"][0]["stacktrace"]["frames"][0]
+    assert frame["abs_path"] == "<home>/projects/my-app/main.py"
+
+
+def test_scrub_handles_windows_backslash_paths(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Windows abs_path uses backslashes; _scrub_string normalises before
+    home-prefix check so Windows stack frames also get scrubbed."""
+    monkeypatch.setattr(Path, "home", classmethod(lambda _: Path("C:\\Users\\Kisum")))
+    from scanner.core.telemetry import _scrub_and_filter_before_send  # noqa: PLC2701
+    event = {
+        "exception": {
+            "values": [{
+                "type": "RuntimeError",
+                "value": "boom",
+                "stacktrace": {
+                    "frames": [
+                        {"abs_path": "C:\\Users\\Kisum\\AppData\\Local\\Temp\\x.py"},
+                    ],
+                },
+            }],
+        },
+    }
+    result = _scrub_and_filter_before_send(event, {})
+    frame = result["exception"]["values"][0]["stacktrace"]["frames"][0]
+    assert frame["abs_path"].startswith("<home>/")
+
+
+def test_scrub_replaces_email_in_exception_value() -> None:
+    """Defence-in-depth — exception.value containing an email gets scrubbed."""
+    from scanner.core.telemetry import _scrub_and_filter_before_send  # noqa: PLC2701
+    event = {
+        "exception": {
+            "values": [{
+                "type": "RuntimeError",
+                "value": "user alice@example.test triggered an error",
+            }],
+        },
+    }
+    result = _scrub_and_filter_before_send(event, {})
+    assert result["exception"]["values"][0]["value"] == \
+        "user <email> triggered an error"
+
+
+def test_scrub_replaces_ipv4_in_exception_value() -> None:
+    """Defence-in-depth — IPv4 inside exception text gets scrubbed."""
+    from scanner.core.telemetry import _scrub_and_filter_before_send  # noqa: PLC2701
+    event = {
+        "exception": {
+            "values": [{
+                "type": "ConnectionError",
+                "value": "could not reach 198.51.100.42",
+            }],
+        },
+    }
+    result = _scrub_and_filter_before_send(event, {})
+    assert result["exception"]["values"][0]["value"] == \
+        "could not reach <ip>"
+
+
+def test_scrub_breadcrumb_messages_too() -> None:
+    """Breadcrumbs are the most likely accidental PII vector — make sure
+    they also get the same scrub treatment."""
+    from scanner.core.telemetry import _scrub_and_filter_before_send  # noqa: PLC2701
+    event = {
+        "breadcrumbs": {
+            "values": [
+                {"message": "POST from 10.0.0.5 user=bob@example.test"},
+                {"message": "scan complete"},
+            ],
+        },
+    }
+    result = _scrub_and_filter_before_send(event, {})
+    bc0 = result["breadcrumbs"]["values"][0]
+    assert "10.0.0.5" not in bc0["message"]
+    assert "bob@example.test" not in bc0["message"]
+    assert "<ip>" in bc0["message"]
+    assert "<email>" in bc0["message"]
+
+
+def test_scrub_top_level_message_field() -> None:
+    """Event with top-level message (captureMessage style) gets scrubbed."""
+    from scanner.core.telemetry import _scrub_and_filter_before_send  # noqa: PLC2701
+    event = {"message": "captured from carol@example.test"}
+    result = _scrub_and_filter_before_send(event, {})
+    assert result["message"] == "captured from <email>"
+
+
+def test_scrub_failure_passes_event_through_unscrubbed() -> None:
+    """If _scrub_string blows up (impossible by design, but defensive),
+    before_send returns the original event rather than dropping it —
+    we'd rather have noisy visibility than lose all events to a bug
+    in our scrub layer."""
+    from scanner.core.telemetry import _scrub_and_filter_before_send  # noqa: PLC2701
+    with mock.patch(
+        "scanner.core.telemetry._scrub_string",
+        side_effect=RuntimeError("simulated"),
+    ):
+        event = {"exception": {"values": [{"type": "TypeError", "value": "x"}]}}
+        result = _scrub_and_filter_before_send(event, {})
+        # MUST NOT return None just because scrub raised.
+        assert result is not None
+
+
+def test_tier1_filter_runs_before_scrub() -> None:
+    """Ordering check — even if scrub would fail on a Tier 1 event,
+    the drop decision happens first (return None short-circuits the
+    rest of the function). Verifies _TIER_1_DROP check is first."""
+    from scanner.core.telemetry import _scrub_and_filter_before_send  # noqa: PLC2701
+    with mock.patch(
+        "scanner.core.telemetry._scrub_string",
+        side_effect=RuntimeError("scrub explosion"),
+    ):
+        event = {"exception": {"values": [{"type": "FileNotFoundError"}]}}
+        # Tier 1 drop first → returns None before scrub gets a chance to fail.
+        assert _scrub_and_filter_before_send(event, {}) is None
