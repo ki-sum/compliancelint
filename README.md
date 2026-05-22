@@ -358,8 +358,8 @@ The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard
 
 | | Free | Starter | Pro | Business | Enterprise |
 |-|------|---------|-----|----------|------------|
-| **Monthly** | €0 forever | €19/mo | €99/mo | €199/mo | Custom |
-| **Annual (per-month rate · billed yearly)** | — | €19/mo · €228/yr | €79/mo · €948/yr | €149/mo · €1,788/yr | — |
+| **Monthly** | €0 forever | €29/mo | €99/mo | €199/mo | Custom |
+| **Annual (per-month rate · billed yearly)** | — | €25/mo · €300/yr (Save €48/yr) | €79/mo · €948/yr | €149/mo · €1,788/yr | — |
 | Projects | 1 | 2 | 10 | Unlimited | Unlimited |
 | Scan history | 7 days | Unlimited | Unlimited | Unlimited | Unlimited |
 | PDF reports | Watermarked | Clean | Clean | Clean | Clean |
@@ -375,7 +375,10 @@ The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard
 | Evidence — `text` declarations + `git_path` pointers (captured: content saved in DB or git) | — | ✓ | ✓ | ✓ | ✓ |
 | Evidence — `url_reference` (external pointer — content not captured, may link-rot) | — | ✓ | ✓ | ✓ | ✓ |
 | Evidence — `repo_file` upload from dashboard (bytes relayed to your git repo) | — | — | ✓ | ✓ | ✓ |
-| Human Gates questionnaires | — | — | ✓ | ✓ | ✓ |
+| Human Gates questionnaires (per-obligation Yes/No + Notes — the attestation surface) | — | ✓ | ✓ | ✓ | ✓ |
+| Declaration of Conformity PDF (EU AI Act Art. 47 Annex V) | — | — | ✓ | ✓ | ✓ |
+| Technical Documentation PDF (Annex IV §1–§8) | — | — | ✓ | ✓ | ✓ |
+| Per-article Compliance PDF (one per attested article, post-Save) | — | — | ✓ | ✓ | ✓ |
 | SARIF export — via [GitHub Action composite](https://compliancelint.dev/ci-cd) (no dashboard button; uploads to GitHub Code Scanning) | — | — | ✓ | ✓ | ✓ |
 | CI/CD quality gate — runs in your CI runner; any AI driver via MCP, see [/ci-cd](https://compliancelint.dev/ci-cd) for the platform-agnostic prompt | — | — | ✓ | ✓ | ✓ |
 | Multi-framework mapping (ISO 42001, NIST AI RMF) | — | — | — | ✓ | ✓ |
