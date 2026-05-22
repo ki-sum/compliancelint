@@ -802,13 +802,22 @@ def test_guidance_skips_findings_without_obligation_id():
 
 
 def test_cl_scan_all_source_calls_build_ai_classification_guidance_helper():
-    """Source-grep pin: cl_scan_all must contain a call to
-    _build_ai_classification_guidance. If a refactor drops this call,
-    no AI guidance ever flows through to the IDE AI."""
+    """Source-grep pin: cl_scan_all must contain a CALL (not just a
+    comment reference) to _build_ai_classification_guidance. If a
+    refactor drops the actual call but leaves a comment behind,
+    a substring-only test would falsely pass. Round 3 self-audit
+    tightened this to require call syntax (function name followed by
+    a paren), which a comment-only reference would not satisfy."""
+    import re
     import inspect
     src = inspect.getsource(server.cl_scan_all)
-    assert "_build_ai_classification_guidance" in src, (
-        "cl_scan_all must call the guidance helper — refactor removed it?"
+    # Require literal call syntax: function name followed by `(`. Allows
+    # whitespace/newline between (current code wraps args across lines).
+    assert re.search(
+        r"_build_ai_classification_guidance\s*\(", src,
+    ), (
+        "cl_scan_all must CALL the guidance helper (not just reference it "
+        "in a comment). Pattern looked for: `_build_ai_classification_guidance(`."
     )
 
 
