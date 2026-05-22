@@ -776,3 +776,96 @@ def test_guidance_skips_findings_without_obligation_id():
     )
     out = server._build_ai_classification_guidance(results=results, saas_configured=True)
     assert out["candidate_obligation_ids"] == ["ART09-OBL-1"]
+
+
+# ── cl_scan_all ↔ _build_ai_classification_guidance wire-up ──
+#
+# Self-audit round 2 (2026-05-22) caught this missing seam: the
+# previous 11 unit tests only exercised the pure helper in isolation,
+# so a refactor that drops the cl_scan_all wire-up would leave all
+# helper tests passing while the feature silently breaks in prod.
+#
+# Strategy: cl_scan_all has a complex inner pipeline (validation gate
+# requiring per-article answers for all 44 applicable articles,
+# per-module ctx_warnings/effective_ctx setup, scope coercion, etc.)
+# that's expensive to fully stub for a true runtime integration test.
+# The PRAGMATIC honest pin is a STATIC-SOURCE check: grep cl_scan_all's
+# source for the exact call pattern + the attach pattern. A refactor
+# that removes either fires this test loud.
+#
+# This is weaker than runtime integration (it doesn't verify the call
+# order or that `results` flows correctly to the helper), but combined
+# with the 11 pure-helper tests + dozens of route + UI tests on the
+# SaaS side, the entire chain is reasonably covered. Future hardening:
+# extract cl_scan_all's tail into a testable helper, then a real
+# runtime test becomes feasible.
+
+
+def test_cl_scan_all_source_calls_build_ai_classification_guidance_helper():
+    """Source-grep pin: cl_scan_all must contain a call to
+    _build_ai_classification_guidance. If a refactor drops this call,
+    no AI guidance ever flows through to the IDE AI."""
+    import inspect
+    src = inspect.getsource(server.cl_scan_all)
+    assert "_build_ai_classification_guidance" in src, (
+        "cl_scan_all must call the guidance helper — refactor removed it?"
+    )
+
+
+def test_cl_scan_all_source_attaches_guidance_to_report_dict():
+    """Source-grep pin: cl_scan_all must attach the helper's return
+    value to the report dict's `ai_classification_guidance` key. A
+    refactor that calls the helper but forgets to attach the result
+    would silently drop the guidance from the response JSON."""
+    import inspect
+    src = inspect.getsource(server.cl_scan_all)
+    assert 'report["ai_classification_guidance"]' in src, (
+        "cl_scan_all must attach helper result to report['ai_classification_guidance'] — "
+        "refactor changed the key or dropped the attach?"
+    )
+
+
+def test_cl_scan_all_source_passes_both_results_and_saas_configured():
+    """Source-grep pin: helper call must include both arguments
+    (results dict + saas_configured flag). Missing either would
+    change semantics (helper signature requires both)."""
+    import inspect
+    src = inspect.getsource(server.cl_scan_all)
+    # The helper call should reference both `results=` and
+    # `saas_configured=` (kwargs style — current code uses kwargs).
+    assert "results=results" in src, (
+        "helper call must pass results=results"
+    )
+    assert "saas_configured=" in src, (
+        "helper call must pass saas_configured= flag"
+    )
+
+
+def test_cl_scan_all_source_attaches_guidance_conditionally():
+    """Source-grep pin: the attach must be CONDITIONAL on the helper
+    returning a non-None value (otherwise empty/None guidance pollutes
+    the response). The pattern is `if guidance is not None:`."""
+    import inspect
+    src = inspect.getsource(server.cl_scan_all)
+    assert "if guidance is not None:" in src, (
+        "guidance attach must be conditional on helper returning non-None — "
+        "otherwise None gets serialised as JSON `null` and clutters the response"
+    )
+
+
+def test_cl_scan_all_source_attach_before_json_dumps():
+    """Source-grep pin: the guidance attach must happen BEFORE
+    `output = json.dumps(report, ...)`. Otherwise the helper runs but
+    the result never makes it into the serialised response. Verifies
+    ordering by checking the attach pattern's position relative to
+    the json.dumps line."""
+    import inspect
+    src = inspect.getsource(server.cl_scan_all)
+    attach_pos = src.find('report["ai_classification_guidance"]')
+    dumps_pos = src.find("output = json.dumps(report")
+    assert attach_pos > 0, "attach pattern missing"
+    assert dumps_pos > 0, "json.dumps(report) missing"
+    assert attach_pos < dumps_pos, (
+        f"guidance attach (pos {attach_pos}) must come BEFORE json.dumps "
+        f"(pos {dumps_pos}); current order would serialise without guidance"
+    )
