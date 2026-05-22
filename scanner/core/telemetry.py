@@ -42,6 +42,7 @@ from __future__ import annotations
 import json
 import logging
 import os
+import subprocess
 from pathlib import Path
 from typing import Any
 
@@ -180,3 +181,101 @@ def _resolve_release() -> str:
         return f"compliancelint-mcp@{version('compliancelint')}"
     except Exception:  # noqa: BLE001 — metadata lookup is best-effort
         return "compliancelint-mcp@unknown"
+
+
+# ─── Phase 2: opt-in / opt-out helpers used by cl_connect / cl_disconnect ──
+
+
+def fetch_dsn_from_saas(saas_url: str, api_key: str, timeout: int = 8) -> dict[str, Any] | None:
+    """Fetch the MCP scanner DSN from the authenticated SaaS endpoint.
+
+    Returns the response dict on 200 ({dsn, env, sample_rate,
+    send_default_pii}), or None on any failure (network, 401, 503,
+    parse error). Caller decides whether to persist or treat as
+    opted-out.
+
+    Uses curl subprocess for consistency with cl_connect's existing
+    approach (avoiding adding an httpx/requests dependency to the
+    scanner just for one HTTP call). The CREATE_NO_WINDOW flag
+    suppresses a console flash on Windows.
+    """
+    url = f"{saas_url.rstrip('/')}/api/v1/telemetry/sentry-dsn"
+    flags: dict[str, Any] = {"capture_output": True, "text": True, "timeout": timeout}
+    if hasattr(subprocess, "CREATE_NO_WINDOW"):
+        flags["creationflags"] = subprocess.CREATE_NO_WINDOW
+    try:
+        result = subprocess.run(
+            ["curl", "-s", "-w", "\n%{http_code}", "--max-time", str(timeout),
+             "-H", f"Authorization: Bearer {api_key}", url],
+            **flags,
+        )
+        if result.returncode != 0 or not result.stdout.strip():
+            logger.debug("telemetry DSN fetch curl failed: rc=%s", result.returncode)
+            return None
+        # Split body and HTTP status (last line is the status code).
+        lines = result.stdout.strip().split("\n")
+        status_line = lines[-1].strip()
+        body = "\n".join(lines[:-1])
+        if status_line != "200":
+            logger.debug("telemetry DSN endpoint returned %s — treating as not configured", status_line)
+            return None
+        data = json.loads(body)
+        if not data.get("dsn"):
+            return None
+        return data
+    except (OSError, subprocess.SubprocessError, json.JSONDecodeError) as e:
+        logger.debug("telemetry DSN fetch failed silently: %s", e)
+        return None
+
+
+def write_dsn_config(payload: dict[str, Any]) -> Path:
+    """Persist the opt-in DSN config to ~/.compliancelint/sentry.json.
+
+    Caller is expected to pass the dict returned by fetch_dsn_from_saas
+    (which already has the required `dsn` key). We add no business
+    logic here — this is a pure I/O helper so opt-in flows remain
+    auditable in one place (cl_connect's call site).
+
+    Creates parent directory if missing. Overwrites any existing file
+    (opt-in is idempotent and may also be used to refresh the DSN
+    after rotation).
+    """
+    path = _config_path()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    return path
+
+
+def delete_dsn_config() -> bool:
+    """Remove ~/.compliancelint/sentry.json (clean opt-out).
+
+    Returns True if a file was deleted, False if nothing was there to
+    delete (idempotent — no error on missing file). Called by
+    cl_disconnect for clean uninstall, and by the cl_connect opt-out
+    path (enable_telemetry=False) to reset to default no-op state.
+    """
+    path = _config_path()
+    if not path.exists():
+        return False
+    try:
+        path.unlink()
+        return True
+    except OSError as e:
+        logger.debug("telemetry config delete failed: %s", e)
+        return False
+
+
+def is_opted_in() -> bool:
+    """True iff a usable DSN config is currently persisted.
+
+    Used by cl_connect to decide whether to surface the opt-in hint
+    (don't nag a user who has already opted in). Mirrors the gate
+    inside init_if_opted_in() but without the side effect.
+    """
+    config = _read_config()
+    if config is None:
+        return False
+    if config.get("opted_out") is True:
+        return False
+    dsn = config.get("dsn")
+    return bool(dsn and isinstance(dsn, str))

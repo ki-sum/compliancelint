@@ -3322,7 +3322,12 @@ def _build_evidence_requests(article_number: int, article_title: str,
 
 
 @mcp.tool()
-async def cl_connect(project_path: str, email: str = "", switch_account: bool = False) -> str:
+async def cl_connect(
+    project_path: str,
+    email: str = "",
+    switch_account: bool = False,
+    enable_telemetry: bool | None = None,
+) -> str:
     """Connect to ComplianceLint Dashboard.
 
     Opens your browser to sign in with GitHub or Google. Once signed in,
@@ -3335,6 +3340,19 @@ async def cl_connect(project_path: str, email: str = "", switch_account: bool = 
         email: (Deprecated, optional) If provided, uses legacy email-based connect.
         switch_account: Set to true to switch to a different account.
             Ignores the current saved API key and opens browser for re-authentication.
+        enable_telemetry: Optional. Per-user-machine opt-in for anonymous error
+            reporting to help us fix MCP scanner bugs faster.
+              None (default) → no change to telemetry state. First-time connect
+                with this default writes nothing; the connect response includes
+                an informational hint about the opt-in path.
+              True → fetch the SaaS-delivered Sentry DSN and persist it to
+                ~/.compliancelint/sentry.json so future MCP server starts
+                ship error events to our compliancelint-mcp Sentry project.
+                Data minimisation: send_default_pii=False, traces_sample_rate=0,
+                25% sampling, file-path scrub (Phase 3). Privacy policy:
+                https://compliancelint.dev/legal/privacy
+              False → delete ~/.compliancelint/sentry.json (opt-out / disable).
+                Future MCP server starts will silently no-op.
 
     Returns: JSON with connection status and API key.
     """
@@ -3470,6 +3488,62 @@ async def cl_connect(project_path: str, email: str = "", switch_account: bool = 
 
     email_display = received_key["email"] or "your account"
 
+    # ── Phase 2 (2026-05-22): telemetry opt-in handling ──────────────
+    # Default opt-out: when enable_telemetry is None, leave the on-disk
+    # state untouched. First-time connectors see an informational hint
+    # in the response message so the AI can surface the option without
+    # us autostarting telemetry. Explicit True/False overrides.
+    telemetry_message_part = ""
+    try:
+        from core.telemetry import (
+            fetch_dsn_from_saas,
+            write_dsn_config,
+            delete_dsn_config,
+            is_opted_in,
+        )
+
+        if enable_telemetry is True:
+            slog.info("cl_connect: telemetry opt-in requested — fetching DSN")
+            dsn_payload = fetch_dsn_from_saas(saas_url, received_key["api_key"])
+            if dsn_payload is None:
+                telemetry_message_part = (
+                    " Telemetry opt-in requested but the SaaS endpoint "
+                    "returned no DSN (likely the SaaS host has not enabled "
+                    "MCP telemetry yet). No local change made; re-run with "
+                    "enable_telemetry=true after the host is configured."
+                )
+            else:
+                config_path_tel = write_dsn_config(dsn_payload)
+                slog.info("cl_connect: telemetry enabled, DSN saved to %s", config_path_tel)
+                telemetry_message_part = (
+                    " Anonymous error reporting enabled — thanks for "
+                    "helping us fix MCP scanner bugs faster. To disable: "
+                    "cl_connect(project_path, enable_telemetry=false). "
+                    "Privacy policy: https://compliancelint.dev/legal/privacy"
+                )
+        elif enable_telemetry is False:
+            removed = delete_dsn_config()
+            slog.info("cl_connect: telemetry opt-out (removed=%s)", removed)
+            telemetry_message_part = (
+                " Anonymous error reporting disabled."
+                if removed
+                else " (Telemetry was already off.)"
+            )
+        else:
+            # None (default) — only surface the hint if user has never
+            # opted in. Stay quiet if they've already made a choice.
+            if not is_opted_in():
+                telemetry_message_part = (
+                    " Optional: enable anonymous error reporting to help "
+                    "us catch MCP scanner bugs faster — "
+                    "cl_connect(project_path, enable_telemetry=true). "
+                    "Off by default; we never collect IPs, file content, "
+                    "or PII. Privacy: https://compliancelint.dev/legal/privacy"
+                )
+    except Exception as e:  # noqa: BLE001
+        # Telemetry plumbing failure MUST NEVER block cl_connect success.
+        slog.debug("cl_connect: telemetry path errored silently: %s", e)
+
     slog.info("cl_connect: connected as %s", email_display)
     return json.dumps({
         "status": "connected",
@@ -3477,7 +3551,8 @@ async def cl_connect(project_path: str, email: str = "", switch_account: bool = 
         "dashboard_url": f"{saas_url}/dashboard",
         "config_saved": config_path,
         "message": f"Connected as {email_display}. API key saved to .compliancelintrc. "
-                   f"Run cl_sync() to upload scan results to your dashboard.",
+                   f"Run cl_sync() to upload scan results to your dashboard."
+                   + telemetry_message_part,
     })
 
 
@@ -4777,11 +4852,26 @@ def cl_disconnect(project_path: str) -> str:
 
     slog.info("cl_disconnect: removed fields=%s", removed)
 
+    # Phase 2 (2026-05-22): also wipe the per-user-machine telemetry DSN
+    # config. cl_disconnect signals the user is severing ties with the
+    # dashboard entirely — keeping a cached DSN that ties future MCP
+    # server starts to a SaaS account they just left would be
+    # inconsistent. Failure here is swallowed so it can never block the
+    # primary cl_disconnect contract.
+    telemetry_wiped = False
+    try:
+        from core.telemetry import delete_dsn_config
+        telemetry_wiped = delete_dsn_config()
+    except Exception as e:  # noqa: BLE001
+        slog.debug("cl_disconnect: telemetry wipe errored silently: %s", e)
+
     return json.dumps({
         "status": "disconnected",
         "removed_fields": removed,
         "preserved": [k for k in data.keys()],
-        "message": "Disconnected from dashboard. Local scan data in .compliancelint/ is preserved.",
+        "telemetry_wiped": telemetry_wiped,
+        "message": "Disconnected from dashboard. Local scan data in .compliancelint/ is preserved."
+                   + (" Telemetry DSN config also cleared." if telemetry_wiped else ""),
     })
 
 

@@ -235,3 +235,181 @@ def test_no_override_uses_home_dir(monkeypatch: pytest.MonkeyPatch) -> None:
     from scanner.core.telemetry import _config_path  # noqa: PLC2701
     expected = Path.home() / ".compliancelint" / "sentry.json"
     assert _config_path() == expected
+
+
+# ─── Phase 2: opt-in / opt-out helpers ───────────────────────────────
+
+
+def test_write_dsn_config_persists_payload(tmp_compliancelint_home: Path) -> None:
+    """write_dsn_config persists the SaaS response dict verbatim."""
+    from scanner.core.telemetry import write_dsn_config
+    payload = {
+        "dsn": "https://test_key@o999.ingest.de.sentry.io/123",
+        "env": "production",
+        "sample_rate": 0.25,
+        "send_default_pii": False,
+    }
+    path = write_dsn_config(payload)
+    assert path.exists()
+    saved = json.loads(path.read_text(encoding="utf-8"))
+    assert saved == payload
+
+
+def test_write_dsn_config_creates_parent_dir(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """write_dsn_config mkdir -p the home dir if missing.
+    Critical for first-time opt-in on a fresh machine."""
+    nested = tmp_path / "fresh_machine_home"
+    monkeypatch.setenv("COMPLIANCELINT_HOME", str(nested))
+    from scanner.core.telemetry import write_dsn_config
+    write_dsn_config({"dsn": "https://x@y.ingest.de.sentry.io/1"})
+    assert nested.exists()
+    assert (nested / "sentry.json").exists()
+
+
+def test_write_dsn_config_overwrites_existing(tmp_compliancelint_home: Path) -> None:
+    """Idempotent — also used to refresh DSN after rotation."""
+    _write_config(tmp_compliancelint_home, {"opted_out": True})
+    from scanner.core.telemetry import write_dsn_config
+    write_dsn_config({"dsn": "https://new@y.ingest.de.sentry.io/2"})
+    saved = json.loads((tmp_compliancelint_home / "sentry.json").read_text())
+    assert "opted_out" not in saved
+    assert saved["dsn"].startswith("https://new@")
+
+
+def test_delete_dsn_config_removes_file(tmp_compliancelint_home: Path) -> None:
+    """delete_dsn_config removes sentry.json and reports True."""
+    _write_config(tmp_compliancelint_home, {"dsn": "https://x@y.ingest.de.sentry.io/1"})
+    from scanner.core.telemetry import delete_dsn_config
+    assert delete_dsn_config() is True
+    assert not (tmp_compliancelint_home / "sentry.json").exists()
+
+
+def test_delete_dsn_config_when_missing_returns_false(tmp_compliancelint_home: Path) -> None:
+    """delete_dsn_config is idempotent — no error if nothing to delete."""
+    from scanner.core.telemetry import delete_dsn_config
+    assert delete_dsn_config() is False
+
+
+def test_is_opted_in_returns_true_with_valid_dsn(tmp_compliancelint_home: Path) -> None:
+    """is_opted_in is the negation of init_if_opted_in's skip path."""
+    _write_config(tmp_compliancelint_home, {"dsn": "https://x@y.ingest.de.sentry.io/1"})
+    from scanner.core.telemetry import is_opted_in
+    assert is_opted_in() is True
+
+
+def test_is_opted_in_returns_false_when_opted_out(tmp_compliancelint_home: Path) -> None:
+    """Explicit opt-out marker means is_opted_in() returns False."""
+    _write_config(tmp_compliancelint_home, {"opted_out": True})
+    from scanner.core.telemetry import is_opted_in
+    assert is_opted_in() is False
+
+
+def test_is_opted_in_returns_false_when_no_file(tmp_compliancelint_home: Path) -> None:
+    """Default (no file) state."""
+    from scanner.core.telemetry import is_opted_in
+    assert is_opted_in() is False
+
+
+# ─── fetch_dsn_from_saas: subprocess-mocked HTTP behaviour ────────────
+
+
+def _mock_curl(stdout_body: str, http_status: str = "200", returncode: int = 0):
+    """Helper: build a mock subprocess.run return that mimics curl
+    output (body + status code on last line, per our -w flag)."""
+    combined = f"{stdout_body}\n{http_status}"
+    return mock.MagicMock(returncode=returncode, stdout=combined, stderr="")
+
+
+def test_fetch_dsn_200_returns_parsed_payload() -> None:
+    """fetch_dsn_from_saas parses 200 JSON response into dict."""
+    body = json.dumps({
+        "dsn": "https://k@o1.ingest.de.sentry.io/2",
+        "env": "production",
+        "sample_rate": 0.25,
+    })
+    with mock.patch("subprocess.run", return_value=_mock_curl(body, "200")):
+        from scanner.core.telemetry import fetch_dsn_from_saas
+        result = fetch_dsn_from_saas("https://test.saas", "cl_apikey123")
+        assert result is not None
+        assert result["dsn"] == "https://k@o1.ingest.de.sentry.io/2"
+
+
+def test_fetch_dsn_503_returns_none() -> None:
+    """SaaS host without MCP_SENTRY_DSN env var returns 503 → we return None."""
+    body = json.dumps({"error": "telemetry-not-configured"})
+    with mock.patch("subprocess.run", return_value=_mock_curl(body, "503")):
+        from scanner.core.telemetry import fetch_dsn_from_saas
+        assert fetch_dsn_from_saas("https://test.saas", "cl_apikey123") is None
+
+
+def test_fetch_dsn_401_returns_none() -> None:
+    """Invalid API key returns 401 → we return None (caller treats as skip)."""
+    body = json.dumps({"error": "Unauthorized"})
+    with mock.patch("subprocess.run", return_value=_mock_curl(body, "401")):
+        from scanner.core.telemetry import fetch_dsn_from_saas
+        assert fetch_dsn_from_saas("https://test.saas", "cl_bad_key") is None
+
+
+def test_fetch_dsn_curl_failure_returns_none() -> None:
+    """Network down / curl missing / DNS failure → curl non-zero exit
+    → we return None (silent — telemetry MUST NEVER block cl_connect)."""
+    with mock.patch("subprocess.run", return_value=_mock_curl("", "0", returncode=7)):
+        from scanner.core.telemetry import fetch_dsn_from_saas
+        assert fetch_dsn_from_saas("https://test.saas", "cl_apikey123") is None
+
+
+def test_fetch_dsn_malformed_response_returns_none() -> None:
+    """Server returns non-JSON despite 200 → silent skip."""
+    with mock.patch("subprocess.run", return_value=_mock_curl("not json", "200")):
+        from scanner.core.telemetry import fetch_dsn_from_saas
+        assert fetch_dsn_from_saas("https://test.saas", "cl_apikey123") is None
+
+
+def test_fetch_dsn_subprocess_exception_silent() -> None:
+    """If subprocess itself raises (curl binary missing, etc.) → return None."""
+    with mock.patch("subprocess.run", side_effect=FileNotFoundError("curl")):
+        from scanner.core.telemetry import fetch_dsn_from_saas
+        # MUST NOT raise FileNotFoundError up to cl_connect.
+        assert fetch_dsn_from_saas("https://test.saas", "cl_apikey123") is None
+
+
+def test_fetch_dsn_200_without_dsn_field_returns_none() -> None:
+    """Defensive: 200 JSON missing the dsn field → skip (treat as invalid)."""
+    body = json.dumps({"env": "production"})  # no dsn key
+    with mock.patch("subprocess.run", return_value=_mock_curl(body, "200")):
+        from scanner.core.telemetry import fetch_dsn_from_saas
+        assert fetch_dsn_from_saas("https://test.saas", "cl_apikey123") is None
+
+
+# ─── End-to-end opt-in/opt-out cycle ─────────────────────────────────
+
+
+def test_opt_in_cycle_writes_then_init_succeeds(tmp_compliancelint_home: Path) -> None:
+    """Full opt-in flow: fetch → write → init_if_opted_in returns True."""
+    body = json.dumps({
+        "dsn": "https://k@o1.ingest.de.sentry.io/2",
+        "env": "production",
+        "sample_rate": 0.25,
+    })
+    with mock.patch("subprocess.run", return_value=_mock_curl(body, "200")):
+        from scanner.core.telemetry import fetch_dsn_from_saas, write_dsn_config
+        payload = fetch_dsn_from_saas("https://test.saas", "cl_apikey123")
+        assert payload is not None
+        write_dsn_config(payload)
+
+    with mock.patch("sentry_sdk.init") as mock_init:
+        from scanner.core.telemetry import init_if_opted_in
+        assert init_if_opted_in() is True
+        assert mock_init.call_count == 1
+
+
+def test_opt_out_cycle_deletes_then_init_skips(tmp_compliancelint_home: Path) -> None:
+    """Full opt-out flow: write opt-in → delete → init_if_opted_in returns False."""
+    from scanner.core.telemetry import (
+        write_dsn_config,
+        delete_dsn_config,
+        init_if_opted_in,
+    )
+    write_dsn_config({"dsn": "https://k@o1.ingest.de.sentry.io/2"})
+    assert delete_dsn_config() is True
+    assert init_if_opted_in() is False
