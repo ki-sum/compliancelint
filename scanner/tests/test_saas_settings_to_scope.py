@@ -235,3 +235,113 @@ class TestArOnlyUserScenario:
         assert scope["risk_classification"] == "high-risk"
         # Conservative — AR isn't a provider, so is_provider=False
         assert scope["is_provider"] is False
+
+
+# =====================================================================
+# v3 Wizard Refactor — identity / high-risk split TDD (Block H)
+#
+# Tests added 2026-06-14 BEFORE the v3 implementation lands. Per v3
+# plan §7.3: scanner-side effective flags (is_deployer / is_importer
+# / etc.) keep their names but semantics shift to "identity AND
+# high-risk pre-computed by SaaS". Scanner trusts SaaS-computed
+# effective value, doesn't re-derive.
+#
+# These tests verify scanner correctly consumes the v3-shape SaaS
+# response (which includes pre-computed is_* AND new is_product_*
+# fields). Until C9 ships the SaaS-side derivation change, the
+# scanner trivially reads what SaaS sends — but the existing scanner
+# logic to extract from roles[] would NOT differentiate Anna from Bob
+# (both have roles=["provider","deployer"]). Hence RED at first.
+#
+# After C9 + C10: SaaS sends pre-computed flags; scanner reads them
+# directly via the modern response shape branch. Tests turn GREEN.
+# =====================================================================
+class TestV3EffectiveFlagsFromSaas:
+    """v3: SaaS sends pre-computed effective flags (identity AND high-risk).
+    Scanner consumes them via the modern response shape."""
+
+    def test_anna_pre_computed_is_deployer_false(self):
+        """Anna: SaaS sends is_deployer=False (computed from
+        identity=true AND high-risk=false). Scanner trusts this value
+        even though roles[] would suggest deployer."""
+        scope = {}
+        _apply_saas_settings_to_scope(scope, {
+            "roles": ["provider", "deployer"],  # legal identity for DoC
+            "is_deployer": False,  # SaaS-computed effective
+            "is_provider": True,
+        })
+        # v3: scanner reads pre-computed flag, not derived from roles[].
+        assert scope["is_deployer"] is False
+
+    def test_bob_pre_computed_is_deployer_true(self):
+        """Bob: SaaS sends is_deployer=True (identity=true AND high-risk=true)."""
+        scope = {}
+        _apply_saas_settings_to_scope(scope, {
+            "roles": ["provider", "deployer"],
+            "is_deployer": True,
+            "is_provider": True,
+        })
+        assert scope["is_deployer"] is True
+
+    def test_pm_field_extracted_from_v3_response(self):
+        """v3 adds is_product_manufacturer to SaaS response payload.
+        Scanner must extract and surface it via scope dict."""
+        scope = {}
+        _apply_saas_settings_to_scope(scope, {
+            "roles": ["provider", "product_manufacturer"],
+            "is_product_manufacturer": True,
+            "is_provider": True,
+        })
+        assert scope.get("is_product_manufacturer") is True
+
+    def test_pm_field_false_when_not_pm(self):
+        scope = {}
+        _apply_saas_settings_to_scope(scope, {
+            "roles": ["provider"],
+            "is_product_manufacturer": False,
+            "is_provider": True,
+        })
+        assert scope.get("is_product_manufacturer") is False
+
+    def test_anna_saas_supplied_list_excludes_art26(self):
+        """End-to-end v3 contract: SaaS pre-computes applicable_articles
+        (which excludes Art 26 for Anna because effective is_deployer
+        is false). Scanner trusts the SaaS list via the Phase 2 §B
+        SaaS-list-wins path in compute_applicable_articles.
+
+        This is the v3 architecture: per-role identity AND high-risk
+        gating happens in SaaS endpoint, scanner just echoes the
+        authoritative list."""
+        from core.validation_gate import compute_applicable_articles
+
+        # Simulate Anna's scan-settings response: SaaS computed
+        # applicable_articles excludes Art 26 / 27 / 86 because
+        # effective is_deployer = identity(true) AND high_risk(false) = false.
+        anna_applicable_from_saas = [
+            "art4", "art5", "art10", "art11", "art13", "art14",
+            "art16", "art50",
+            # Note: art26, art27, art86 deliberately omitted by SaaS
+        ]
+        scope = {
+            "_saas_settings_active": True,
+            "_applicable_articles_from_saas": anna_applicable_from_saas,
+            "_saas_engine_version": "v3.0.0",
+            "is_deployer": False,
+            "is_provider": True,
+        }
+        applicable, skipped = compute_applicable_articles(scope)
+
+        # Scanner echoes SaaS authoritative list verbatim
+        assert "art26" not in applicable, (
+            f"Art 26 should be skipped (SaaS did not include it); "
+            f"got applicable={sorted(applicable)}"
+        )
+        assert "art27" not in applicable
+        assert "art86" not in applicable
+        # Articles SaaS sent through must be applicable
+        assert "art4" in applicable
+        assert "art16" in applicable
+        # Skipped reason should attribute the decision to SaaS engine
+        assert "art26" in skipped
+        assert "SaaS Applicability Engine" in skipped["art26"]
+
