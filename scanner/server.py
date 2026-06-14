@@ -341,24 +341,33 @@ def _apply_saas_settings_to_scope(scope: dict, saas_settings: dict) -> dict:
       - _saas_settings_active = True
       - is_provider / is_deployer / is_authorised_representative /
         is_importer / is_distributor (booleans)
+      - is_product_manufacturer (boolean, v3 C10 2026-06-14)
       - risk_classification / risk_classification_confidence (when
         SaaS supplies a non-empty riskClassification)
 
-    Two response shapes are supported (R5-F2 fix 2026-04-27):
-      Modern: response includes pre-computed effective flags
-              (`is_provider`, `is_deployer`, etc.). The server merges
-              roles[] with the per-role wizard booleans
-              (isImporter / isDistributor / isDeployer /
-              isAuthorisedRepresentative from compliance-profile)
-              using OR semantics. Three-state: true | false | null.
-              Null = user has not confirmed → leave AI scope alone.
+    Three response shapes supported:
+
+      v3 (2026-06-14): top-level effective flags are pre-computed
+          server-side via effectiveV3(identity AND high-risk). The
+          new is_product_manufacturer key surfaces the Art 25(3)
+          identity override. wizard_answers payload exposes both
+          layers separately (identity keys + isHighRisk* keys) so
+          downstream override logic (_apply_wizard_overrides_to_answers)
+          can target either.
+      Modern (R5-F2 2026-04-27): response includes pre-computed
+          effective flags (`is_provider`, `is_deployer`, etc.) but
+          derived from F11 OR-reconciliation (roles[] OR wizard
+          boolean). Null = user has not confirmed → leave AI scope
+          alone. v3 is a superset of modern; scanner treats them
+          identically for the 5 legacy keys.
       Legacy: response only has roles[] + riskClassification.
-              Fall back to the original roles[]-only derivation
-              (False when role missing) so older SaaS deployments
-              keep working until upgrade.
+          Fall back to the original roles[]-only derivation
+          (False when role missing) so older SaaS deployments
+          keep working until upgrade.
 
     Detection: presence of any `is_<role>` key in the response means
-    the server is the modern shape. The 5 keys ship together.
+    the server is the modern/v3 shape. The 5 legacy keys ship together;
+    v3 adds is_product_manufacturer alongside them.
     """
     scope["_saas_settings_active"] = True
     roles = saas_settings.get("roles") or []
@@ -374,7 +383,7 @@ def _apply_saas_settings_to_scope(scope: dict, saas_settings: dict) -> dict:
 
     for scope_key, role_str in role_flag_keys.items():
         if has_effective:
-            # Modern SaaS: honor server-computed effective flag.
+            # Modern/v3 SaaS: honor server-computed effective flag.
             # null → don't override (let AI-supplied value stand).
             eff = saas_settings.get(scope_key)
             if eff is not None:
@@ -382,6 +391,15 @@ def _apply_saas_settings_to_scope(scope: dict, saas_settings: dict) -> dict:
         else:
             # Legacy SaaS: roles[]-only derivation (pre-R5-F2 behaviour).
             scope[scope_key] = role_str in roles
+
+    # v3 C10 (2026-06-14) — is_product_manufacturer extraction. Pure
+    # identity field (no high-risk follow-up; Art 25(3) makes PM a
+    # provider for all integrated AI regardless of risk). Three-state
+    # passthrough: bool(eff) when SaaS sent true/false; absent when
+    # SaaS omitted (legacy shape) or sent null.
+    pm = saas_settings.get("is_product_manufacturer")
+    if pm is not None:
+        scope["is_product_manufacturer"] = bool(pm)
 
     risk = saas_settings.get("riskClassification")
     if risk:
