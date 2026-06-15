@@ -113,6 +113,49 @@ def _ensure_all_modules_loaded() -> None:
         _load_module(entry)
 
 
+# ── D7 (2026-06-15) Transient-AI retry helper for cl_scan_all ──────
+# Module-level so unit tests can patch / drive it without spinning
+# up a real article module. cl_scan_all wraps mod.scan() via this
+# helper so a single AI timeout / rate-limit / network blip stops
+# silently dropping that article's findings. Three attempts with
+# exponential backoff (0.5s → 1s → 2s) absorb the common transient
+# class; permanent errors re-raise so cl_scan_all's outer except
+# branch records the article in failed_articles + forces overall
+# coverage to "partial".
+_AI_RETRY_ATTEMPTS = 3
+_AI_RETRY_BACKOFFS = [0.5, 1.0, 2.0]  # seconds; len == attempts
+
+
+def _scan_with_retry_module_level(art_num: int, mod, project_path: str):
+    """Run mod.scan(project_path) with up to 3 retries on Exception.
+
+    Returns the ScanResult on success. Raises the LAST exception when
+    all attempts exhaust — cl_scan_all's outer except catches it and
+    records the article in `failed_articles`.
+    """
+    import time as _t
+    last_exc = None
+    for attempt in range(_AI_RETRY_ATTEMPTS):
+        try:
+            res = mod.scan(project_path)
+            if attempt > 0:
+                logger.info(
+                    "Art. %d scan succeeded on attempt %d/%d after %d transient failure(s)",
+                    art_num, attempt + 1, _AI_RETRY_ATTEMPTS, attempt,
+                )
+            return res
+        except Exception as scan_err:
+            last_exc = scan_err
+            if attempt < _AI_RETRY_ATTEMPTS - 1:
+                wait = _AI_RETRY_BACKOFFS[attempt]
+                logger.warning(
+                    "Art. %d scan attempt %d/%d failed (%s); retrying in %.1fs",
+                    art_num, attempt + 1, _AI_RETRY_ATTEMPTS, scan_err, wait,
+                )
+                _t.sleep(wait)
+    raise last_exc
+
+
 def _ensure_module_loaded(article_number: int) -> None:
     """Load only the module needed for a specific article scan."""
     # Find the module path that corresponds to this article number
@@ -1449,6 +1492,25 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
     # Pass risk_classification in _scope to enable this:
     #   "_scope": { "risk_classification": "not high-risk", "risk_classification_confidence": "high" }
 
+    def _scan_with_retry(art_num: int, mod, project_path_local):
+        """Run mod.scan(project_path) with up to 3 retries on Exception.
+
+        2026-06-15 D7 — transient-AI-failure retry. cl_scan_all calls
+        one AI provider per article. Without retry, a single timeout /
+        rate-limit / network blip silently drops that article's findings
+        → daily auto-scan on a "bad day" shows ~5-6 missing articles →
+        user sees mystery dips on the Compliance Journey chart
+        (verified on prod 2026-06-15 for kisum's repo: 6/5 missing
+        art9-15, 6/14 missing art9, art12-15). Three attempts with
+        exponential backoff absorb the common transient class;
+        permanent errors still surface as failed_articles in the
+        response report. Delegates to module-level
+        `_scan_with_retry_module_level` so unit tests can exercise the
+        retry policy without standing up an entire concrete article
+        module.
+        """
+        return _scan_with_retry_module_level(art_num, mod, project_path_local)
+
     def _scan_one(art_num: int, mod) -> dict:
         """Run a single article scan and return a compact summary dict."""
         try:
@@ -1465,7 +1527,7 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
             if skip_result is not None:
                 result = skip_result
             else:
-                result = mod.scan(project_path)
+                result = _scan_with_retry(art_num, mod, project_path)
             # Inject AI model attribution
             if ctx and getattr(ctx, "ai_model", ""):
                 result.assessed_by = ctx.ai_model
@@ -1601,9 +1663,24 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
     except Exception as e:
         logger.warning("Could not cache commit SHAs: %s", e)
 
+    # 2026-06-15 — list articles whose scan failed after retries. When
+    # any article fails permanently, the overall report is marked
+    # "partial" so the dashboard can flag a partial-coverage scan
+    # instead of treating it as a clean run with mysterious dips.
+    failed_articles = sorted(
+        int(k.replace("article_", ""))
+        for k, v in results.items()
+        if isinstance(v, dict) and "error" in v
+    )
+
     # Determine worst-case overall
     if "non_compliant" in overall_levels:
         overall = "non_compliant"
+    elif failed_articles:
+        # Permanent AI-call failure on at least one article → partial
+        # coverage. Force "partial" even if every successful article
+        # was COMPLIANT, so dashboard never shows green-with-gaps.
+        overall = "partial"
     elif "partial" in overall_levels:
         overall = "partial"
     elif all(l == "compliant" for l in overall_levels):
@@ -1642,6 +1719,12 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
             ctx.compliance_answers.get("_scope", {}).get("_paid_gate_state_load_warning")
             if ctx else None
         ),
+        # 2026-06-15 — articles whose AI scan failed all 3 retries.
+        # Empty when scan was fully successful. When non-empty,
+        # overall_compliance is forced to "partial" above so the
+        # dashboard can flag partial-coverage scans visibly instead
+        # of treating them as clean runs with mystery dips.
+        "failed_articles": failed_articles,
         "results": results,
         "related_recitals_by_article": related_recitals_by_article,
         "next_steps": (
