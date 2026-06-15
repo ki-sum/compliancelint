@@ -387,6 +387,7 @@ The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard
 | OSCAL export — structured compliance data (NIST OSCAL JSON) for GRC / audit ingestion | — | — | — | — | ✓ |
 | Cryptographically signed Compliance All-in-One Pack — tamper-evident audit chain | — | — | — | — | ✓ |
 | SSO / SAML / on-prem | — | — | — | — | ✓ |
+| Custom SaaS UI translation (your team's language) — bespoke build per engagement | — | — | — | — | ✓ |
 
 **Evidence stays in your repo.** Upload files from the dashboard — bytes commit to `.compliancelint/evidence/` in your git repo. We relay transiently. We never hold your files.
 
