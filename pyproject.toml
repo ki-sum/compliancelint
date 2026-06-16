@@ -61,3 +61,14 @@ scanner = [
     "obligations/*.json",
     "sources/**/*.json",
 ]
+
+[tool.pytest.ini_options]
+# Register custom markers so pytest --strict-markers doesn't fail.
+# Tests marked `network` need SaaS reachability + a valid api_key in
+# `~/.compliancelint/config.json` — these are excluded from daily CI
+# (CI workflows pass `-m "not network"`). Run them explicitly with
+# `pytest -m network` against a live dashboard before publishing
+# a new MCP scanner release.
+markers = [
+    "network: test depends on SaaS network (excluded from default CI)",
+]

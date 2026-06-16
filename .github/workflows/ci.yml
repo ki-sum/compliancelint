@@ -35,7 +35,12 @@ jobs:
         # --ignore=tests/pool4: private-repo territory — module-level
         # `import yaml` in cell_loader.py would block collection on
         # PUBLIC CI where pyyaml is not a declared dep.
-        run: python -m pytest tests/ -v --tb=short --ignore=tests/e2e --ignore=tests/pool4
+        # -m "not network": tests that need SaaS reachability + valid
+        # api_key in ~/.compliancelint/config.json (e.g. cl_action_guide
+        # returning human_judgment_needed which lives SaaS-side per §AA
+        # Option C 2026-05-02). Run those locally with `pytest -m network`
+        # against a live dashboard before publishing a scanner release.
+        run: python -m pytest tests/ -v --tb=short --ignore=tests/e2e --ignore=tests/pool4 -m "not network"
 
       - name: Verify all modules load
         working-directory: scanner

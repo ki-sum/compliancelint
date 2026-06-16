@@ -46,4 +46,8 @@ jobs:
       #   `import yaml` would fail at pytest collection on PUBLIC CI
       #   where pyyaml is not a declared dep, blocking ALL scanner tests.
       # Run from project root so scanner/tests/ resolves cleanly.
-      - run: python -m pytest scanner/tests/ -x --tb=short --ignore=scanner/tests/e2e --ignore=scanner/tests/pool4
+      # -m "not network": tests that need SaaS reachability + valid api_key
+      # (e.g. cl_action_guide returning human_judgment_needed which lives
+      # SaaS-side per §AA Option C 2026-05-02). Run via `pytest -m network`
+      # locally against a live dashboard before publishing a scanner release.
+      - run: python -m pytest scanner/tests/ -x --tb=short --ignore=scanner/tests/e2e --ignore=scanner/tests/pool4 -m "not network"

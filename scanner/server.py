@@ -4981,7 +4981,7 @@ def cl_disconnect(project_path: str) -> str:
 @mcp.tool()
 def cl_version() -> str:
     """Return ComplianceLint scanner version and check for updates."""
-    result = {"version": CL_VERSION, "tools": 17}
+    result = {"version": CL_VERSION, "tools": 18}
     update_info = _check_latest_version()
     if update_info:
         result.update(update_info)

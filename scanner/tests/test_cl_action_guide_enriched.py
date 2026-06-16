@@ -212,10 +212,18 @@ def test_action_guide_returns_decomposed_atoms():
 # ──────────────────────────────────────────────────────────────────────
 
 
+@pytest.mark.network
 def test_action_guide_returns_human_judgment_needed():
     """For Human Gates the human_judgment_needed text is THE answer
     to 'why this can't be automated'. Surface it so AI clients can
-    explain to user what they need to think about."""
+    explain to user what they need to think about.
+
+    Marked `network` because human_judgment_needed comes from the SaaS
+    classification layer (§AA Option C 2026-05-02) — fetched at runtime
+    via `~/.compliancelint/config.json` api_key. Without a valid SaaS
+    connection the field is empty string and the assertion fails.
+    Excluded from daily CI; run via `pytest -m network` against a live
+    dashboard before publishing a scanner release."""
     from server import cl_action_guide
 
     raw = cl_action_guide("ART26-OBL-2")
