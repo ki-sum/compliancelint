@@ -1951,7 +1951,6 @@ def cl_action_guide(obligation_id: str) -> str:
     return append_upgrade_hint(json.dumps(response), "cl_action_guide")
 
 
-@mcp.tool()
 def _fetch_effective_status_from_saas(project_path: str) -> dict[str, str]:
     """§AT.19 Phase 4 (2026-05-13) — cross-surface consistency overlay.
 
@@ -2024,6 +2023,7 @@ def _fetch_effective_status_from_saas(project_path: str) -> dict[str, str]:
         return {}
 
 
+@mcp.tool()
 def cl_action_plan(project_path: str, regulation: str = "eu-ai-act", article: int = 0) -> str:
     """Generate a human action plan for compliance.
 

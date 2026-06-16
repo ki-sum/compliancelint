@@ -23,19 +23,13 @@ Scan, attest, and document EU AI Act compliance without leaving your IDE. The sc
 
 ### See it in action
 
-**Demo: scanning an AI chatbot** (limited risk — all applicable obligations verified):
-
-https://github.com/user-attachments/assets/0816cc3c-e848-4080-a863-8ed4dffef487
-
-Watch a full compliance scan: from non-compliant to fully verified in under 2 minutes.
-
-> **More demos:** <a href="https://github.com/user-attachments/assets/591ca74c-e2c5-450a-9055-7a827c21ad42" target="_blank">AI Finance (high-risk)</a> · <a href="https://github.com/user-attachments/assets/e74e2613-2f82-4d43-96e3-94279e6f68dd" target="_blank">AI Medical (high-risk)</a>
+Try the live demo at **[compliancelint.dev/demo](https://compliancelint.dev/demo)** — pre-loaded with three AI systems (limited-risk chatbot, high-risk finance, high-risk medical) so you can browse a real scan, attestation flow, and Compliance Journey trend without setting up a project of your own.
 
 ### Dashboard
 
 ![ComplianceLint Dashboard](docs/media/dashboard.png)
 
-Track compliance across all your AI systems. Export audit-ready PDF reports. [Try the live demo →](https://compliancelint.dev/demo)
+Track compliance across all your AI systems. Export audit-ready PDF reports.
 
 ### Documentation
 
@@ -265,6 +259,7 @@ Not all 44 articles apply to every project. The applicable obligations depend on
 | `cl_action_plan` | Prioritized remediation plan with effort estimates |
 | `cl_update_finding` | Submit evidence, rebuttals, acknowledgements |
 | `cl_update_finding_batch` | Batch-update multiple findings at once |
+| `cl_get_ai_observation` | Fetch the AI's prior observation for an obligation (read-back of what your IDE AI told the dashboard last scan) |
 | `cl_verify_evidence` | Verify submitted evidence |
 | `cl_interim_standard` | Generate interim compliance standard for an article |
 | `cl_connect` | Link to dashboard (browser OAuth) |
@@ -414,7 +409,7 @@ The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard
 - [x] Snapshot ledger (deterministic state hash on every scan)
 - [x] Directory v2 — local cache (`.compliancelint/local/`, gitignored) vs committed evidence (`.compliancelint/evidence/` + `manifest.json`) split
 - [x] Cross-OS CI matrix (Ubuntu, macOS, Windows × Python 3.10–3.13)
-- [x] Profiling Wizard — answer a series of questions about your AI system (EU establishment, Annex III category, training data, GPAI status, value-chain role, Art. 2 carve-outs) and the 247-obligation matrix is filtered down to the ones that actually apply to you (Starter+)
+- [x] Profiling Wizard — guided questions about your AI system (EU establishment, Annex III category, training data, GPAI status, Art. 2 carve-outs) AND your organisation's role (provider, deployer, importer, distributor, product manufacturer, authorised representative — for each, the wizard asks whether the AI you handle in that role is high-risk in practice). The 247-obligation matrix is filtered down to the ones that actually apply to you. Returning users see every question with their saved answers pre-filled, in three on-screen sections (about your AI system / your organisational roles / scope carve-outs) so you can review and edit anywhere without re-clicking from question 1 (Starter+)
 - [x] **EU AI Act browser at [`/dashboard/regulations/eu-ai-act`](https://compliancelint.dev/dashboard/regulations/eu-ai-act)** — full text of 44 articles + 13 annexes + searchable across 247 obligations. **Free tier includes the full browser after a free sign-up** (no credit card). Browse legal text + search "biometric" / "logging" / "human oversight" instantly
 - [x] **Auto-discovery endpoint** — `.well-known/mcp/server-card.json` ([SEP-2127](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2127)) for zero-config Claude Desktop / Cursor / Windsurf / ChatGPT onboarding
 

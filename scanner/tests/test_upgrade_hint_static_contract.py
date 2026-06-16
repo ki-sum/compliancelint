@@ -69,6 +69,13 @@ UNWRAPPED_TOOLS = frozenset({
     "cl_delete",
     "cl_update_finding",
     "cl_update_finding_batch",
+    # Phase 3 2026-05-21 — read-only AI-internal self-audit tool. The
+    # IDE AI calls cl_get_ai_observation BEFORE forming a new judgment
+    # to check what it previously said (anti-hallucination). The
+    # returned JSON is consumed by the AI, not surfaced to the user
+    # directly; injecting a paywall nudge would confuse the AI's
+    # downstream reasoning rather than nudge a human upgrade decision.
+    "cl_get_ai_observation",
 })
 
 
