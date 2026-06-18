@@ -147,15 +147,38 @@ Track compliance over time at **[compliancelint.dev](https://compliancelint.dev)
 - **Findings by article** — bar chart of issues per EU AI Act article
 - **Tasks** — prioritized remediation to-do list with severity and effort estimates
 - **Scan History** — full audit trail of every scan, with diff between consecutive scans
-- **PDF reports** — export audit-ready reports with legal citations
+- **Audit-ready PDF exports** — every PDF carries verbatim EUR-Lex citations + obligation IDs:
+  - **Declaration of Conformity** (Art. 47, Annex V) — provider attestation document for high-risk AI systems
+  - **Technical Documentation** (Art. 11, Annex IV §1–§8) — full system dossier covering data governance, risk management, accuracy / robustness, post-market monitoring
+  - **Per-article Compliance PDF** — one per attested article, generated after Save with all findings + evidence + Human Gate answers for that article
+  - **Compliance Journey PDF** — visual progress export for stakeholders, investors, or board reporting
+  - **Compliance All-in-One Pack ZIP** (Business+) — audit-grade snapshot bundling all of the above plus an embedded offline HTML viewer that mirrors the live dashboard
 - **Attestation** — record human review decisions with evidence directly in the dashboard, or ask your AI to submit evidence via natural-language conversation
 - **Evidence stays in your repo** — upload files from the dashboard; bytes commit to `.compliancelint/evidence/` in your git repo. We relay transiently, never hold your files.
-- **Human Gates** — guided questionnaires for obligations that require human verification (DPIA, oversight assignments, worker notifications)
-- **Role selection** — filter obligations by your EU AI Act role (Provider, Product Manufacturer, Deployer, Importer, Distributor, Authorised Representative) for accurate scoring
+- **Profiling Wizard** — guided 3-section interview about your AI system + organisational role + Art. 2 scope carve-outs (territorial, military, research, open-source); filters the 247-obligation matrix down to the ones that actually apply to you
+- **Human Gates** — guided questionnaires for obligations that need human judgment (FRIA, Art. 14 human oversight, Art. 26(7) worker notifications); each answer saved as attestation evidence with full audit trail
+- **Penalty Exposure** — live € estimate per non-compliant finding using Art. 99 caps (€35M or 7% turnover for Art. 5 prohibitions; €15M or 3% for high-risk violations); applies the Art. 99(6) SME min-fine formula for microenterprise / small / medium organisations
+- **Role-based filtering** — Provider / Product Manufacturer / Deployer / Importer / Distributor / Authorised Representative; combined with Art. 2 carve-outs auto-narrows the obligation set so you don't see noise from articles that don't apply
 
 ```
 "Connect to ComplianceLint dashboard and sync my scan results."
 ```
+
+---
+
+## Human Oversight (design principle)
+
+ComplianceLint is designed with human oversight at every stage:
+
+1. **Human initiates scans** — the AI never scans autonomously; the user explicitly requests each scan
+2. **Human reviews findings** — all findings are presented for human judgment before any action
+3. **Human submits evidence** — users acknowledge, rebut, defer, or provide evidence for any finding via natural-language conversation with their AI (which invokes `cl_update_finding` on their behalf)
+4. **Human controls sync** — scan results are only uploaded to the dashboard when the user explicitly asks the AI to sync
+5. **No autonomous decisions** — ComplianceLint never makes compliance determinations without human review
+
+The user can stop any MCP tool call at any time by pressing Stop in their IDE.
+
+> This is the **architectural principle** — distinct from **Human Gates** in the Dashboard section above, which are guided questionnaires for specific EU AI Act obligations (FRIA, Art. 14 oversight, Art. 26(7) worker notifications). Human Oversight here means AI never acts compliance-decisively without your approval; Human Gates is the dashboard feature that captures your judgment for obligations the scanner can't determine from code alone.
 
 ---
 
@@ -166,7 +189,7 @@ Track compliance over time at **[compliancelint.dev](https://compliancelint.dev)
 | **Method** | Check if `RISK_MANAGEMENT.md` exists | AI reads entire codebase, checks against 247 decomposed legal obligations |
 | **Citations** | "You need logging" | `Art. 12(1): "High-risk AI systems shall technically allow for the automatic recording of events..."` |
 | **False positives** | Keyword matching → many | AI understands context → near zero |
-| **Privacy** | Cloud upload | **100% local** — code never leaves your machine |
+| **Privacy** | Cloud upload | **Code stays local** — source never leaves your machine; only compliance verdicts sync to your dashboard |
 | **Cost** | Separate subscription | **Free + source-available (BSL 1.1)** — uses your existing AI IDE |
 
 ---
@@ -394,46 +417,26 @@ The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard
 
 ### Shipped
 
-- [x] MCP Server with full EU AI Act tool surface — 44 articles, 247 obligations
-- [x] SaaS Dashboard with Compliance Journey tracking
-- [x] Audit-ready exports — Compliance Journey PDF, Human Gates per-article PDFs (Declaration of Conformity at Art. 47, Technical Documentation at Art. 11, per-article evidence packs), and Compliance All-in-One Pack ZIP (Business+)
-- [x] Attestation system (evidence, rebuttals, acknowledgements, defer, questionnaire response)
-- [x] `npx compliancelint init` — one-line setup
-- [x] Role-based obligation filtering (Provider, Product Manufacturer, Deployer, Importer, Distributor, Authorised Representative)
-- [x] Human Gates — guided questionnaires for manual obligations
-- [x] Settings audit trail — track who changed compliance settings
-- [x] Evidence v4 deferred-path (browser upload → `.compliancelint/evidence/` → next sync pulls → user commits)
-- [x] Project fingerprint detection (first_commit_sha mismatch → owner acknowledge)
-- [x] Force-push broken_link detection (evidence health sweep on every sync)
-- [x] Stale-evidence banners (finding + repo level)
-- [x] Snapshot ledger (deterministic state hash on every scan)
-- [x] Directory v2 — local cache (`.compliancelint/local/`, gitignored) vs committed evidence (`.compliancelint/evidence/` + `manifest.json`) split
-- [x] Cross-OS CI matrix (Ubuntu, macOS, Windows × Python 3.10–3.13)
-- [x] Profiling Wizard — guided questions about your AI system (EU establishment, Annex III category, training data, GPAI status, Art. 2 carve-outs) AND your organisation's role (provider, deployer, importer, distributor, product manufacturer, authorised representative — for each, the wizard asks whether the AI you handle in that role is high-risk in practice). The 247-obligation matrix is filtered down to the ones that actually apply to you. Returning users see every question with their saved answers pre-filled, in three on-screen sections (about your AI system / your organisational roles / scope carve-outs) so you can review and edit anywhere without re-clicking from question 1 (Starter+)
-- [x] **EU AI Act browser at [`/dashboard/regulations/eu-ai-act`](https://compliancelint.dev/dashboard/regulations/eu-ai-act)** — full text of 44 articles + 13 annexes + searchable across 247 obligations. **Free tier includes the full browser after a free sign-up** (no credit card). Browse legal text + search "biometric" / "logging" / "human oversight" instantly
-- [x] **Auto-discovery endpoint** — `.well-known/mcp/server-card.json` ([SEP-2127](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2127)) for zero-config Claude Desktop / Cursor / Windsurf / ChatGPT onboarding
+- [x] **MCP Server** with full EU AI Act tool surface — 44 articles, 247 obligations
+- [x] **SaaS Dashboard** with Compliance Journey tracking
+- [x] **Audit-ready PDFs** — Compliance Journey, Declaration of Conformity (Art. 47), Technical Documentation (Art. 11), per-article evidence packs, and the Compliance All-in-One Pack ZIP
+- [x] **`npx compliancelint init`** — one-line setup for Claude Code, Cursor, Windsurf, Claude Desktop, ChatGPT (zero-config auto-discovery via [SEP-2127](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2127))
+- [x] **Role-based obligation filtering** — Provider, Product Manufacturer, Deployer, Importer, Distributor, Authorised Representative
+- [x] **Profiling Wizard** — guided questions about your AI system + organisational role; filters the 247-obligation matrix down to what actually applies to you
+- [x] **Human Gates** — guided questionnaires for obligations that need human judgment (FRIA, Art. 14 oversight, Art. 26(7) worker notifications)
+- [x] **Evidence trail** — attestations, rebuttals, acknowledgements, deferrals with full audit history
+- [x] **EU AI Act browser** at [`/dashboard/regulations/eu-ai-act`](https://compliancelint.dev/dashboard/regulations/eu-ai-act) — full text of 44 articles + 13 annexes + searchable across 247 obligations (free after sign-up, no credit card)
+- [x] **Tamper-evident audit trail** — deterministic state hashing, evidence health sweeps, cross-OS CI tested (Ubuntu, macOS, Windows × Python 3.10–3.13)
 
-### Pre-launch
+### Up next
 
-- [x] **Compliance All-in-One Pack** (Business+ tier) — historical snapshot zip with Declaration of Conformity + Technical Documentation + per-article PDFs + audit-trail CSV + an embedded HTML viewer (index/dashboard/tasks/human-gates pages SSR-rendered from the same React components the live SaaS dashboard uses, so the offline bundle stays in step with the dashboard automatically). 11/11 verifier-gated (`npx tsx dashboard/scripts/verify-time-capsule-phase-1-5.ts` exits 0).
-
-### Post-launch (v2+)
-
-- [ ] OAuth direct-commit integration — dashboard can commit evidence to cloud git without requiring MCP to be running (GitHub first, GitLab second; together they cover ~80% of cloud git users)
-- [ ] GitHub Marketplace App (discovery + one-click install)
-- [ ] **EU regulation expansion — "five-pillar" coverage roadmap** (expanding beyond EU AI Act, architecture-reuse-driven so each new regulation is ~3–4 weeks instead of starting from zero)
-  - [ ] **Phase 2 — GDPR** (Regulation (EU) 2016/679, ~99 articles): personal-data processing for any SaaS handling EU users. Reuses the same scanner + Human Gates architecture, so each new regulation ships in weeks rather than months. Differentiator vs incumbent GDPR tools (Vanta / Drata / OneTrust): ComplianceLint runs *in your IDE* and auto-collects code-level evidence, instead of vendor-management questionnaires.
-  - [ ] **Phase 3 — CRA** (Cyber Resilience Act, Reg (EU) 2024/2847, ~85 articles, full effect 2027): security-by-design + vulnerability handling + CE marking for any software product placed on the EU market. Highest market-fit for our IDE-attached architecture; very few code-level tools exist today.
-  - [ ] **Phase 4 — NIS2** (Directive (EU) 2022/2555, ~46 articles): cybersecurity for "essential" + "important" entities (digital service providers, MSPs, healthcare, energy, etc.). Risk management, incident reporting, supply-chain security obligations.
-  - [ ] **Phase 4 — DORA** (Reg (EU) 2022/2554, ~64 articles, in force 2025): ICT operational resilience for the financial sector. Incident reporting, third-party-risk register, threat-led penetration testing.
-  - The five pillars (EU AI Act + GDPR + CRA + NIS2 + DORA) cover the legal stack a typical EU SaaS / regulated-industry deployment must satisfy. No existing tool we are aware of bundles all five at the code level.
-- [ ] OSCAL export (Enterprise — sales-scoped) — structured NIST OSCAL JSON for GRC ingestion. Listed in the Enterprise tier alongside SSO / SAML / on-prem; built per engagement when an enterprise customer asks for it.
-- [ ] Cryptographically signed Compliance All-in-One Pack (Enterprise — sales-scoped) — ed25519 signature over the canonicalised pack so external auditors can verify the bundle was not modified after export.
-- [ ] **Incremental scanning** — only re-scan obligations whose underlying code changed since the last full scan, instead of running every article every time. Demand-driven, triggered post-launch when usage warrants the optimization.
-- [ ] **Human Gates evidence verifier** (`cl_verify_human_gates`) — AI cross-checks each questionnaire answer against the obligation's `source_quote` requirements; flags vague text, missing answers, and cross-obligation contradictions before re-scan promotes evidence to COMPLIANT.
-- [ ] **All-in-One Pack `dashboard_state.json`** (post-launch, possibly tier-gated) — extend the export zip with a serialized snapshot of the dashboard's KPI cards, penalty calculation, role/risk-classification context, and per-article status matrix. Today the zip contains the legal artefacts (PDFs + manifest); this adds the *interpretive layer* the dashboard provides. Consumed by the offline viewer below.
-- [ ] **Public All-in-One Pack viewer** (`/viewer`, post-launch, possibly tier-gated) — public, no-login web page where an auditor or external lawyer drag-drops a Compliance All-in-One Pack zip and the page renders the same KPI cards, penalty estimates, and article-status visualisations as the live dashboard, all client-side from the zip's `dashboard_state.json`. No backend hit. Closes the gap that today's zip is "audit-ready files" but not "audit-ready *interface*". Pricing tier and exact UX still TBD.
-- [ ] **MCP Apps** (interactive UI widgets, **Business tier only**) — render scan results as a sandboxed dashboard, action plans as drag-drop card stacks, and explanations as 3-pane source-quote/atoms/recitals views directly inside Claude / ChatGPT / Cursor conversations. Per the [MCP Apps spec](https://github.com/modelcontextprotocol/ext-apps) (shipped Jan 2026, first official MCP extension). Lower tiers continue to get text-only responses from the same MCP tools. Phased rollout: Phase A on `cl_scan` + `cl_action_plan` + `cl_explain` (highest-value, ~3–4 days), Phase B on multi-step workflows, Phase C on advanced visualisations.
+- [ ] **OAuth direct-commit** — dashboard commits evidence to your cloud git without MCP running (GitHub → GitLab)
+- [ ] **GitHub Marketplace App** — discovery + one-click install
+- [ ] **Multi-regulation expansion** — same scanner + Human Gates architecture, next regulations prioritised by customer demand. Likely candidates: GDPR, CRA, NIS2, DORA, ISO 27001
+- [ ] **Incremental scanning** — only re-scan obligations whose underlying code changed since the last full scan
+- [ ] **Human Gates evidence verifier** — AI cross-checks questionnaire answers against `source_quote` requirements before promoting evidence to COMPLIANT
+- [ ] **Enterprise integrations** — OSCAL export, signed All-in-One Pack, SSO / SAML, on-prem (built per engagement)
+- [ ] **MCP Apps** — interactive UI widgets inside Claude / Cursor / ChatGPT conversations, per the [MCP Apps spec](https://github.com/modelcontextprotocol/ext-apps)
 
 ---
 
@@ -460,20 +463,6 @@ All obligation logic is tested against 12 synthetic project archetypes — simul
 - **High-risk focus.** Many obligations (Art. 9–27) apply primarily to high-risk AI systems. Non-high-risk systems may show NOT_APPLICABLE for those obligations.
 - **No runtime monitoring.** ComplianceLint scans source code and documentation. It does not monitor running AI systems. For ongoing compliance assurance, schedule periodic scans via CI/CD and ask your AI to sync results after each scan to maintain an auditable trail of compliance progress over time.
 - **English legal citations.** Obligation definitions and source quotes are in English (from the official EUR-Lex publication). However, since ComplianceLint runs inside AI-powered IDEs, the AI will naturally converse, explain regulations, and generate reports in your preferred language.
-
----
-
-## Human Oversight Design
-
-ComplianceLint is designed with human oversight at every stage:
-
-1. **Human initiates scans** — the AI never scans autonomously; the user explicitly requests each scan
-2. **Human reviews findings** — all findings are presented for human judgment before any action
-3. **Human submits evidence** — users acknowledge, rebut, defer, or provide evidence for any finding via natural-language conversation with their AI (which invokes `cl_update_finding` on their behalf)
-4. **Human controls sync** — scan results are only uploaded to the dashboard when the user explicitly asks the AI to sync
-5. **No autonomous decisions** — ComplianceLint never makes compliance determinations without human review
-
-The user can stop any MCP tool call at any time by pressing Stop in their IDE.
 
 ---
 
