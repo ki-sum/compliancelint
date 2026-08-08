@@ -4,6 +4,43 @@
     "title": "Transparency Obligations for Certain AI Systems",
     "prerequisites": [],
     "decomposition_date": "2026-03-17",
+    "revisions": [
+      {
+        "date": "2026-08-08",
+        "author": "kisum + Claude (session a0f81112)",
+        "scope": "exceptions[] completeness fix for OBL-1/2/3/4b (Option D of Art 50 clean-up)",
+        "changes": [
+          "OBL-1: added law_enforcement exception (with public_reporting carve-out) — Act line 4852",
+          "OBL-2: added standard_editing_or_non_substantial_alteration + law_enforcement exceptions — Act line 4862",
+          "OBL-3: added law_enforcement exception (with 'permitted by law' wording variation) — Act line 4868",
+          "OBL-4b: removed wrongly-placed artistic_satirical_fictional (that exception belongs to OBL-4 deepfake, not Art 50(4) para 2 text); added law_enforcement + human_review_and_editorial_responsibility exceptions — Act line 4881"
+        ],
+        "source_verification": "EUR-Lex CELEX:32024R1689 (docs/research/eu-official/eu-ai-act-regulation-2024-1689-eurlex.pdf SHA256 bba630444b3278e881066774002a1d7824308934f49ccfa203e65be43692f55e), cross-referenced with EC Guidelines C(2026) 5054 final (art50-guidelines-2026-07-20-C2026-5054.pdf SHA256 30861fc5de31205846f023068069c92fabc7271ebeac6af7bef68b97f0a33f66)",
+        "verifier_status": "scripts/verify_obligation_source_quotes.py 50 → post-edit expected: 0 INCOMPLETE_EXCEPTIONS for OBL-1/2/3/4b (down from 4)",
+        "consensus_lock_pending": "MANUAL RE-RUN NEEDED: run Consensus Lock check (o3 or newer model) against these 5 exception additions before considering Three Locks complete. See docs/handoff/2026-08-07-art50-audit-and-methodology-findings.md §5 step 9 for brief.",
+        "deferred_out_of_scope_today": "ART50-EMP-7a and ART50-EMP-7b are still-present o3 hallucinations (Act does not contain the quoted text). Deferred to separate cleanup (Option A/B/C decision) because they have 31 downstream references (data files, tests). See handoff doc §5 items 6-7."
+      },
+      {
+        "date": "2026-08-08",
+        "author": "kisum + Claude (session a0f81112)",
+        "scope": "Repair (not delete) of EMP-7a and EMP-7b hallucinations",
+        "changes": [
+          "ART50-EMP-7a: replaced hallucinated source_quote ('technical specifications for machine-readable format') with verbatim Art 50(7) sentence 2 ('Commission may adopt implementing acts to approve those codes of practice…'). Rewrote atom + note. Added cross_references to Art 56 (6) and Art 50(7).",
+          "ART50-EMP-7b: replaced hallucinated source_quote ('specify and update the list of specific categories of AI systems') with verbatim Art 50(7) sentence 3 ('If it deems the code is not adequate, the Commission may adopt an implementing act…'). Rewrote atom + note. Added cross_references to Art 98(2) and Art 50(7)."
+        ],
+        "rationale_for_repair_over_delete": "Delete would break 31 downstream references AND the CI invariant `assert total == 247` in .github/workflows/ci.yml, cascading to README.md (5 places), marketing slide, bin/init.js, scanner/server.py (2 places), and 2 scanner core modules — all hardcoding '247 obligations'. Repair preserves IDs → zero count impact → localized to primary JSON + 4 downstream sourceQuote-caching files.",
+        "downstream_updates_needed": [
+          "dashboard/src/data/legal-texts.json — update EMP-7a/7b sourceQuote (UI display)",
+          "dashboard/src/data/upstream-obligations.json — update EMP-7a/7b source_quote",
+          "dashboard/src/data/obligation-classifications/art50.json — update EMP-7a/7b human_needed",
+          "saas-engine/questionnaires/my-version/art50.json — update skipped_commission description"
+        ],
+        "systemic_gap_noted": "Act has ~10 Commission empowerments; tool tracks 5 (this repair keeps that count at 5). Full coverage is a separate architectural decision — tracked in docs/architecture/emp-coverage-policy-decision-needed.md and added to docs/nice-to-have.md.",
+        "source_verification": "EUR-Lex CELEX:32024R1689 line 4897-4900 (SHA256 bba630444b3278e881066774002a1d7824308934f49ccfa203e65be43692f55e); cross-referenced with EC Guidelines C(2026) 5054 §8.1 ¶146-150 (SHA256 30861fc5de31205846f023068069c92fabc7271ebeac6af7bef68b97f0a33f66)",
+        "verifier_status": "post-repair expected: audit_emp_and_consensus_added.py EMP audit → 20/20 VERBATIM_OK (was 18/20 + 2 HALLUCINATION_SUSPECT)",
+        "consensus_lock_pending": "MANUAL RE-RUN NEEDED for these 2 repaired empowerments alongside the 5 exception additions from the 2026-08-08 revision above."
+      }
+    ],
     "related_standards": {
       "published": [
         "C2PA Technical Specification v2.1 — Content provenance and authenticity",
@@ -58,6 +95,11 @@
           "description": "Disclosure is not required when it is 'obvious from the circumstances and context of use' that the person is interacting with an AI system",
           "burden_of_proof": "The deployer bears the burden of demonstrating that AI interaction is obvious from context",
           "note": "This exception should be interpreted narrowly — most conversational AI interactions are NOT obviously AI-driven"
+        },
+        {
+          "condition": "law_enforcement",
+          "description": "AI systems authorised by law to detect, prevent, investigate or prosecute criminal offences (subject to appropriate safeguards for the rights and freedoms of third parties)",
+          "note": "Carve-out: exception does NOT apply if the system is available for the public to report a criminal offence — disclosure remains required in that case. Source: Art. 50(1) second sentence (EUR-Lex CELEX:32024R1689 SHA256 bba63044…). Per EC Guidelines C(2026) 5054 §3.2.2 ¶46-49: 'authorised by law' includes both Union and national law adopted in compliance with Union law. Added 2026-08-08 via source_quote completeness audit (see docs/handoff/2026-08-07-art50-audit-and-methodology-findings.md)."
         }
       ],
       "cross_references": [
@@ -101,6 +143,18 @@
       "automation_assessment": {
         "level": "full"
       },
+      "exceptions": [
+        {
+          "condition": "standard_editing_or_non_substantial_alteration",
+          "description": "AI systems that perform an assistive function for standard editing, OR that do not substantially alter the input data provided by the deployer or the semantics thereof",
+          "note": "Standard editing = preparing existing content for publication without generating new content (grammar/spellcheck, format conversion, minor colour/crop, noise reduction, rescaling, transcription, medical image annotation). Substantial alteration = manipulation affecting meaning, style or intent (summaries, paraphrasing, face replacement, voice cloning, composite images). Source: Art. 50(2) second sentence (EUR-Lex CELEX:32024R1689). Per EC Guidelines C(2026) 5054 §4.3 ¶90-92 for detailed positive/negative examples. Added 2026-08-08 via source_quote completeness audit."
+        },
+        {
+          "condition": "law_enforcement",
+          "description": "AI systems authorised by law to detect, prevent, investigate or prosecute criminal offences",
+          "note": "Source: Art. 50(2) second sentence (EUR-Lex CELEX:32024R1689). Per EC Guidelines C(2026) 5054 §4.3 ¶93 (cross-refers to §3.2.2 ¶46-49 for 'authorised by law' interpretation). Added 2026-08-08 via source_quote completeness audit."
+        }
+      ],
       "recommended_standards": [
         {
           "standard": "C2PA v2.1",
@@ -164,6 +218,13 @@
       "automation_assessment": {
         "level": "partial"
       },
+      "exceptions": [
+        {
+          "condition": "law_enforcement",
+          "description": "Emotion recognition / biometric categorisation systems permitted by law to detect, prevent or investigate criminal offences (subject to appropriate safeguards for the rights and freedoms of third parties, and in accordance with Union law)",
+          "note": "Wording variation from Art. 50(1)/(2)/(4) law enforcement exception: this one uses 'permitted by law' (not 'authorised by law') and covers only detect/prevent/investigate (NOT prosecute). Source: Art. 50(3) second sentence (EUR-Lex CELEX:32024R1689). Per EC Guidelines C(2026) 5054 §5.2 ¶109 — the softer 'permitted by law' phrasing accommodates existing sectoral rules on law enforcement powers without requiring separate explicit authorisation. Added 2026-08-08 via source_quote completeness audit."
+        }
+      ],
       "cross_references": [
         {
           "regulation": "GDPR",
@@ -262,9 +323,14 @@
       },
       "exceptions": [
         {
-          "condition": "artistic_satirical_fictional",
-          "description": "Content used for manifestly artistic, creative, satirical, or fictional analogous purposes",
-          "note": "Even excepted content should indicate AI generation in an appropriate manner"
+          "condition": "law_enforcement",
+          "description": "AI-generated text used where authorised by law to detect, prevent, investigate or prosecute criminal offences",
+          "note": "Source: Art. 50(4) second subparagraph, first exception (EUR-Lex CELEX:32024R1689). Per EC Guidelines C(2026) 5054 §6.2.4 ¶139 (cross-refers to §3.2.2 ¶46-49). Added 2026-08-08 via source_quote completeness audit."
+        },
+        {
+          "condition": "human_review_and_editorial_responsibility",
+          "description": "AI-generated content that has undergone a process of human review or editorial control AND where a natural or legal person holds editorial responsibility for the publication of the content",
+          "note": "TWO CUMULATIVE conditions must BOTH apply: (1) deliberate substantive human review — spell-check, automated review, or cursory approval are NOT sufficient; (2) named editorial responsibility — the identity and contact of the responsible natural or legal person must be publicly discoverable. Any substantive AI modification AFTER editorial sign-off voids the exception. Source: Art. 50(4) second subparagraph, second exception (EUR-Lex CELEX:32024R1689). Per EC Guidelines C(2026) 5054 §6.2.3 ¶133-138. CORRECTION NOTE (2026-08-08): the previous exception artistic_satirical_fictional was wrongly copied from OBL-4 (deepfake image/audio/video) during the 2026-03-20 Consensus Lock addition of OBL-4b; that regime does NOT apply to Art 50(4) second subparagraph (text). The two exceptions above are the actual Act-defined ones. Removed the wrong entry and added these two correct exceptions."
         }
       ]
     },
@@ -378,40 +444,64 @@
     {
       "id": "ART50-EMP-7a",
       "source": "Art. 50(7)",
-      "source_quote": "The Commission may adopt implementing acts to establish the technical specifications for the machine-readable format referred to in paragraph 2 of this Article.",
+      "source_quote": "The Commission may adopt implementing acts to approve those codes of practice in accordance with the procedure laid down in Article 56 (6).",
       "deontic_type": "empowerment",
       "modality": "may",
       "addressee": "commission",
-      "note": "Commission empowerment to specify the technical format for machine-readable content marking (Art. 50(2)). Providers should monitor for implementing acts that may specify required formats.",
+      "note": "Commission empowerment to approve Union-level codes of practice on detection and labelling of AI-generated/manipulated content (drawn up by the AI Office under ART50-OBL-7). Adherence to an approved code of practice provides a presumption of compliance with Art. 50(2), (4) and (5) obligations. Providers and deployers should monitor for the Commission's approval decision and consider signing approved codes. Procedural cross-reference: Article 56 (6). Per EC Guidelines C(2026) 5054 §8.1 ¶146-149. CORRECTION 2026-08-08: previous source_quote (about 'technical specifications for machine-readable format') was an o3 hallucination from the 2026-03-20 Consensus Lock session — full-text grep of EUR-Lex CELEX:32024R1689 returned zero matches. Repaired to verbatim Art 50(7) sentence 2, with corresponding atom rewrite. ID preserved to avoid breaking 31 downstream references and the CI `total == 247` invariant.",
       "decomposed_atoms": [
         {
-          "atom": "commission_may_specify_marking_format",
-          "description": "Commission may adopt implementing acts for machine-readable format specifications",
-          "requirement": "The Commission MAY adopt implementing acts to establish technical specifications for the machine-readable format"
+          "atom": "commission_may_approve_codes_of_practice",
+          "description": "Commission may adopt implementing acts to approve codes of practice on detection and labelling of AI-generated content",
+          "requirement": "The Commission MAY adopt implementing acts to approve codes of practice (drawn up under ART50-OBL-7) in accordance with the procedure laid down in Article 56 (6). Approval status confers a presumption of compliance for signatories."
         }
       ],
       "automation_assessment": {
         "level": "manual"
-      }
+      },
+      "cross_references": [
+        {
+          "article": 56,
+          "paragraph": 6,
+          "context": "Article 56 (6) sets out the procedure for Commission approval of codes of practice — the empowerment above operates within that procedural framework."
+        },
+        {
+          "article": 50,
+          "paragraph": 7,
+          "context": "This EMP is one of two Commission empowerments in Art 50(7). Its counterpart ART50-EMP-7b covers the fallback empowerment when a code is deemed inadequate."
+        }
+      ]
     },
     {
       "id": "ART50-EMP-7b",
       "source": "Art. 50(7)",
-      "source_quote": "The Commission may adopt implementing acts to specify and update the list of specific categories of AI systems referred to in paragraph 4 of this Article.",
+      "source_quote": "If it deems the code is not adequate, the Commission may adopt an implementing act specifying common rules for the implementation of those obligations in accordance with the examination procedure laid down in Article 98(2).",
       "deontic_type": "empowerment",
       "modality": "may",
       "addressee": "commission",
-      "note": "Commission empowerment to specify and update the list of AI system categories subject to Art. 50(4) deep fake disclosure. Providers should monitor for implementing acts that may expand the scope.",
+      "note": "Commission fallback empowerment: if the AI Office code of practice (see ART50-OBL-7 and ART50-EMP-7a) is deemed inadequate, the Commission may issue common rules directly. This is a residual power ensuring baseline compliance obligations exist even without industry consensus. Procedural cross-reference: Article 98(2) (examination procedure — comitology). Per EC Guidelines C(2026) 5054 §8.1 ¶150. CORRECTION 2026-08-08: previous source_quote (about 'specify and update the list of specific categories of AI systems') was an o3 hallucination from the 2026-03-20 Consensus Lock session — full-text grep of EUR-Lex CELEX:32024R1689 returned zero matches. Repaired to verbatim Art 50(7) sentence 3, with corresponding atom rewrite. ID preserved to avoid breaking 31 downstream references and the CI `total == 247` invariant.",
       "decomposed_atoms": [
         {
-          "atom": "commission_may_specify_system_categories",
-          "description": "Commission may specify AI system categories for Art. 50(4) disclosure",
-          "requirement": "The Commission MAY adopt implementing acts to specify and update the list of AI system categories for Art. 50(4)"
+          "atom": "commission_may_specify_common_rules_if_code_inadequate",
+          "description": "Commission may adopt implementing act with common rules if code of practice is deemed inadequate",
+          "requirement": "IF the Commission deems the code of practice (per ART50-EMP-7a) is not adequate, the Commission MAY adopt an implementing act specifying common rules for the implementation of the Art. 50(2)/(4)/(5) obligations, in accordance with the examination procedure laid down in Article 98(2)."
         }
       ],
       "automation_assessment": {
         "level": "manual"
-      }
+      },
+      "cross_references": [
+        {
+          "article": 98,
+          "paragraph": 2,
+          "context": "Article 98(2) sets out the examination procedure (comitology) — the fallback empowerment above operates within that procedural framework."
+        },
+        {
+          "article": 50,
+          "paragraph": 7,
+          "context": "This EMP is the second of two Commission empowerments in Art 50(7). Its counterpart ART50-EMP-7a covers the primary empowerment (approval of codes of practice)."
+        }
+      ]
     }
   ],
   "summary": {
