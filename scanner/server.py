@@ -1043,11 +1043,22 @@ def cl_scan(
     # from the same Recital grounding that cl_explain surfaces, keyed
     # by article number for quick lookup.
     from core.obligation_lookup import recitals_for_article as _recitals_for_article
+    from core.layer2_loader import (
+        get_interpretive_materials_for_article as _l2_for_article,
+        get_atoms_for_obligation as _l2_atoms_for_obligation,
+    )
     related_recitals_by_article: dict[str, list[dict]] = {}
+    # Layer 2 (2026-08-10) — surface interpretive materials keyed by
+    # article. Pilot: 304 Art 50 atoms from C(2026) 5054 final. Same
+    # payload shape as related_recitals_by_article.
+    interpretive_materials_by_article: dict[str, list[dict]] = {}
     for art_num in article_numbers:
         recs = _recitals_for_article(art_num)
         if recs:
             related_recitals_by_article[str(art_num)] = recs
+        l2 = _l2_for_article(art_num)
+        if l2:
+            interpretive_materials_by_article[str(art_num)] = l2
 
     # Single article → return full findings + post-scan hint
     if len(article_numbers) == 1:
@@ -1058,8 +1069,24 @@ def cl_scan(
         # returned non-JSON for some reason, leave output unchanged.
         try:
             single_payload = json.loads(output)
-            if isinstance(single_payload, dict) and related_recitals_by_article:
-                single_payload["related_recitals_by_article"] = related_recitals_by_article
+            if isinstance(single_payload, dict):
+                if related_recitals_by_article:
+                    single_payload["related_recitals_by_article"] = related_recitals_by_article
+                if interpretive_materials_by_article:
+                    single_payload["interpretive_materials_by_article"] = interpretive_materials_by_article
+                # Layer 2 per-finding enrichment (top-3 atoms per
+                # finding's obligation_id). Full atom list still in
+                # interpretive_materials_by_article for the article.
+                for finding in single_payload.get("findings", []) or []:
+                    if not isinstance(finding, dict):
+                        continue
+                    oid = finding.get("obligation_id") or finding.get("obligationId")
+                    if not oid or not isinstance(oid, str):
+                        continue
+                    atoms = _l2_atoms_for_obligation(oid)
+                    if atoms:
+                        finding["interpretive_atoms"] = atoms[:3]
+                        finding["interpretive_atoms_total"] = len(atoms)
                 output = json.dumps(single_payload, indent=2, default=str)
         except json.JSONDecodeError:
             pass
@@ -1127,6 +1154,12 @@ def cl_scan(
         # (same shape as cl_action_plan). Empty when no covered article
         # has mapped Recitals.
         "related_recitals_by_article": related_recitals_by_article,
+        # Layer 2 (2026-08-10) — EU-authoritative interpretive materials
+        # keyed by article number. Pilot: 304 Art 50 atoms from EC
+        # Guidelines C(2026) 5054 final. Each atom carries byte-verbatim
+        # text + paragraph anchor + source PDF URL + SHA256 for
+        # hallucination-free citation.
+        "interpretive_materials_by_article": interpretive_materials_by_article,
     }, indent=2, default=str)
 
     # Post-scan: auto-sync or contextual hint
@@ -1190,6 +1223,12 @@ def cl_explain(regulation: str = "eu-ai-act", article: int = 0) -> str:
         # Per Kisum decision: full text inline (no links), customer's own
         # AI can interpret further.
         payload["related_recitals"] = recitals_for_article(article)
+        # Layer 2 (2026-08-10) — EU-authoritative interpretive materials
+        # (EC Guidelines, Codes of Practice, EDPB Statements). Attached
+        # to Layer 1 obligations via each atom's `attaches_to_obligation`
+        # field. First doc: C(2026) 5054 final on Art 50 (304 atoms).
+        from core.layer2_loader import get_interpretive_materials_for_article
+        payload["interpretive_materials"] = get_interpretive_materials_for_article(article)
         payload["disclaimer"] = (
             "Prose fields (one_sentence, official_summary, recital, "
             "compliance_checklist_summary) are ComplianceLint's "
@@ -1198,9 +1237,13 @@ def cl_explain(regulation: str = "eu-ai-act", article: int = 0) -> str:
             "EUR-Lex — is in the `verbatim_obligations` array (each "
             "entry's `source_quote` field) and in `related_recitals` "
             "(each entry's `source_quote`, drawn from the official "
-            "Regulation (EU) 2024/1689 PDF via pdfplumber). Use these "
-            "arrays as ground truth when quoting the regulation; consult "
-            "`eur_lex_official_url` for the canonical PDF."
+            "Regulation (EU) 2024/1689 PDF via pdfplumber). "
+            "Layer-2 interpretive materials from EU authorities "
+            "(EC Guidelines etc.) are in `interpretive_materials[]` — "
+            "each atom carries byte-verbatim text + paragraph anchor + "
+            "source PDF URL + SHA256 for hallucination-free citation. "
+            "Use these arrays as ground truth when quoting the regulation; "
+            "consult `eur_lex_official_url` for the canonical Act PDF."
         )
         return append_upgrade_hint(
             json.dumps(payload, indent=2, ensure_ascii=False),
@@ -2074,7 +2117,15 @@ def cl_action_plan(project_path: str, regulation: str = "eu-ai-act", article: in
     # §AD.5b — Recital interpretive layer (full verbatim text, keyed
     # by article number). Same pattern as cl_explain.related_recitals.
     from core.obligation_lookup import recitals_for_article
+    from core.layer2_loader import (
+        get_interpretive_materials_for_article,
+        get_atoms_for_obligation,
+    )
     related_recitals_by_article: dict[str, list[dict]] = {}
+    # Layer 2 (2026-08-10) — EU-authoritative interpretive materials
+    # (EC Guidelines etc.) attached to Layer 1 obligations. Pilot: 304
+    # atoms on Art 50. Structure mirrors related_recitals_by_article.
+    interpretive_materials_by_article: dict[str, list[dict]] = {}
 
     all_actions = []
     articles_covered = []
@@ -2101,6 +2152,10 @@ def cl_action_plan(project_path: str, regulation: str = "eu-ai-act", article: in
             recitals = recitals_for_article(art_num)
             if recitals:
                 related_recitals_by_article[str(art_num)] = recitals
+            # Layer 2 attach — only for articles that have interpretive materials.
+            l2_materials = get_interpretive_materials_for_article(art_num)
+            if l2_materials:
+                interpretive_materials_by_article[str(art_num)] = l2_materials
         except Exception as e:
             all_actions.append({
                 "priority": "HIGH",
@@ -2118,6 +2173,22 @@ def cl_action_plan(project_path: str, regulation: str = "eu-ai-act", article: in
             action_dicts.append(a.to_dict())
         elif isinstance(a, dict):
             action_dicts.append(a)
+
+    # Layer 2 (2026-08-10) — enrich each action with its obligation's
+    # attached interpretive atoms, capped to top-3 to keep the action
+    # entry manageable. Full atom list still available in
+    # `interpretive_materials_by_article` for the article. Cap = 3 so
+    # each action carries concrete EC-authoritative guidance without
+    # ballooning the payload; AI can drill into the full doc via the
+    # per-article key when needed.
+    for action_dict in action_dicts:
+        oid = action_dict.get("obligation_id") or action_dict.get("obligationId")
+        if not oid or not isinstance(oid, str):
+            continue
+        atoms = get_atoms_for_obligation(oid)
+        if atoms:
+            action_dict["interpretive_atoms"] = atoms[:3]
+            action_dict["interpretive_atoms_total"] = len(atoms)
 
     # §AT.19 Phase 4 (2026-05-13) — Cross-surface overlay. Fetch
     # effective status from SaaS dashboard (Channel B overlay applied)
@@ -2186,12 +2257,24 @@ def cl_action_plan(project_path: str, regulation: str = "eu-ai-act", article: in
         # recitals.json is unavailable. Per Kisum decision 2026-05-04:
         # full Recital text inline (not links).
         "related_recitals_by_article": related_recitals_by_article,
+        # Layer 2 (2026-08-10) — EU-authoritative interpretive materials
+        # keyed by article number. Pilot: 304 Art 50 atoms from EC
+        # Guidelines C(2026) 5054 final. Each atom carries byte-verbatim
+        # text + paragraph anchor + source PDF URL + SHA256 for
+        # hallucination-free citation. Empty dict when no covered article
+        # has mapped Layer 2 materials.
+        "interpretive_materials_by_article": interpretive_materials_by_article,
         "disclaimer": (
             "This action plan is based on ComplianceLint compliance checklist and best practices. "
             "Official CEN-CENELEC standards (expected Q4 2026) may modify these requirements. "
             "Verbatim EU AI Act Recital text in `related_recitals_by_article` is drawn from "
             "the official Regulation (EU) 2024/1689 PDF (via pdfplumber) — use as ground "
-            "truth when interpreting the Articles."
+            "truth when interpreting the Articles. "
+            "Layer-2 EU-authoritative interpretive materials in "
+            "`interpretive_materials_by_article[]` (and per-action top-3 in "
+            "`interpretive_atoms[]`) carry byte-verbatim EC Guidelines / CoP / "
+            "EDPB text with paragraph anchors — cite these when generating "
+            "concrete how-to-fix guidance for the user."
         ),
     }
     return append_upgrade_hint(
