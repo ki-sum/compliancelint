@@ -1,0 +1,141 @@
+{
+  "_meta": {
+    "schema_version": "1.0",
+    "doc_id": "C(2026) 5054 final",
+    "doc_type": "guidelines",
+    "title": "Guidelines on the implementation of the transparency obligations for certain AI systems under Article 50 of Regulation (EU) 2024/1689 (the 'AI Act')",
+    "issuing_body": "European Commission",
+    "language": "EN",
+    "publication_date": "2026-07-20",
+    "effective_date": "2026-08-02",
+    "source_url": "https://ai-act-service-desk.ec.europa.eu/sites/default/files/2026-07/guidelines_on_the_implementation_of_the_transparency_obligations_for_certain_ai_systems_under_article_50_of_the_ai_act_bzptwqhk0ikg1dtlddap41psfy_131215.pdf",
+    "source_sha256": "30861fc5de31205846f023068069c92fabc7271ebeac6af7bef68b97f0a33f66",
+    "extract_path": "docs/research/eu-official/art50-guidelines-2026-07-20-C2026-5054.extract.txt",
+    "status": "in_force",
+    "binding_nature": "non_binding_interpretation",
+    "verbatim_policy": {
+      "quoting_style": "verbatim_required",
+      "notes": "Guidelines paragraphs are numbered (¶N) and quotable byte-for-byte from EC PDF. Verifier confirms each guidance_atoms[].verbatim_text appears in extract_path."
+    },
+    "article_refs": [
+      {"article": "art50", "paragraph": null, "point": null, "annex": null}
+    ],
+    "lifecycle": {
+      "revision_style": "snapshot_only",
+      "living_subsection": null,
+      "current_version": "1.0",
+      "supersedes": null,
+      "superseded_by": null
+    },
+    "related_docs": [
+      {"doc_id": "C(2025) 5052 final", "relation": "cross_reference", "note": "Guidelines on prohibited practices — Section 3.2.2 ¶46-49 of this doc cross-refs the 'authorised by law' interpretation used there."},
+      {"doc_id": "gpai-code-of-practice", "relation": "companion_ecosystem", "note": "Section 8.1 discusses Code of Practice adherence as demonstration of compliance with 50(2)/(4)/(5)."}
+    ],
+    "three_locks_status": {
+      "source_lock": "pending",
+      "logic_lock": "pending",
+      "consensus_lock": "pending"
+    }
+  },
+  "content": {
+    "paragraph_scheme": "numbered_bracketed",
+    "section_hierarchy": [
+      {"id": "1", "title": "Background and Objectives"},
+      {"id": "2", "title": "Overview of the Transparency Obligations and Horizontal Topics"},
+      {"id": "3", "title": "Article 50(1) AI Act: Transparency for Interactive AI systems"},
+      {"id": "3.1", "title": "Main components, concepts and related transparency obligation(s)"},
+      {"id": "3.1.2", "title": "Information obligation under Article 50(1) AI Act"},
+      {"id": "3.2", "title": "Exceptions to the information obligation under Article 50(1) AI Act"},
+      {"id": "4", "title": "Article 50(2) AI Act: Marking and Detection of AI-generated or manipulated content"},
+      {"id": "5", "title": "Article 50(3) AI Act: Emotion Recognition Systems and Biometric Categorisation Systems"},
+      {"id": "6", "title": "Article 50(4): Labelling of Deep Fakes and Certain Text Publications"},
+      {"id": "6.1.1", "title": "The notion of 'deep fake'"},
+      {"id": "6.2.3", "title": "Exception from the transparency obligation for text under human review or editorial control and editorial responsibility"},
+      {"id": "7", "title": "Horizontal Requirements Applicable to the Information Provided under Article 50(5) AI Act"},
+      {"id": "8", "title": "Enforcement of Article 50 AI Act"},
+      {"id": "8.1", "title": "Effects of adhering to a code of practice assessed as adequate"}
+    ],
+    "guidance_atoms": [
+      {
+        "id": "ART50-GL-OBL1-INSUFFICIENT-01",
+        "attaches_to_obligation": "ART50-OBL-1",
+        "paragraph_ref": 38,
+        "section_ref": "3.1.2",
+        "verbatim_text": "Disclosures contained only in terms and conditions, URLs, or documentation (such disclosures may complement, though not replace, in-context disclosure);",
+        "atom_type": "insufficient_pattern"
+      },
+      {
+        "id": "ART50-GL-OBL1-INSUFFICIENT-02",
+        "attaches_to_obligation": "ART50-OBL-1",
+        "paragraph_ref": 38,
+        "section_ref": "3.1.2",
+        "verbatim_text": "Machine-readable markings (e.g. metadata or watermarks) that are not perceivable by users at the point of interaction. This does not affect the appropriateness of such marks to comply with Article 50(2) AI Act (see Section 4);",
+        "atom_type": "insufficient_pattern"
+      },
+      {
+        "id": "ART50-GL-OBL1-INSUFFICIENT-03",
+        "attaches_to_obligation": "ART50-OBL-1",
+        "paragraph_ref": 38,
+        "section_ref": "3.1.2",
+        "verbatim_text": "Unclear or ambiguous signals (e.g. generic references to \"assistant\") or human-like representations that may mislead users;",
+        "atom_type": "insufficient_pattern"
+      },
+      {
+        "id": "ART50-GL-OBL1-INSUFFICIENT-04",
+        "attaches_to_obligation": "ART50-OBL-1",
+        "paragraph_ref": 38,
+        "section_ref": "3.1.2",
+        "verbatim_text": "Generalised disclosures that are not sufficiently specific to the AI system's outputs and interactions (e.g. on a platform providing a variety of services or individual inputs, a general disclosure like \"Services on this website use AI\" is insufficient);",
+        "atom_type": "insufficient_pattern"
+      },
+      {
+        "id": "ART50-GL-OBL1-INSUFFICIENT-05",
+        "attaches_to_obligation": "ART50-OBL-1",
+        "paragraph_ref": 38,
+        "section_ref": "3.1.2",
+        "verbatim_text": "Technical or capability-based descriptions: statements solely referring to underlying technologies (e.g. \"this system uses LLMs\") without explaining the function or implications of the system for the user and its artificial origin.",
+        "atom_type": "insufficient_pattern"
+      },
+      {
+        "id": "ART50-GL-OBL4-DEEPFAKE-DEF-01",
+        "attaches_to_obligation": "ART50-OBL-4",
+        "paragraph_ref": 113,
+        "section_ref": "6.1.1",
+        "verbatim_text": "For the purpose of clarifying the notion of deep fake, four cumulative criteria from that definition are examined below: (i) resemblance of (ii) existing (iii) persons, objects, places, entities or events (iv) that would falsely appear to a person to be authentic or truthful.",
+        "atom_type": "definition_clarification"
+      },
+      {
+        "id": "ART50-GL-OBL4-DEEPFAKE-EXISTING-01",
+        "attaches_to_obligation": "ART50-OBL-4",
+        "paragraph_ref": 113,
+        "section_ref": "6.1.1",
+        "verbatim_text": "Therefore, it is sufficient for simulated persons, objects, places, entities or events to resemble someone or something that exists, can plausibly exist or could have plausibly existed in reality to be considered a deep fake, since such content can be a major source of deception, manipulation and disinformation.",
+        "atom_type": "scope_extension"
+      },
+      {
+        "id": "ART50-GL-OBL4b-EDITORIAL-CONDITION-01",
+        "attaches_to_obligation": "ART50-OBL-4b",
+        "paragraph_ref": 134,
+        "section_ref": "6.2.3",
+        "verbatim_text": "Human review refers to the deliberate examination of the substance of the content by one or more natural persons possessing relevant knowledge and professional judgement pertaining to the subject matter under scrutiny (e.g. academic peer review or professional validation chains). Fact-checking the accuracy of the content is a minimum requirement that should be part of that review.",
+        "atom_type": "definition_clarification"
+      },
+      {
+        "id": "ART50-GL-OBL4b-EDITORIAL-CONDITION-02",
+        "attaches_to_obligation": "ART50-OBL-4b",
+        "paragraph_ref": 138,
+        "section_ref": "6.2.3",
+        "verbatim_text": "To ensure public accountability and trust, and in line with existing media professional standards, the identity and contact details of the legal person, the natural person or the function with editorial responsibility should be made publicly available on an easily findable location (if not yet otherwise available).",
+        "atom_type": "definition_clarification"
+      },
+      {
+        "id": "ART50-GL-OBL4b-EDITORIAL-INSUFFICIENT-01",
+        "attaches_to_obligation": "ART50-OBL-4b",
+        "paragraph_ref": 135,
+        "section_ref": "6.2.3",
+        "verbatim_text": "Superficial, solely formal or procedural checks (e.g. spell-checking or grammatical correction), the mere existence of an editorial policy, automated review processes or cursory editorial approval without substantive engagement by the human reviewer or the editorial entity, cannot fulfil the conditions for human review or editorial control for the purposes of this exception.",
+        "atom_type": "insufficient_pattern"
+      }
+    ]
+  }
+}
