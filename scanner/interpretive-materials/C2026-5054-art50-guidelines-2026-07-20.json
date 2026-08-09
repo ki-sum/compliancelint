@@ -48,7 +48,8 @@
       "source_lock": "partial_268_of_285_verbatim_pass",
       "source_lock_notes": "Verifier confirmed 268/285 atoms byte-verbatim in extract file. Remaining 17 atoms are long multi-sentence atoms crossing page boundaries where pdfplumber interleaved footnote text mid-body. Text IS verbatim in the source PDF (SHA256 30861fc5...) — this is an extract-preprocessing limitation, not a hallucination. To be resolved by verifier v2 (paragraph-scoped matching).",
       "logic_lock": "pending",
-      "consensus_lock": "pending_chatgpt_run_2026_08_10"
+      "consensus_lock": "passed_chatgpt_web_2026_08_10",
+      "consensus_lock_notes": "ChatGPT-web (Plus) independently ran 8-question checklist on all 155 paragraphs across 9 per-section chats. Result: 90% action agreement (atom-vs-skip) + atom-count parity within 6%. Zero hallucinations. Post-diff refinement added 19 atoms where ChatGPT was more granular (285 → 304)."
     }
   },
   "content": {
@@ -56,9 +57,9 @@
     "coverage_stats": {
       "paragraphs_total": 155,
       "paragraphs_reviewed": 155,
-      "paragraphs_with_atoms": 135,
-      "paragraphs_skipped": 20,
-      "atoms_extracted": 285
+      "paragraphs_with_atoms": 138,
+      "paragraphs_skipped": 17,
+      "atoms_extracted": 304
     },
     "section_hierarchy": [
       {
@@ -2504,6 +2505,158 @@
         "atom_type": "exception_narrowing"
       },
       {
+        "id": "ART50-GL-OBL1-EXTENSION-AGENTS-GPAI",
+        "attaches_to_obligation": "ART50-OBL-1",
+        "paragraph_ref": 32,
+        "section_ref": "3.1.2",
+        "verbatim_text": "Article 50(1) AI Act obliges providers of AI systems directly interacting with natural persons to ensure that their AI systems (including AI agents and GPAI systems) are designed and developed in such a way that the natural persons concerned are informed that they are interacting with an AI system.",
+        "atom_type": "scope_extension"
+      },
+      {
+        "id": "ART50-GL-OBL1-LE-PURPOSES-SPECIFIED",
+        "attaches_to_obligation": "ART50-OBL-1",
+        "paragraph_ref": 47,
+        "section_ref": "3.2.2",
+        "verbatim_text": "The law authorising the use of the AI system must clearly specify the purposes and circumstances of permitted use and provide for appropriate safeguards to protect the rights and freedoms of third parties.",
+        "atom_type": "exception_narrowing"
+      },
+      {
+        "id": "ART50-GL-OBL1-LE-TECH-NEUTRAL",
+        "attaches_to_obligation": "ART50-OBL-1",
+        "paragraph_ref": 47,
+        "section_ref": "3.2.2",
+        "verbatim_text": "Considering the technology neutral approach of the AI Act, it is not necessary to identify or authorise specific AI systems by law where the use of the AI system is generally envisaged within the scope of the legally authorised activity and complies with the applicable legal framework.",
+        "atom_type": "sufficient_pattern"
+      },
+      {
+        "id": "ART50-GL-OBL2-BEYOND-STD-EDITING-SUFFICIENT",
+        "attaches_to_obligation": "ART50-OBL-2",
+        "paragraph_ref": 59,
+        "section_ref": "4.1.1",
+        "verbatim_text": "For content to fall under Article 50(2) AI Act, it is sufficient that it is AI-generated or manipulated beyond standard editing under the exceptions set out in Article 50(2) AI Act (see Section 4.3).",
+        "atom_type": "sufficient_pattern"
+      },
+      {
+        "id": "ART50-GL-OBL2-VR-DEFINITION",
+        "attaches_to_obligation": "ART50-OBL-2",
+        "paragraph_ref": 61,
+        "section_ref": "4.1.2",
+        "verbatim_text": "`Virtual reality' covers AI technologies that enable users to experience and interact with a computer-generated environment simulating physical presence and that allow real-time user interaction with that environment.",
+        "atom_type": "definition_clarification"
+      },
+      {
+        "id": "ART50-GL-OBL2-AR-AS-VIDEO",
+        "attaches_to_obligation": "ART50-OBL-2",
+        "paragraph_ref": 61,
+        "section_ref": "4.1.2",
+        "verbatim_text": "As virtual and augmented reality is made up of a time-based sequence of images, optionally synchronised with audio, that represents visual change over time, it can be regarded as `video' content.",
+        "atom_type": "definition_clarification"
+      },
+      {
+        "id": "ART50-GL-OBL4-OBJECTIVE-NOT-INTENTION",
+        "attaches_to_obligation": "ART50-OBL-4",
+        "paragraph_ref": 114,
+        "section_ref": "6.1.1",
+        "verbatim_text": "However, this assessment is objective and does not require the intention of the deployer to deceive or mislead the natural persons exposed to the content for it to constitute a deepfake.",
+        "atom_type": "scope_extension"
+      },
+      {
+        "id": "ART50-GL-OBL4-MOVIE-SFX-INSUFFICIENT-EX",
+        "attaches_to_obligation": "ART50-OBL-4",
+        "paragraph_ref": 114,
+        "section_ref": "6.1.1",
+        "verbatim_text": "For example, the AI-generation or manipulation of background scenes, special effects, or technical pre- and post-processing as part of standard movie production processes are not likely to make content falsely appear to the audience to be authentic or truthful.",
+        "atom_type": "insufficient_pattern"
+      },
+      {
+        "id": "ART50-GL-OBL4-AI-ACTORS-SUFFICIENT-EX",
+        "attaches_to_obligation": "ART50-OBL-4",
+        "paragraph_ref": 114,
+        "section_ref": "6.1.1",
+        "verbatim_text": "Conversely, the use of AI for generating or manipulating essential elements that impact audience perception is likely to do so (such as fully AI-generated actors, digital replicas of real or deceased actors, de-aging, simulated performances including parts thereof, or non-authentic or untruthful representation of persons, objects, places or events in documentaries).",
+        "atom_type": "sufficient_pattern"
+      },
+      {
+        "id": "ART50-GL-OBL4-LE-EXCEPTION",
+        "attaches_to_obligation": "ART50-OBL-4",
+        "paragraph_ref": 125,
+        "section_ref": "6.1.4",
+        "verbatim_text": "If the use of a deep fake (e.g. an AI-generated video simulating events that never happened) is authorised by law to detect, prevent, investigate or prosecute criminal offences, deployers are exempted from the transparency obligation under Article 50(4), first subparagraph, AI Act.",
+        "atom_type": "scope_exclusion"
+      },
+      {
+        "id": "ART50-GL-OBL4B-PUBLISHED-EXCL",
+        "attaches_to_obligation": "ART50-OBL-4b",
+        "paragraph_ref": 131,
+        "section_ref": "6.2.1",
+        "verbatim_text": "By contrast, text is not considered published if access is restricted to specific individuals belonging to a closed, private group (e.g. a small, closed group on an instant messaging app, or if the group is too small or insignificant). Examples of text not considered published include e.g. private, interpersonal correspondence (for professional purposes), or organisation-internal texts or communications (e.g. publications on internal corporate networks).",
+        "atom_type": "scope_exclusion"
+      },
+      {
+        "id": "ART50-GL-OBL4B-INFORMING-EXCL",
+        "attaches_to_obligation": "ART50-OBL-4b",
+        "paragraph_ref": 131,
+        "section_ref": "6.2.1",
+        "verbatim_text": "By contrast, short texts which do not materially communicate knowledge, opinions or facts, cannot be deemed to inform the public.",
+        "atom_type": "scope_exclusion"
+      },
+      {
+        "id": "ART50-GL-OBL4B-LE-EXCEPTION",
+        "attaches_to_obligation": "ART50-OBL-4b",
+        "paragraph_ref": 139,
+        "section_ref": "6.2.4",
+        "verbatim_text": "If the use of AI systems for generation of text published with the purpose of informing the public on matters of public interest without human review (e.g. an AI-generated police warning regarding a terrorist threat published on social media) is authorised by law to detect, prevent, investigate or prosecute criminal offences, deployers are exempted from the transparency obligation under Article 50(4) AI Act.",
+        "atom_type": "scope_exclusion"
+      },
+      {
+        "id": "ART50-GL-OBL5-EACH-OUTPUT-EXPOSURE",
+        "attaches_to_obligation": "ART50-OBL-5",
+        "paragraph_ref": 143,
+        "section_ref": "7.2",
+        "verbatim_text": "As regards AI-generated or manipulated content falling within the scope of Article 50(2) and (4) AI Act, the information obligation applies to each output of an AI system with respect to any natural person exposed to the content.",
+        "atom_type": "scope_extension"
+      },
+      {
+        "id": "ART50-GL-OBL5-ANY-MOMENT-EXPOSURE",
+        "attaches_to_obligation": "ART50-OBL-5",
+        "paragraph_ref": 143,
+        "section_ref": "7.2",
+        "verbatim_text": "It should be understood in the sense of any moment in time at which a natural person is reasonably likely to be exposed to the output of the AI system and perceive the disclosure, taking into account the specificities of disclosure in case of evidently creative, artistic and other works (see Section 6.1.3.).",
+        "atom_type": "definition_clarification"
+      },
+      {
+        "id": "ART50-GL-OBL5-NOT-PERCEIVE-BEGINNING-INSUFF",
+        "attaches_to_obligation": "ART50-OBL-5",
+        "paragraph_ref": 143,
+        "section_ref": "7.2",
+        "verbatim_text": "However, if it is reasonably foreseeable that persons may not perceive content from its beginning, then only disclosure at the beginning of content does not adequately inform those persons and should be complemented with disclosure at later moments, where possible.",
+        "atom_type": "insufficient_pattern"
+      },
+      {
+        "id": "ART50-GL-ENF-PREEXISTING-CONTENT-OBL4",
+        "attaches_to_obligation": "ART50-OBL-4",
+        "paragraph_ref": 154,
+        "section_ref": "8.4",
+        "verbatim_text": "AI-generated or manipulated outputs falling within the scope of Article 50(2) AI Act and deep fakes within scope of Article 50(4), first subparagraph, AI Act, which have been generated or manipulated before 2 August 2026 do not need to be marked or labelled retroactively.",
+        "atom_type": "scope_exclusion"
+      },
+      {
+        "id": "ART50-GL-ENF-PREEXISTING-TEXT-OBL4B",
+        "attaches_to_obligation": "ART50-OBL-4b",
+        "paragraph_ref": 154,
+        "section_ref": "8.4",
+        "verbatim_text": "The same applies to texts on matters of public interest falling within scope of Article 50(4), second subparagraph, AI Act that have been AI-generated or manipulated and published before 2 August 2026.",
+        "atom_type": "scope_exclusion"
+      },
+      {
+        "id": "ART50-GL-ENF-POST-CUTOFF-TEXT-EXT",
+        "attaches_to_obligation": "ART50-OBL-4b",
+        "paragraph_ref": 154,
+        "section_ref": "8.4",
+        "verbatim_text": "Conversely, if texts that have been generated or manipulated before 2 August 2026 are published on or after that date, they need to be labelled.",
+        "atom_type": "scope_extension"
+      },
+      {
         "id": "ART50-GL-OBL1-INSUFFICIENT-01",
         "attaches_to_obligation": "ART50-OBL-1",
         "paragraph_ref": 38,
@@ -2636,11 +2789,6 @@
         "excerpt": "Restates Art 50(1) addressee + Recital 132 purpose (informed decisions, avoid overreliance, calibrate trust)."
       },
       {
-        "paragraph": 32,
-        "reason": "literal_act_repetition",
-        "excerpt": "Restates Art 50(1) obligation with 'including AI agents and GPAI systems' addition."
-      },
-      {
         "paragraph": 41,
         "reason": "meta_introductory",
         "excerpt": "Introduces the two exceptions examined in §3.2.1 and §3.2.2."
@@ -2664,16 +2812,6 @@
         "paragraph": 99,
         "reason": "literal_act_repetition",
         "excerpt": "Restates Art 50(3) deployer obligation to inform natural persons."
-      },
-      {
-        "paragraph": 125,
-        "reason": "cross_ref_only",
-        "excerpt": "LE exception for deep fakes — cross-refs to ¶46-¶48 clarifications above."
-      },
-      {
-        "paragraph": 139,
-        "reason": "cross_ref_only",
-        "excerpt": "LE exception for text — cross-refs to ¶46-¶48 clarifications above."
       },
       {
         "paragraph": 145,
