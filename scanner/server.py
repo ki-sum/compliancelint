@@ -20,7 +20,7 @@ from datetime import datetime, timezone
 
 from mcp.server.fastmcp import FastMCP
 
-CL_VERSION = "1.1.4"  # ComplianceLint version — displayed in UI, PDF, and scan metadata
+CL_VERSION = "1.1.5"  # ComplianceLint version — displayed in UI, PDF, and scan metadata
 
 logger = logging.getLogger("compliancelint")
 logging.basicConfig(level=logging.INFO, format="%(name)s %(levelname)s: %(message)s",
@@ -3371,7 +3371,7 @@ def _scan_single_article(article_number: int, project_path: str, context=None, r
         13: "2026-08-02",  # Transparency to users
         14: "2026-08-02",  # Human oversight
         15: "2026-08-02",  # Accuracy and robustness
-        50: "2025-08-02",  # GPAI transparency obligations
+        50: "2026-08-02",  # Transparency obligations (Chapter IV)
     }
 
     # Scan metadata — which files Claude actually read (from _scan_metadata in compliance_answers)
