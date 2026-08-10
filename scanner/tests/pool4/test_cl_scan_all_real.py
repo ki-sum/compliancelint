@@ -118,6 +118,12 @@ def test_cl_scan_all_synthetic_context_writes_state(tmp_path: Path) -> None:
             f"gate rejection; got error={err!r}"
         )
         return
+    # v1.1.4 (pre-existing WIP) — validation gate response format
+    # switched from {error, fix} to {status, for_user, ai_instructions,
+    # missing_articles}. Same early-return semantics as the old error
+    # envelope: gate blocked scan because fixture is incomplete.
+    if response.get("status") in {"needs_analysis_first", "blocked_strict"}:
+        return
 
     # Non-error path: per-article state files were written.
     articles_dir = (

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "compliancelint"
-version = "1.1.0"
+version = "1.1.4"
 description = "EU AI Act compliance: scan, attest, document — from your IDE. Source-available, MCP-native, AI-assisted."
 readme = "README.md"
 license = {text = "BSL-1.1"}

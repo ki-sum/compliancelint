@@ -20,7 +20,7 @@ from datetime import datetime, timezone
 
 from mcp.server.fastmcp import FastMCP
 
-CL_VERSION = "1.1.0"  # ComplianceLint version — displayed in UI, PDF, and scan metadata
+CL_VERSION = "1.1.4"  # ComplianceLint version — displayed in UI, PDF, and scan metadata
 
 logger = logging.getLogger("compliancelint")
 logging.basicConfig(level=logging.INFO, format="%(name)s %(levelname)s: %(message)s",
@@ -317,6 +317,48 @@ def cl_analyze_project(project_path: str) -> str:
         metadata,
         tier_at_scan=get_cached_tier(project_path),
     )
+
+    # v1.1.1 onboarding hint — when project has no api_key configured,
+    # tell the AI to recommend cl_connect FIRST. Without cl_connect the
+    # scanner has no wizard_answers and falls back to scanning all 247
+    # obligations, producing a noisy unable_to_determine-heavy report
+    # that wastes the user's first impression. This is by design (Free
+    # tier "see everything" legal safety) but a fresh user has no way
+    # to know that — so we tell the AI to surface the trade-off.
+    cfg = ProjectConfig.load(project_path)
+    if not cfg.saas_api_key:
+        metadata["_onboarding_hint"] = {
+            "user_state": "not_connected",
+            "ai_instructions": (
+                "This project has no dashboard connection yet. BEFORE you "
+                "call cl_scan_all, you MUST first present the user with the "
+                "two-mode choice below (in plain language, not tool names). "
+                "Do NOT auto-pick — wait for their answer."
+            ),
+            "what_to_tell_user": (
+                "Before I scan, you have two options:\n"
+                "  (1) RECOMMENDED — connect this project to the free "
+                "ComplianceLint dashboard at compliancelint.dev. You'll "
+                "answer a quick 30-second wizard about your role "
+                "(Provider / Deployer / Importer / etc.) and risk class. "
+                "The scanner will then check only the EU AI Act obligations "
+                "that actually apply to you — clean, focused report.\n"
+                "  (2) Skip connecting — I'll scan immediately against all "
+                "247 obligations. Most won't apply and will return 'unable "
+                "to determine'. Legally safe, but noisy.\n"
+                "Which would you like?"
+            ),
+            "if_user_picks_connect": (
+                "Call cl_connect() — it will return a one-time auth URL. "
+                "Give it to the user, wait for them to finish the wizard "
+                "in their browser, then proceed to cl_scan_all."
+            ),
+            "if_user_picks_skip": (
+                "Proceed directly to cl_scan_all. Filter the noisy "
+                "unable_to_determine findings out of the user-facing "
+                "summary; focus on actionable non_compliant items."
+            ),
+        }
 
     return append_upgrade_hint(
         json.dumps(metadata, indent=2, ensure_ascii=False),
@@ -995,15 +1037,33 @@ def cl_scan(
             })
         if gate.missing_articles:
             return json.dumps({
-                "error": f"Cannot scan: {len(gate.missing_articles)} applicable articles are missing.",
+                "status": "needs_analysis_first",
+                "for_user": (
+                    f"I have answers for most articles but still need to check "
+                    f"{len(gate.missing_articles)} more before I can finish the scan. "
+                    f"Let me read a few more files to fill those in."
+                ),
+                "ai_instructions": (
+                    f"Grep + Read the relevant codebase for the missing_articles "
+                    f"and then re-call cl_scan with the complete template. For "
+                    f"articles where evidence truly cannot be determined from "
+                    f"code, set the field to null (UNABLE_TO_DETERMINE)."
+                ),
                 "missing_articles": sorted(gate.missing_articles),
-                "fix": "Fill ALL applicable articles in the compliance_answers_template.",
             })
         if not gate.all_valid:
             return json.dumps({
-                "error": f"Cannot scan: {len(gate.invalid_articles)} articles have format errors.",
+                "status": "blocked_strict",
+                "for_user": (
+                    f"My answers for {len(gate.invalid_articles)} articles aren't in "
+                    f"the format the scanner expects. Let me fix them and retry."
+                ),
+                "ai_instructions": (
+                    "Format errors: boolean fields must be literal true, false, "
+                    "or null — not strings like \"true\" or \"yes\". Fix the "
+                    "listed entries and re-call cl_scan."
+                ),
                 "invalid_articles": gate.to_error_response()["errors"],
-                "fix": "Fix format errors: boolean fields must be true, false, or null.",
             })
 
     # Parse articles parameter
@@ -1074,8 +1134,8 @@ def cl_scan(
                     single_payload["related_recitals_by_article"] = related_recitals_by_article
                 if interpretive_materials_by_article:
                     single_payload["interpretive_materials_by_article"] = interpretive_materials_by_article
-                # Layer 2 per-finding enrichment (top-3 atoms per
-                # finding's obligation_id). Full atom list still in
+                # Per-finding Layer 2 enrichment (top-3 atoms per finding's
+                # obligation_id). Full atom list still in
                 # interpretive_materials_by_article for the article.
                 for finding in single_payload.get("findings", []) or []:
                     if not isinstance(finding, dict):
@@ -1481,13 +1541,21 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
         logger.error("cl_scan_all — %d applicable articles missing: %s",
                       len(gate.missing_articles), gate.missing_articles)
         return json.dumps({
-            "error": f"Cannot scan: {len(gate.missing_articles)} applicable articles are missing from compliance_answers.",
-            "missing_articles": sorted(gate.missing_articles),
-            "fix": (
-                "Fill ALL applicable articles in the compliance_answers_template. "
-                "Copy the template from cl_analyze_project() response and fill "
-                "every boolean field with true, false, or null."
+            "status": "needs_analysis_first",
+            "for_user": (
+                f"I have answers for most of the EU AI Act articles that apply to "
+                f"this project but still need to check {len(gate.missing_articles)} "
+                f"more before I can finish the full scan. Let me look at a few more "
+                f"files."
             ),
+            "ai_instructions": (
+                f"You declared a scope that makes these articles applicable but "
+                f"didn't include them in compliance_answers. Either Grep + Read the "
+                f"relevant codebase areas to fill in true/false answers, or set "
+                f"each missing article's fields to null (UNABLE_TO_DETERMINE) if "
+                f"evidence can't be derived from code. Re-call cl_scan_all."
+            ),
+            "missing_articles": sorted(gate.missing_articles),
         })
 
     if not gate.all_valid:
@@ -1911,12 +1979,22 @@ def cl_action_guide(obligation_id: str) -> str:
     """
     import re
 
-    # Validate obligation ID format (legacy contract — preserve)
-    if not re.match(r"^ART\d+-OBL-\d+", obligation_id.upper()):
+    # Validate obligation ID format. Accept the full atom taxonomy currently
+    # in the obligation JSONs: OBL, CLS (classification), EXC (exception),
+    # COM (compliance), EMP, CON, PER, PERM, PRO, SAV. Pre-2026-06-16 this
+    # regex only accepted OBL-N, which silently rejected ~25-30% of valid
+    # IDs (e.g., ART06-CLS-1 / ART06-EXC-3 are the entire Art. 6 risk-
+    # classification + Art. 6(3) derogation surface) — caught during the
+    # ai2study walkthrough when AI tried cl_action_guide on every applicable
+    # obligation and got 3/14 rejected with a misleading "invalid format"
+    # error. The accepted tag list mirrors what `scripts/audit-atom-tags.py`
+    # would generate from the JSONs; widen the regex (don't pin specific
+    # tags) if a new atom kind ships and isn't reflected here yet.
+    if not re.match(r"^ART\d+-[A-Z]{2,5}-\d+[a-z]?$", obligation_id.upper()):
         return append_upgrade_hint(
             json.dumps({
                 "error": f"Invalid obligation ID format: {obligation_id}",
-                "fix": "Use format like ART26-OBL-2",
+                "fix": "Use format like ART26-OBL-2 (or ART06-CLS-1, ART06-EXC-3, etc. for non-OBL atom tags).",
             }),
             "cl_action_guide",
         )
@@ -2258,7 +2336,7 @@ def cl_action_plan(project_path: str, regulation: str = "eu-ai-act", article: in
         # full Recital text inline (not links).
         "related_recitals_by_article": related_recitals_by_article,
         # Layer 2 (2026-08-10) — EU-authoritative interpretive materials
-        # keyed by article number. Pilot: 304 Art 50 atoms from EC
+        # keyed by article number. Pilot: 304 atoms on Art 50 from EC
         # Guidelines C(2026) 5054 final. Each atom carries byte-verbatim
         # text + paragraph anchor + source PDF URL + SHA256 for
         # hallucination-free citation. Empty dict when no covered article
@@ -3730,14 +3808,58 @@ async def cl_connect(
         # Telemetry plumbing failure MUST NEVER block cl_connect success.
         slog.debug("cl_connect: telemetry path errored silently: %s", e)
 
+    # v1.1.3 (2026-06-16) — pre-register a placeholder repo on the dashboard
+    # so the user sees their project immediately after cl_connect, without
+    # waiting for cl_sync. Fixes the long-standing "connected but my repo
+    # isn't on the dashboard" UX gap (kisum hit it twice during the
+    # EvoRadar + ai2study walkthroughs the same day this fix was written).
+    # Non-blocking: any failure here is logged and ignored so a SaaS-side
+    # outage cannot break the local cl_connect success path. The endpoint
+    # itself is idempotent (returns existing repo_id if it already exists),
+    # so running cl_connect repeatedly is safe.
+    repo_dashboard_url = f"{saas_url}/dashboard"
+    try:
+        register_body = json.dumps({
+            "repo": config.repo_name,
+            "project_id": config.project_id or None,
+        }).encode("utf-8")
+        register_args = [
+            "curl", "-s", "--max-time", "8", "-X", "POST",
+            "-H", f"Authorization: Bearer {received_key['api_key']}",
+            "-H", "Content-Type: application/json",
+            "-d", register_body.decode("utf-8"),
+            f"{saas_url}/api/v1/repos/register",
+        ]
+        reg_result = await asyncio.to_thread(_run_curl, register_args, 10)
+        if reg_result.returncode == 0 and reg_result.stdout.strip():
+            try:
+                reg_data = json.loads(reg_result.stdout.strip())
+                if reg_data.get("dashboard_url"):
+                    repo_dashboard_url = reg_data["dashboard_url"]
+                slog.info(
+                    "cl_connect: pre-registered repo (was_new=%s, repo_id=%s)",
+                    reg_data.get("was_new"),
+                    reg_data.get("repo_id", "")[:12],
+                )
+            except (json.JSONDecodeError, TypeError) as e:
+                slog.debug("cl_connect: register response not JSON (older dashboard?): %s", e)
+        else:
+            slog.debug(
+                "cl_connect: register call returned rc=%s (older dashboard or transient error)",
+                reg_result.returncode,
+            )
+    except Exception as e:  # noqa: BLE001
+        slog.debug("cl_connect: pre-register path errored silently: %s", e)
+
     slog.info("cl_connect: connected as %s", email_display)
     return json.dumps({
         "status": "connected",
         "email": email_display,
-        "dashboard_url": f"{saas_url}/dashboard",
+        "dashboard_url": repo_dashboard_url,
         "config_saved": config_path,
-        "message": f"Connected as {email_display}. API key saved to .compliancelintrc. "
-                   f"Run cl_sync() to upload scan results to your dashboard."
+        "message": f"Connected as {email_display}. Your project is now on your dashboard — "
+                   f"open it to configure the profiling wizard before your first scan, or "
+                   f"just ask your AI to scan and the results will sync up automatically."
                    + telemetry_message_part,
     })
 
@@ -4875,6 +4997,58 @@ def cl_delete(
 
     results: dict = {}
 
+    # Helper: purge the dashboard-side repo row + cascaded findings/evidence.
+    # Pre-v1.1.4 this lived inline inside the target='dashboard' branch only,
+    # which meant target='all' silently skipped the dashboard purge entirely
+    # — dashboard's own "Purge all data" Danger Zone copy promised both
+    # sides but the scanner only wiped local disk. kisum's 2026-06-17
+    # ai2study cleanup caught it. Now both target='all' and
+    # target='dashboard' call this helper.
+    def _purge_dashboard() -> str:
+        if not config.saas_api_key:
+            return "error: no API key configured. Run cl_connect() first."
+        saas_url = config.saas_url or "https://compliancelint.dev"
+        _safely_derive_with_timeout(config.derive_git_identity, project_path, slog=logger)
+        repo_name_local = config.repo_name or os.path.basename(os.path.normpath(project_path))
+
+        import subprocess
+        curl_flags_local: dict = {"capture_output": True, "text": True, "timeout": 15}
+        if hasattr(subprocess, "CREATE_NO_WINDOW"):
+            curl_flags_local["creationflags"] = subprocess.CREATE_NO_WINDOW
+
+        try:
+            list_url = f"{saas_url}/api/v1/repos"
+            r = subprocess.run(
+                ["curl", "-s", "--max-time", "8",
+                 "-H", f"Authorization: Bearer {config.saas_api_key}",
+                 list_url],
+                **curl_flags_local,
+            )
+            if r.returncode != 0 or not r.stdout.strip():
+                return f"error: failed to list repos (exit {r.returncode})"
+            repos_list = json.loads(r.stdout.strip())
+            matched = [rp for rp in repos_list if rp.get("name") == repo_name_local]
+            if not matched:
+                return f"not_found: repo '{repo_name_local}' not found on dashboard"
+            repo_id = matched[0]["id"]
+            purge_url = f"{saas_url}/api/v1/repos/{repo_id}/purge"
+            payload = json.dumps({"confirmName": repo_name_local})
+            r2 = subprocess.run(
+                ["curl", "-s", "--max-time", "8", "-X", "DELETE",
+                 "-H", f"Authorization: Bearer {config.saas_api_key}",
+                 "-H", "Content-Type: application/json",
+                 "-d", payload, purge_url],
+                **curl_flags_local,
+            )
+            if r2.returncode == 0 and r2.stdout.strip():
+                resp = json.loads(r2.stdout.strip())
+                if resp.get("error"):
+                    return f"error: {resp['error']}"
+                return resp.get("status", "unknown")
+            return f"error: purge request failed (exit {r2.returncode})"
+        except Exception as e:
+            return f"error: {e}"
+
     # ── target=local — ephemeral-only delete ────────────────────────────────
     if target == "local":
         slog.info("cl_delete: removing .compliancelint/local/ + home log dir")
@@ -4892,9 +5066,23 @@ def cl_delete(
         else:
             results["logs"] = "not_found"
 
-    # ── target=all — full working-tree wipe ─────────────────────────────────
+    # ── target=all — full wipe: dashboard FIRST, then working-tree ──────────
     elif target == "all":
-        slog.info("cl_delete: removing .compliancelint/ + .compliancelintrc + home log dir")
+        slog.info("cl_delete: target=all — dashboard purge then local wipe")
+        # Step 1: purge dashboard BEFORE wiping rc (which holds api_key).
+        # If api_key is missing, the project was never connected — treat as
+        # "not_connected" (graceful skip), NOT an error. Per the existing
+        # status derivation logic, "not_connected:" / "not_found:" prefixes
+        # don't count as errors, so the top-level status stays "deleted"
+        # when the only thing "missing" was a never-existed connection.
+        # target='dashboard' (called directly by user) still treats missing
+        # api_key as an error because the user explicitly asked for it.
+        if config.saas_api_key:
+            results["dashboard"] = _purge_dashboard()
+        else:
+            results["dashboard"] = "not_connected: skipped (cl_connect was never run on this project)"
+        slog.info("cl_delete[all]: dashboard purge result=%s", results["dashboard"])
+        # Step 2: wipe local working-tree state.
         from core.scanner_log import close_scanner_logger, _resolve_log_dir
         close_scanner_logger(project_path)
         if os.path.isdir(root_dir):
@@ -4919,58 +5107,8 @@ def cl_delete(
 
     # ── target=dashboard — server-side purge ────────────────────────────────
     elif target == "dashboard":
-        if not config.saas_api_key:
-            results["dashboard"] = "error: no API key configured. Run cl_connect() first."
-        else:
-            saas_url = config.saas_url or "https://compliancelint.dev"
-            # derive_git_identity calls git subprocess — wrap in hard
-            # timeout to avoid the Windows MCP-stdio hang (memory:
-            # bug_mcp_tool_hang.md). Worst case: repo_name falls back
-            # to the directory basename (still usable for the API call).
-            _safely_derive_with_timeout(config.derive_git_identity, project_path, slog=logger)
-            repo_name = config.repo_name or os.path.basename(os.path.normpath(project_path))
-
-            import subprocess
-            curl_flags: dict = {"capture_output": True, "text": True, "timeout": 15}
-            if hasattr(subprocess, "CREATE_NO_WINDOW"):
-                curl_flags["creationflags"] = subprocess.CREATE_NO_WINDOW
-
-            try:
-                list_url = f"{saas_url}/api/v1/repos"
-                r = subprocess.run(
-                    ["curl", "-s", "--max-time", "8",
-                     "-H", f"Authorization: Bearer {config.saas_api_key}",
-                     list_url],
-                    **curl_flags,
-                )
-                if r.returncode != 0 or not r.stdout.strip():
-                    results["dashboard"] = f"error: failed to list repos (exit {r.returncode})"
-                else:
-                    repos_list = json.loads(r.stdout.strip())
-                    matched = [rp for rp in repos_list if rp.get("name") == repo_name]
-                    if not matched:
-                        results["dashboard"] = f"not_found: repo '{repo_name}' not found on dashboard"
-                    else:
-                        repo_id = matched[0]["id"]
-                        purge_url = f"{saas_url}/api/v1/repos/{repo_id}/purge"
-                        payload = json.dumps({"confirmName": repo_name})
-                        r2 = subprocess.run(
-                            ["curl", "-s", "--max-time", "8", "-X", "DELETE",
-                             "-H", f"Authorization: Bearer {config.saas_api_key}",
-                             "-H", "Content-Type: application/json",
-                             "-d", payload, purge_url],
-                            **curl_flags,
-                        )
-                        if r2.returncode == 0 and r2.stdout.strip():
-                            resp = json.loads(r2.stdout.strip())
-                            results["dashboard"] = resp.get("status", "unknown")
-                            if resp.get("error"):
-                                results["dashboard"] = f"error: {resp['error']}"
-                        else:
-                            results["dashboard"] = f"error: purge request failed (exit {r2.returncode})"
-            except Exception as e:
-                results["dashboard"] = f"error: {e}"
-            slog.info("cl_delete: dashboard purge result=%s", results.get("dashboard"))
+        results["dashboard"] = _purge_dashboard()
+        slog.info("cl_delete: dashboard purge result=%s", results.get("dashboard"))
 
     # Derive top-level status from per-sub-target results so a fully-
     # failed call doesn't claim success. Pool 4 audit-first 2026-05-04

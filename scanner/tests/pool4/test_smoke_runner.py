@@ -142,8 +142,11 @@ def test_smoke_cl_version_round_trip(
     assert response["version"].count(".") >= 2, (
         f"cl_version 'version' should be semver (got {response['version']!r})"
     )
-    assert response.get("tools") == 17, (
-        f"cl_version 'tools' count drifted from registered 17: "
+    # Registered tool count. Bumped 17→18 when cl_get_ai_observation was
+    # added in Phase 3 (kisum 2026-05-21) but this test wasn't updated at
+    # the time. Aligned to current server.py registration count.
+    assert response.get("tools") == 18, (
+        f"cl_version 'tools' count drifted from registered 18: "
         f"got {response.get('tools')}"
     )
 
