@@ -3879,32 +3879,29 @@ async def cl_connect(
         })
 
     # Save API key to .compliancelintrc
-    # v1.1.6 (2026-08-11 Bug E fix) — call derive_git_identity() so
-    # cl_connect knows the git-derived repo_name (e.g.
-    # `owner/repo` from `git remote get-url origin`) + the deterministic
-    # project_id (`git-<sha256(url:root_hash)[:16]>`). Without these,
-    # the SaaS-side connect endpoint had no project_id to match against
-    # and created a fresh empty repo row — orphaning any prior scan /
-    # wizard state (see 2026-08-11 dry-run: rp_Mzvrx79k_... vs newly
-    # created 68cf9a44-... on the same demo repo).
+    # v1.1.6 REVERT (2026-08-11): removed derive_git_identity() call
+    # here. Original commit added it thinking cl_connect had to seed
+    # project_id in .compliancelintrc for SaaS to avoid duplicate
+    # repo rows. That was wrong — 2026-04-15 project_repo_sharing
+    # design keeps project_id OPTIONAL: SaaS scans route falls back
+    # to (user_id, repo_name) match when project_id is null (see
+    # `Backward compat: scans without project_id fall back to
+    # repos.userId` in dashboard/src/app/api/v1/scans/route.ts +
+    # memory/project_repo_sharing.md).
     #
-    # `_safely_derive_with_timeout` wraps `config.derive_git_identity`
-    # which uses asyncio.create_subprocess_exec (safe in MCP per
-    # 2026-05-06 refactor; the old "git subprocess hangs MCP loop"
-    # warning applied to blocking subprocess.run and is now obsolete).
-    slog.info("cl_connect: deriving git identity (repo_name + project_id)")
-    _safely_derive_with_timeout(
-        config.derive_git_identity, project_path, slog=slog,
-    )
-    slog.info(
-        "cl_connect: post-derive repo_name=%s project_id=%s",
-        config.repo_name, config.project_id,
-    )
+    # Additionally, derive_git_identity uses `asyncio.run()`
+    # internally, which crashes when called from within an already-
+    # running event loop — which is exactly what `async def cl_connect`
+    # is. The exception was silently swallowed inside `except Exception`,
+    # so this "fix" silently no-op'd anyway.
+    #
+    # For team-sharing (cross-user project_id linking), users still
+    # run `npx compliancelint init` in a normal terminal to
+    # pre-populate .compliancelintrc with project_id + repo_name.
+    slog.info("cl_connect: saving config")
     config.saas_api_key = received_key["api_key"]
     config.saas_url = saas_url
     if not config.repo_name:
-        # Fallback only if git derivation returned nothing (non-git
-        # project, missing origin, timeout, etc.)
         config.repo_name = os.path.basename(os.path.normpath(project_path))
     # Pre-populate attester from OAuth email (so cl_update_finding works
     # without needing npx init or manual config)
@@ -4090,39 +4087,17 @@ def cl_sync(project_path: str, regulation: str = "") -> str:
 
     saas_url = config.saas_url or "https://compliancelint.dev"
 
-    # Get project identity — reads config cache, or derives from git.
+    # Get project identity — reads config cache, never blocks on git in cl_sync
     slog.info("STEP 3b: loading project_id")
     from core.state import load_state
     # config.project_id is populated by cl_connect (cached in .compliancelintrc)
+    # If not there, fall back to .compliancelint/local/project.json (UUID cache)
+    # NEVER call derive_git_identity() here — git can hang in MCP context
+    # (bug_mcp_tool_hang.md) AND project_id is OPTIONAL by design
+    # (project_repo_sharing.md: "Backward compat: scans without project_id
+    # fall back to repos.userId"). For cross-user team-sharing, users run
+    # `npx compliancelint init` in a normal terminal to pre-populate.
     project_id = config.project_id or None
-    # v1.1.6 (2026-08-11 Bug E follow-up) — legacy users whose cl_connect
-    # ran pre-1.1.6 have no project_id in .compliancelintrc. Derive it
-    # here as a one-time upgrade so SaaS can match by project_id (avoids
-    # the duplicate-repo-row bug). derive_git_identity uses asyncio
-    # subprocess and is safe in MCP context (old "hangs MCP loop"
-    # warning applied to blocking subprocess.run, obsolete since
-    # 2026-05-06 refactor).
-    if not project_id:
-        slog.info(
-            "STEP 3b.1: no project_id in .compliancelintrc — attempting "
-            "git derivation as one-time upgrade for legacy user",
-        )
-        _safely_derive_with_timeout(
-            config.derive_git_identity, project_path, slog=slog,
-        )
-        if config.project_id:
-            project_id = config.project_id
-            # Persist so future syncs read it from config cache directly.
-            try:
-                config.save(project_path)
-                slog.info(
-                    "STEP 3b.2: git-derived project_id=%s persisted to .compliancelintrc",
-                    project_id,
-                )
-            except Exception as e:
-                slog.warning("STEP 3b.2: failed to persist project_id: %s", e)
-    # Fall back to .compliancelint/local/project.json (UUID cache) for
-    # non-git projects where git derivation returns nothing.
     if not project_id:
         from core import paths as cl_paths
         pj_file = cl_paths.project_file_str(project_path)
