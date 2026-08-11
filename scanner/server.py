@@ -20,7 +20,7 @@ from datetime import datetime, timezone
 
 from mcp.server.fastmcp import FastMCP
 
-CL_VERSION = "1.1.5"  # ComplianceLint version — displayed in UI, PDF, and scan metadata
+CL_VERSION = "1.1.6"  # ComplianceLint version — displayed in UI, PDF, and scan metadata
 
 logger = logging.getLogger("compliancelint")
 logging.basicConfig(level=logging.INFO, format="%(name)s %(levelname)s: %(message)s",
@@ -1103,22 +1103,30 @@ def cl_scan(
     # from the same Recital grounding that cl_explain surfaces, keyed
     # by article number for quick lookup.
     from core.obligation_lookup import recitals_for_article as _recitals_for_article
+    # v1.1.6 (2026-08-11) — Bug C fix: swap the full Layer 2 payload
+    # (192 KB for Art 50 → total cl_scan hit 283 KB and blew past
+    # Claude Code's ~25k-token MCP response cap) for the SUMMARY tier.
+    # AI consumers get doc metadata (SHA256 + source_url + counts) in
+    # the scan response and fetch verbatim atoms on demand via
+    # cl_explain(obligation_id=..., limit=..., offset=...). Generic
+    # tiering — no assumptions about any specific AI client's cap.
     from core.layer2_loader import (
-        get_interpretive_materials_for_article as _l2_for_article,
+        get_materials_summary_for_article as _l2_summary_for_article,
         get_atoms_for_obligation as _l2_atoms_for_obligation,
     )
     related_recitals_by_article: dict[str, list[dict]] = {}
-    # Layer 2 (2026-08-10) — surface interpretive materials keyed by
-    # article. Pilot: 304 Art 50 atoms from C(2026) 5054 final. Same
-    # payload shape as related_recitals_by_article.
+    # Layer 2 SUMMARY (v1.1.6) — doc metadata + per-obligation atom
+    # counts (~1 KB/article). Full atoms live in
+    # cl_explain(obligation_id=...). Full payload was 192 KB/article
+    # for Art 50 pre-1.1.6.
     interpretive_materials_by_article: dict[str, list[dict]] = {}
     for art_num in article_numbers:
         recs = _recitals_for_article(art_num)
         if recs:
             related_recitals_by_article[str(art_num)] = recs
-        l2 = _l2_for_article(art_num)
-        if l2:
-            interpretive_materials_by_article[str(art_num)] = l2
+        l2_summary = _l2_summary_for_article(art_num)
+        if l2_summary:
+            interpretive_materials_by_article[str(art_num)] = l2_summary
 
     # Single article → return full findings + post-scan hint
     if len(article_numbers) == 1:
@@ -1134,9 +1142,11 @@ def cl_scan(
                     single_payload["related_recitals_by_article"] = related_recitals_by_article
                 if interpretive_materials_by_article:
                     single_payload["interpretive_materials_by_article"] = interpretive_materials_by_article
-                # Per-finding Layer 2 enrichment (top-3 atoms per finding's
-                # obligation_id). Full atom list still in
-                # interpretive_materials_by_article for the article.
+                # v1.1.6 (2026-08-11) — Per-finding Layer 2 enrichment
+                # replaces the old `interpretive_atoms[:3]` inline dump
+                # (~3.5 KB × 8 findings = 28 KB) with just the count +
+                # a deep-dive hint. AI consumers fetch verbatim atoms
+                # via cl_explain(obligation_id=..., limit=10, offset=0).
                 for finding in single_payload.get("findings", []) or []:
                     if not isinstance(finding, dict):
                         continue
@@ -1145,23 +1155,55 @@ def cl_scan(
                         continue
                     atoms = _l2_atoms_for_obligation(oid)
                     if atoms:
-                        finding["interpretive_atoms"] = atoms[:3]
                         finding["interpretive_atoms_total"] = len(atoms)
+                        finding["interpretive_atoms_deep_dive"] = (
+                            f"cl_explain(obligation_id='{oid}', "
+                            f"limit=10, offset=0)"
+                        )
                 output = json.dumps(single_payload, indent=2, default=str)
         except json.JSONDecodeError:
             pass
 
+        # v1.1.6 (2026-08-11 Bug D fix) — post-scan hints go into a
+        # `_meta` field in the JSON, not as trailing markdown text.
+        # Previously ended with "\n\n--- Results synced ---" or a
+        # multi-line hint block, both of which broke naive
+        # `json.loads(full_output)` in downstream consumers with an
+        # "Extra data: line N column 1" error (JSON body + trailing
+        # text). append_upgrade_hint() already merges into `_meta`,
+        # so we co-locate our own sync/hint metadata there for a
+        # single parseable JSON response.
         config = ProjectConfig.load(project_path)
+        meta_extras: dict = {}
         if config.saas_api_key and config.auto_sync:
             try:
                 sync_result = cl_sync(project_path)
                 sync_data = json.loads(sync_result)
                 if sync_data.get("status") == "synced":
-                    output += "\n\n--- Results synced to dashboard ---"
+                    meta_extras["sync_status"] = {
+                        "status": "synced_to_dashboard",
+                        "scan_id": sync_data.get("scan_id"),
+                        "dashboard_url": sync_data.get("dashboard_url"),
+                    }
             except Exception as e:
                 logger.debug("Auto-sync after scan failed: %s", e)
         else:
-            output += _build_post_scan_hint(project_path)
+            hint_text = _build_post_scan_hint(project_path)
+            if hint_text.strip():
+                meta_extras["post_scan_hint"] = hint_text.strip()
+        if meta_extras:
+            try:
+                parsed = json.loads(output)
+                if isinstance(parsed, dict):
+                    existing_meta = parsed.get("_meta") or {}
+                    if isinstance(existing_meta, dict):
+                        existing_meta.update(meta_extras)
+                        parsed["_meta"] = existing_meta
+                    else:
+                        parsed["_meta"] = meta_extras
+                    output = json.dumps(parsed, indent=2, default=str)
+            except json.JSONDecodeError:
+                pass
         # B3 self-audit follow-up 2026-04-30 — single-article path
         # was silently bypassing the upgrade_hint wrap. The
         # multi-article path below DOES wrap. AST static contract
@@ -1214,43 +1256,90 @@ def cl_scan(
         # (same shape as cl_action_plan). Empty when no covered article
         # has mapped Recitals.
         "related_recitals_by_article": related_recitals_by_article,
-        # Layer 2 (2026-08-10) — EU-authoritative interpretive materials
-        # keyed by article number. Pilot: 304 Art 50 atoms from EC
-        # Guidelines C(2026) 5054 final. Each atom carries byte-verbatim
-        # text + paragraph anchor + source PDF URL + SHA256 for
-        # hallucination-free citation.
+        # Layer 2 SUMMARY tier (v1.1.6 2026-08-11) — doc metadata
+        # (SHA256, source_url, publication_date, binding_nature) +
+        # per-obligation atom counts. Verbatim atom text on demand via
+        # cl_explain(obligation_id=..., limit=..., offset=...). Pilot
+        # doc: EC Guidelines C(2026) 5054 final (304 Art 50 atoms).
         "interpretive_materials_by_article": interpretive_materials_by_article,
     }, indent=2, default=str)
 
-    # Post-scan: auto-sync or contextual hint
+    # v1.1.6 (2026-08-11 Bug D fix) — same _meta migration as
+    # single-article path above so downstream json.loads() gets a
+    # single parseable JSON with no trailing text.
     config = ProjectConfig.load(project_path)
+    meta_extras: dict = {}
     if config.saas_api_key and config.auto_sync:
         try:
             sync_result = cl_sync(project_path)
             sync_data = json.loads(sync_result)
             if sync_data.get("status") == "synced":
-                output += "\n\n--- Results synced to dashboard ---"
+                meta_extras["sync_status"] = {
+                    "status": "synced_to_dashboard",
+                    "scan_id": sync_data.get("scan_id"),
+                    "dashboard_url": sync_data.get("dashboard_url"),
+                }
         except Exception as e:
             logger.debug("Auto-sync after scan failed: %s", e)
     else:
-        output += _build_post_scan_hint(project_path)
+        hint_text = _build_post_scan_hint(project_path)
+        if hint_text.strip():
+            meta_extras["post_scan_hint"] = hint_text.strip()
+    if meta_extras:
+        try:
+            parsed = json.loads(output)
+            if isinstance(parsed, dict):
+                existing_meta = parsed.get("_meta") or {}
+                if isinstance(existing_meta, dict):
+                    existing_meta.update(meta_extras)
+                    parsed["_meta"] = existing_meta
+                else:
+                    parsed["_meta"] = meta_extras
+                output = json.dumps(parsed, indent=2, default=str)
+        except json.JSONDecodeError:
+            pass
 
     return append_upgrade_hint(output, "cl_scan", project_path=project_path)
 
 
 @mcp.tool()
-def cl_explain(regulation: str = "eu-ai-act", article: int = 0) -> str:
-    """Explain a regulation article in plain language.
+def cl_explain(
+    regulation: str = "eu-ai-act",
+    article: int = 0,
+    obligation_id: str = "",
+    limit: int = 10,
+    offset: int = 0,
+) -> str:
+    """Explain a regulation article — or deep-dive one obligation's
+    Layer 2 interpretive atoms.
 
-    Provides:
-    - The official requirement summary
-    - What can be automated vs. needs human judgment
-    - The ComplianceLint compliance checklist
-    - Cross-references to related articles
+    Two modes:
+
+    (1) Article mode — call with `article=N` (existing behaviour).
+        Returns the article summary, verbatim Layer 1 obligations,
+        related Recitals, and a SUMMARY tier of Layer 2 documents
+        (doc metadata + per-obligation atom counts). Verbatim Layer 2
+        atoms are NOT inlined — fetch on demand via mode (2).
+
+    (2) Obligation deep-dive mode — call with `obligation_id="ART50-OBL-1"`.
+        Returns paginated Layer 2 atoms for that specific obligation,
+        each with verbatim_text + paragraph_ref + source PDF metadata.
+        Use `limit` (default 10, max 20) and `offset` for pagination.
+
+    v1.1.6 (2026-08-11 Bug C fix): swapped the full Layer 2 payload
+    (~192 KB for Art 50) for the summary tier so responses fit inside
+    any AI client's MCP cap (Claude Code ~25k tokens ≈ 100 KB).
+    Verbatim atoms surface on demand via mode (2), 10 atoms at a time.
 
     Args:
         regulation: Which regulation (default: "eu-ai-act").
-        article: Article number to explain (e.g. 12 for Article 12).
+        article: Article number to explain (mode 1). Ignored when
+            obligation_id is set.
+        obligation_id: Obligation atom id (mode 2), e.g. "ART50-OBL-1".
+            Mode selector: presence flips from article-mode to
+            per-obligation deep-dive.
+        limit: Mode 2 only — atoms per response (default 10, max 20).
+        offset: Mode 2 only — starting atom index (0-based).
     """
     if regulation != "eu-ai-act":
         return dump_error(
@@ -1258,6 +1347,60 @@ def cl_explain(regulation: str = "eu-ai-act", article: int = 0) -> str:
             fix="Use regulation='eu-ai-act'.",
             details="Supported: ['eu-ai-act']. Additional regulations are on the roadmap.",
         )
+
+    # Mode 2 — per-obligation deep dive. Takes priority when both
+    # obligation_id and article are provided (obligation_id is more
+    # specific).
+    if obligation_id:
+        from core.layer2_loader import get_atoms_for_obligation
+        # Clamp limit to [1, 20] — 20 atoms × ~1160 bytes = ~24 KB,
+        # a safe upper bound below Claude Code's ~25k-token MCP cap.
+        try:
+            n = int(limit)
+        except (TypeError, ValueError):
+            n = 10
+        capped_limit = max(1, min(20, n))
+        try:
+            o = int(offset)
+        except (TypeError, ValueError):
+            o = 0
+        capped_offset = max(0, o)
+
+        all_atoms = get_atoms_for_obligation(obligation_id)
+        total = len(all_atoms)
+        page = all_atoms[capped_offset : capped_offset + capped_limit]
+        has_more = (capped_offset + capped_limit) < total
+        next_offset = capped_offset + capped_limit if has_more else None
+
+        payload = {
+            "mode": "obligation_deep_dive",
+            "obligation_id": obligation_id,
+            "atoms": page,
+            "total_atoms": total,
+            "offset": capped_offset,
+            "limit": capped_limit,
+            "has_more": has_more,
+            "next_offset": next_offset,
+            "disclaimer": (
+                "Each atom's `verbatim_text` is byte-for-byte from the "
+                "issuing authority's source PDF (SHA256 verified). Cite "
+                "using `doc_id` + `paragraph_ref` + `source_url` for "
+                "hallucination-free provenance. Paginate remaining atoms "
+                "by re-calling with offset=next_offset when has_more=true."
+            ),
+        }
+        if total == 0:
+            payload["fix"] = (
+                f"No Layer 2 atoms attach to obligation_id='{obligation_id}'. "
+                "Verify the id (case-insensitive) or call "
+                "cl_explain(article=N) to see coverage counts per obligation."
+            )
+        return append_upgrade_hint(
+            json.dumps(payload, indent=2, ensure_ascii=False),
+            "cl_explain",
+        )
+
+    # Mode 1 — article summary.
     _ensure_module_loaded(article)
     if article in _modules:
         explanation = _modules[article].explain()
@@ -1283,12 +1426,12 @@ def cl_explain(regulation: str = "eu-ai-act", article: int = 0) -> str:
         # Per Kisum decision: full text inline (no links), customer's own
         # AI can interpret further.
         payload["related_recitals"] = recitals_for_article(article)
-        # Layer 2 (2026-08-10) — EU-authoritative interpretive materials
-        # (EC Guidelines, Codes of Practice, EDPB Statements). Attached
-        # to Layer 1 obligations via each atom's `attaches_to_obligation`
-        # field. First doc: C(2026) 5054 final on Art 50 (304 atoms).
-        from core.layer2_loader import get_interpretive_materials_for_article
-        payload["interpretive_materials"] = get_interpretive_materials_for_article(article)
+        # Layer 2 SUMMARY tier (v1.1.6 2026-08-11) — doc metadata +
+        # per-obligation atom counts. Verbatim atoms on demand via
+        # cl_explain(obligation_id=..., limit=..., offset=...). Full
+        # payload was ~192 KB for Art 50 pre-1.1.6 (blew past MCP cap).
+        from core.layer2_loader import get_materials_summary_for_article
+        payload["interpretive_materials"] = get_materials_summary_for_article(article)
         payload["disclaimer"] = (
             "Prose fields (one_sentence, official_summary, recital, "
             "compliance_checklist_summary) are ComplianceLint's "
@@ -1299,11 +1442,13 @@ def cl_explain(regulation: str = "eu-ai-act", article: int = 0) -> str:
             "(each entry's `source_quote`, drawn from the official "
             "Regulation (EU) 2024/1689 PDF via pdfplumber). "
             "Layer-2 interpretive materials from EU authorities "
-            "(EC Guidelines etc.) are in `interpretive_materials[]` — "
-            "each atom carries byte-verbatim text + paragraph anchor + "
-            "source PDF URL + SHA256 for hallucination-free citation. "
-            "Use these arrays as ground truth when quoting the regulation; "
-            "consult `eur_lex_official_url` for the canonical Act PDF."
+            "(EC Guidelines etc.) are surfaced here in SUMMARY tier — "
+            "doc metadata + per-obligation atom counts. Fetch verbatim "
+            "atoms (with paragraph anchors + source SHA256) on demand "
+            "via cl_explain(obligation_id='ART50-OBL-N', limit=10, "
+            "offset=0). Use these arrays as ground truth when quoting "
+            "the regulation; consult `eur_lex_official_url` for the "
+            "canonical Act PDF."
         )
         return append_upgrade_hint(
             json.dumps(payload, indent=2, ensure_ascii=False),
@@ -1893,40 +2038,52 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
     if guidance is not None:
         report["ai_classification_guidance"] = guidance
 
-    output = json.dumps(report, indent=2, default=str)
-
-    # ── Post-scan: role configuration hint ──
-    scope = gate.coerced_answers.get("_scope", {}) if gate else {}
-    if not scope.get("_saas_settings_active"):
-        output_lines = [output]
-        output_lines.append(
-            "\n\n--- Role & Risk Configuration ---\n"
-            "This scan checked all 247 obligations across all roles.\n"
-            "For accurate scoring, configure your role and risk classification at:\n"
-            "  compliancelint.dev/dashboard \u2192 [repo] \u2192 Settings\n\n"
-            "With settings configured:\n"
-            "  \u2713 Only applicable articles scanned (faster, more accurate)\n"
-            "  \u2713 Compliance score reflects your actual obligations\n"
-            "  \u2713 Human Gates show only your required actions\n\n"
-            "After syncing (cl_sync), review your AI-detected risk classification\n"
-            "in Settings to confirm it matches your assessment."
-        )
-        output = "".join(output_lines)
-
-    # ── Post-scan: auto-sync or contextual hint ──
+    # v1.1.6 (2026-08-11 Bug D fix) - same rule as single-article
+    # cl_scan: all hints and sync status go into report['_meta'],
+    # not as trailing markdown text. Downstream json.loads() gets
+    # one parseable JSON with no 'Extra data' error.
     nc_total = sum(
-        1 for r in results.values() if isinstance(r, dict) and r.get("overall") == "non_compliant"
+        1 for r in results.values() if isinstance(r, dict) and r.get('overall') == 'non_compliant'
     )
+    meta_extras: dict = {}
+    scope = gate.coerced_answers.get('_scope', {}) if gate else {}
+    if not scope.get('_saas_settings_active'):
+        meta_extras['role_configuration_hint'] = (
+            'This scan checked all 247 obligations across all roles. '
+            'For accurate scoring, configure your role and risk '
+            'classification at compliancelint.dev/dashboard -> '
+            '[repo] -> Settings. With settings configured: only '
+            'applicable articles scanned (faster, more accurate); '
+            'compliance score reflects your actual obligations; Human '
+            'Gates show only your required actions. After syncing '
+            '(cl_sync), review your AI-detected risk classification '
+            'in Settings to confirm.'
+        )
     if config.saas_api_key and config.auto_sync:
         try:
             sync_result = cl_sync(project_path)
             sync_data = json.loads(sync_result)
-            if sync_data.get("status") == "synced":
-                output += "\n\n--- Results synced to dashboard ---"
+            if sync_data.get('status') == 'synced':
+                meta_extras['sync_status'] = {
+                    'status': 'synced_to_dashboard',
+                    'scan_id': sync_data.get('scan_id'),
+                    'dashboard_url': sync_data.get('dashboard_url'),
+                }
         except Exception as e:
-            logger.debug("Auto-sync after scan_all failed: %s", e)
+            logger.debug('Auto-sync after scan_all failed: %s', e)
     else:
-        output += _build_post_scan_hint(project_path, nc_count=nc_total)
+        hint_text = _build_post_scan_hint(project_path, nc_count=nc_total)
+        if hint_text.strip():
+            meta_extras['post_scan_hint'] = hint_text.strip()
+    if meta_extras:
+        existing_meta = report.get('_meta') or {}
+        if isinstance(existing_meta, dict):
+            existing_meta.update(meta_extras)
+            report['_meta'] = existing_meta
+        else:
+            report['_meta'] = meta_extras
+
+    output = json.dumps(report, indent=2, default=str)
 
     # Phase 5 Task 15 — cross-AI-client paywall hint footer.
     # Cache fresh tier from this scan's SaaS response if available,
@@ -2195,14 +2352,16 @@ def cl_action_plan(project_path: str, regulation: str = "eu-ai-act", article: in
     # §AD.5b — Recital interpretive layer (full verbatim text, keyed
     # by article number). Same pattern as cl_explain.related_recitals.
     from core.obligation_lookup import recitals_for_article
+    # v1.1.6 (2026-08-11 Bug C fix) — SUMMARY tier for Layer 2 to keep
+    # cl_action_plan responses under MCP caps. Full atoms on demand via
+    # cl_explain(obligation_id=..., limit=..., offset=...).
     from core.layer2_loader import (
-        get_interpretive_materials_for_article,
+        get_materials_summary_for_article,
         get_atoms_for_obligation,
     )
     related_recitals_by_article: dict[str, list[dict]] = {}
-    # Layer 2 (2026-08-10) — EU-authoritative interpretive materials
-    # (EC Guidelines etc.) attached to Layer 1 obligations. Pilot: 304
-    # atoms on Art 50. Structure mirrors related_recitals_by_article.
+    # Layer 2 SUMMARY tier (v1.1.6) — doc metadata + per-obligation
+    # atom counts. Pilot: 304 Art 50 atoms from C(2026) 5054 final.
     interpretive_materials_by_article: dict[str, list[dict]] = {}
 
     all_actions = []
@@ -2230,10 +2389,11 @@ def cl_action_plan(project_path: str, regulation: str = "eu-ai-act", article: in
             recitals = recitals_for_article(art_num)
             if recitals:
                 related_recitals_by_article[str(art_num)] = recitals
-            # Layer 2 attach — only for articles that have interpretive materials.
-            l2_materials = get_interpretive_materials_for_article(art_num)
-            if l2_materials:
-                interpretive_materials_by_article[str(art_num)] = l2_materials
+            # Layer 2 attach — SUMMARY tier only (v1.1.6). AI consumers
+            # deep-dive per-obligation via cl_explain(obligation_id=...).
+            l2_summary = get_materials_summary_for_article(art_num)
+            if l2_summary:
+                interpretive_materials_by_article[str(art_num)] = l2_summary
         except Exception as e:
             all_actions.append({
                 "priority": "HIGH",
@@ -2349,10 +2509,13 @@ def cl_action_plan(project_path: str, regulation: str = "eu-ai-act", article: in
             "the official Regulation (EU) 2024/1689 PDF (via pdfplumber) — use as ground "
             "truth when interpreting the Articles. "
             "Layer-2 EU-authoritative interpretive materials in "
-            "`interpretive_materials_by_article[]` (and per-action top-3 in "
-            "`interpretive_atoms[]`) carry byte-verbatim EC Guidelines / CoP / "
-            "EDPB text with paragraph anchors — cite these when generating "
-            "concrete how-to-fix guidance for the user."
+            "`interpretive_materials_by_article[]` are SUMMARY tier "
+            "(v1.1.6) — doc metadata + per-obligation atom counts; "
+            "fetch verbatim atoms via cl_explain(obligation_id=..., "
+            "limit=10, offset=0). Per-action top-3 in "
+            "`interpretive_atoms[]` carry byte-verbatim EC Guidelines / "
+            "CoP / EDPB text with paragraph anchors — cite these when "
+            "generating concrete how-to-fix guidance for the user."
         ),
     }
     return append_upgrade_hint(
@@ -3716,13 +3879,32 @@ async def cl_connect(
         })
 
     # Save API key to .compliancelintrc
-    # repo_name/project_id are pre-derived by `npx compliancelint init` (runs in
-    # normal terminal, not MCP). We only set a fallback repo_name here.
-    # NEVER call derive_git_identity() or git subprocess in MCP context — it hangs.
-    slog.info("cl_connect: saving config")
+    # v1.1.6 (2026-08-11 Bug E fix) — call derive_git_identity() so
+    # cl_connect knows the git-derived repo_name (e.g.
+    # `owner/repo` from `git remote get-url origin`) + the deterministic
+    # project_id (`git-<sha256(url:root_hash)[:16]>`). Without these,
+    # the SaaS-side connect endpoint had no project_id to match against
+    # and created a fresh empty repo row — orphaning any prior scan /
+    # wizard state (see 2026-08-11 dry-run: rp_Mzvrx79k_... vs newly
+    # created 68cf9a44-... on the same demo repo).
+    #
+    # `_safely_derive_with_timeout` wraps `config.derive_git_identity`
+    # which uses asyncio.create_subprocess_exec (safe in MCP per
+    # 2026-05-06 refactor; the old "git subprocess hangs MCP loop"
+    # warning applied to blocking subprocess.run and is now obsolete).
+    slog.info("cl_connect: deriving git identity (repo_name + project_id)")
+    _safely_derive_with_timeout(
+        config.derive_git_identity, project_path, slog=slog,
+    )
+    slog.info(
+        "cl_connect: post-derive repo_name=%s project_id=%s",
+        config.repo_name, config.project_id,
+    )
     config.saas_api_key = received_key["api_key"]
     config.saas_url = saas_url
     if not config.repo_name:
+        # Fallback only if git derivation returned nothing (non-git
+        # project, missing origin, timeout, etc.)
         config.repo_name = os.path.basename(os.path.normpath(project_path))
     # Pre-populate attester from OAuth email (so cl_update_finding works
     # without needing npx init or manual config)
@@ -3908,13 +4090,39 @@ def cl_sync(project_path: str, regulation: str = "") -> str:
 
     saas_url = config.saas_url or "https://compliancelint.dev"
 
-    # Get project identity — reads config cache, never blocks on git in cl_sync
+    # Get project identity — reads config cache, or derives from git.
     slog.info("STEP 3b: loading project_id")
     from core.state import load_state
     # config.project_id is populated by cl_connect (cached in .compliancelintrc)
-    # If not there, fall back to .compliancelint/local/project.json (UUID cache)
-    # NEVER call derive_git_identity() here — git can hang in MCP context
     project_id = config.project_id or None
+    # v1.1.6 (2026-08-11 Bug E follow-up) — legacy users whose cl_connect
+    # ran pre-1.1.6 have no project_id in .compliancelintrc. Derive it
+    # here as a one-time upgrade so SaaS can match by project_id (avoids
+    # the duplicate-repo-row bug). derive_git_identity uses asyncio
+    # subprocess and is safe in MCP context (old "hangs MCP loop"
+    # warning applied to blocking subprocess.run, obsolete since
+    # 2026-05-06 refactor).
+    if not project_id:
+        slog.info(
+            "STEP 3b.1: no project_id in .compliancelintrc — attempting "
+            "git derivation as one-time upgrade for legacy user",
+        )
+        _safely_derive_with_timeout(
+            config.derive_git_identity, project_path, slog=slog,
+        )
+        if config.project_id:
+            project_id = config.project_id
+            # Persist so future syncs read it from config cache directly.
+            try:
+                config.save(project_path)
+                slog.info(
+                    "STEP 3b.2: git-derived project_id=%s persisted to .compliancelintrc",
+                    project_id,
+                )
+            except Exception as e:
+                slog.warning("STEP 3b.2: failed to persist project_id: %s", e)
+    # Fall back to .compliancelint/local/project.json (UUID cache) for
+    # non-git projects where git derivation returns nothing.
     if not project_id:
         from core import paths as cl_paths
         pj_file = cl_paths.project_file_str(project_path)

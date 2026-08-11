@@ -172,6 +172,53 @@ def get_atoms_for_obligation(obligation_id: str) -> list[dict]:
     return out
 
 
+def get_materials_summary_for_article(article: int) -> list[dict]:
+    """v1.1.6 (2026-08-11) — SUMMARY tier of
+    `get_interpretive_materials_for_article`. Same doc metadata,
+    but atoms replaced by per-obligation counts.
+
+    For Art 50 this drops the payload from ~192 KB (304 verbatim atoms)
+    to ~1 KB, so cl_scan / cl_explain fit inside any AI client's MCP
+    response limit (Claude Code caps ~25k tokens ≈ 100 KB). Full atom
+    verbatim text is fetched on demand via
+    `cl_explain(obligation_id=..., limit=..., offset=...)`.
+    """
+    prefix = f"ART{article}-"
+    out: list[dict] = []
+    for doc in _get_cache():
+        content = doc.get("content") or {}
+        atoms = content.get("guidance_atoms") or []
+        obligation_coverage: dict[str, int] = {}
+        for a in atoms:
+            if not isinstance(a, dict):
+                continue
+            oid = a.get("attaches_to_obligation", "")
+            if not isinstance(oid, str) or not oid.startswith(prefix):
+                continue
+            obligation_coverage[oid] = obligation_coverage.get(oid, 0) + 1
+        if not obligation_coverage:
+            continue
+        meta = doc.get("_meta") or {}
+        out.append({
+            "doc_id": meta.get("doc_id", ""),
+            "doc_type": meta.get("doc_type", ""),
+            "title": meta.get("title", ""),
+            "issuing_body": meta.get("issuing_body", ""),
+            "publication_date": meta.get("publication_date", ""),
+            "source_url": meta.get("source_url", ""),
+            "source_sha256": meta.get("source_sha256", ""),
+            "binding_nature": meta.get("binding_nature", ""),
+            "atoms_total": sum(obligation_coverage.values()),
+            "obligation_coverage": obligation_coverage,
+            "deep_dive_via": (
+                "cl_explain(obligation_id=<atom's attaches_to_obligation>, "
+                "limit=10, offset=0) — returns paginated atoms with "
+                "verbatim_text for that obligation."
+            ),
+        })
+    return out
+
+
 def loaded_doc_count() -> int:
     """Diagnostic — how many Layer 2 documents are loaded."""
     return len(_get_cache())

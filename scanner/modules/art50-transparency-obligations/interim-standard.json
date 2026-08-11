@@ -1,21 +1,25 @@
 {
   "_metadata": {
-    "standard_id": "CL-IS-ART50-v0.1",
+    "standard_id": "CL-IS-ART50-v0.2",
     "title": "ComplianceLint Interim Standard for EU AI Act Article 50: Transparency Obligations for Certain AI Systems",
-    "version": "0.1.0",
-    "date": "2026-03-17",
+    "version": "0.2.0",
+    "date": "2026-08-11",
     "status": "draft",
     "disclaimer": "This is an interim standard developed by ComplianceLint based on available guidance, industry best practices, and existing provenance standards. It is NOT an official standard. It will be superseded when CEN-CENELEC publishes the harmonized standard for Article 50 (expected Q4 2026).",
     "basis": [
       "EU AI Act Article 50 (official text)",
       "EU AI Act Recitals 132-134 (legislative intent for transparency)",
+      "European Commission Guidelines C(2026) 5054 final on the application of Article 50 transparency obligations (published 2026-07-20; SHA256 30861fc5de31205846f023068069c92fabc7271ebeac6af7bef68b97f0a33f66) — 304 verbatim atoms surfaced via cl_explain(obligation_id=..., limit=..., offset=...)",
       "C2PA (Coalition for Content Provenance and Authenticity) v2.1",
       "IPTC Photo Metadata Standard 2024.1",
-      "EU AI Office Guidelines on AI system transparency (2025)",
       "ISO/IEC 12792:2024 — Transparency taxonomy of AI systems",
       "NIST AI 100-4 — Reducing Risks Posed by Synthetic Content"
     ],
-    "awaiting_standard": "CEN-CENELEC harmonized standard for Art. 50 (expected Q4 2026)"
+    "awaiting_standard": "CEN-CENELEC harmonized standard for Art. 50 (expected Q4 2026)",
+    "changelog": [
+      "v0.2.0 (2026-08-11) — Basis updated: swapped placeholder 'EU AI Office Guidelines (2025)' for the actual EC Commission Guidelines C(2026) 5054 final published 2026-07-20 (Layer 2 pilot). SHA256 anchor included for hallucination-free citation.",
+      "v0.1.0 (2026-03-17) — Initial draft."
+    ]
   },
 
   "scope_note": "Art. 50 applies to ALMOST ALL AI systems, not just high-risk. This is the broadest transparency obligation in the EU AI Act. Any AI system that interacts with persons, generates synthetic content, or performs emotion recognition/biometric categorization falls under Art. 50.",
