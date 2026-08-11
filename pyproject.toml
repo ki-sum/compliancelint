@@ -26,7 +26,12 @@ classifiers = [
     "Topic :: Software Development :: Testing",
 ]
 dependencies = [
-    "mcp>=1.0",
+    # v1.1.6 (2026-08-11) — cap at <2.0. mcp 2.0.0 dropped the
+    # `mcp.server.fastmcp` submodule that scanner/server.py imports.
+    # Any pre-cap install after 2026-08 pulls mcp 2.x by default and
+    # crashes at import time (also affects pre-1.1.6 installs). Bump
+    # to >=2.0 requires migrating server.py to the new mcp SDK layout.
+    "mcp>=1.0,<2.0",
     # Optional telemetry — initialised only when the user opts in via
     # cl_connect (writes ~/.compliancelint/sentry.json). When that file
     # is absent, sentry_sdk is imported lazily and otherwise idle.
