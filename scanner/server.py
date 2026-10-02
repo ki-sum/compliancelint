@@ -2147,7 +2147,11 @@ def cl_action_guide(obligation_id: str) -> str:
     # error. The accepted tag list mirrors what `scripts/audit-atom-tags.py`
     # would generate from the JSONs; widen the regex (don't pin specific
     # tags) if a new atom kind ships and isn't reflected here yet.
-    if not re.match(r"^ART\d+-[A-Z]{2,5}-\d+[a-z]?$", obligation_id.upper()):
+    # The ID is upper-cased before matching, so the letter suffix must be
+    # matched as [A-Z] (1a / 2b / 1ba / 1bb). Until 2026-10-02 it was
+    # [a-z]?, which rejected all 83 letter-suffixed IDs (e.g. every
+    # ART05-PRO-1x) — tests/test_cl_action_guide_oid_format.py.
+    if not re.match(r"^ART\d+-[A-Z]{2,5}-\d+[A-Z]{0,2}$", obligation_id.upper()):
         return append_upgrade_hint(
             json.dumps({
                 "error": f"Invalid obligation ID format: {obligation_id}",
@@ -2168,7 +2172,7 @@ def cl_action_guide(obligation_id: str) -> str:
     row = lookup_obligation(obl_id)
 
     # §AD.5b — derive article number from the OID for Recital lookup.
-    # OID validation above already enforced ^ART\d+-OBL-\d+ so this match
+    # OID validation above already enforced ^ART\d+-<TAG>-\d+ so this match
     # cannot fail; we still guard defensively against future format drift.
     _art_match = re.match(r"^ART(\d+)-", obl_id)
     _article_num = int(_art_match.group(1)) if _art_match else 0
