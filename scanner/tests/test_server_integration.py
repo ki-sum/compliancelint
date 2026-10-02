@@ -1595,21 +1595,18 @@ class TestClScanArticle5:
     """Test cl_scan_article_5 MCP tool function end-to-end."""
 
     def test_no_prohibited_practices_compliant(self, project_dir):
-        ctx = ProjectContext.from_json(json.dumps({
-            "art5": {
-                "prohibited_practices": [
-                    {"practice": "subliminal_manipulation", "detected": False,
-                     "evidence": "no evidence found", "confidence": "high"},
-                    {"practice": "social_scoring", "detected": False,
-                     "evidence": "no evidence found", "confidence": "high"},
-                ]
-            }
-        }))
+        # Fill the cl_analyze_project template exactly as an AI client would
+        # (gap G-19: the old version fed the legacy prohibited_practices list,
+        # which module.py never reads, and only asserted != non_compliant,
+        # so an all-UTD result passed).
+        from core.context import _build_answers_template
+        art5 = {k: (False if v is None else v)
+                for k, v in _build_answers_template()["art5"].items()}
+        ctx = ProjectContext.from_json(json.dumps({"art5": art5}))
         result_json = _scan_single_article(5, project_dir, context=ctx)
         result = json.loads(result_json)
         assert "error" not in result
-        # No prohibited practices detected -> should not be non_compliant
-        assert result["overall_level"] != "non_compliant"
+        assert result["overall_level"] == "compliant"
 
     def test_practice_detected_non_compliant(self, project_dir):
         ctx = ProjectContext.from_json(json.dumps({

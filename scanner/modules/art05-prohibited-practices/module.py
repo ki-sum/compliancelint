@@ -53,6 +53,21 @@ _PRACTICE_LABELS: dict[str, str] = {
 # All expected practices; used to generate UNABLE_TO_DETERMINE findings when AI provides none
 _EXPECTED_PRACTICES = list(_PRACTICE_TO_OBLIGATIONS.keys())
 
+# compliance_answers field → obligation mapping (same structure as Art.12's pattern).
+# Every field listed here MUST also be in core/context.py _BOOL_FIELDS["art5"],
+# otherwise cl_analyze_project's template never asks the AI for it
+# (tests/test_art05_answers_template.py enforces this).
+_PROHIBITION_FIELDS = [
+    ("has_subliminal_manipulation",      "ART05-PRO-1a", "subliminal / manipulative techniques (Art. 5(1)(a))"),
+    ("has_exploitation_of_vulnerabilities", "ART05-PRO-1b", "exploitation of age, disability, or socioeconomic vulnerability (Art. 5(1)(b))"),
+    ("has_social_scoring",               "ART05-PRO-1c", "social scoring (Art. 5(1)(c))"),
+    ("has_predictive_policing",          "ART05-PRO-1d", "criminal risk assessment from profiling (Art. 5(1)(d))"),
+    ("has_facial_recognition_scraping",  "ART05-PRO-1e", "untargeted facial image scraping (Art. 5(1)(e))"),
+    ("has_emotion_recognition_workplace","ART05-PRO-1f", "emotion recognition in workplace/education (Art. 5(1)(f))"),
+    ("has_biometric_categorization",     "ART05-PRO-1g", "biometric categorization for sensitive attributes (Art. 5(1)(g))"),
+    ("has_real_time_biometric_id",       "ART05-PRO-1h", "real-time remote biometric identification (Art. 5(1)(h))"),
+]
+
 
 class Art05Module(BaseArticleModule):
     """Article 5: Prohibited AI Practices compliance module.
@@ -102,18 +117,6 @@ class Art05Module(BaseArticleModule):
         #   not False = True → true path (COMPLIANT via true_level)
         #   not True = False → false path (NON_COMPLIANT)
         #   not None = kept as None → UTD path
-
-        # Field → obligation mapping (same structure as Art.12's pattern)
-        _PROHIBITION_FIELDS = [
-            ("has_subliminal_manipulation",      "ART05-PRO-1a", "subliminal / manipulative techniques (Art. 5(1)(a))"),
-            ("has_exploitation_of_vulnerabilities", "ART05-PRO-1b", "exploitation of age, disability, or socioeconomic vulnerability (Art. 5(1)(b))"),
-            ("has_social_scoring",               "ART05-PRO-1c", "social scoring (Art. 5(1)(c))"),
-            ("has_predictive_policing",          "ART05-PRO-1d", "criminal risk assessment from profiling (Art. 5(1)(d))"),
-            ("has_facial_recognition_scraping",  "ART05-PRO-1e", "untargeted facial image scraping (Art. 5(1)(e))"),
-            ("has_emotion_recognition_workplace","ART05-PRO-1f", "emotion recognition in workplace/education (Art. 5(1)(f))"),
-            ("has_biometric_categorization",     "ART05-PRO-1g", "biometric categorization for sensitive attributes (Art. 5(1)(g))"),
-            ("has_real_time_biometric_id",       "ART05-PRO-1h", "real-time remote biometric identification (Art. 5(1)(h))"),
-        ]
 
         for field_name, obl_id, label in _PROHIBITION_FIELDS:
             detected = answers.get(field_name)  # True | False | None

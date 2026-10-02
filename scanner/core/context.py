@@ -76,7 +76,12 @@ _LIST_FIELDS: dict = {
 # Fields that must be bool or None (never strings like "true")
 _BOOL_FIELDS: dict = {
     "art8":  ["has_section_2_compliance", "is_annex_i_product", "has_annex_i_compliance"],
-    "art5":  ["is_realtime_processing"],
+    "art5":  ["is_realtime_processing",
+              # Read by modules/art05-prohibited-practices/module.py _PROHIBITION_FIELDS
+              "has_subliminal_manipulation", "has_exploitation_of_vulnerabilities",
+              "has_social_scoring", "has_predictive_policing",
+              "has_facial_recognition_scraping", "has_emotion_recognition_workplace",
+              "has_biometric_categorization", "has_real_time_biometric_id"],
     "art6":  ["is_high_risk"],
     "art9":  ["has_risk_docs", "has_testing_infrastructure", "has_risk_code_patterns", "has_defined_metrics", "affects_children"],
     "art10": ["has_data_governance_doc", "has_bias_mitigation", "has_data_lineage", "processes_special_category_data"],
