@@ -114,10 +114,19 @@ def _make_context(project_context: dict) -> ProjectContext:
     )
 
 
-def _scan_article(article_key: str, ctx: ProjectContext, tmp_path) -> dict:
-    """Scan a single article with the given context, return result dict."""
+def _scan_article(article_key: str, ctx: ProjectContext, tmp_path, today: str | None = None) -> dict:
+    """Scan a single article with the given context, return result dict.
+
+    `today` (archetype field, ISO date) pins the module clock for date-gated
+    obligations such as Art. 5(1)(ba)/(bb), which apply from 2026-12-02.
+    """
     module_dir = ARTICLE_MODULE_MAP[article_key]
     mod = _load_module(module_dir)
+    if today is not None:
+        from datetime import date
+        scan_globals = type(mod).scan.__globals__
+        assert "_today" in scan_globals, f"{article_key} module has no _today() clock to pin"
+        scan_globals["_today"] = lambda: date.fromisoformat(today)
     BaseArticleModule.set_context(ctx)
     BaseArticleModule.set_config(None)
     try:
@@ -143,7 +152,7 @@ def _archetype_article_params():
 def test_archetype_article(archetype, article_key, expected, tmp_path):
     """Test that scanning an archetype produces the expected overall level."""
     ctx = _make_context(archetype["project_context"])
-    result = _scan_article(article_key, ctx, tmp_path)
+    result = _scan_article(article_key, ctx, tmp_path, archetype.get("today"))
 
     expected_overall = expected["overall"]
     actual_overall = result["overall_level"]

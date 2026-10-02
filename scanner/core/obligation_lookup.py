@@ -22,6 +22,7 @@ Failure modes:
 """
 from __future__ import annotations
 
+import glob
 import json
 import logging
 import os
@@ -224,6 +225,43 @@ def lookup_obligation(obligation_id: str) -> Optional[dict]:
     return _OID_INDEX.get(obligation_id.upper())
 
 
+def iter_obligation_rows():
+    """Every obligation row (one per unique ID), with SaaS classification metadata
+    merged in when available — the same rows lookup_obligation() returns."""
+    global _OID_INDEX
+    if _OID_INDEX is None:
+        _OID_INDEX = _build_index()
+    return iter(list(_OID_INDEX.values()))
+
+
+_UNIQUE_IDS: Optional[frozenset] = None
+
+
+def _unique_ids() -> frozenset:
+    """Obligation IDs from the JSON files only — no SaaS classification merge."""
+    global _UNIQUE_IDS
+    if _UNIQUE_IDS is None:
+        ids = set()
+        for path in glob.glob(os.path.join(_obligations_dir(), "art*.json")):
+            try:
+                with open(path, encoding="utf-8") as f:
+                    ids.update(o["id"] for o in json.load(f).get("obligations", []) if o.get("id"))
+            except (OSError, json.JSONDecodeError):
+                continue
+        _UNIQUE_IDS = frozenset(ids)
+    return _UNIQUE_IDS
+
+
+def unique_obligation_count() -> int:
+    """Number of unique obligation IDs — the count used in user-facing text (self-audit A13).
+    Three IDs appear in two obligation files, so JSON rows outnumber obligations."""
+    return len(_unique_ids())
+
+
+def article_count() -> int:
+    return len({int(re.match(r"ART0*(\d+)-", i).group(1)) for i in _unique_ids()})
+
+
 def reset_cache() -> None:
     """Drop the in-memory index. Used by tests after disk mutations."""
     global _OID_INDEX
@@ -306,15 +344,13 @@ def eur_lex_url_for_article(article_number: int) -> str:
     the article fragment so the AI consumer lands at the right
     paragraph.
 
-    Format follows EUR-Lex's stable CELEX URL pattern for the EU AI
-    Act consolidated text (Regulation 2024/1689). The fragment
-    `#art_N` is the official anchor naming convention used by
-    eur-lex.europa.eu.
+    Points at the consolidated text the scanner's obligations are verified
+    against (CELEX 02024R1689-20260727, incl. Regulation (EU) 2026/1744),
+    not the original OJ text, which lacks the amendments. The fragment
+    `#art_N` is EUR-Lex's article anchor naming convention.
     """
-    return (
-        f"https://eur-lex.europa.eu/legal-content/EN/TXT/"
-        f"?uri=CELEX:32024R1689#art_{article_number}"
-    )
+    from core.application_dates import eur_lex_url
+    return f"{eur_lex_url()}#art_{article_number}"
 
 
 # Module-level cache for recitals.json (loaded lazily; ~250KB).
@@ -422,6 +458,13 @@ def extract_action_guide_fields(row: dict) -> dict:
     decomposed = row.get("decomposed_atoms")
     if not isinstance(decomposed, list):
         decomposed = []
+    # `_`-prefixed atom keys are internal audit trail (e.g. `_history` holds
+    # superseded wording after a consensus-lock correction) — never served.
+    decomposed = [
+        {k: v for k, v in atom.items() if not str(k).startswith("_")}
+        if isinstance(atom, dict) else atom
+        for atom in decomposed
+    ]
 
     return {
         "source": str(row.get("source", "")),

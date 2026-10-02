@@ -118,26 +118,8 @@ def _all_false_answers():
     return {
         "_scope": {"is_ai_system": True, "is_open_source": False,
                     "is_military_defense": False, "is_research_only": False},
-        "art5": {
-            "is_realtime_processing": True,
-            "processing_mode_evidence": "test",
-            "prohibited_practices": [
-                {"practice": "biometric_surveillance", "detected": True,
-                 "evidence": "test", "evidence_paths": ["test.py"], "confidence": "high"},
-                {"practice": "social_scoring", "detected": True,
-                 "evidence": "test", "evidence_paths": ["test.py"], "confidence": "high"},
-                {"practice": "subliminal_manipulation", "detected": True,
-                 "evidence": "test", "evidence_paths": ["test.py"], "confidence": "high"},
-                {"practice": "prohibited_emotion_recognition", "detected": True,
-                 "evidence": "test", "evidence_paths": ["test.py"], "confidence": "high"},
-                {"practice": "vulnerability_exploitation", "detected": True,
-                 "evidence": "test", "evidence_paths": ["test.py"], "confidence": "high"},
-                {"practice": "criminal_profiling", "detected": True,
-                 "evidence": "test", "evidence_paths": ["test.py"], "confidence": "high"},
-                {"practice": "prohibited_real_time_biometrics", "detected": True,
-                 "evidence": "test", "evidence_paths": ["test.py"], "confidence": "high"},
-            ],
-        },
+        # every prohibition present (was a legacy prohibited_practices list the module never read)
+        "art5": {"has_subliminal_manipulation": True, "has_exploitation_of_vulnerabilities": True, "has_social_scoring": True, "has_predictive_policing": True, "has_facial_recognition_scraping": True, "has_emotion_recognition_workplace": True, "has_biometric_categorization": True, "has_real_time_biometric_id": True, "has_ncii_generation": True, "has_csam_generation": True},
         "art6": {"annex_iii_categories": ["biometric_identification"],
                  "annex_i_product_type": "medical_device",
                  "is_high_risk": True, "reasoning": "test"},

@@ -216,3 +216,34 @@ class TestPostProcessVarianceElimination:
             _apply_approach_b_post_process(findings)
             runs.append(findings[0]["level"])
         assert runs == ["not_applicable", "not_applicable", "not_applicable"]
+
+
+class TestProhibitionDetectionKept:
+    """Founder decision C2 (2026-10-02): a detected prohibition stays amber (UTD) on the
+    dashboard, but the AI's detection text must survive the rewrite — the generic HYBRID
+    text alone hid that the AI had flagged a prohibited practice."""
+
+    def _nc(self, oid, desc):
+        return [{"obligation_id": oid, "level": "non_compliant", "description": desc, "confidence": "medium"}]
+
+    def test_detected_ncii_keeps_detection_text(self):
+        desc = "[REQUIRES LEGAL REVIEW] AI detected patterns consistent with non-consensual intimate material"
+        findings = _apply_approach_b_post_process(self._nc("ART05-PRO-1ba", desc))
+        assert findings[0]["level"] == "unable_to_determine"
+        assert desc in findings[0]["description"]
+        assert "HYBRID" in findings[0]["description"]
+
+    def test_detected_social_scoring_keeps_detection_text(self):
+        desc = "[REQUIRES LEGAL REVIEW] AI detected patterns consistent with social scoring (Art. 5(1)(c))."
+        findings = _apply_approach_b_post_process(self._nc("ART05-PRO-1c", desc))
+        assert desc in findings[0]["description"]
+
+    def test_non_prohibition_text_unchanged_behaviour(self):
+        findings = _apply_approach_b_post_process(self._nc("ART50-OBL-3", "AI: no disclosure found"))
+        assert "AI: no disclosure found" not in findings[0]["description"]
+
+    def test_prohibition_not_detected_gets_generic_text(self):
+        findings = _apply_approach_b_post_process([{
+            "obligation_id": "ART05-PRO-1c", "level": "compliant",
+            "description": "No social scoring (Art. 5(1)(c)) detected.", "confidence": "medium"}])
+        assert "No social scoring" not in findings[0]["description"]

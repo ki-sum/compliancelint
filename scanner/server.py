@@ -35,6 +35,7 @@ from core.protocol import BaseArticleModule, ScanResult
 from core.config import ProjectConfig
 from core.evidence import load_evidence, apply_evidence_to_findings
 from core.error_response import dump_error
+from core.obligation_lookup import unique_obligation_count
 from core.upgrade_hint import (
     append_upgrade_hint,
     cache_tier,
@@ -344,7 +345,7 @@ def cl_analyze_project(project_path: str) -> str:
                 "The scanner will then check only the EU AI Act obligations "
                 "that actually apply to you — clean, focused report.\n"
                 "  (2) Skip connecting — I'll scan immediately against all "
-                "247 obligations. Most won't apply and will return 'unable "
+                f"{unique_obligation_count()} obligations. Most won't apply and will return 'unable "
                 "to determine'. Legally safe, but noisy.\n"
                 "Which would you like?"
             ),
@@ -692,9 +693,15 @@ def _apply_approach_b_post_process(findings: list) -> list:
         # Rewrite to UTD + HG hint. Preserve original obligation_id +
         # source_quote + article (already part of f). Replace level,
         # description, human_gate_hint.
+        # A detected prohibition (Art. 5) stays amber, but the AI's detection
+        # text is kept — founder decision C2 (2026-10-02).
+        detection = ""
+        if f.get("level") == "non_compliant" and row.get("deontic_type") == "prohibition":
+            detection = f"AI detection: {f.get('description', '')} "
         f["level"] = "unable_to_determine"
         f["description"] = (
             f"[HYBRID — needs Human Gates attestation] {row.get('source', oid)}: "
+            f"{detection}"
             f"This obligation requires both code-level evidence AND human "
             f"legal-interpretation judgment. AI cannot determine compliance "
             f"unilaterally. Provide evidence + attestation via "
@@ -876,11 +883,23 @@ def _check_paid_completion_gate(ctx, project_path: str):
         )
         return None
 
+    # Obligations that do not apply yet (obligation JSON `applicable_from`,
+    # e.g. ART05-PRO-1ba/1bb until 2026-12-02) are not required.
+    from core import application_dates
+    from core.obligation_lookup import lookup_obligation
+    applicable_from = {}
+    for oid in questionnaire:
+        row = lookup_obligation(oid)
+        if row and row.get("applicable_from"):
+            applicable_from[oid] = row["applicable_from"]
+
     result = enforce_paid_completion(
         questionnaire=questionnaire,
         evidence_counts=evidence_counts,
         enforcement_mode=enforcement_mode,
         oid_answers=oid_answers,
+        applicable_from=applicable_from,
+        today=application_dates._today(),
     )
 
     if result.warnings:
@@ -2049,7 +2068,7 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
     scope = gate.coerced_answers.get('_scope', {}) if gate else {}
     if not scope.get('_saas_settings_active'):
         meta_extras['role_configuration_hint'] = (
-            'This scan checked all 247 obligations across all roles. '
+            f'This scan checked all {unique_obligation_count()} obligations across all roles. '
             'For accurate scoring, configure your role and risk '
             'classification at compliancelint.dev/dashboard -> '
             '[repo] -> Settings. With settings configured: only '
@@ -2201,7 +2220,8 @@ def cl_action_guide(obligation_id: str) -> str:
         title = f"Obligation {obl_id}"
 
     response = {
-        "obligation_id": obl_id,
+        # Echo the ID as shipped (ART05-PRO-1ba), not the upper-cased lookup key.
+        "obligation_id": row["id"] if row and row.get("id") else obl_id,
         "title": title,
         "is_human_gate": is_known_gate,
         "status": "pending",
@@ -2535,39 +2555,14 @@ def cl_check_updates() -> str:
 
     Returns the current status of relevant standards and upcoming deadlines.
     """
-    from datetime import date
-    days_remaining = (date(2026, 8, 2) - date.today()).days
+    from core import application_dates
 
     _check_updates_response = json.dumps({
-        "last_checked": date.today().isoformat(),
-        "upcoming_deadlines": [
-            {
-                "date": "2025-02-02",
-                "event": "Art. 5 prohibitions + AI literacy (Art. 4) became enforceable",
-                "status": "ALREADY_IN_FORCE",
-            },
-            {
-                "date": "2025-08-02",
-                "event": "GPAI obligations (Art. 51-56) became enforceable",
-                "status": "ALREADY_IN_FORCE",
-            },
-            {
-                "date": "2026-08-02",
-                "event": "High-risk AI system requirements (Art. 6-49) become enforceable",
-                "days_remaining": days_remaining,
-                "status": "APPROACHING",
-            },
-            {
-                "date": "2026-Q4",
-                "event": "CEN-CENELEC harmonized standards expected publication",
-                "status": "IN_PROGRESS",
-            },
-            {
-                "date": "2027-08-02",
-                "event": "Requirements for AI in regulated products (Annex I products)",
-                "status": "FUTURE",
-            },
-        ],
+        "last_checked": application_dates._today().isoformat(),
+        "regulation_text_version": application_dates.regulation_text_version(),
+        # Art. 113 / Art. 111 dates as amended by Regulation (EU) 2026/1744 —
+        # scanner/data/application_dates.json; status computed against today.
+        "upcoming_deadlines": application_dates.milestones_status(),
         "standards_status": [
             {
                 "standard": "prEN 18286 — AI Quality Management System",
@@ -3527,19 +3522,9 @@ def _scan_single_article(article_number: int, project_path: str, context=None, r
             ),
         }
 
-    # Per-article applicable dates (EU AI Act 2024/1689)
-    _applicable_from = {
-        5: "2025-02-02",   # Prohibited practices — Chapter II
-        6: "2026-08-02",   # High-risk classification — Chapter III
-        9: "2026-08-02",   # Risk management system
-        10: "2026-08-02",  # Data governance
-        11: "2026-08-02",  # Technical documentation
-        12: "2026-08-02",  # Record-keeping
-        13: "2026-08-02",  # Transparency to users
-        14: "2026-08-02",  # Human oversight
-        15: "2026-08-02",  # Accuracy and robustness
-        50: "2026-08-02",  # Transparency obligations (Chapter IV)
-    }
+    # Per-article application dates (Art. 113 as amended) — scanner/data/application_dates.json
+    from core import application_dates
+    _dates = application_dates.article(article_number)
 
     # Scan metadata — which files Claude actually read (from _scan_metadata in compliance_answers)
     scan_meta = {}
@@ -3561,12 +3546,17 @@ def _scan_single_article(article_number: int, project_path: str, context=None, r
     data["compliance_summary"] = {
         "article": f"Art. {article_number} ({mod.article_title})",
         "overall": result.overall_level.value,
-        "regulation": "EU AI Act (Regulation (EU) 2024/1689)",
-        "applicable_from": _applicable_from.get(article_number, "2026-08-02"),
-        "compliance_checklist_version": f"CL-IS-ART{article_number:02d}-v0.1",
+        "regulation": "EU AI Act (Regulation (EU) 2024/1689, as amended by Regulation (EU) 2026/1744)",
+        "regulation_text_version": application_dates.regulation_text_version(),
+        "applicable_from": _dates["applicable_from"],
+        **({"applicable_from_annex_i": _dates["applicable_from_annex_i"]}
+           if "applicable_from_annex_i" in _dates else {}),
+        **({"applicable_from_exceptions": _dates["exceptions"]} if "exceptions" in _dates else {}),
+        # The module's own interim standard ID; None when the article has none.
+        "compliance_checklist_version": (mod.compliance_checklist().get("_metadata") or {}).get("standard_id"),
         "compliance_checklist_note": (
             "ComplianceLint interim standard — operational interpretation of EU AI Act obligations "
-            "pending official harmonised standards (expected 2026-08-02)."
+            "pending official harmonised standards."
         ),
         "assessed_by": result.assessed_by or "not provided — set ai_model in project_context",
         "scan_date": result.scan_date,
@@ -5390,6 +5380,10 @@ def cl_disconnect(project_path: str) -> str:
 def cl_version() -> str:
     """Return ComplianceLint scanner version and check for updates."""
     result = {"version": CL_VERSION, "tools": 18}
+    # Which regulation text versions the shipped obligations were verified against
+    # (scanner/data/_versions.json, the public mirror of the regulation registry).
+    with open(os.path.join(PROJECT_ROOT, "data", "_versions.json"), encoding="utf-8") as f:
+        result["regulations"] = json.load(f)["regulations"]
     update_info = _check_latest_version()
     if update_info:
         result.update(update_info)

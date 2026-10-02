@@ -237,7 +237,7 @@
         {
           "condition": "explicit_consent",
           "description": "Not prohibited where the identifiable person gave freely-given, specific, informed, unambiguous and explicit consent for that generation or manipulation",
-          "note": "Art. 5(1)(ba) does not specify which actor must collect, verify or document the consent"
+          "note": "Art. 5(1)(ba) does not specify which actor must collect, verify or document the consent. Reg (EU) 2026/1744, Recital 12: for AI systems intended to generate or manipulate such material, the measures and other safeguards should include appropriate means for the distribution of the AI system aimed at enabling the reliable collection and demonstration of the depicted person's consent, in compliance with Regulation (EU) 2016/679."
         }
       ],
       "cross_references": [
@@ -299,7 +299,7 @@
         {
           "condition": "without_right_defence",
           "description": "Not prohibited where a 'without right' defence applies under national law",
-          "note": "Depends on the national law of the Member State concerned"
+          "note": "Depends on the national law of the Member State concerned. Reg (EU) 2026/1744, Recital 13: this includes activities carried out under domestic legal powers, such as the legitimate generation or manipulation of such material by the authorities in order to conduct criminal proceedings or to prevent, detect or investigate crime, and the legitimate use of the AI system for red-teaming and evaluation activities to assess its compliance with the prohibition."
         }
       ],
       "cross_references": [
@@ -628,7 +628,7 @@
           "requirement": "Exception: real-time biometric ID MAY be used for localization or identification of suspects of criminal offences punishable by custodial sentence of at least 4 years, for offences listed in Annex II — strictly necessary use only"
         },
         {
-          "atom": "exception_requires_judicial_authorization",
+          "atom": "exception_requires_prior_authorisation",
           "description": "All exceptions require prior authorisation by a judicial authority or a binding independent administrative authority",
           "requirement": "Use under any exception SHALL require prior authorisation granted by a judicial authority or an independent administrative authority whose decision is binding (Art. 5(3)) — except in a duly justified situation of urgency, where authorisation must be requested without undue delay, at the latest within 24 hours. If authorisation is rejected, use must stop with immediate effect and all data, results and outputs must be immediately discarded and deleted",
           "_history": [
@@ -674,7 +674,7 @@
         {
           "article": 99,
           "paragraph": 3,
-          "context": "Penalties for Art. 5 violations: up to EUR 35M or 7% of global annual turnover"
+          "context": "Penalties for non-compliance with Art. 5: up to EUR 35 000 000 or, if the offender is an undertaking, up to 7 % of its total worldwide annual turnover for the preceding financial year, whichever is higher (Art. 99(3)); for SMEs, including start-ups, Art. 99(6) applies the lower cap."
         }
       ]
     }
@@ -693,11 +693,11 @@
       "manual": 0
     },
     "scope_notes": {
-      "absolute_prohibitions_no_exceptions": "ART05-PRO-1a, ART05-PRO-1b, ART05-PRO-1c, ART05-PRO-1e — absolute prohibitions with no exceptions (harm threshold still applies for OBL-1 and OBL-2)",
-      "prohibitions_with_narrow_exceptions": "ART05-PRO-1d (human assessment + objective facts exception), ART05-PRO-1f (medical/safety exception), ART05-PRO-1g (dataset labelling + law enforcement exception), ART05-PRO-1h (three narrow law enforcement exceptions with judicial authorization)",
-      "enforcement_date": "2025-02-02 — Art. 5 prohibitions are in force since this date (6 months after entry into force of the AI Act)",
-      "penalty_tier": "Highest under the AI Act: up to EUR 35,000,000 or 7% of total worldwide annual turnover (Art. 99(3))",
-      "omnibus_2026_additions": "ART05-PRO-1ba (non-consensual intimate imagery) and ART05-PRO-1bb (child sexual abuse material) added by Regulation (EU) 2026/1744; applicable from 2026-12-02; conditioned by Art. 5(1a) and (for 1ba) Art. 5(1b)"
+      "absolute_prohibitions_no_exceptions": "ART05-PRO-1a, ART05-PRO-1b, ART05-PRO-1c, ART05-PRO-1e — prohibitions with no exceptions (the significant-harm threshold still applies to ART05-PRO-1a and ART05-PRO-1b)",
+      "prohibitions_with_narrow_exceptions": "ART05-PRO-1d (support of a human assessment of involvement in criminal activity that is already based on objective and verifiable facts directly linked to a criminal activity), ART05-PRO-1f (medical or safety reasons), ART05-PRO-1g (labelling or filtering of lawfully acquired biometric datasets; categorising biometric data in the area of law enforcement), ART05-PRO-1h (three law-enforcement objectives, subject to Art. 5(2)-(5), including prior authorisation under Art. 5(3) except that in a duly justified situation of urgency use may commence before authorisation if authorisation is requested without undue delay and at the latest within 24 hours), ART05-PRO-1ba (the depicted person's freely-given, specific, informed, unambiguous and explicit consent), ART05-PRO-1bb ('without right' defence under national law)",
+      "enforcement_date": "2025-02-02 — Art. 5 applies from this date (Art. 113, third paragraph, point (a)); points (ba) and (bb) and paragraphs (1a) and (1b), added by Regulation (EU) 2026/1744, apply from 2026-12-02",
+      "penalty_tier": "Highest under the AI Act: up to EUR 35 000 000 or, if the offender is an undertaking, up to 7 % of its total worldwide annual turnover for the preceding financial year, whichever is higher (Art. 99(3)); for SMEs, including start-ups, Art. 99(6) applies the lower cap.",
+      "omnibus_2026_additions": "ART05-PRO-1ba (non-consensual intimate material) and ART05-PRO-1bb (child sexual abuse material) added by Regulation (EU) 2026/1744; applicable from 2026-12-02; conditioned by Art. 5(1a) and (for 1ba) Art. 5(1b)"
     }
   }
 }

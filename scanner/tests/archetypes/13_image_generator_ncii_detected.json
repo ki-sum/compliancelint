@@ -1,0 +1,39 @@
+{
+  "name": "13_image_generator_ncii_detected.json",
+  "description": "Face-swap image generator whose 'undress' mode is its advertised purpose; scanned after Art. 5(1)(ba) applies.",
+  "today": "2027-01-01",
+  "project_context": {
+    "primary_language": "Python",
+    "risk_classification": "limited-risk",
+    "risk_classification_confidence": "medium",
+    "compliance_answers": {
+      "_scope": {
+        "is_ai_system": true,
+        "territorial_scope_applies": true,
+        "risk_classification": "limited-risk"
+      },
+      "art5": {
+        "has_subliminal_manipulation": false,
+        "has_exploitation_of_vulnerabilities": false,
+        "has_social_scoring": false,
+        "has_predictive_policing": false,
+        "has_facial_recognition_scraping": false,
+        "has_emotion_recognition_workplace": false,
+        "has_biometric_categorization": false,
+        "has_real_time_biometric_id": false,
+        "has_ncii_generation": true,
+        "has_csam_generation": false,
+        "ncii_generation_evidence": "Face-swap pipeline with an 'undress' preset applied to uploaded photos of real people"
+      }
+    }
+  },
+  "expected": {
+    "art5": {
+      "overall": "non_compliant",
+      "must_have_obligations": [
+        "ART05-PRO-1ba"
+      ],
+      "legal_basis": "Art. 5(1)(ba) with Art. 5(1a)(a)(i): generating realistic intimate images of identifiable persons without consent is the intended purpose; applies from 2026-12-02 (Art. 113, third paragraph, point (a))"
+    }
+  }
+}

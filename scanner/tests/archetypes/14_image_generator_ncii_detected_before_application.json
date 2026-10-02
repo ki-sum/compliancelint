@@ -1,0 +1,39 @@
+{
+  "name": "14_image_generator_ncii_detected_before_application.json",
+  "description": "Same system as archetype 13, scanned before Art. 5(1)(ba) applies.",
+  "today": "2026-11-30",
+  "project_context": {
+    "primary_language": "Python",
+    "risk_classification": "limited-risk",
+    "risk_classification_confidence": "medium",
+    "compliance_answers": {
+      "_scope": {
+        "is_ai_system": true,
+        "territorial_scope_applies": true,
+        "risk_classification": "limited-risk"
+      },
+      "art5": {
+        "has_subliminal_manipulation": false,
+        "has_exploitation_of_vulnerabilities": false,
+        "has_social_scoring": false,
+        "has_predictive_policing": false,
+        "has_facial_recognition_scraping": false,
+        "has_emotion_recognition_workplace": false,
+        "has_biometric_categorization": false,
+        "has_real_time_biometric_id": false,
+        "has_ncii_generation": true,
+        "has_csam_generation": false,
+        "ncii_generation_evidence": "Face-swap pipeline with an 'undress' preset applied to uploaded photos of real people"
+      }
+    }
+  },
+  "expected": {
+    "art5": {
+      "overall": "compliant",
+      "must_have_obligations": [
+        "ART05-PRO-1ba"
+      ],
+      "legal_basis": "Art. 5(1)(ba) applies only from 2026-12-02; before that date the finding is informational and does not move the Art. 5 result (the other Art. 5 points are answered false)"
+    }
+  }
+}

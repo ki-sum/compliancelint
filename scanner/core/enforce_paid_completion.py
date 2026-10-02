@@ -27,6 +27,7 @@ The function is intentionally I/O-free. The wrapper that loads
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from datetime import date
 from typing import Optional
 
 
@@ -78,6 +79,8 @@ def enforce_paid_completion(
     evidence_counts: Optional[dict],
     enforcement_mode: Optional[str] = None,
     oid_answers: Optional[dict] = None,
+    applicable_from: Optional[dict] = None,
+    today: Optional[date] = None,
 ) -> EnforceResult:
     """Check evidence + answer completeness against the SaaS-narrowed
     questionnaire.
@@ -98,6 +101,11 @@ def enforce_paid_completion(
           answer = silent pass" as a false-COMPLIANT bug. When None
           or omitted, falls back to legacy evidence-only check (no
           regression for existing callers).
+        applicable_from: dict mapping obligation_id → ISO date from which
+          the obligation applies (e.g. ART05-PRO-1ba → "2026-12-02").
+        today: the date to compare against. An obligation whose
+          applicable_from is after `today` is not required yet. Both must
+          be given for the date check to run.
 
     Returns:
         EnforceResult — caller (cl_scan_all wrapper) reads `.status`.
@@ -121,6 +129,9 @@ def enforce_paid_completion(
             continue
         if not row.get("completion_required"):
             continue
+        starts = (applicable_from or {}).get(oid)
+        if today is not None and starts and date.fromisoformat(starts) > today:
+            continue  # does not apply yet (self-audit A12)
         expected = _coerce_int(row.get("evidence_min"))
         actual = _coerce_int(counts.get(oid))
 

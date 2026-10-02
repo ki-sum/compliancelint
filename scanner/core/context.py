@@ -20,6 +20,7 @@ There is NO offline fallback. AI is required.
 """
 
 import json
+import re
 import os
 from dataclasses import dataclass, field, asdict
 from typing import Optional
@@ -28,7 +29,7 @@ from typing import Optional
 # Fields that must be lists (never strings) per article — used by get_article_answers()
 _LIST_FIELDS: dict = {
     "art8":  ["section_2_evidence"],
-    "art5":  ["prohibited_practices"],
+    "art5":  [],
     "art6":  ["annex_iii_categories"],
     "art9":  ["risk_doc_paths", "testing_evidence", "risk_code_evidence", "metrics_evidence"],
     "art10": ["data_doc_paths", "bias_evidence"],
@@ -76,8 +77,7 @@ _LIST_FIELDS: dict = {
 # Fields that must be bool or None (never strings like "true")
 _BOOL_FIELDS: dict = {
     "art8":  ["has_section_2_compliance", "is_annex_i_product", "has_annex_i_compliance"],
-    "art5":  ["is_realtime_processing",
-              # Read by modules/art05-prohibited-practices/module.py _PROHIBITION_FIELDS
+    "art5":  [# Read by modules/art05-prohibited-practices/module.py _PROHIBITION_FIELDS
               "has_subliminal_manipulation", "has_exploitation_of_vulnerabilities",
               "has_social_scoring", "has_predictive_policing",
               "has_facial_recognition_scraping", "has_emotion_recognition_workplace",
@@ -161,6 +161,111 @@ _BOOL_FIELDS: dict = {
 }
 
 
+# Keys article modules read that are neither bool- nor list-validated:
+# free-text evidence strings and legacy aliases (fallbacks — the canonical
+# field wins in the module). validation_gate must never fuzzy-rename these
+# onto a schema field: the rename overwrote the boolean with the evidence
+# string (Art 5) or the canonical answer with the alias (self-audit A1,
+# 2026-10-02). tests/test_validation_gate_aux_fields.py keeps this in sync
+# with every `answers.get("...")` in modules/.
+_AUX_FIELDS: dict = {
+    # module.py reads `<has_ field minus "has_">_evidence` next to each boolean
+    "art5":  ["subliminal_manipulation_evidence", "exploitation_of_vulnerabilities_evidence",
+              "social_scoring_evidence", "predictive_policing_evidence",
+              "facial_recognition_scraping_evidence", "emotion_recognition_workplace_evidence",
+              "biometric_categorization_evidence", "real_time_biometric_id_evidence",
+              "ncii_generation_evidence", "csam_generation_evidence"],
+    "art9":  ["has_risk_code", "has_metrics", "has_testing"],
+    "art10": ["has_bias_detection"],
+    "art12": ["has_retention_policy"],
+    "art15": ["has_accuracy_metrics"],
+    "art19": ["has_retention_policy"],
+}
+
+
+def _art5_ba_bb_from() -> str:
+    from core.application_dates import article
+    return article(5)["exceptions"][0]["applicable_from"]
+
+
+_ANSWER_KEY = " false if it does not; null if you cannot determine it from the project."
+# Art. 5(1a) test — wording verified by o3 (Prompt D, D55, 2026-10-02)
+_ART5_1A = (
+    "For placing on the market or putting into service (Art. 5(1a)(a)), true only if (1) that generation or "
+    "manipulation is the intended purpose, or (2) the system's design, training, architecture, capabilities or "
+    "user-facing functionalities make it a reasonably foreseeable and reproducible outcome without requiring "
+    "significant technical modification and the system does not have reasonable and adequate technical safety "
+    "measures and other safeguards that reliably prevent it, taking into account reasonably foreseeable misuse, "
+    "and correct observed or reported misuse. For use (Art. 5(1a)(b)), true only where the deployer uses the "
+    "system for that purpose."
+)
+
+# What each answer field means — returned by cl_analyze_project as
+# compliance_answers_field_descriptions (self-audit B2, 2026-10-02). "true" for an
+# Art. 5 field means the prohibited practice IS present (a violation signal).
+_FIELD_DESCRIPTIONS: dict = {
+    "art5": {
+        "has_subliminal_manipulation": (
+            "true if the system deploys subliminal techniques beyond a person's consciousness, or purposefully "
+            "manipulative or deceptive techniques, with the objective or effect of materially distorting "
+            "behaviour by appreciably impairing the ability to make an informed decision, thereby causing the "
+            "person or group to take a decision they would not otherwise have taken, in a manner that causes or "
+            "is reasonably likely to cause significant harm (Art. 5(1)(a));" + _ANSWER_KEY),
+        "has_exploitation_of_vulnerabilities": (
+            "true if the system exploits vulnerabilities of a person or group due to their age, disability or a "
+            "specific social or economic situation, with the objective or effect of materially distorting their "
+            "behaviour in a manner that causes or is reasonably likely to cause significant harm "
+            "(Art. 5(1)(b));" + _ANSWER_KEY),
+        "has_social_scoring": (
+            "true if the system evaluates or classifies natural persons or groups over a certain period of time "
+            "based on their social behaviour or known, inferred or predicted personal or personality "
+            "characteristics, with the score leading to detrimental or unfavourable treatment in unrelated "
+            "social contexts or treatment that is unjustified or disproportionate (Art. 5(1)(c));" + _ANSWER_KEY),
+        "has_predictive_policing": (
+            "true if the system assesses or predicts the risk of a natural person committing a criminal offence "
+            "based solely on profiling or on assessing personality traits and characteristics (Art. 5(1)(d)); "
+            "supporting a human assessment already based on objective and verifiable facts directly linked to "
+            "a criminal activity does not count;" + _ANSWER_KEY),
+        "has_facial_recognition_scraping": (
+            "true if the system creates or expands facial recognition databases through the untargeted scraping "
+            "of facial images from the internet or CCTV footage (Art. 5(1)(e));" + _ANSWER_KEY),
+        "has_emotion_recognition_workplace": (
+            "true if the system infers emotions of natural persons in the areas of workplace or education "
+            "institutions, unless it is intended to be put in place or into the market for medical or safety "
+            "reasons (Art. 5(1)(f));" + _ANSWER_KEY),
+        "has_biometric_categorization": (
+            "true if the system categorises individual natural persons based on their biometric data to deduce "
+            "or infer their race, political opinions, trade union membership, religious or philosophical "
+            "beliefs, sex life or sexual orientation (Art. 5(1)(g)); labelling or filtering of lawfully acquired "
+            "biometric datasets and categorising biometric data in the area of law enforcement do not count;"
+            + _ANSWER_KEY),
+        "has_real_time_biometric_id": (
+            "true if the system is used for 'real-time' remote biometric identification in publicly accessible "
+            "spaces for law-enforcement purposes (Art. 5(1)(h)), unless the use is strictly necessary for one of "
+            "the objectives in Art. 5(1)(h)(i)-(iii) and complies with the applicable conditions in Art. 5(2)-(5), "
+            "including the authorisation rule and urgency procedure in Art. 5(3) and the Member State's "
+            "national-law framework under Art. 5(5); Art. 5(6)-(7) concern reporting;" + _ANSWER_KEY),
+        "has_ncii_generation": (
+            "Art. 5(1)(ba) — realistic images, videos, audio or similar material of an identifiable person's "
+            "intimate parts, or of an identifiable person engaged in sexually explicit activities, without that "
+            "person's freely-given, specific, informed, unambiguous and explicit consent. " + _ART5_1A + " "
+            "For manipulation, Art. 5(1b) also applies: conduct that neither increases exposure of depicted "
+            "intimate parts nor alters the nature of depicted sexually explicit activities is not manipulation "
+            "for this prohibition. Mere capability to generate images is not enough. Applies from "
+            + _art5_ba_bb_from() + ";" + _ANSWER_KEY),
+        "has_csam_generation": (
+            "Art. 5(1)(bb) — material or performance within Article 2(c) and (e) of Directive 2011/93/EU, unless "
+            "a 'without right' defence applies under national law. " + _ART5_1A + " Mere capability is not "
+            "enough. Applies from " + _art5_ba_bb_from() + ";" + _ANSWER_KEY),
+    },
+}
+for _has in list(_FIELD_DESCRIPTIONS["art5"]):
+    _FIELD_DESCRIPTIONS["art5"][_has.replace("has_", "") + "_evidence"] = (
+        f"Free text: what you found (files, functions, configuration, documentation) that supports your "
+        f"answer to {_has}. Leave empty if there is nothing to report."
+    )
+
+
 @dataclass
 class ProjectContext:
     """AI-provided understanding of a project.
@@ -174,19 +279,28 @@ class ProjectContext:
     Schema for compliance_answers:
     {
       "art5": {
-        "is_realtime_processing": true | false | null,  # does the system process data in real-time vs batch?
-        "processing_mode_evidence": "description of why (e.g. streaming API calls, live camera feed, batch job)",
-        "prohibited_practices": [
-          {
-            "practice": "biometric_surveillance" | "social_scoring" |
-                        "subliminal_manipulation" | "prohibited_emotion_recognition" |
-                        "prohibited_real_time_biometrics",
-            "detected": true | false | null,  # null = AI could not determine
-            "evidence": "description of what was found, or empty string",
-            "evidence_paths": ["file:line", ...],
-            "confidence": "high" | "medium" | "low"
-          }
-        ]
+        # one pair per prohibition; true = the practice IS present (see
+        # compliance_answers_field_descriptions returned by cl_analyze_project)
+        "has_subliminal_manipulation": true | false | null,
+        "subliminal_manipulation_evidence": "what was found, or empty string",
+        "has_exploitation_of_vulnerabilities": true | false | null,
+        "exploitation_of_vulnerabilities_evidence": "what was found, or empty string",
+        "has_social_scoring": true | false | null,
+        "social_scoring_evidence": "what was found, or empty string",
+        "has_predictive_policing": true | false | null,
+        "predictive_policing_evidence": "what was found, or empty string",
+        "has_facial_recognition_scraping": true | false | null,
+        "facial_recognition_scraping_evidence": "what was found, or empty string",
+        "has_emotion_recognition_workplace": true | false | null,
+        "emotion_recognition_workplace_evidence": "what was found, or empty string",
+        "has_biometric_categorization": true | false | null,
+        "biometric_categorization_evidence": "what was found, or empty string",
+        "has_real_time_biometric_id": true | false | null,
+        "real_time_biometric_id_evidence": "what was found, or empty string",
+        "has_ncii_generation": true | false | null,
+        "ncii_generation_evidence": "what was found, or empty string",
+        "has_csam_generation": true | false | null,
+        "csam_generation_evidence": "what was found, or empty string",
       },
       "art6": {
         "annex_iii_categories": ["Biometrics", "Employment", ...],  # detected categories
@@ -412,6 +526,10 @@ def _build_answers_template() -> dict:
             fields[field_name] = None
         for field_name in _LIST_FIELDS.get(art_key, []):
             fields[field_name] = []
+        # Free-text evidence slots the module reads next to each answer (not legacy aliases)
+        for field_name in _AUX_FIELDS.get(art_key, []):
+            if field_name.endswith("_evidence") and field_name in _FIELD_DESCRIPTIONS.get(art_key, {}):
+                fields[field_name] = ""
         template[art_key] = fields
 
     # Add _scope separately
@@ -437,53 +555,31 @@ def _build_answers_template() -> dict:
 
 
 def _build_scanning_strategy() -> dict:
-    """Build per-article scanning guidance from obligation JSONs.
+    """Build per-article scanning guidance from the obligation rows.
 
-    Dynamically reads detection_method and what_to_scan from each
-    obligation JSON. Zero hardcoded search terms — the obligation
-    JSONs are the single source of truth.
+    Detection hints (automation_assessment.detection_method / what_to_scan) are not in
+    the public obligation JSONs since §AA (2026-05-02); obligation_lookup merges them in
+    from the SaaS classification API. Without that metadata the strategy is empty and
+    says why (self-audit B2, 2026-10-02 — it used to be silently empty for all articles).
     """
-    import json as _json
+    from core import obligation_lookup
 
-    obligations_dir = os.path.join(os.path.dirname(__file__), "..", "obligations")
-    if not os.path.isdir(obligations_dir):
-        return {"error": "obligations directory not found"}
-
-    per_article = {}
-    for fname in sorted(os.listdir(obligations_dir)):
-        if not fname.endswith(".json"):
+    per_article: dict = {}
+    for row in obligation_lookup.iter_obligation_rows():
+        m = re.match(r"ART0*(\d+)-", row.get("id", ""))
+        auto = row.get("automation_assessment") or {}
+        method = auto.get("detection_method", "")
+        if not m or not method or method == "N/A" or "permission" in method.lower():
             continue
-        try:
-            with open(os.path.join(obligations_dir, fname), "r", encoding="utf-8") as f:
-                data = _json.load(f)
-        except (ValueError, OSError):
-            continue
+        entry = per_article.setdefault(f"art{m.group(1)}", {"what_to_scan": set(), "detection_hints": []})
+        entry["detection_hints"].append(method)
+        entry["what_to_scan"].update(auto.get("what_to_scan", []))
 
-        meta = data.get("_metadata", {})
-        art_num = meta.get("article")
-        title = meta.get("title", "")
-        if not art_num:
-            continue
-
-        # Extract unique detection methods and scan targets
-        methods = []
-        scan_targets = set()
-        for obl in data.get("obligations", []):
-            auto = obl.get("automation_assessment", {})
-            method = auto.get("detection_method", "")
-            if method and method != "N/A" and "permission" not in method.lower():
-                methods.append(method)
-            for target in auto.get("what_to_scan", []):
-                scan_targets.add(target)
-
-        if methods:
-            per_article[f"art{art_num}"] = {
-                "title": title,
-                "what_to_scan": sorted(scan_targets),
-                "detection_hints": methods[:5],  # cap at 5 to avoid bloat
-            }
-
-    return {
+    articles = {
+        key: {"what_to_scan": sorted(v["what_to_scan"]), "detection_hints": v["detection_hints"][:5]}
+        for key, v in sorted(per_article.items(), key=lambda kv: int(kv[0][3:]))
+    }
+    strategy = {
         "instruction": (
             "For each article below, use Grep to search the ENTIRE codebase "
             "for relevant patterns based on the detection_hints. Then Read only "
@@ -492,8 +588,15 @@ def _build_scanning_strategy() -> dict:
             "WHAT to look for, not the exact regex. "
             "Report progress to the user every ~20 files read."
         ),
-        "articles": per_article,
+        "articles": articles,
     }
+    if not articles:
+        strategy["note"] = (
+            "No detection hints available: they come from the ComplianceLint classification "
+            "metadata, which is fetched once this project is connected to the dashboard (free). "
+            "Use compliance_answers_field_descriptions to decide each answer."
+        )
+    return strategy
 
 
 def analyze_project_metadata(project_path: str) -> dict:
@@ -672,6 +775,7 @@ def analyze_project_metadata(project_path: str) -> dict:
         "ci_configs": ci_configs,
         "scanning_strategy": scanning_strategy,
         "compliance_answers_template": answers_template,
+        "compliance_answers_field_descriptions": _FIELD_DESCRIPTIONS,
         "setup_warnings": setup_warnings if setup_warnings else None,
     }
 
@@ -734,59 +838,26 @@ Respond with ONLY a JSON object (no markdown, no explanation) with this structur
   "test_framework": "test framework used or none",
   "compliance_answers": {{
     "art5": {{
-      "is_realtime_processing": null,
-      "processing_mode_evidence": "",
-      "prohibited_practices": [
-        {{
-          "practice": "biometric_surveillance",
-          "detected": null,
-          "evidence": "",
-          "evidence_paths": [],
-          "confidence": "low"
-        }},
-        {{
-          "practice": "social_scoring",
-          "detected": null,
-          "evidence": "",
-          "evidence_paths": [],
-          "confidence": "low"
-        }},
-        {{
-          "practice": "subliminal_manipulation",
-          "detected": null,
-          "evidence": "",
-          "evidence_paths": [],
-          "confidence": "low"
-        }},
-        {{
-          "practice": "prohibited_emotion_recognition",
-          "detected": null,
-          "evidence": "",
-          "evidence_paths": [],
-          "confidence": "low"
-        }},
-        {{
-          "practice": "vulnerability_exploitation",
-          "detected": null,
-          "evidence": "",
-          "evidence_paths": [],
-          "confidence": "low"
-        }},
-        {{
-          "practice": "criminal_profiling",
-          "detected": null,
-          "evidence": "",
-          "evidence_paths": [],
-          "confidence": "low"
-        }},
-        {{
-          "practice": "prohibited_real_time_biometrics",
-          "detected": null,
-          "evidence": "",
-          "evidence_paths": [],
-          "confidence": "low"
-        }}
-      ]
+      "has_subliminal_manipulation": null,
+      "subliminal_manipulation_evidence": "",
+      "has_exploitation_of_vulnerabilities": null,
+      "exploitation_of_vulnerabilities_evidence": "",
+      "has_social_scoring": null,
+      "social_scoring_evidence": "",
+      "has_predictive_policing": null,
+      "predictive_policing_evidence": "",
+      "has_facial_recognition_scraping": null,
+      "facial_recognition_scraping_evidence": "",
+      "has_emotion_recognition_workplace": null,
+      "emotion_recognition_workplace_evidence": "",
+      "has_biometric_categorization": null,
+      "biometric_categorization_evidence": "",
+      "has_real_time_biometric_id": null,
+      "real_time_biometric_id_evidence": "",
+      "has_ncii_generation": null,
+      "ncii_generation_evidence": "",
+      "has_csam_generation": null,
+      "csam_generation_evidence": ""
     }},
     "art6": {{
       "annex_iii_categories": [],

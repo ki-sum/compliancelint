@@ -4,6 +4,37 @@ All notable changes to ComplianceLint will be documented in this file.
 
 This project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.2.0] — unreleased
+
+### Added — Regulation (EU) 2026/1744 (Digital Omnibus), Art. 5
+- **ART05-PRO-1ba** (Art. 5(1)(ba), non-consensual intimate material) and **ART05-PRO-1bb**
+  (Art. 5(1)(bb), child sexual abuse material). Both apply from **2026-12-02** (Art. 113, third
+  paragraph, point (a), as amended); before that date their findings are informational
+  `not_applicable` and do not change the Art. 5 result. Answers: `art5.has_ncii_generation`,
+  `art5.has_csam_generation`.
+- Obligations are now verified against the EUR-Lex consolidated text **02024R1689-20260727**.
+
+### Changed
+- Application dates follow Art. 113 as amended (`scanner/data/application_dates.json`):
+  `compliance_summary.applicable_from` (plus `applicable_from_annex_i` for Chapter III
+  Sections 1-3 and `applicable_from_exceptions`), `cl_check_updates` (status computed against
+  today) and `cl_explain` `enforcement_date`.
+- `cl_version` reports the regulation text version(s) the obligations were verified against.
+- EUR-Lex links point at the consolidated text.
+- Obligation count in messages and docs is derived from the data: 246 unique obligations
+  (three IDs are listed in two article files).
+
+### Fixed
+- Art. 5(1)(a)/(b)/(c)/(f)/(h) obligation atoms corrected after a two-model review
+  against the primary text.
+- `cl_action_guide` accepted only 163 of 246 obligation IDs (letter-suffixed IDs such as
+  `ART05-PRO-1a` were rejected); it now also returns the ID in its shipped case and no longer
+  serves superseded atom wording.
+- The validation gate no longer renames fields modules read (Art. 5 `*_evidence` strings,
+  Art. 9/10/12/15/19 legacy aliases) onto other answer fields.
+- The paid strict gate no longer requires answers for obligations that do not apply yet.
+- The wheel now ships `scanner/data/*.json` and `scanner/interpretive-materials/*.json`.
+
 ## [1.1.0] — 2026-04-11 (unreleased)
 
 ### Changed — Role coverage 4 → 5 (2026-04-26)

@@ -22,6 +22,7 @@ from datetime import datetime, timezone
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
+from core.application_dates import applicable_from
 from core.protocol import (
     BaseArticleModule, ScanResult, Explanation, ActionPlan, ActionItem,
     Finding, ComplianceLevel, Confidence, GapType,
@@ -195,7 +196,7 @@ class Art61Module(BaseArticleModule):
                 "to test subjects or their legal representatives. "
                 "Based on: EU AI Act Art. 61."
             ),
-            enforcement_date="2026-08-02",
+            enforcement_date=applicable_from(61),
             waiting_for="CEN-CENELEC harmonized standard for AI real-world testing (expected Q4 2026)",
         )
 

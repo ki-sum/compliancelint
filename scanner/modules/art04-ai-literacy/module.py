@@ -17,6 +17,7 @@ from datetime import datetime, timezone
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
+from core.application_dates import applicable_from
 from core.protocol import (
     BaseArticleModule, ScanResult, Explanation, ActionPlan, ActionItem,
     Finding, ComplianceLevel, Confidence, GapType,
@@ -172,7 +173,7 @@ class Art04Module(BaseArticleModule):
                 "(3) evidence of context-appropriate training. "
                 "Based on: ISO/IEC 42001:2023 Clause 7.2 (Competence), 7.3 (Awareness)."
             ),
-            enforcement_date="2025-02-02",
+            enforcement_date=applicable_from(4),
             waiting_for="CEN-CENELEC harmonized standard for AI literacy (expected Q4 2026)",
         )
 

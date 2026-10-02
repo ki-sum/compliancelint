@@ -22,6 +22,7 @@ from datetime import datetime, timezone
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
+from core.application_dates import applicable_from
 from core.protocol import (
     BaseArticleModule, ScanResult, Explanation, ActionPlan, ActionItem,
     Finding, ComplianceLevel, Confidence, GapType,
@@ -188,7 +189,7 @@ class Art49Module(BaseArticleModule):
                 "(4) public authority deployer use registration if applicable. "
                 "Based on: EU AI Act Art. 49, Annex VIII."
             ),
-            enforcement_date="2026-08-02",
+            enforcement_date=applicable_from(49),
             waiting_for="EU database (Art. 71) operational availability",
         )
 

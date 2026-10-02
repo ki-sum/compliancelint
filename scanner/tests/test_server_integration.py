@@ -1705,24 +1705,19 @@ class TestClScanArticle5:
             assert obl_id in finding_ids, f"{obl_id} not in findings"
 
     def test_full_context_all_practices(self, project_dir):
-        """All practices detected=False -> no non_compliant findings."""
+        """All prohibitions answered not present -> Art. 5 compliant, no non_compliant findings.
+
+        Until 2026-10-02 this fed the legacy prohibited_practices list, which the module never
+        read — every prohibition came out UNABLE_TO_DETERMINE and the assertion held vacuously.
+        """
         ctx = ProjectContext.from_json(json.dumps({
-            "art5": {
-                "prohibited_practices": [
-                    {"practice": "subliminal_manipulation", "detected": False, "evidence": "none", "confidence": "high"},
-                    {"practice": "vulnerability_exploitation", "detected": False, "evidence": "none", "confidence": "high"},
-                    {"practice": "social_scoring", "detected": False, "evidence": "none", "confidence": "high"},
-                    {"practice": "criminal_profiling", "detected": False, "evidence": "none", "confidence": "high"},
-                    {"practice": "biometric_surveillance", "detected": False, "evidence": "none", "confidence": "high"},
-                    {"practice": "prohibited_emotion_recognition", "detected": False, "evidence": "none", "confidence": "high"},
-                    {"practice": "prohibited_real_time_biometrics", "detected": False, "evidence": "none", "confidence": "high"},
-                ]
-            }
+            "art5": {"has_subliminal_manipulation": False, "has_exploitation_of_vulnerabilities": False, "has_social_scoring": False, "has_predictive_policing": False, "has_facial_recognition_scraping": False, "has_emotion_recognition_workplace": False, "has_biometric_categorization": False, "has_real_time_biometric_id": False, "has_ncii_generation": False, "has_csam_generation": False}
         }))
         result_json = _scan_single_article(5, project_dir, context=ctx)
         result = json.loads(result_json)
         non_compliant = [f for f in result.get("findings", []) if f["level"] == "non_compliant"]
         assert len(non_compliant) == 0, f"Expected 0 non_compliant, got {len(non_compliant)}"
+        assert result["overall_level"] == "compliant"
 
 
 class TestClScanArticle6:

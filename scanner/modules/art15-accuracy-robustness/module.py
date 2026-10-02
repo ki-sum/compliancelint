@@ -20,6 +20,7 @@ from datetime import datetime, timezone
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
+from core.application_dates import applicable_from
 from core.protocol import (
     BaseArticleModule, ScanResult, Explanation, ActionPlan, ActionItem,
     Finding, ComplianceLevel, Confidence, GapType,
@@ -247,7 +248,7 @@ class Art15Module(BaseArticleModule):
                 "(4) cybersecurity measures, (5) AI-specific attack mitigation. "
                 "Based on: ISO/IEC 42001:2023, NIST AI RMF."
             ),
-            enforcement_date="2026-08-02",
+            enforcement_date=applicable_from(15),
             waiting_for="CEN-CENELEC harmonized standard (expected Q4 2026)",
         )
 

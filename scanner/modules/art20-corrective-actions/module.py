@@ -20,6 +20,7 @@ from datetime import datetime, timezone
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
+from core.application_dates import applicable_from
 from core.protocol import (
     BaseArticleModule, ScanResult, Explanation, ActionPlan, ActionItem,
     Finding, ComplianceLevel, Confidence, GapType,
@@ -227,7 +228,7 @@ class Art20Module(BaseArticleModule):
                 "notification protocol. "
                 "Based on: ISO/IEC 42001:2023 (corrective action controls)."
             ),
-            enforcement_date="2026-08-02",
+            enforcement_date=applicable_from(20),
             waiting_for="CEN-CENELEC harmonized standard for AI corrective actions (expected Q4 2026)",
         )
 

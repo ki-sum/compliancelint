@@ -22,8 +22,16 @@
         "has_ai_literacy_measures": null
       },
       "art5": {
-        "is_realtime_processing": false,
-        "processing_mode_evidence": "Batch recommendation generation"
+        "has_subliminal_manipulation": false,
+        "has_exploitation_of_vulnerabilities": false,
+        "has_social_scoring": false,
+        "has_predictive_policing": false,
+        "has_facial_recognition_scraping": false,
+        "has_emotion_recognition_workplace": false,
+        "has_biometric_categorization": false,
+        "has_real_time_biometric_id": false,
+        "has_ncii_generation": false,
+        "has_csam_generation": false
       },
       "art6": {
         "annex_iii_categories": [],

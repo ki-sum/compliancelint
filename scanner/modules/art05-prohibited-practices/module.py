@@ -19,40 +19,13 @@ from datetime import date, datetime, timezone
 # Add core to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
+from core.application_dates import applicable_from, article as application_dates_for
 from core.protocol import (
     BaseArticleModule, ScanResult, Explanation, ActionPlan, ActionItem,
     Finding, ComplianceLevel, Confidence, GapType,
 )
 from core.obligation_engine import ObligationEngine
 
-
-# ── Practice → obligation mapping ──
-
-# Maps practice name (from AI answer) to prohibition ID(s).
-# biometric_surveillance covers two prohibitions: PRO-1e (scraping) and PRO-1g (categorization).
-_PRACTICE_TO_OBLIGATIONS: dict[str, list[str]] = {
-    "subliminal_manipulation":          ["ART05-PRO-1a"],
-    "vulnerability_exploitation":       ["ART05-PRO-1b"],
-    "social_scoring":                   ["ART05-PRO-1c"],
-    "criminal_profiling":               ["ART05-PRO-1d"],
-    "biometric_surveillance":           ["ART05-PRO-1e", "ART05-PRO-1g"],
-    "prohibited_emotion_recognition":   ["ART05-PRO-1f"],
-    "prohibited_real_time_biometrics":  ["ART05-PRO-1h"],
-}
-
-# Human-readable labels for each practice (used in descriptions)
-_PRACTICE_LABELS: dict[str, str] = {
-    "subliminal_manipulation":         "subliminal / manipulative techniques (Art. 5(1)(a))",
-    "vulnerability_exploitation":      "exploitation of age, disability, or socioeconomic vulnerability (Art. 5(1)(b))",
-    "social_scoring":                  "social scoring (Art. 5(1)(c))",
-    "criminal_profiling":              "criminal risk assessment from profiling/personality traits alone (Art. 5(1)(d))",
-    "biometric_surveillance":          "biometric surveillance — facial scraping (Art. 5(1)(e)) / categorization (Art. 5(1)(g))",
-    "prohibited_emotion_recognition":  "prohibited emotion recognition in workplace/education (Art. 5(1)(f))",
-    "prohibited_real_time_biometrics": "real-time remote biometric identification in public spaces (Art. 5(1)(h))",
-}
-
-# All expected practices; used to generate UNABLE_TO_DETERMINE findings when AI provides none
-_EXPECTED_PRACTICES = list(_PRACTICE_TO_OBLIGATIONS.keys())
 
 # compliance_answers field → obligation mapping (same structure as Art.12's pattern).
 # Every field listed here MUST also be in core/context.py _BOOL_FIELDS["art5"],
@@ -72,9 +45,13 @@ _PROHIBITION_FIELDS = [
     # intended purpose, OR a reasonably foreseeable and reproducible outcome while the
     # system lacks either reliable prevention safeguards or misuse correction, OR a
     # deployer uses the system for that purpose.
-    ("has_ncii_generation",              "ART05-PRO-1ba", "non-consensual intimate imagery of identifiable persons (Art. 5(1)(ba))"),
+    ("has_ncii_generation",              "ART05-PRO-1ba", "non-consensual intimate material of identifiable persons (Art. 5(1)(ba))"),
     ("has_csam_generation",              "ART05-PRO-1bb", "child sexual abuse material within Directive 2011/93/EU Art. 2(c)/(e) (Art. 5(1)(bb))"),
 ]
+
+
+# Points (ba)/(bb) and paragraphs (1a)/(1b) — Art. 113, third paragraph, point (a), as amended.
+ART5_BA_BB_FROM = next(e["applicable_from"] for e in application_dates_for(5)["exceptions"])
 
 
 def _today() -> date:
@@ -149,10 +126,13 @@ class Art05Module(BaseArticleModule):
         #   not True = False → false path (NON_COMPLIANT)
         #   not None = kept as None → UTD path
 
+        practices = []
         for field_name, obl_id, label in _PROHIBITION_FIELDS:
             detected = answers.get(field_name)  # True | False | None
             evidence_field = answers.get(field_name.replace("has_", "") + "_evidence", "")
             evidence_list = [evidence_field] if evidence_field else []
+            practices.append({"obligation_id": obl_id, "label": label, "detected": detected,
+                              "evidence": evidence_field if isinstance(evidence_field, str) else ""})
 
             # Invert for _finding_from_answer: not-detected = compliant
             inverted = None if detected is None else (not detected)
@@ -181,6 +161,8 @@ class Art05Module(BaseArticleModule):
                 "practice found (COMPLIANT). detected=true means a signal was found "
                 "(NON_COMPLIANT — requires legal review). A clean scan does NOT guarantee compliance."
             ),
+            # Read by action_plan(): one entry per prohibition, with the AI's answer and evidence.
+            "practices": practices,
         }
 
         # ── Obligation Engine: enrich findings + identify gaps ──
@@ -192,18 +174,20 @@ class Art05Module(BaseArticleModule):
             # 2026-12-02) become informational NOT_APPLICABLE. Done after
             # enrich_finding(), which rebuilds Finding without is_informational.
             today = _today()
-            applicable_from = {
+            starts_on = {
                 o["id"]: o["applicable_from"]
                 for o in obligations.get("obligations", [])
                 if o.get("applicable_from")
             }
+            pending = {
+                oid: starts for oid, starts in starts_on.items()
+                if today < date.fromisoformat(starts)
+            }
             findings = [
-                _not_yet_applicable(f, applicable_from[f.obligation_id])
-                if f.obligation_id in applicable_from
-                and today < date.fromisoformat(applicable_from[f.obligation_id])
-                else f
+                _not_yet_applicable(f, pending[f.obligation_id]) if f.obligation_id in pending else f
                 for f in findings
             ]
+            details["not_yet_applicable"] = pending
             gap_findings = engine.gap_findings(findings, ctx.compliance_answers if ctx else None)
             findings.extend(gap_findings)
             details["obligation_coverage"] = {
@@ -258,23 +242,32 @@ class Art05Module(BaseArticleModule):
                 "law enforcement (except in three narrowly defined situations with "
                 "prior authorisation by a judicial or binding independent administrative "
                 "authority). Regulation (EU) 2026/1744 adds, from 2026-12-02: "
-                "(ba) AI generating or manipulating realistic intimate or sexually "
-                "explicit material of identifiable persons without their explicit "
-                "consent; (bb) AI generating or manipulating child sexual abuse material "
-                "within Directive 2011/93/EU. Under Art. 5(1a) these apply where that "
-                "output is the intended purpose, or a reasonably foreseeable and "
-                "reproducible outcome of a system lacking adequate prevention and "
-                "misuse-correction safeguards, or where a deployer uses the system for it."
+                "(ba) AI systems generating or manipulating realistic intimate or "
+                "sexually explicit material of identifiable persons without their "
+                "freely-given, specific, informed, unambiguous and explicit consent, "
+                "subject to the provider/deployer conditions in Art. 5(1a) and the "
+                "manipulation rule in Art. 5(1b); (bb) AI systems generating or "
+                "manipulating material or performance within Article 2, points (c) "
+                "and (e), of Directive 2011/93/EU, subject to Art. 5(1a), unless a "
+                "'without right' defence applies under national law."
             ),
             related_articles={
                 "Art. 6": "Classification of high-risk AI systems (systems not banned by Art. 5 may still be high-risk)",
-                "Art. 99(3)": "Penalties: fines up to EUR 35 million or 7% of global annual turnover for Art. 5 violations",
+                "Art. 99(3)": (
+                    "Penalties for non-compliance with Art. 5: up to EUR 35 000 000 or, if the offender is an "
+                    "undertaking, up to 7 % of its total worldwide annual turnover for the preceding financial "
+                    "year, whichever is higher; for SMEs, including start-ups, Art. 99(6) applies the lower cap"
+                ),
                 "Annex II": "List of criminal offences for which Art. 5(1)(h) exception may apply",
                 "Art. 5(2)-(7)": "Detailed conditions for the law enforcement biometric ID exception",
                 "Recital 29": "Legislative intent: manipulation through subliminal techniques",
                 "Recital 31": "Legislative intent: social scoring prohibition scope",
                 "Recital 33": "Legislative intent: emotion recognition restrictions",
                 "Recital 44": "Legislative intent: biometric categorization restrictions",
+                "Reg (EU) 2026/1744 Recitals 10-16": (
+                    "Legislative intent for points (ba) and (bb): scope, safeguards, consent, "
+                    "excluded cases (Recital 12) and the 'without right' defence (Recital 13)"
+                ),
             },
             recital=(
                 "Recitals 29-44 provide the legislative intent behind Art. 5 prohibitions. "
@@ -306,7 +299,7 @@ class Art05Module(BaseArticleModule):
                 ],
             },
             compliance_checklist_summary=(
-                "ComplianceLint Compliance Checklist v0.1 for Art. 5 restates the prohibitions as "
+                "ComplianceLint Compliance Checklist v0.2 for Art. 5 restates the prohibitions as "
                 "checkable requirements. Since Art. 5 prohibitions are clear and absolute "
                 "(unlike Art. 12's 'appropriate measures'), the standard primarily: "
                 "(1) enumerates each prohibited practice with its exact legal scope; "
@@ -315,7 +308,7 @@ class Art05Module(BaseArticleModule):
                 "(4) mandates human legal review for all flagged items. "
                 "A clean automated scan is NECESSARY but NOT SUFFICIENT for compliance."
             ),
-            enforcement_date="2025-02-02",
+            enforcement_date=applicable_from(5),
             waiting_for=(
                 "Art. 5 prohibitions took effect 2025-02-02 (6 months after entry into force); "
                 "points (ba) and (bb), added by Regulation (EU) 2026/1744, apply from 2026-12-02. "
@@ -337,45 +330,63 @@ class Art05Module(BaseArticleModule):
             ActionPlan with prioritized actions for each flagged practice.
         """
         actions: list[ActionItem] = []
-        details = scan_result.details
-        detected_practices = details.get("detected_practices", [])
+        details = scan_result.details or {}
+        levels = {f.obligation_id: f.level for f in scan_result.findings}
+        pending = details.get("not_yet_applicable", {})
+        penalty = (
+            "For infringements subject to Art. 99, non-compliance with Art. 5 is subject to an "
+            "administrative fine of up to EUR 35 000 000 or, if the offender is an undertaking, up to "
+            "7 % of its total worldwide annual turnover for the preceding financial year, whichever is "
+            "higher (Art. 99(3)); for SMEs, including start-ups, Art. 99(6) applies the lower cap."
+        )
 
-        # Generate actions for each detected practice
-        for entry in detected_practices:
-            practice_name = entry.get("practice", "")
-            label = entry.get("label", practice_name)
-            evidence = entry.get("evidence", "")
-            evidence_paths = entry.get("evidence_paths", [])
+        for p in details.get("practices", []):
+            oid, label, detected = p["obligation_id"], p["label"], p["detected"]
+            evidence = f"AI evidence: {p['evidence']}. " if p.get("evidence") else ""
+            if oid in pending:
+                if detected is not False:
+                    actions.append(ActionItem(
+                        priority="HIGH",
+                        article=f"Art. 5 ({oid})",
+                        action=(f"Prepare before {pending[oid]}: "
+                                + ("AI detected patterns consistent with " if detected else
+                                   "AI could not determine whether the system involves ")
+                                + label),
+                        details=(f"{evidence}This prohibition applies from {pending[oid]}. "
+                                 "Review the system against it before that date. " + penalty),
+                        effort="2-4 hours legal review",
+                        action_type="human_judgment_required",
+                    ))
+                continue
+            if levels.get(oid) == ComplianceLevel.NON_COMPLIANT:
+                actions.append(ActionItem(
+                    priority="CRITICAL",
+                    article=f"Art. 5 ({oid})",
+                    action=f"LEGAL REVIEW REQUIRED: AI detected patterns consistent with {label}",
+                    details=(f"{evidence}Code presence alone does not establish a violation; "
+                             "the statutory conditions must be assessed. " + penalty),
+                    effort="Depends on scope — minimum 2-4 hours legal review per flagged practice",
+                    action_type="human_judgment_required",
+                ))
+            elif levels.get(oid) == ComplianceLevel.UNABLE_TO_DETERMINE:
+                actions.append(ActionItem(
+                    priority="HIGH",
+                    article=f"Art. 5 ({oid})",
+                    action=f"Determine whether the system involves {label}",
+                    details=(f"{evidence}The AI could not determine this from the code. "
+                             "Review the system's purpose and deployment context with legal counsel."),
+                    effort="1-2 hours",
+                    action_type="human_judgment_required",
+                ))
 
-            obl_ids = _PRACTICE_TO_OBLIGATIONS.get(practice_name, [])
-            obl_refs = ", ".join(obl_ids)
-
-            files_str = "; ".join(evidence_paths[:5])
-            if len(evidence_paths) > 5:
-                files_str += f" (and {len(evidence_paths) - 5} more)"
-
-            actions.append(ActionItem(
-                priority="CRITICAL",
-                article=f"Art. 5 ({obl_refs})",
-                action=f"LEGAL REVIEW REQUIRED: AI detected potential {label}",
-                details=(
-                    f"AI evidence: {evidence or 'see evidence_paths'}. "
-                    f"Files: {files_str or 'see scan findings'}. "
-                    f"Prohibition: {label}. "
-                    "Penalty for violation: up to EUR 35M or 7% global turnover (Art. 99(3))."
-                ),
-                effort="Depends on scope — minimum 2-4 hours legal review per flagged practice",
-                action_type="human_judgment_required",
-            ))
-
-        # If no practices detected, still recommend proactive review
-        if not detected_practices:
+        # Nothing flagged: still recommend a proactive human review
+        if not actions:
             actions.append(ActionItem(
                 priority="MEDIUM",
                 article="Art. 5 (all)",
                 action="Conduct proactive Art. 5 compliance review",
                 details=(
-                    "No prohibited practice signals detected by AI. "
+                    "No prohibited practice was detected on the answers given. "
                     "However, AI scanning cannot detect all prohibited practices "
                     "(e.g., deployment context, intent, effect on users). "
                     "Conduct a human review of the system's purpose and deployment "
@@ -408,9 +419,10 @@ class Art05Module(BaseArticleModule):
             project_path=scan_result.project_path,
             actions=actions,
             disclaimer=(
-                "Art. 5 prohibitions are in force since 2025-02-02. Violations carry "
-                "the HIGHEST penalties under the EU AI Act (up to EUR 35M or 7% of "
-                "global annual turnover). This action plan is based on AI-detected signals "
+                f"Art. 5 applies from {applicable_from(5)}; points (ba) and (bb) apply from "
+                f"{ART5_BA_BB_FROM}. Violations carry "
+                "the highest fines under the EU AI Act (Art. 99(3); for SMEs, including "
+                "start-ups, Art. 99(6) applies the lower cap). This action plan is based on AI-detected signals "
                 "and CANNOT replace legal counsel. All flagged items require "
                 "review by a qualified legal professional."
             ),

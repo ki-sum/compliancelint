@@ -25,6 +25,8 @@ import json
 import os
 from typing import Final, Literal
 
+from core.obligation_lookup import article_count, unique_obligation_count
+
 TierStatus = Literal[
     "unconnected", "free", "starter", "pro", "business", "enterprise"
 ]
@@ -45,7 +47,7 @@ PLANS_URL: Final[str] = "https://compliancelint.dev/dashboard/plans"
 TOOL_HINTS: Final[dict[str, dict]] = {
     "cl_scan_all": {
         "free_message": (
-            "You're seeing all 247 obligations across 44 articles. "
+            f"You're seeing all {unique_obligation_count()} obligations across {article_count()} articles. "
             "Connect to Starter+ to narrow scope to your specific AI "
             "system (saves ~70% review time) and unlock per-obligation "
             "questionnaires that prevent AI hallucination."

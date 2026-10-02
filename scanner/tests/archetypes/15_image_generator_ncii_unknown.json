@@ -1,0 +1,38 @@
+{
+  "name": "15_image_generator_ncii_unknown.json",
+  "description": "General image generator; the AI could not tell whether intimate images of real people are a reproducible outcome or whether safeguards exist.",
+  "today": "2027-01-01",
+  "project_context": {
+    "primary_language": "Python",
+    "risk_classification": "limited-risk",
+    "risk_classification_confidence": "medium",
+    "compliance_answers": {
+      "_scope": {
+        "is_ai_system": true,
+        "territorial_scope_applies": true,
+        "risk_classification": "limited-risk"
+      },
+      "art5": {
+        "has_subliminal_manipulation": false,
+        "has_exploitation_of_vulnerabilities": false,
+        "has_social_scoring": false,
+        "has_predictive_policing": false,
+        "has_facial_recognition_scraping": false,
+        "has_emotion_recognition_workplace": false,
+        "has_biometric_categorization": false,
+        "has_real_time_biometric_id": false,
+        "has_ncii_generation": null,
+        "has_csam_generation": false
+      }
+    }
+  },
+  "expected": {
+    "art5": {
+      "overall": "unable_to_determine",
+      "must_have_obligations": [
+        "ART05-PRO-1ba"
+      ],
+      "legal_basis": "Art. 5(1)(ba) with Art. 5(1a)(a)(ii): whether the output is reasonably foreseeable and reproducible and whether prevention and correction safeguards exist needs human judgement"
+    }
+  }
+}

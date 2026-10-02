@@ -32,6 +32,7 @@ from datetime import datetime, timezone
 # Add core to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
+from core.application_dates import applicable_from
 from core.protocol import (
     BaseArticleModule, ScanResult, Explanation, ActionPlan, ActionItem,
     Finding, ComplianceLevel, Confidence, GapType,
@@ -432,7 +433,7 @@ class Art54Module(BaseArticleModule):
                 "(3) open-source exception assessment. Note: mandate validity, representative "
                 "establishment status, and procedural obligations always require human judgment."
             ),
-            enforcement_date="2025-08-02",
+            enforcement_date=applicable_from(54),
             waiting_for="CEN-CENELEC harmonized standard for GPAI (expected 2027)",
         )
 

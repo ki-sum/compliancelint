@@ -35,7 +35,6 @@ def test_template_shaped_answers_reach_compliant(art05_module, tmp_path):
     answers = dict(_build_answers_template()["art5"])
     for field in _module_fields(art05_module):
         answers[field] = False
-    answers["is_realtime_processing"] = False
     BaseArticleModule.set_context(_ctx_with("art5", answers))
     result = art05_module.scan(str(tmp_path))
     assert result.overall_level == ComplianceLevel.COMPLIANT

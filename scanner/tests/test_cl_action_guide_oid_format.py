@@ -43,6 +43,18 @@ def test_letter_suffixed_ids_accepted(oid):
     assert _INVALID not in _action_guide(oid)
 
 
+@pytest.mark.parametrize("oid,canonical", [
+    ("art05-pro-1ba", "ART05-PRO-1ba"),
+    ("ART05-PRO-1BB", "ART05-PRO-1bb"),
+    ("art09-obl-2a", "ART09-OBL-2a"),
+    ("art26-obl-2", "ART26-OBL-2"),
+])
+def test_known_id_echoed_in_canonical_case(oid, canonical):
+    """Self-audit A15: the response must carry the ID as shipped, not upper-cased."""
+    body = json.JSONDecoder().raw_decode(_action_guide(oid))[0]
+    assert body["obligation_id"] == canonical
+
+
 @pytest.mark.parametrize("oid", ["", "ART5", "ART05-PRO-", "ART05-PRO-1abc", "FOO-BAR-1", "ART05-PRO-1a; DROP"])
 def test_malformed_ids_still_rejected(oid):
     assert _INVALID in _action_guide(oid)

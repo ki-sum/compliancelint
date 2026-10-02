@@ -65,7 +65,7 @@ def minimal_ai_context():
         compliance_answers={
             "art4": {"has_ai_literacy_measures": None, "literacy_description": "", "literacy_evidence": []},
             "art8": {"has_section_2_compliance": None, "section_2_evidence": [], "is_annex_i_product": None, "has_annex_i_compliance": None},
-            "art5": {"prohibited_practices": [], "is_realtime_processing": None, "processing_mode_evidence": ""},
+            "art5": {"has_subliminal_manipulation": None, "has_exploitation_of_vulnerabilities": None, "has_social_scoring": None, "has_predictive_policing": None, "has_facial_recognition_scraping": None, "has_emotion_recognition_workplace": None, "has_biometric_categorization": None, "has_real_time_biometric_id": None, "has_ncii_generation": None, "has_csam_generation": None},
             "art6": {"annex_iii_categories": [], "annex_i_product_type": None, "is_high_risk": None, "reasoning": ""},
             "art9": {"has_risk_docs": None, "risk_doc_paths": [], "has_testing_infrastructure": None, "testing_evidence": [], "has_risk_code_patterns": None, "risk_code_evidence": [], "has_defined_metrics": None, "metrics_evidence": [], "affects_children": None},
             "art10": {"has_data_governance_doc": None, "data_doc_paths": [], "has_bias_mitigation": None, "bias_evidence": [], "has_data_lineage": None, "processes_special_category_data": None},
@@ -141,7 +141,7 @@ def _ctx_with(article_key: str, answers: dict):
     base_answers = {
         "art4": {"has_ai_literacy_measures": None, "literacy_description": "", "literacy_evidence": []},
         "art8": {"has_section_2_compliance": None, "section_2_evidence": [], "is_annex_i_product": None, "has_annex_i_compliance": None},
-        "art5": {"prohibited_practices": [], "is_realtime_processing": None, "processing_mode_evidence": ""},
+        "art5": {"has_subliminal_manipulation": None, "has_exploitation_of_vulnerabilities": None, "has_social_scoring": None, "has_predictive_policing": None, "has_facial_recognition_scraping": None, "has_emotion_recognition_workplace": None, "has_biometric_categorization": None, "has_real_time_biometric_id": None, "has_ncii_generation": None, "has_csam_generation": None},
         "art6": {"annex_iii_categories": [], "annex_i_product_type": None, "is_high_risk": None, "reasoning": ""},
         "art9": {"has_risk_docs": None, "risk_doc_paths": [], "has_testing_infrastructure": None, "testing_evidence": [], "has_risk_code_patterns": None, "risk_code_evidence": [], "has_defined_metrics": None, "metrics_evidence": [], "affects_children": None},
         "art10": {"has_data_governance_doc": None, "data_doc_paths": [], "has_bias_mitigation": None, "bias_evidence": [], "has_data_lineage": None, "processes_special_category_data": None},

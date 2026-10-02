@@ -20,6 +20,7 @@ from datetime import datetime, timezone
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
+from core.application_dates import applicable_from
 from core.protocol import (
     BaseArticleModule, ScanResult, Explanation, ActionPlan, ActionItem,
     Finding, ComplianceLevel, Confidence, GapType,
@@ -159,7 +160,7 @@ class Art82Module(BaseArticleModule):
                 "respect of all affected AI systems on the Union market within the timeline "
                 "prescribed by the market surveillance authority."
             ),
-            enforcement_date="2026-08-02",
+            enforcement_date=applicable_from(82),
             waiting_for="CEN-CENELEC harmonized standard (expected Q4 2026)",
         )
 

@@ -1,0 +1,688 @@
+{
+  "schema": "cl-application-dates-v1",
+  "regulation_text_version": "02024R1689-20260727",
+  "eur_lex_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:02024R1689-20260727",
+  "source": "Art. 113 of Regulation (EU) 2024/1689 as amended by Regulation (EU) 2026/1744",
+  "milestones": [
+    {
+      "date": "2025-02-02",
+      "event": "Chapters I and II apply, except Art. 5(1), first subparagraph, points (ba) and (bb), and Art. 5(1a) and (1b), which apply from 2026-12-02",
+      "basis": "Art. 113, third paragraph, point (a)"
+    },
+    {
+      "date": "2025-08-02",
+      "event": "Chapter III Section 4, Chapters V, VII and XII and Art. 78 apply (except Art. 101)",
+      "basis": "Art. 113, third paragraph, point (b)"
+    },
+    {
+      "date": "2026-07-27",
+      "event": "Articles 102 to 110 apply",
+      "basis": "Art. 113, third paragraph, point (d)"
+    },
+    {
+      "date": "2026-08-02",
+      "event": "General application date: all provisions not listed under another date apply",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    {
+      "date": "2026-12-02",
+      "event": "Art. 5(1), first subparagraph, points (ba) and (bb) and Art. 5(1a) and (1b) apply",
+      "basis": "Art. 113, third paragraph, point (a)"
+    },
+    {
+      "date": "2026-12-02",
+      "event": "Providers of AI systems generating synthetic audio, image, video or text content placed on the market before 2 August 2026 must comply with Art. 50(2)",
+      "basis": "Art. 111(4)"
+    },
+    {
+      "date": "2027-08-02",
+      "event": "Providers of general-purpose AI models placed on the market before 2 August 2025 must comply",
+      "basis": "Art. 111(3)"
+    },
+    {
+      "date": "2027-12-02",
+      "event": "Chapter III Sections 1-3 (except Art. 6(5)) apply to Annex III high-risk AI systems",
+      "basis": "Art. 113, third paragraph, point (c)(i)"
+    },
+    {
+      "date": "2028-08-02",
+      "event": "Chapter III Sections 1-3 (except Art. 6(5)) apply to Annex I high-risk AI systems",
+      "basis": "Art. 113, third paragraph, point (c)(ii)"
+    },
+    {
+      "date": "2030-08-02",
+      "event": "Providers and deployers of high-risk AI systems intended to be used by public authorities must comply",
+      "basis": "Art. 111(2)"
+    },
+    {
+      "date": "2030-12-31",
+      "event": "AI systems that are components of the large-scale IT systems listed in Annex X, placed on the market or put into service before 2 August 2027, must comply",
+      "basis": "Art. 111(1)"
+    }
+  ],
+  "articles": {
+    "1": {
+      "chapter": "CHAPTER I",
+      "applicable_from": "2025-02-02",
+      "basis": "Art. 113, third paragraph, point (a)"
+    },
+    "2": {
+      "chapter": "CHAPTER I",
+      "applicable_from": "2025-02-02",
+      "basis": "Art. 113, third paragraph, point (a)"
+    },
+    "3": {
+      "chapter": "CHAPTER I",
+      "applicable_from": "2025-02-02",
+      "basis": "Art. 113, third paragraph, point (a)"
+    },
+    "4": {
+      "chapter": "CHAPTER I",
+      "applicable_from": "2025-02-02",
+      "basis": "Art. 113, third paragraph, point (a)"
+    },
+    "5": {
+      "chapter": "CHAPTER II",
+      "applicable_from": "2025-02-02",
+      "basis": "Art. 113, third paragraph, point (a)",
+      "exceptions": [
+        {
+          "provisions": "Art. 5(1), first subparagraph, points (ba) and (bb); Art. 5(1a) and (1b)",
+          "applicable_from": "2026-12-02",
+          "basis": "Art. 113, third paragraph, point (a)"
+        }
+      ]
+    },
+    "6": {
+      "chapter": "CHAPTER III SECTION 1",
+      "applicable_from": "2027-12-02",
+      "applicable_from_annex_i": "2028-08-02",
+      "basis": "Art. 113, third paragraph, point (c): Chapter III Sections 1-3 apply from 2027-12-02 to AI systems classified as high-risk pursuant to Art. 6(2) and Annex III (point (c)(i)) and from 2028-08-02 to those classified pursuant to Art. 6(1) and Annex I (point (c)(ii))",
+      "scope_note": "The 2027-12-02 / 2028-08-02 dates state when those sections apply by Art. 113; for Annex I systems, substantive applicability remains subject to Art. 2(2) (Section B: only Art. 6(1), Art. 60a and Arts. 102-112 apply, with Arts. 57-59 only insofar as the high-risk requirements have been integrated into the relevant harmonisation legislation) and Art. 2(13) (possible limitations for specified Section A requirements/obligations).",
+      "exceptions": [
+        {
+          "provisions": "Art. 6(5)",
+          "applicable_from": "2026-08-02",
+          "basis": "Art. 113, third paragraph, point (c) excludes Art. 6(5); general application date applies"
+        }
+      ]
+    },
+    "7": {
+      "chapter": "CHAPTER III SECTION 1",
+      "applicable_from": "2027-12-02",
+      "applicable_from_annex_i": "2028-08-02",
+      "basis": "Art. 113, third paragraph, point (c): Chapter III Sections 1-3 apply from 2027-12-02 to AI systems classified as high-risk pursuant to Art. 6(2) and Annex III (point (c)(i)) and from 2028-08-02 to those classified pursuant to Art. 6(1) and Annex I (point (c)(ii))",
+      "scope_note": "The 2027-12-02 / 2028-08-02 dates state when those sections apply by Art. 113; for Annex I systems, substantive applicability remains subject to Art. 2(2) (Section B: only Art. 6(1), Art. 60a and Arts. 102-112 apply, with Arts. 57-59 only insofar as the high-risk requirements have been integrated into the relevant harmonisation legislation) and Art. 2(13) (possible limitations for specified Section A requirements/obligations)."
+    },
+    "8": {
+      "chapter": "CHAPTER III SECTION 2",
+      "applicable_from": "2027-12-02",
+      "applicable_from_annex_i": "2028-08-02",
+      "basis": "Art. 113, third paragraph, point (c): Chapter III Sections 1-3 apply from 2027-12-02 to AI systems classified as high-risk pursuant to Art. 6(2) and Annex III (point (c)(i)) and from 2028-08-02 to those classified pursuant to Art. 6(1) and Annex I (point (c)(ii))",
+      "scope_note": "The 2027-12-02 / 2028-08-02 dates state when those sections apply by Art. 113; for Annex I systems, substantive applicability remains subject to Art. 2(2) (Section B: only Art. 6(1), Art. 60a and Arts. 102-112 apply, with Arts. 57-59 only insofar as the high-risk requirements have been integrated into the relevant harmonisation legislation) and Art. 2(13) (possible limitations for specified Section A requirements/obligations)."
+    },
+    "9": {
+      "chapter": "CHAPTER III SECTION 2",
+      "applicable_from": "2027-12-02",
+      "applicable_from_annex_i": "2028-08-02",
+      "basis": "Art. 113, third paragraph, point (c): Chapter III Sections 1-3 apply from 2027-12-02 to AI systems classified as high-risk pursuant to Art. 6(2) and Annex III (point (c)(i)) and from 2028-08-02 to those classified pursuant to Art. 6(1) and Annex I (point (c)(ii))",
+      "scope_note": "The 2027-12-02 / 2028-08-02 dates state when those sections apply by Art. 113; for Annex I systems, substantive applicability remains subject to Art. 2(2) (Section B: only Art. 6(1), Art. 60a and Arts. 102-112 apply, with Arts. 57-59 only insofar as the high-risk requirements have been integrated into the relevant harmonisation legislation) and Art. 2(13) (possible limitations for specified Section A requirements/obligations)."
+    },
+    "10": {
+      "chapter": "CHAPTER III SECTION 2",
+      "applicable_from": "2027-12-02",
+      "applicable_from_annex_i": "2028-08-02",
+      "basis": "Art. 113, third paragraph, point (c): Chapter III Sections 1-3 apply from 2027-12-02 to AI systems classified as high-risk pursuant to Art. 6(2) and Annex III (point (c)(i)) and from 2028-08-02 to those classified pursuant to Art. 6(1) and Annex I (point (c)(ii))",
+      "scope_note": "The 2027-12-02 / 2028-08-02 dates state when those sections apply by Art. 113; for Annex I systems, substantive applicability remains subject to Art. 2(2) (Section B: only Art. 6(1), Art. 60a and Arts. 102-112 apply, with Arts. 57-59 only insofar as the high-risk requirements have been integrated into the relevant harmonisation legislation) and Art. 2(13) (possible limitations for specified Section A requirements/obligations)."
+    },
+    "11": {
+      "chapter": "CHAPTER III SECTION 2",
+      "applicable_from": "2027-12-02",
+      "applicable_from_annex_i": "2028-08-02",
+      "basis": "Art. 113, third paragraph, point (c): Chapter III Sections 1-3 apply from 2027-12-02 to AI systems classified as high-risk pursuant to Art. 6(2) and Annex III (point (c)(i)) and from 2028-08-02 to those classified pursuant to Art. 6(1) and Annex I (point (c)(ii))",
+      "scope_note": "The 2027-12-02 / 2028-08-02 dates state when those sections apply by Art. 113; for Annex I systems, substantive applicability remains subject to Art. 2(2) (Section B: only Art. 6(1), Art. 60a and Arts. 102-112 apply, with Arts. 57-59 only insofar as the high-risk requirements have been integrated into the relevant harmonisation legislation) and Art. 2(13) (possible limitations for specified Section A requirements/obligations)."
+    },
+    "12": {
+      "chapter": "CHAPTER III SECTION 2",
+      "applicable_from": "2027-12-02",
+      "applicable_from_annex_i": "2028-08-02",
+      "basis": "Art. 113, third paragraph, point (c): Chapter III Sections 1-3 apply from 2027-12-02 to AI systems classified as high-risk pursuant to Art. 6(2) and Annex III (point (c)(i)) and from 2028-08-02 to those classified pursuant to Art. 6(1) and Annex I (point (c)(ii))",
+      "scope_note": "The 2027-12-02 / 2028-08-02 dates state when those sections apply by Art. 113; for Annex I systems, substantive applicability remains subject to Art. 2(2) (Section B: only Art. 6(1), Art. 60a and Arts. 102-112 apply, with Arts. 57-59 only insofar as the high-risk requirements have been integrated into the relevant harmonisation legislation) and Art. 2(13) (possible limitations for specified Section A requirements/obligations)."
+    },
+    "13": {
+      "chapter": "CHAPTER III SECTION 2",
+      "applicable_from": "2027-12-02",
+      "applicable_from_annex_i": "2028-08-02",
+      "basis": "Art. 113, third paragraph, point (c): Chapter III Sections 1-3 apply from 2027-12-02 to AI systems classified as high-risk pursuant to Art. 6(2) and Annex III (point (c)(i)) and from 2028-08-02 to those classified pursuant to Art. 6(1) and Annex I (point (c)(ii))",
+      "scope_note": "The 2027-12-02 / 2028-08-02 dates state when those sections apply by Art. 113; for Annex I systems, substantive applicability remains subject to Art. 2(2) (Section B: only Art. 6(1), Art. 60a and Arts. 102-112 apply, with Arts. 57-59 only insofar as the high-risk requirements have been integrated into the relevant harmonisation legislation) and Art. 2(13) (possible limitations for specified Section A requirements/obligations)."
+    },
+    "14": {
+      "chapter": "CHAPTER III SECTION 2",
+      "applicable_from": "2027-12-02",
+      "applicable_from_annex_i": "2028-08-02",
+      "basis": "Art. 113, third paragraph, point (c): Chapter III Sections 1-3 apply from 2027-12-02 to AI systems classified as high-risk pursuant to Art. 6(2) and Annex III (point (c)(i)) and from 2028-08-02 to those classified pursuant to Art. 6(1) and Annex I (point (c)(ii))",
+      "scope_note": "The 2027-12-02 / 2028-08-02 dates state when those sections apply by Art. 113; for Annex I systems, substantive applicability remains subject to Art. 2(2) (Section B: only Art. 6(1), Art. 60a and Arts. 102-112 apply, with Arts. 57-59 only insofar as the high-risk requirements have been integrated into the relevant harmonisation legislation) and Art. 2(13) (possible limitations for specified Section A requirements/obligations)."
+    },
+    "15": {
+      "chapter": "CHAPTER III SECTION 2",
+      "applicable_from": "2027-12-02",
+      "applicable_from_annex_i": "2028-08-02",
+      "basis": "Art. 113, third paragraph, point (c): Chapter III Sections 1-3 apply from 2027-12-02 to AI systems classified as high-risk pursuant to Art. 6(2) and Annex III (point (c)(i)) and from 2028-08-02 to those classified pursuant to Art. 6(1) and Annex I (point (c)(ii))",
+      "scope_note": "The 2027-12-02 / 2028-08-02 dates state when those sections apply by Art. 113; for Annex I systems, substantive applicability remains subject to Art. 2(2) (Section B: only Art. 6(1), Art. 60a and Arts. 102-112 apply, with Arts. 57-59 only insofar as the high-risk requirements have been integrated into the relevant harmonisation legislation) and Art. 2(13) (possible limitations for specified Section A requirements/obligations)."
+    },
+    "16": {
+      "chapter": "CHAPTER III SECTION 3",
+      "applicable_from": "2027-12-02",
+      "applicable_from_annex_i": "2028-08-02",
+      "basis": "Art. 113, third paragraph, point (c): Chapter III Sections 1-3 apply from 2027-12-02 to AI systems classified as high-risk pursuant to Art. 6(2) and Annex III (point (c)(i)) and from 2028-08-02 to those classified pursuant to Art. 6(1) and Annex I (point (c)(ii))",
+      "scope_note": "The 2027-12-02 / 2028-08-02 dates state when those sections apply by Art. 113; for Annex I systems, substantive applicability remains subject to Art. 2(2) (Section B: only Art. 6(1), Art. 60a and Arts. 102-112 apply, with Arts. 57-59 only insofar as the high-risk requirements have been integrated into the relevant harmonisation legislation) and Art. 2(13) (possible limitations for specified Section A requirements/obligations)."
+    },
+    "17": {
+      "chapter": "CHAPTER III SECTION 3",
+      "applicable_from": "2027-12-02",
+      "applicable_from_annex_i": "2028-08-02",
+      "basis": "Art. 113, third paragraph, point (c): Chapter III Sections 1-3 apply from 2027-12-02 to AI systems classified as high-risk pursuant to Art. 6(2) and Annex III (point (c)(i)) and from 2028-08-02 to those classified pursuant to Art. 6(1) and Annex I (point (c)(ii))",
+      "scope_note": "The 2027-12-02 / 2028-08-02 dates state when those sections apply by Art. 113; for Annex I systems, substantive applicability remains subject to Art. 2(2) (Section B: only Art. 6(1), Art. 60a and Arts. 102-112 apply, with Arts. 57-59 only insofar as the high-risk requirements have been integrated into the relevant harmonisation legislation) and Art. 2(13) (possible limitations for specified Section A requirements/obligations)."
+    },
+    "18": {
+      "chapter": "CHAPTER III SECTION 3",
+      "applicable_from": "2027-12-02",
+      "applicable_from_annex_i": "2028-08-02",
+      "basis": "Art. 113, third paragraph, point (c): Chapter III Sections 1-3 apply from 2027-12-02 to AI systems classified as high-risk pursuant to Art. 6(2) and Annex III (point (c)(i)) and from 2028-08-02 to those classified pursuant to Art. 6(1) and Annex I (point (c)(ii))",
+      "scope_note": "The 2027-12-02 / 2028-08-02 dates state when those sections apply by Art. 113; for Annex I systems, substantive applicability remains subject to Art. 2(2) (Section B: only Art. 6(1), Art. 60a and Arts. 102-112 apply, with Arts. 57-59 only insofar as the high-risk requirements have been integrated into the relevant harmonisation legislation) and Art. 2(13) (possible limitations for specified Section A requirements/obligations)."
+    },
+    "19": {
+      "chapter": "CHAPTER III SECTION 3",
+      "applicable_from": "2027-12-02",
+      "applicable_from_annex_i": "2028-08-02",
+      "basis": "Art. 113, third paragraph, point (c): Chapter III Sections 1-3 apply from 2027-12-02 to AI systems classified as high-risk pursuant to Art. 6(2) and Annex III (point (c)(i)) and from 2028-08-02 to those classified pursuant to Art. 6(1) and Annex I (point (c)(ii))",
+      "scope_note": "The 2027-12-02 / 2028-08-02 dates state when those sections apply by Art. 113; for Annex I systems, substantive applicability remains subject to Art. 2(2) (Section B: only Art. 6(1), Art. 60a and Arts. 102-112 apply, with Arts. 57-59 only insofar as the high-risk requirements have been integrated into the relevant harmonisation legislation) and Art. 2(13) (possible limitations for specified Section A requirements/obligations)."
+    },
+    "20": {
+      "chapter": "CHAPTER III SECTION 3",
+      "applicable_from": "2027-12-02",
+      "applicable_from_annex_i": "2028-08-02",
+      "basis": "Art. 113, third paragraph, point (c): Chapter III Sections 1-3 apply from 2027-12-02 to AI systems classified as high-risk pursuant to Art. 6(2) and Annex III (point (c)(i)) and from 2028-08-02 to those classified pursuant to Art. 6(1) and Annex I (point (c)(ii))",
+      "scope_note": "The 2027-12-02 / 2028-08-02 dates state when those sections apply by Art. 113; for Annex I systems, substantive applicability remains subject to Art. 2(2) (Section B: only Art. 6(1), Art. 60a and Arts. 102-112 apply, with Arts. 57-59 only insofar as the high-risk requirements have been integrated into the relevant harmonisation legislation) and Art. 2(13) (possible limitations for specified Section A requirements/obligations)."
+    },
+    "21": {
+      "chapter": "CHAPTER III SECTION 3",
+      "applicable_from": "2027-12-02",
+      "applicable_from_annex_i": "2028-08-02",
+      "basis": "Art. 113, third paragraph, point (c): Chapter III Sections 1-3 apply from 2027-12-02 to AI systems classified as high-risk pursuant to Art. 6(2) and Annex III (point (c)(i)) and from 2028-08-02 to those classified pursuant to Art. 6(1) and Annex I (point (c)(ii))",
+      "scope_note": "The 2027-12-02 / 2028-08-02 dates state when those sections apply by Art. 113; for Annex I systems, substantive applicability remains subject to Art. 2(2) (Section B: only Art. 6(1), Art. 60a and Arts. 102-112 apply, with Arts. 57-59 only insofar as the high-risk requirements have been integrated into the relevant harmonisation legislation) and Art. 2(13) (possible limitations for specified Section A requirements/obligations)."
+    },
+    "22": {
+      "chapter": "CHAPTER III SECTION 3",
+      "applicable_from": "2027-12-02",
+      "applicable_from_annex_i": "2028-08-02",
+      "basis": "Art. 113, third paragraph, point (c): Chapter III Sections 1-3 apply from 2027-12-02 to AI systems classified as high-risk pursuant to Art. 6(2) and Annex III (point (c)(i)) and from 2028-08-02 to those classified pursuant to Art. 6(1) and Annex I (point (c)(ii))",
+      "scope_note": "The 2027-12-02 / 2028-08-02 dates state when those sections apply by Art. 113; for Annex I systems, substantive applicability remains subject to Art. 2(2) (Section B: only Art. 6(1), Art. 60a and Arts. 102-112 apply, with Arts. 57-59 only insofar as the high-risk requirements have been integrated into the relevant harmonisation legislation) and Art. 2(13) (possible limitations for specified Section A requirements/obligations)."
+    },
+    "23": {
+      "chapter": "CHAPTER III SECTION 3",
+      "applicable_from": "2027-12-02",
+      "applicable_from_annex_i": "2028-08-02",
+      "basis": "Art. 113, third paragraph, point (c): Chapter III Sections 1-3 apply from 2027-12-02 to AI systems classified as high-risk pursuant to Art. 6(2) and Annex III (point (c)(i)) and from 2028-08-02 to those classified pursuant to Art. 6(1) and Annex I (point (c)(ii))",
+      "scope_note": "The 2027-12-02 / 2028-08-02 dates state when those sections apply by Art. 113; for Annex I systems, substantive applicability remains subject to Art. 2(2) (Section B: only Art. 6(1), Art. 60a and Arts. 102-112 apply, with Arts. 57-59 only insofar as the high-risk requirements have been integrated into the relevant harmonisation legislation) and Art. 2(13) (possible limitations for specified Section A requirements/obligations)."
+    },
+    "24": {
+      "chapter": "CHAPTER III SECTION 3",
+      "applicable_from": "2027-12-02",
+      "applicable_from_annex_i": "2028-08-02",
+      "basis": "Art. 113, third paragraph, point (c): Chapter III Sections 1-3 apply from 2027-12-02 to AI systems classified as high-risk pursuant to Art. 6(2) and Annex III (point (c)(i)) and from 2028-08-02 to those classified pursuant to Art. 6(1) and Annex I (point (c)(ii))",
+      "scope_note": "The 2027-12-02 / 2028-08-02 dates state when those sections apply by Art. 113; for Annex I systems, substantive applicability remains subject to Art. 2(2) (Section B: only Art. 6(1), Art. 60a and Arts. 102-112 apply, with Arts. 57-59 only insofar as the high-risk requirements have been integrated into the relevant harmonisation legislation) and Art. 2(13) (possible limitations for specified Section A requirements/obligations)."
+    },
+    "25": {
+      "chapter": "CHAPTER III SECTION 3",
+      "applicable_from": "2027-12-02",
+      "applicable_from_annex_i": "2028-08-02",
+      "basis": "Art. 113, third paragraph, point (c): Chapter III Sections 1-3 apply from 2027-12-02 to AI systems classified as high-risk pursuant to Art. 6(2) and Annex III (point (c)(i)) and from 2028-08-02 to those classified pursuant to Art. 6(1) and Annex I (point (c)(ii))",
+      "scope_note": "The 2027-12-02 / 2028-08-02 dates state when those sections apply by Art. 113; for Annex I systems, substantive applicability remains subject to Art. 2(2) (Section B: only Art. 6(1), Art. 60a and Arts. 102-112 apply, with Arts. 57-59 only insofar as the high-risk requirements have been integrated into the relevant harmonisation legislation) and Art. 2(13) (possible limitations for specified Section A requirements/obligations)."
+    },
+    "26": {
+      "chapter": "CHAPTER III SECTION 3",
+      "applicable_from": "2027-12-02",
+      "applicable_from_annex_i": "2028-08-02",
+      "basis": "Art. 113, third paragraph, point (c): Chapter III Sections 1-3 apply from 2027-12-02 to AI systems classified as high-risk pursuant to Art. 6(2) and Annex III (point (c)(i)) and from 2028-08-02 to those classified pursuant to Art. 6(1) and Annex I (point (c)(ii))",
+      "scope_note": "The 2027-12-02 / 2028-08-02 dates state when those sections apply by Art. 113; for Annex I systems, substantive applicability remains subject to Art. 2(2) (Section B: only Art. 6(1), Art. 60a and Arts. 102-112 apply, with Arts. 57-59 only insofar as the high-risk requirements have been integrated into the relevant harmonisation legislation) and Art. 2(13) (possible limitations for specified Section A requirements/obligations)."
+    },
+    "27": {
+      "chapter": "CHAPTER III SECTION 3",
+      "applicable_from": "2027-12-02",
+      "applicable_from_annex_i": "2028-08-02",
+      "basis": "Art. 113, third paragraph, point (c): Chapter III Sections 1-3 apply from 2027-12-02 to AI systems classified as high-risk pursuant to Art. 6(2) and Annex III (point (c)(i)) and from 2028-08-02 to those classified pursuant to Art. 6(1) and Annex I (point (c)(ii))",
+      "scope_note": "The 2027-12-02 / 2028-08-02 dates state when those sections apply by Art. 113; for Annex I systems, substantive applicability remains subject to Art. 2(2) (Section B: only Art. 6(1), Art. 60a and Arts. 102-112 apply, with Arts. 57-59 only insofar as the high-risk requirements have been integrated into the relevant harmonisation legislation) and Art. 2(13) (possible limitations for specified Section A requirements/obligations)."
+    },
+    "28": {
+      "chapter": "CHAPTER III SECTION 4",
+      "applicable_from": "2025-08-02",
+      "basis": "Art. 113, third paragraph, point (b)"
+    },
+    "29": {
+      "chapter": "CHAPTER III SECTION 4",
+      "applicable_from": "2025-08-02",
+      "basis": "Art. 113, third paragraph, point (b)"
+    },
+    "30": {
+      "chapter": "CHAPTER III SECTION 4",
+      "applicable_from": "2025-08-02",
+      "basis": "Art. 113, third paragraph, point (b)"
+    },
+    "31": {
+      "chapter": "CHAPTER III SECTION 4",
+      "applicable_from": "2025-08-02",
+      "basis": "Art. 113, third paragraph, point (b)"
+    },
+    "32": {
+      "chapter": "CHAPTER III SECTION 4",
+      "applicable_from": "2025-08-02",
+      "basis": "Art. 113, third paragraph, point (b)"
+    },
+    "33": {
+      "chapter": "CHAPTER III SECTION 4",
+      "applicable_from": "2025-08-02",
+      "basis": "Art. 113, third paragraph, point (b)"
+    },
+    "34": {
+      "chapter": "CHAPTER III SECTION 4",
+      "applicable_from": "2025-08-02",
+      "basis": "Art. 113, third paragraph, point (b)"
+    },
+    "35": {
+      "chapter": "CHAPTER III SECTION 4",
+      "applicable_from": "2025-08-02",
+      "basis": "Art. 113, third paragraph, point (b)"
+    },
+    "36": {
+      "chapter": "CHAPTER III SECTION 4",
+      "applicable_from": "2025-08-02",
+      "basis": "Art. 113, third paragraph, point (b)"
+    },
+    "37": {
+      "chapter": "CHAPTER III SECTION 4",
+      "applicable_from": "2025-08-02",
+      "basis": "Art. 113, third paragraph, point (b)"
+    },
+    "38": {
+      "chapter": "CHAPTER III SECTION 4",
+      "applicable_from": "2025-08-02",
+      "basis": "Art. 113, third paragraph, point (b)"
+    },
+    "39": {
+      "chapter": "CHAPTER III SECTION 4",
+      "applicable_from": "2025-08-02",
+      "basis": "Art. 113, third paragraph, point (b)"
+    },
+    "40": {
+      "chapter": "CHAPTER III SECTION 5",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "41": {
+      "chapter": "CHAPTER III SECTION 5",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "42": {
+      "chapter": "CHAPTER III SECTION 5",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "43": {
+      "chapter": "CHAPTER III SECTION 5",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "44": {
+      "chapter": "CHAPTER III SECTION 5",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "45": {
+      "chapter": "CHAPTER III SECTION 5",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "46": {
+      "chapter": "CHAPTER III SECTION 5",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "47": {
+      "chapter": "CHAPTER III SECTION 5",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "48": {
+      "chapter": "CHAPTER III SECTION 5",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "49": {
+      "chapter": "CHAPTER III SECTION 5",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "50": {
+      "chapter": "CHAPTER IV",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "51": {
+      "chapter": "CHAPTER V SECTION 1",
+      "applicable_from": "2025-08-02",
+      "basis": "Art. 113, third paragraph, point (b)"
+    },
+    "52": {
+      "chapter": "CHAPTER V SECTION 1",
+      "applicable_from": "2025-08-02",
+      "basis": "Art. 113, third paragraph, point (b)"
+    },
+    "53": {
+      "chapter": "CHAPTER V SECTION 2",
+      "applicable_from": "2025-08-02",
+      "basis": "Art. 113, third paragraph, point (b)"
+    },
+    "54": {
+      "chapter": "CHAPTER V SECTION 2",
+      "applicable_from": "2025-08-02",
+      "basis": "Art. 113, third paragraph, point (b)"
+    },
+    "55": {
+      "chapter": "CHAPTER V SECTION 3",
+      "applicable_from": "2025-08-02",
+      "basis": "Art. 113, third paragraph, point (b)"
+    },
+    "56": {
+      "chapter": "CHAPTER V SECTION 4",
+      "applicable_from": "2025-08-02",
+      "basis": "Art. 113, third paragraph, point (b)"
+    },
+    "57": {
+      "chapter": "CHAPTER VI",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "58": {
+      "chapter": "CHAPTER VI",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "59": {
+      "chapter": "CHAPTER VI",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "60": {
+      "chapter": "CHAPTER VI",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "61": {
+      "chapter": "CHAPTER VI",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "62": {
+      "chapter": "CHAPTER VI",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "63": {
+      "chapter": "CHAPTER VI",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "64": {
+      "chapter": "CHAPTER VII SECTION 1",
+      "applicable_from": "2025-08-02",
+      "basis": "Art. 113, third paragraph, point (b)"
+    },
+    "65": {
+      "chapter": "CHAPTER VII SECTION 1",
+      "applicable_from": "2025-08-02",
+      "basis": "Art. 113, third paragraph, point (b)"
+    },
+    "66": {
+      "chapter": "CHAPTER VII SECTION 1",
+      "applicable_from": "2025-08-02",
+      "basis": "Art. 113, third paragraph, point (b)"
+    },
+    "67": {
+      "chapter": "CHAPTER VII SECTION 1",
+      "applicable_from": "2025-08-02",
+      "basis": "Art. 113, third paragraph, point (b)"
+    },
+    "68": {
+      "chapter": "CHAPTER VII SECTION 1",
+      "applicable_from": "2025-08-02",
+      "basis": "Art. 113, third paragraph, point (b)"
+    },
+    "69": {
+      "chapter": "CHAPTER VII SECTION 1",
+      "applicable_from": "2025-08-02",
+      "basis": "Art. 113, third paragraph, point (b)"
+    },
+    "70": {
+      "chapter": "CHAPTER VII SECTION 2",
+      "applicable_from": "2025-08-02",
+      "basis": "Art. 113, third paragraph, point (b)"
+    },
+    "71": {
+      "chapter": "CHAPTER VIII",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "72": {
+      "chapter": "CHAPTER IX SECTION 1",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "73": {
+      "chapter": "CHAPTER IX SECTION 2",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "74": {
+      "chapter": "CHAPTER IX SECTION 3",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "75": {
+      "chapter": "CHAPTER IX SECTION 3",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "76": {
+      "chapter": "CHAPTER IX SECTION 3",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "77": {
+      "chapter": "CHAPTER IX SECTION 3",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "78": {
+      "chapter": "CHAPTER IX SECTION 3",
+      "applicable_from": "2025-08-02",
+      "basis": "Art. 113, third paragraph, point (b)"
+    },
+    "79": {
+      "chapter": "CHAPTER IX SECTION 3",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "80": {
+      "chapter": "CHAPTER IX SECTION 3",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "81": {
+      "chapter": "CHAPTER IX SECTION 3",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "82": {
+      "chapter": "CHAPTER IX SECTION 3",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "83": {
+      "chapter": "CHAPTER IX SECTION 3",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "84": {
+      "chapter": "CHAPTER IX SECTION 3",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "85": {
+      "chapter": "CHAPTER IX SECTION 4",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "86": {
+      "chapter": "CHAPTER IX SECTION 4",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "87": {
+      "chapter": "CHAPTER IX SECTION 4",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "88": {
+      "chapter": "CHAPTER IX SECTION 5",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "89": {
+      "chapter": "CHAPTER IX SECTION 5",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "90": {
+      "chapter": "CHAPTER IX SECTION 5",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "91": {
+      "chapter": "CHAPTER IX SECTION 5",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "92": {
+      "chapter": "CHAPTER IX SECTION 5",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "93": {
+      "chapter": "CHAPTER IX SECTION 5",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "94": {
+      "chapter": "CHAPTER IX SECTION 5",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "95": {
+      "chapter": "CHAPTER X",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "96": {
+      "chapter": "CHAPTER X",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "97": {
+      "chapter": "CHAPTER XI",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "98": {
+      "chapter": "CHAPTER XI",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "99": {
+      "chapter": "CHAPTER XII",
+      "applicable_from": "2025-08-02",
+      "basis": "Art. 113, third paragraph, point (b)"
+    },
+    "100": {
+      "chapter": "CHAPTER XII",
+      "applicable_from": "2025-08-02",
+      "basis": "Art. 113, third paragraph, point (b)"
+    },
+    "101": {
+      "chapter": "CHAPTER XII",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "102": {
+      "chapter": "CHAPTER XIII",
+      "applicable_from": "2026-07-27",
+      "basis": "Art. 113, third paragraph, point (d)"
+    },
+    "103": {
+      "chapter": "CHAPTER XIII",
+      "applicable_from": "2026-07-27",
+      "basis": "Art. 113, third paragraph, point (d)"
+    },
+    "104": {
+      "chapter": "CHAPTER XIII",
+      "applicable_from": "2026-07-27",
+      "basis": "Art. 113, third paragraph, point (d)"
+    },
+    "105": {
+      "chapter": "CHAPTER XIII",
+      "applicable_from": "2026-07-27",
+      "basis": "Art. 113, third paragraph, point (d)"
+    },
+    "106": {
+      "chapter": "CHAPTER XIII",
+      "applicable_from": "2026-07-27",
+      "basis": "Art. 113, third paragraph, point (d)"
+    },
+    "107": {
+      "chapter": "CHAPTER XIII",
+      "applicable_from": "2026-07-27",
+      "basis": "Art. 113, third paragraph, point (d)"
+    },
+    "108": {
+      "chapter": "CHAPTER XIII",
+      "applicable_from": "2026-07-27",
+      "basis": "Art. 113, third paragraph, point (d)"
+    },
+    "109": {
+      "chapter": "CHAPTER XIII",
+      "applicable_from": "2026-07-27",
+      "basis": "Art. 113, third paragraph, point (d)"
+    },
+    "110": {
+      "chapter": "CHAPTER XIII",
+      "applicable_from": "2026-07-27",
+      "basis": "Art. 113, third paragraph, point (d)"
+    },
+    "111": {
+      "chapter": "CHAPTER XIII",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "112": {
+      "chapter": "CHAPTER XIII",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "113": {
+      "chapter": "CHAPTER XIII",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    }
+  }
+}

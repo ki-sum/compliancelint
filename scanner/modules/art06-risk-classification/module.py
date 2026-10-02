@@ -20,6 +20,7 @@ from datetime import datetime, timezone
 # Add core to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
+from core.application_dates import applicable_from
 from core.protocol import (
     BaseArticleModule, ScanResult, Explanation, ActionPlan, ActionItem,
     Finding, ComplianceLevel, Confidence, GapType,
@@ -297,7 +298,7 @@ class Art06Module(BaseArticleModule):
                 "checklist. Note: automated scanning can only flag potential matches — "
                 "the final classification always requires human judgment on intended purpose."
             ),
-            enforcement_date="2026-08-02",
+            enforcement_date=applicable_from(6),
             waiting_for="CEN-CENELEC harmonized standard for Art. 6 classification (expected Q4 2026)",
         )
 

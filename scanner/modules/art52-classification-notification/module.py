@@ -36,6 +36,7 @@ from datetime import datetime, timezone
 # Add core to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
+from core.application_dates import applicable_from
 from core.protocol import (
     BaseArticleModule, ScanResult, Explanation, ActionPlan, ActionItem,
     Finding, ComplianceLevel, Confidence, GapType,
@@ -284,7 +285,7 @@ class Art52Module(BaseArticleModule):
                 "Note: all obligations under Art. 52 require human judgment — automated "
                 "scanning can only check for documentation of notification."
             ),
-            enforcement_date="2025-08-02",
+            enforcement_date=applicable_from(52),
             waiting_for="CEN-CENELEC harmonized standard for GPAI notification (expected 2027)",
         )
 

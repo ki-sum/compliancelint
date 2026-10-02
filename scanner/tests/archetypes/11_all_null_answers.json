@@ -10,8 +10,16 @@
         "has_ai_literacy_measures": null
       },
       "art5": {
-        "is_realtime_processing": null,
-        "processing_mode_evidence": null
+        "has_subliminal_manipulation": null,
+        "has_exploitation_of_vulnerabilities": null,
+        "has_social_scoring": null,
+        "has_predictive_policing": null,
+        "has_facial_recognition_scraping": null,
+        "has_emotion_recognition_workplace": null,
+        "has_biometric_categorization": null,
+        "has_real_time_biometric_id": null,
+        "has_ncii_generation": null,
+        "has_csam_generation": null
       },
       "art6": {
         "annex_iii_categories": null,

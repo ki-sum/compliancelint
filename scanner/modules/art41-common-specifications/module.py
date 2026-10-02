@@ -23,6 +23,7 @@ from datetime import datetime, timezone
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
+from core.application_dates import applicable_from
 from core.protocol import (
     BaseArticleModule, ScanResult, Explanation, ActionPlan, ActionItem,
     Finding, ComplianceLevel, Confidence, GapType,
@@ -208,7 +209,7 @@ class Art41Module(BaseArticleModule):
                 "documented justification of equivalent alternative technical solutions. "
                 "Based on: EU AI Act Art. 41, Recital 124."
             ),
-            enforcement_date="2026-08-02",
+            enforcement_date=applicable_from(41),
             waiting_for="CEN-CENELEC harmonized standards for AI Act (expected 2026)",
         )
 

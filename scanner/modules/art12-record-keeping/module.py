@@ -19,6 +19,7 @@ from datetime import datetime, timezone
 # Add core to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
+from core.application_dates import applicable_from
 from core.protocol import (
     BaseArticleModule, ScanResult, Explanation, ActionPlan, ActionItem,
     Finding, ComplianceLevel, Confidence, GapType,
@@ -354,7 +355,7 @@ class Art12Module(BaseArticleModule):
                 "(SHOULD for general, MUST for biometric systems). "
                 "Based on: ISO/IEC DIS 24970:2025, ISO 42001, ISO 27001 A.12.4."
             ),
-            enforcement_date="2026-08-02",
+            enforcement_date=applicable_from(12),
             waiting_for="CEN-CENELEC harmonized standard (expected Q4 2026)",
         )
 

@@ -170,8 +170,10 @@ def emit_degraded_notice_once() -> None:
     _DEGRADED_NOTICE_SHOWN = True
     import sys
 
+    from core.obligation_lookup import unique_obligation_count
+
     sys.stderr.write(
-        "⚠ Offline mode: 247 obligations loaded, but classification "
+        f"⚠ Offline mode: {unique_obligation_count()} obligations loaded, but classification "
         "metadata\n"
         "  (detection_method, rationale, etc.) unavailable.\n"
         "  Ask your AI to set up ComplianceLint for this project to "

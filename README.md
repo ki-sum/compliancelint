@@ -214,7 +214,7 @@ You can ask any AI to review your code. But here's the difference:
 
 ## Coverage
 
-**EU AI Act** (Regulation (EU) 2024/1689) — 44 articles, 247 obligations:
+**EU AI Act** (Regulation (EU) 2024/1689) — 44 articles, 246 obligations:
 
 | Article | Topic | Obligations |
 |---------|-------|:-----------:|
@@ -381,7 +381,7 @@ The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard
 | Projects | 1 | 2 | 10 | Unlimited | Unlimited |
 | Scan history | 7 days | Unlimited | Unlimited | Unlimited | Unlimited |
 | PDF reports | Watermarked | Clean | Clean | Clean | Clean |
-| All 247 obligations visible (worst-case) | ✓ | ✓ | ✓ | ✓ | ✓ |
+| All 246 obligations visible (worst-case) | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Penalty display (worst-case Art. 99 caps) | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Team members | Unlimited | Unlimited | Unlimited | Unlimited | Unlimited |
 | **Scope narrowing** — see only obligations applicable to your AI system (typically saves ~70% review time) | — | ✓ | ✓ | ✓ | ✓ |
@@ -417,7 +417,7 @@ The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard
 
 ### Shipped
 
-- [x] **MCP Server** with full EU AI Act tool surface — 44 articles, 247 obligations
+- [x] **MCP Server** with full EU AI Act tool surface — 44 articles, 246 obligations
 - [x] **SaaS Dashboard** with Compliance Journey tracking
 - [x] **Audit-ready PDFs** — Compliance Journey, Declaration of Conformity (Art. 47), Technical Documentation (Art. 11), per-article evidence packs, and the Compliance All-in-One Pack ZIP
 - [x] **`npx compliancelint init`** — one-line setup for Claude Code, Cursor, Windsurf, Claude Desktop, ChatGPT (zero-config auto-discovery via [SEP-2127](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2127))
@@ -425,7 +425,7 @@ The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard
 - [x] **Profiling Wizard** — guided questions about your AI system + organisational role; filters the 247-obligation matrix down to what actually applies to you
 - [x] **Human Gates** — guided questionnaires for obligations that need human judgment (FRIA, Art. 14 oversight, Art. 26(7) worker notifications)
 - [x] **Evidence trail** — attestations, rebuttals, acknowledgements, deferrals with full audit history
-- [x] **EU AI Act browser** at [`/dashboard/regulations/eu-ai-act`](https://compliancelint.dev/dashboard/regulations/eu-ai-act) — full text of 44 articles + 13 annexes + searchable across 247 obligations (free after sign-up, no credit card)
+- [x] **EU AI Act browser** at [`/dashboard/regulations/eu-ai-act`](https://compliancelint.dev/dashboard/regulations/eu-ai-act) — full text of 44 articles + 13 annexes + searchable across 246 obligations (free after sign-up, no credit card)
 - [x] **Tamper-evident audit trail** — deterministic state hashing, evidence health sweeps, cross-OS CI tested (Ubuntu, macOS, Windows × Python 3.10–3.13)
 
 ### Up next

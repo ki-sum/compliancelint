@@ -7,7 +7,7 @@ Open-source, MCP-native compliance engine that decomposes EU AI Act requirements
 ```
 core/             — Protocol definitions, ObligationEngine, persistence layer
 modules/          — Per-article scanning modules (44 articles covered)
-obligations/      — Legal obligation definitions (247 obligations)
+obligations/      — Legal obligation definitions (246 obligations)
 server.py         — MCP Server entry point (14 tools)
 ```
 

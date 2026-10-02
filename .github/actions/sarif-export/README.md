@@ -58,7 +58,7 @@ After a few PRs you will see, in the GitHub UI:
 | `api-key` | yes | — | ComplianceLint API key (starts with `cl_`). Store as a GitHub secret. |
 | `scan-id` | no | latest scan for `repo-name` | Specific scan UUID to export. |
 | `repo-name` | no | `${{ github.repository }}` | When `scan-id` is omitted, look up latest scan for this repo. |
-| `level` | no | `scan` | `status-summary` (1 row per scan) \| `scan` (1 row per article) \| `full` (1 row per obligation, ~247) |
+| `level` | no | `scan` | `status-summary` (1 row per scan) \| `scan` (1 row per article) \| `full` (1 row per obligation, ~250) |
 | `output-file` | no | `compliancelint.sarif` | Where to write the SARIF JSON. |
 | `dashboard-url` | no | `https://compliancelint.dev` | Override for self-hosted / staging. |
 
@@ -76,7 +76,7 @@ After a few PRs you will see, in the GitHub UI:
 - **`scan`** *(default)* — Use for normal team review. ~30 alerts (one per
   article). Each alert links to the article and shows obligation totals.
 - **`full`** — Use when audit teams need every individual obligation finding
-  surfaced as its own alert. ~247 results per scan; can be noisy.
+  surfaced as its own alert. ~250 results per scan; can be noisy.
 
 ## Tier requirement
 

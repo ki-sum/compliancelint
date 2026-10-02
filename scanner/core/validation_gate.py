@@ -19,7 +19,7 @@ Design principles:
 import difflib
 from typing import Any
 
-from core.context import _BOOL_FIELDS, _LIST_FIELDS
+from core.context import _AUX_FIELDS, _BOOL_FIELDS, _LIST_FIELDS
 
 
 # ── Article scope classification ──
@@ -408,12 +408,20 @@ def _coerce_article_fields(article_key: str, fields: dict) -> tuple[dict, list[d
                 "original_type": type(val).__name__,
             })
 
-    # Fuzzy match field names within the article
+    # Fuzzy match field names within the article. Keys the module reads under
+    # their own name (_AUX_FIELDS) are not typos; a rename never overwrites a
+    # field the AI already supplied.
     known_fields = set(_BOOL_FIELDS.get(article_key, [])) | set(_LIST_FIELDS.get(article_key, []))
-    unknown_fields = set(result.keys()) - known_fields
-    for uf in list(unknown_fields):
+    unknown_fields = set(result.keys()) - known_fields - set(_AUX_FIELDS.get(article_key, []))
+    for uf in sorted(unknown_fields):
         matches = difflib.get_close_matches(uf, known_fields, n=1, cutoff=0.7)
-        if matches:
+        if matches and matches[0] in result:
+            log.append({
+                "action": "field_rename_skipped",
+                "key": f"{article_key}.{uf}",
+                "reason": f"'{uf}' resembles '{matches[0]}', which is already set — kept both",
+            })
+        elif matches:
             result[matches[0]] = result.pop(uf)
             log.append({
                 "action": "field_renamed",

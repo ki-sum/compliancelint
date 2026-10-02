@@ -17,6 +17,7 @@ from datetime import datetime, timezone
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
+from core.application_dates import applicable_from
 from core.protocol import (
     BaseArticleModule, ScanResult, Explanation, ActionPlan, ActionItem,
     Finding, ComplianceLevel, Confidence, GapType,
@@ -200,7 +201,7 @@ class Art13Module(BaseArticleModule):
                 "(2) deployer-facing documentation, (3) Art. 13(3)(a)-(f) content coverage. "
                 "Based on: ISO/IEC 42001:2023."
             ),
-            enforcement_date="2026-08-02",
+            enforcement_date=applicable_from(13),
             waiting_for="CEN-CENELEC harmonized standard (expected Q4 2026)",
         )
 

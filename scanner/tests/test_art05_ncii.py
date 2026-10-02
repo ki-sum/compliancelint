@@ -200,3 +200,10 @@ def test_applicable_date_is_read_from_obligation_json(art05_module, tmp_path, mo
     f = _finding(result, "ART05-PRO-1ba")
     assert f.level == ComplianceLevel.NOT_APPLICABLE
     assert "applies from 2030-01-01" in f.description
+
+
+def test_today_tracks_the_real_clock(art05_module):
+    """Self-audit A17: a hard-coded _today() (e.g. a forgotten time-bomb probe) must fail CI."""
+    from datetime import datetime, timezone
+    module_today = type(art05_module).scan.__globals__["_today"]
+    assert module_today() == datetime.now(timezone.utc).date()

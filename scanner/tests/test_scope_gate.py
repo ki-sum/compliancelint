@@ -22,7 +22,7 @@ def _make_ctx(scope: dict = None, risk: str = "likely high-risk",
               risk_conf: str = "high") -> ProjectContext:
     """Create a ProjectContext with given _scope and minimal answers."""
     answers = {
-        "art5": {"prohibited_practices": []},
+        "art5": {"has_subliminal_manipulation": None, "has_exploitation_of_vulnerabilities": None, "has_social_scoring": None, "has_predictive_policing": None, "has_facial_recognition_scraping": None, "has_emotion_recognition_workplace": None, "has_biometric_categorization": None, "has_real_time_biometric_id": None, "has_ncii_generation": None, "has_csam_generation": None},
         "art6": {"annex_iii_categories": [], "annex_i_product_type": None,
                  "is_high_risk": None, "reasoning": ""},
         "art9": {"has_risk_docs": None, "risk_doc_paths": [],

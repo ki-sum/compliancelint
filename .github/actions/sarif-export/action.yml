@@ -30,7 +30,7 @@ inputs:
       SARIF granularity. One of:
         - status-summary  — 1 result per scan (good for "is this PR compliant?" gate)
         - scan            — 1 result per article (~30 results, recommended default)
-        - full            — 1 result per obligation (~247 results, for deep audit)
+        - full            — 1 result per obligation (~250 results, for deep audit)
     required: false
     default: scan
   output-file:

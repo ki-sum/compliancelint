@@ -20,6 +20,7 @@ from datetime import datetime, timezone
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
+from core.application_dates import applicable_from
 from core.protocol import (
     BaseArticleModule, ScanResult, Explanation, ActionPlan, ActionItem,
     Finding, ComplianceLevel, Confidence, GapType,
@@ -216,7 +217,7 @@ class Art72Module(BaseArticleModule):
                 "plan included in Annex IV technical documentation. "
                 "Based on: ISO/IEC 42001:2023, ISO 9001:2015 (post-delivery activities)."
             ),
-            enforcement_date="2026-08-02",
+            enforcement_date=applicable_from(72),
             waiting_for="CEN-CENELEC harmonized standard for post-market monitoring of AI systems (expected Q4 2026)",
         )
 

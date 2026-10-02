@@ -23,6 +23,7 @@ from datetime import datetime, timezone
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
+from core.application_dates import applicable_from
 from core.protocol import (
     BaseArticleModule, ScanResult, Explanation, ActionPlan, ActionItem,
     Finding, ComplianceLevel, Confidence, GapType,
@@ -225,7 +226,7 @@ class Art47Module(BaseArticleModule):
                 "signed format, (3) 10-year retention policy, (4) process for keeping DoC "
                 "up-to-date. Based on: EU AI Act Annex V, ISO/IEC 17050-1:2004."
             ),
-            enforcement_date="2026-08-02",
+            enforcement_date=applicable_from(47),
             waiting_for="CEN-CENELEC harmonized standard for Art. 47 (expected Q4 2026)",
         )
 

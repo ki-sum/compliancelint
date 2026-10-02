@@ -65,3 +65,20 @@ def test_cl_version_tools_count_matches_registered_decorators():
         f"{decorator_count} @mcp.tool() decorators. Update the "
         f"cl_version count constant to match."
     )
+
+
+def test_cl_version_reports_regulation_text_versions():
+    """Self-audit A10 (2026-10-02): scanner/data/_versions.json (public mirror of the
+    regulation registry) had no consumer — cl_version now reports it, so an AI client can
+    tell which consolidated text the obligations were verified against."""
+    regs = {r["slug"]: r for r in _parse_cl_version()["regulations"]}
+    ai_act = regs["eu-ai-act"]
+    assert ai_act["regulation_text_version"] == "02024R1689-20260727"
+    assert [a["celex"] for a in ai_act["amendments"]] == ["32026R1744"]
+
+
+def test_versions_mirror_and_application_dates_agree_on_text_version():
+    """Two data files carry the text version; they must never disagree."""
+    from core import application_dates
+    regs = {r["slug"]: r for r in _parse_cl_version()["regulations"]}
+    assert regs["eu-ai-act"]["regulation_text_version"] == application_dates.regulation_text_version()
