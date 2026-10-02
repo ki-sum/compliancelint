@@ -1,0 +1,22 @@
+{
+  "slug": "art94",
+  "classification": "MINOR",
+  "change_type_guess": "AMEND",
+  "added_text_blocks": [
+    "model Article 18 of Regulation (EU) 2019/1020 shall apply mutatis mutandis to the providers of the general-purpose AI model, without prejudice to more specific procedural rights provided for in this Regulation."
+  ],
+  "removed_text_blocks": [
+    "Article 18 of Regulation (EU) 2019/1020 shall apply mutatis mutandis to the providers of the general-purpose AI model, without prejudice to more specific procedural rights provided for in this Regulation."
+  ],
+  "unified_diff": "--- art94@from\n+++ art94@to\n@@ -1 +1 @@\n-Article 18 of Regulation (EU) 2019/1020 shall apply mutatis mutandis to the providers of the general-purpose AI model, without prejudice to more specific procedural rights provided for in this Regulation.\n+model Article 18 of Regulation (EU) 2019/1020 shall apply mutatis mutandis to the providers of the general-purpose AI model, without prejudice to more specific procedural rights provided for in this Regulation.",
+  "from_text": "Article 18 of Regulation (EU) 2019/1020 shall apply mutatis mutandis to the providers of the general-purpose AI model, without prejudice to more specific procedural rights provided for in this Regulation.",
+  "to_text": "model Article 18 of Regulation (EU) 2019/1020 shall apply mutatis mutandis to the providers of the general-purpose AI model, without prejudice to more specific procedural rights provided for in this Regulation.",
+  "title_from": "Procedural rights of economic operators of the general-purpose AI model",
+  "title_to": "Procedural rights of economic operators of the general-purpose AI",
+  "pages_from": [
+    113
+  ],
+  "pages_to": [
+    112
+  ]
+}

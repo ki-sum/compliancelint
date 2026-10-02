@@ -81,7 +81,9 @@ _BOOL_FIELDS: dict = {
               "has_subliminal_manipulation", "has_exploitation_of_vulnerabilities",
               "has_social_scoring", "has_predictive_policing",
               "has_facial_recognition_scraping", "has_emotion_recognition_workplace",
-              "has_biometric_categorization", "has_real_time_biometric_id"],
+              "has_biometric_categorization", "has_real_time_biometric_id",
+              # Art. 5(1)(ba)/(bb), Reg (EU) 2026/1744 — apply from 2026-12-02
+              "has_ncii_generation", "has_csam_generation"],
     "art6":  ["is_high_risk"],
     "art9":  ["has_risk_docs", "has_testing_infrastructure", "has_risk_code_patterns", "has_defined_metrics", "affects_children"],
     "art10": ["has_data_governance_doc", "has_bias_mitigation", "has_data_lineage", "processes_special_category_data"],

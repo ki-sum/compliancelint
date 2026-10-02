@@ -1,0 +1,22 @@
+{
+  "slug": "art32",
+  "classification": "MINOR",
+  "change_type_guess": "AMEND",
+  "added_text_blocks": [
+    "bodies Where a conformity assessment body demonstrates its conformity with the criteria laid down in the relevant harmonised standards or parts thereof, the references of which have been published in the Official Journal of the European Union, it shall be presumed to comply with the requirements set out in Article 31 in so far as the applicable harmonised standards cover those requirements."
+  ],
+  "removed_text_blocks": [
+    "Where a conformity assessment body demonstrates its conformity with the criteria laid down in the relevant harmonised standards or parts thereof, the references of which have been published in the Official Journal of the European Union, it shall be presumed to comply with the requirements set out in Article 31 in so far as the applicable harmonised standards cover those requirements."
+  ],
+  "unified_diff": "--- art32@from\n+++ art32@to\n@@ -1 +1 @@\n-Where a conformity assessment body demonstrates its conformity with the criteria laid down in the relevant harmonised standards or parts thereof, the references of which have been published in the Official Journal of the European Union, it shall be presumed to comply with the requirements set out in Article 31 in so far as the applicable harmonised standards cover those requirements.\n+bodies Where a conformity assessment body demonstrates its conformity with the criteria laid down in the relevant harmonised standards or parts thereof, the references of which have been published in the Official Journal of the European Union, it shall be presumed to comply with the requirements set out in Article 31 in so far as the applicable harmonised standards cover those requirements.",
+  "from_text": "Where a conformity assessment body demonstrates its conformity with the criteria laid down in the relevant harmonised standards or parts thereof, the references of which have been published in the Official Journal of the European Union, it shall be presumed to comply with the requirements set out in Article 31 in so far as the applicable harmonised standards cover those requirements.",
+  "to_text": "bodies Where a conformity assessment body demonstrates its conformity with the criteria laid down in the relevant harmonised standards or parts thereof, the references of which have been published in the Official Journal of the European Union, it shall be presumed to comply with the requirements set out in Article 31 in so far as the applicable harmonised standards cover those requirements.",
+  "title_from": "Presumption of conformity with requirements relating to notified bodies",
+  "title_to": "Presumption of conformity with requirements relating to notified",
+  "pages_from": [
+    72
+  ],
+  "pages_to": [
+    45
+  ]
+}

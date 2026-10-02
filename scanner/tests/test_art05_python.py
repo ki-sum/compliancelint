@@ -28,11 +28,17 @@ class TestArt5ProhibitedPractices:
         assert len(compliant) == 8
 
     def test_all_none_all_utd(self, art05_module, tmp_path):
-        """When no has_* fields provided, all 8 should be UNABLE_TO_DETERMINE."""
+        """When no has_* fields provided, all 8 base prohibitions should be UNABLE_TO_DETERMINE.
+
+        Scoped to the 8 base points (a)-(h): ART05-PRO-1ba/1bb are date-gated
+        (NOT_APPLICABLE before 2026-12-02, UTD after) and covered with pinned
+        dates in test_art05_ncii.py, so this test does not change on that date.
+        """
         ctx = _ctx_with("art5", {})
         BaseArticleModule.set_context(ctx)
         result = art05_module.scan(str(tmp_path))
-        pro_findings = [f for f in result.findings if f.obligation_id.startswith("ART05-PRO")]
+        base_ids = {obl_id for _, obl_id in _PROHIBITIONS}
+        pro_findings = [f for f in result.findings if f.obligation_id in base_ids]
         utd = [f for f in pro_findings if f.level == ComplianceLevel.UNABLE_TO_DETERMINE]
         assert len(utd) == 8
 

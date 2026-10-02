@@ -21,7 +21,44 @@
       "celex": "32024R1689",
       "oj_citation": "OJ L 2024/1689, 12.7.2024",
       "eli_note": "ELI (European Legislation Identifier) is designed for permanent persistence. Preferred over CELEX-based URLs."
-    }
+    },
+    "amendments": [
+      {
+        "amending_celex": "32026R1744",
+        "amending_act": "Regulation (EU) 2026/1744 (Digital Omnibus), Article 1 point (7)",
+        "oj_date": "2026-07-24",
+        "consolidated_celex": "02024R1689-20260727",
+        "applicable_from": "2026-12-02",
+        "change_type": "ADD",
+        "obligations_added": [
+          "ART05-PRO-1ba",
+          "ART05-PRO-1bb"
+        ],
+        "atoms_added": [
+          "no_ncii_generation_or_manipulation",
+          "ncii_consent_standard",
+          "ncii_market_trigger_intended_purpose",
+          "ncii_market_trigger_foreseeable_outcome",
+          "ncii_market_trigger_inadequate_safeguards",
+          "ncii_use_trigger_deployer_purpose",
+          "ncii_manipulation_threshold",
+          "no_csam_generation_or_manipulation",
+          "csam_without_right_defence_carve_out",
+          "csam_market_trigger_intended_purpose",
+          "csam_market_trigger_foreseeable_outcome",
+          "csam_market_trigger_inadequate_safeguards",
+          "csam_use_trigger_deployer_purpose"
+        ],
+        "source_pdf": "docs/sources/eu-ai-act-2024-1689-consolidated-20260727-en.pdf",
+        "source_pdf_sha256": "1ccd38d1c78482cf2053b70110115adcc5080700acc8bd7bead8cb3579143ccf",
+        "source_pages": [
+          13,
+          15
+        ],
+        "consensus_lock_date": "2026-10-02",
+        "recorded_on": "2026-10-02"
+      }
+    ]
   },
   "obligations": [
     {
@@ -144,6 +181,143 @@
               "reason": "consensus-lock 2026-10-02 §6 (o3 sweep + Claude verification against Art 5 / Art 3 / Recital 18)"
             }
           ]
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial"
+      }
+    },
+    {
+      "id": "ART05-PRO-1ba",
+      "source": "Art. 5(1)(ba)",
+      "source_quote": "The following AI practices shall be prohibited: (ba) the placing on the market, the putting into service or the use of an AI system that generates or manipulates realistic images, videos, audio or similar material of an identifiable natural person’s intimate parts, or of an identifiable natural person engaged in sexually explicit activities, without that person’s freely-given, specific, informed, unambiguous and explicit consent for that generation or manipulation.",
+      "deontic_type": "prohibition",
+      "modality": "shall not",
+      "addressee": "any_person",
+      "addressee_note": "Applies to any natural or legal person placing on the market, putting into service or using such an AI system. Art. 5(1a)(a) limits the placing-on-the-market / putting-into-service limb to intended-purpose or foreseeable-outcome-without-adequate-safeguards cases; Art. 5(1a)(b) limits the use limb to a deployer using the system for that purpose.",
+      "applicable_from": "2026-12-02",
+      "decomposed_atoms": [
+        {
+          "atom": "no_ncii_generation_or_manipulation",
+          "description": "AI systems must not generate or manipulate realistic intimate or sexually explicit material of identifiable persons without their consent",
+          "requirement": "An AI system that generates or manipulates realistic images, videos, audio or similar material of an identifiable natural person's intimate parts, or of an identifiable natural person engaged in sexually explicit activities, SHALL NOT be placed on the market, put into service or used unless that person gave consent meeting the standard in ncii_consent_standard"
+        },
+        {
+          "atom": "ncii_consent_standard",
+          "description": "Only consent with all five statutory qualities lifts the prohibition (Art. 5(1)(ba))",
+          "requirement": "The prohibition is lifted only by the depicted person's consent that is freely-given, specific, informed, unambiguous AND explicit, given for that particular generation or manipulation — all five qualities are required"
+        },
+        {
+          "atom": "ncii_market_trigger_intended_purpose",
+          "description": "Placing on the market / putting into service is prohibited where NCII generation is the intended purpose (Art. 5(1a)(a)(i))",
+          "requirement": "Placing on the market or putting into service is prohibited where generating or manipulating such material is the intended purpose of the AI system"
+        },
+        {
+          "atom": "ncii_market_trigger_foreseeable_outcome",
+          "description": "Placing on the market / putting into service is also prohibited where NCII is a foreseeable, reproducible outcome (Art. 5(1a)(a)(ii))",
+          "requirement": "Placing on the market or putting into service is also prohibited where the system's design, training, architecture, capabilities or user-facing functionalities make such generation or manipulation a reasonably foreseeable and reproducible outcome without requiring significant technical modification, and the safeguards condition in ncii_market_trigger_inadequate_safeguards is met"
+        },
+        {
+          "atom": "ncii_market_trigger_inadequate_safeguards",
+          "description": "Foreseeable-outcome route applies unless BOTH prevention and misuse-correction safeguards exist (Art. 5(1a)(a)(ii))",
+          "requirement": "Under the foreseeable-outcome route, the system escapes the prohibition only if it has BOTH (1) reasonable and adequate technical safety measures and other safeguards that reliably prevent such generation or manipulation, taking into account reasonably foreseeable misuse, AND (2) reasonable and adequate measures to correct observed or reported misuse — lacking either one means the prohibition applies"
+        },
+        {
+          "atom": "ncii_use_trigger_deployer_purpose",
+          "description": "Use is prohibited where the deployer uses the system to generate or manipulate such material (Art. 5(1a)(b))",
+          "requirement": "Use of the AI system is prohibited where the deployer uses it for the purpose of generating or manipulating such material"
+        },
+        {
+          "atom": "ncii_manipulation_threshold",
+          "description": "Manipulation that does not increase exposure or alter sexual activity is not manipulation (Art. 5(1b))",
+          "requirement": "Manipulation that neither increases the exposure of any depicted intimate parts nor alters the nature of any depicted sexually explicit activities does not constitute manipulation for point (ba)"
+        }
+      ],
+      "exceptions": [
+        {
+          "condition": "explicit_consent",
+          "description": "Not prohibited where the identifiable person gave freely-given, specific, informed, unambiguous and explicit consent for that generation or manipulation",
+          "note": "Art. 5(1)(ba) does not specify which actor must collect, verify or document the consent"
+        }
+      ],
+      "cross_references": [
+        {
+          "article": 5,
+          "context": "Art. 5(1a) conditions points (ba) and (bb) (intended purpose / foreseeable outcome without adequate safeguards / deployer purpose); Art. 5(1b) applies to point (ba) only"
+        },
+        {
+          "article": 113,
+          "context": "Art. 113, third paragraph, point (a), as amended by Regulation (EU) 2026/1744: points (ba) and (bb) and Art. 5(1a) and (1b) apply from 2 December 2026"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial"
+      }
+    },
+    {
+      "id": "ART05-PRO-1bb",
+      "source": "Art. 5(1)(bb)",
+      "source_quote": "The following AI practices shall be prohibited: (bb) the placing on the market, the putting into service or the use of an AI system that generates or manipulates material or performance within the meaning of Article 2, points (c) and (e), of Directive 2011/93/EU, except where a ‘without right’ defence applies under national law.",
+      "deontic_type": "prohibition",
+      "modality": "shall not",
+      "addressee": "any_person",
+      "addressee_note": "Applies to any natural or legal person placing on the market, putting into service or using such an AI system. Art. 5(1a)(a) limits the placing-on-the-market / putting-into-service limb to intended-purpose or foreseeable-outcome-without-adequate-safeguards cases; Art. 5(1a)(b) limits the use limb to a deployer using the system for that purpose.",
+      "applicable_from": "2026-12-02",
+      "decomposed_atoms": [
+        {
+          "atom": "no_csam_generation_or_manipulation",
+          "description": "AI systems must not generate or manipulate child sexual abuse material or performance (Directive 2011/93/EU Art. 2(c), (e))",
+          "requirement": "An AI system that generates or manipulates material or performance within the meaning of Article 2, points (c) and (e), of Directive 2011/93/EU SHALL NOT be placed on the market, put into service or used"
+        },
+        {
+          "atom": "csam_without_right_defence_carve_out",
+          "description": "National-law 'without right' defence (Art. 5(1)(bb))",
+          "requirement": "The prohibition does not apply where a 'without right' defence applies under national law"
+        },
+        {
+          "atom": "csam_market_trigger_intended_purpose",
+          "description": "Placing on the market / putting into service is prohibited where such generation is the intended purpose (Art. 5(1a)(a)(i))",
+          "requirement": "Placing on the market or putting into service is prohibited where generating or manipulating such material or performance is the intended purpose of the AI system"
+        },
+        {
+          "atom": "csam_market_trigger_foreseeable_outcome",
+          "description": "Placing on the market / putting into service is also prohibited where such output is a foreseeable, reproducible outcome (Art. 5(1a)(a)(ii))",
+          "requirement": "Placing on the market or putting into service is also prohibited where the system's design, training, architecture, capabilities or user-facing functionalities make such generation or manipulation a reasonably foreseeable and reproducible outcome without requiring significant technical modification, and the safeguards condition in csam_market_trigger_inadequate_safeguards is met"
+        },
+        {
+          "atom": "csam_market_trigger_inadequate_safeguards",
+          "description": "Foreseeable-outcome route applies unless BOTH prevention and misuse-correction safeguards exist (Art. 5(1a)(a)(ii))",
+          "requirement": "Under the foreseeable-outcome route, the system escapes the prohibition only if it has BOTH (1) reasonable and adequate technical safety measures and other safeguards that reliably prevent such generation or manipulation, taking into account reasonably foreseeable misuse, AND (2) reasonable and adequate measures to correct observed or reported misuse — lacking either one means the prohibition applies"
+        },
+        {
+          "atom": "csam_use_trigger_deployer_purpose",
+          "description": "Use is prohibited where the deployer uses the system to generate or manipulate such material (Art. 5(1a)(b))",
+          "requirement": "Use of the AI system is prohibited where the deployer uses it for the purpose of generating or manipulating such material or performance"
+        }
+      ],
+      "exceptions": [
+        {
+          "condition": "without_right_defence",
+          "description": "Not prohibited where a 'without right' defence applies under national law",
+          "note": "Depends on the national law of the Member State concerned"
+        }
+      ],
+      "cross_references": [
+        {
+          "regulation": "Directive 2011/93/EU",
+          "articles": [
+            "Art. 2(c)",
+            "Art. 2(e)"
+          ],
+          "context": "Defines the material and performance covered by Art. 5(1)(bb). The Directive text is not in ComplianceLint's source set; cited, not paraphrased"
+        },
+        {
+          "article": 5,
+          "context": "Art. 5(1a) conditions point (bb) (intended purpose / foreseeable outcome without adequate safeguards / deployer purpose)"
+        },
+        {
+          "article": 113,
+          "context": "Art. 113, third paragraph, point (a), as amended by Regulation (EU) 2026/1744: points (ba) and (bb) and Art. 5(1a) and (1b) apply from 2 December 2026"
         }
       ],
       "automation_assessment": {
@@ -499,30 +673,31 @@
         },
         {
           "article": 99,
-          "paragraph": 1,
+          "paragraph": 3,
           "context": "Penalties for Art. 5 violations: up to EUR 35M or 7% of global annual turnover"
         }
       ]
     }
   ],
   "summary": {
-    "total_obligations": 8,
+    "total_obligations": 10,
     "addressee_breakdown": {
-      "any_person": 7,
+      "any_person": 9,
       "law_enforcement": 1,
       "provider": 0,
       "deployer": 0
     },
     "automation_breakdown": {
       "full": 0,
-      "partial": 8,
+      "partial": 10,
       "manual": 0
     },
     "scope_notes": {
       "absolute_prohibitions_no_exceptions": "ART05-PRO-1a, ART05-PRO-1b, ART05-PRO-1c, ART05-PRO-1e — absolute prohibitions with no exceptions (harm threshold still applies for OBL-1 and OBL-2)",
       "prohibitions_with_narrow_exceptions": "ART05-PRO-1d (human assessment + objective facts exception), ART05-PRO-1f (medical/safety exception), ART05-PRO-1g (dataset labelling + law enforcement exception), ART05-PRO-1h (three narrow law enforcement exceptions with judicial authorization)",
       "enforcement_date": "2025-02-02 — Art. 5 prohibitions are in force since this date (6 months after entry into force of the AI Act)",
-      "penalty_tier": "Highest under the AI Act: up to EUR 35,000,000 or 7% of total worldwide annual turnover (Art. 99(1))"
+      "penalty_tier": "Highest under the AI Act: up to EUR 35,000,000 or 7% of total worldwide annual turnover (Art. 99(3))",
+      "omnibus_2026_additions": "ART05-PRO-1ba (non-consensual intimate imagery) and ART05-PRO-1bb (child sexual abuse material) added by Regulation (EU) 2026/1744; applicable from 2026-12-02; conditioned by Art. 5(1a) and (for 1ba) Art. 5(1b)"
     }
   }
 }

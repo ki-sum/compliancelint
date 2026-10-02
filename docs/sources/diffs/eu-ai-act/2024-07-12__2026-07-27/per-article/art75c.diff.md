@@ -1,0 +1,45 @@
+# art75c — NEW_ARTICLE
+
+- Change-type guess: `ADD_ARTICLE` (human must confirm per framework §2)
+- Title: None → 'Non-compliance, fines and periodic penalty payments'
+- Pages: [] → [98, 99]
+
+## Added
+
+> 1. Where the AI Office finds that an operator falling within the scope of Article 75(1) does not comply with the relevant provisions of this Regulation or with commitments made binding pursuant to Article 75b, it shall adopt a decision establishing such non-compliance.
+
+> 2. Before adopting a decision pursuant to paragraph 1, the AI Office shall communicate its preliminary findings to the operator concerned. In the preliminary findings, the AI Office shall explain the measures that it is considering taking, or that it considers that the operator concerned should take, in order to effectively address the preliminary findings.
+
+> 3. In the decision pursuant to paragraph 1 of this Article, the AI Office shall, where relevant, order the operator concerned to take the necessary measures to ensure compliance with the relevant provisions of this Regulation within a reasonable period specified therein and to provide information on the measures that that operator intends to take to comply with the decision. The operator concerned shall provide the AI Office with a description of the measures it has taken to ensure compliance with the decision upon their implementation. Prior to requesting any measure, the AI Office may engage in a structured dialogue with the operator of the AI system in question. During this dialogue, the operator may propose commitments in accordance with Article 75b.
+
+> 4. A decision adopted pursuant to paragraph 1 of this Article may be accompanied by the imposition of penalties in accordance with Article 99(3) to (7), which provisions shall apply mutatis mutandis to the AI Office in the execution of its supervision and enforcement tasks referred to in Article 75(1). In particular, the following shall be subject to administrative fines as referred to in Article 99(4):
+
+> (a) infringement of any applicable provision of this Regulation, including those not listed in Article 99(4);
+
+> (b) failure to comply with decisions or measures adopted pursuant to the powers listed in Article 14(4) or Article 16(3) of Regulation (EU) 2019/1020, as well as those specified in Article 75a of this Regulation;
+
+> (c) failure to comply with a commitment made binding by a decision pursuant to Article 75b. The supply of incorrect, incomplete or misleading information to the AI Office in reply to a request shall be subject to administrative fines as referred to in Article 99(5).
+
+> 5. The AI Office may adopt a decision imposing periodic penalty payments to compel the operators subject to its competence pursuant to Article 75(1) to the following:
+
+> (a) to submit to an investigation;
+
+> (b) to comply with an information request ordered by a decision adopted under Article 75a(3);
+
+> (c) to submit to an inspection ordered by a decision pursuant to Article 75a(4);
+
+> (d) to provide correct or complete answers or explanations in the context of an inspection ordered by a decision pursuant to Article 75a(4);
+
+> (e) to comply with corrective actions ordered pursuant to the power listed in Article 16 of Regulation (EU) 2019/1020;
+
+> (f) to comply with commitments made legally binding by a decision pursuant to Article 75b; or
+
+> (g) to comply with a decision pursuant to the paragraph (1) of this Article. Those penalty payments shall be effective and proportionate, and, where applicable, shall not exceed 5 % of the average daily income or worldwide annual turnover in the preceding financial year per day, calculated from the date appointed by the decision.
+
+> 6. The Court of Justice of the European Union shall have unlimited jurisdiction to review decisions of the AI Office fixing a fine or periodic penalty payment pursuant to this Article. It may cancel, reduce or increase the fine or periodic penalty payment imposed.
+
+> 7. Funds collected through the imposition of fines or periodic penalty payments pursuant to this Article shall contribute to the general budget of the Union.
+
+> 8. The powers conferred on the AI Office by this Article shall be subject to a limitation period of five years. The limitation period shall begin to run on the day on which the infringement is committed. However, in the case of continuing or repeated infringements, the limitation period shall begin to run on the day on which the infringement ceases. The power of the AI Office to enforce decisions taken pursuant to this Article shall be subject to a limitation period of five years. The limitation period shall begin to run on the day on which the decision becomes final. The implementing act referred to in Article 75d(3) shall specify the first and second subparagraphs of this paragraph, including the circumstances in which the limitation periods shall be interrupted.
+
+> 9. Where the AI Office determines that there are no grounds to adopt a decision of non-compliance, it shall close the proceeding by a decision. That decision shall apply with immediate effect.

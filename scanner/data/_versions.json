@@ -1,0 +1,22 @@
+{
+  "schema": "cl-public-versions-v1.1",
+  "generated_from": "ComplianceLint regulation registry",
+  "generated_at": "2026-10-02T00:00:00Z",
+  "regulations": [
+    {
+      "slug": "eu-ai-act",
+      "regulation_text_version": "02024R1689-20260727",
+      "regulation_text_date": "2026-07-27",
+      "amendments": [
+        {
+          "celex": "32026R1744",
+          "effective": "2026-07-27",
+          "migrated_articles": [
+            "art5"
+          ]
+        }
+      ],
+      "amendments_recorded_through": "2026-10-02"
+    }
+  ]
+}

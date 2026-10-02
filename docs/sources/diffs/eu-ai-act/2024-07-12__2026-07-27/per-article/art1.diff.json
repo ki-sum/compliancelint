@@ -1,0 +1,23 @@
+{
+  "slug": "art1",
+  "classification": "SUBSTANTIVE",
+  "change_type_guess": "AMEND",
+  "added_text_blocks": [
+    "(g) measures to support innovation, with a particular focus on small mid-cap enterprises (SMCs) and small and medium-sized enterprises (SMEs), including start-ups."
+  ],
+  "removed_text_blocks": [
+    "(g) measures to support innovation, with a particular focus on SMEs, including start-ups."
+  ],
+  "unified_diff": "--- art1@from\n+++ art1@to\n@@ -8,2 +8,2 @@\n (f) rules on market monitoring, market surveillance, governance and enforcement;\n-(g) measures to support innovation, with a particular focus on SMEs, including start-ups.\n+(g) measures to support innovation, with a particular focus on small mid-cap enterprises (SMCs) and small and medium-sized enterprises (SMEs), including start-ups.",
+  "from_text": "1. The purpose of this Regulation is to improve the functioning of the internal market and promote the uptake of human-centric and trustworthy artificial intelligence (AI), while ensuring a high level of protection of health, safety, fundamental rights enshrined in the Charter, including democracy, the rule of law and environmental protection, against the harmful effects of AI systems in the Union and supporting innovation. 2. This Regulation lays down: (a) harmonised rules for the placing on the market, the putting into service, and the use of AI systems in the Union; (b) prohibitions of certain AI practices; (c) specific requirements for high-risk AI systems and obligations for operators of such systems; (d) harmonised transparency rules for certain AI systems; (e) harmonised rules for the placing on the market of general-purpose AI models; (f) rules on market monitoring, market surveillance, governance and enforcement; (g) measures to support innovation, with a particular focus on SMEs, including start-ups.",
+  "to_text": "1. The purpose of this Regulation is to improve the functioning of the internal market and promote the uptake of human-centric and trustworthy artificial intelligence (AI), while ensuring a high level of protection of health, safety, fundamental rights enshrined in the Charter, including democracy, the rule of law and environmental protection, against the harmful effects of AI systems in the Union and supporting innovation. 2. This Regulation lays down: (a) harmonised rules for the placing on the market, the putting into service, and the use of AI systems in the Union; (b) prohibitions of certain AI practices; (c) specific requirements for high-risk AI systems and obligations for operators of such systems; (d) harmonised transparency rules for certain AI systems; (e) harmonised rules for the placing on the market of general-purpose AI models; (f) rules on market monitoring, market surveillance, governance and enforcement; (g) measures to support innovation, with a particular focus on small mid-cap enterprises (SMCs) and small and medium-sized enterprises (SMEs), including start-ups.",
+  "title_from": "Subject matter`",
+  "title_to": "Subject matter'",
+  "pages_from": [
+    44,
+    45
+  ],
+  "pages_to": [
+    2
+  ]
+}

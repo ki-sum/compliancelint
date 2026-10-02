@@ -1,0 +1,27 @@
+{
+  "slug": "art113",
+  "classification": "SUBSTANTIVE",
+  "change_type_guess": "APPLICABLE_FROM",
+  "added_text_blocks": [
+    "(a) Chapters I and II shall apply from 2 February 2025, with the exception of Article 5(1), first subparagraph, points (ba) and (bb), and Article 5(1a) and (1b) which shall apply from 2 December 2026;",
+    "(c) Chapter III, Sections 1, 2, and 3, with the exception of Article 6(5), shall apply from:",
+    "(i) 2 December 2027 as regards AI systems classified as high-risk pursuant to Article 6(2) and Annex III; and",
+    "(ii) 2 August 2028 as regards AI systems classified as high-risk pursuant to Article 6(1) and Annex I;",
+    "(d) Articles 102 to 110 shall apply from 27 July 2026. This Regulation shall be binding in its entirety and directly applicable in all Member States."
+  ],
+  "removed_text_blocks": [
+    "(a) Chapters I and II shall apply from 2 February 2025;",
+    "(c) Article 6(1) and the corresponding obligations in this Regulation shall apply from 2 August 2027. This Regulation shall be binding in its entirety and directly applicable in all Member States."
+  ],
+  "unified_diff": "--- art113@from\n+++ art113@to\n@@ -1,4 +1,7 @@\n This Regulation shall enter into force on the twentieth day following that of its publication in the Official Journal of the European Union. It shall apply from 2 August 2026. However:\n-(a) Chapters I and II shall apply from 2 February 2025;\n+(a) Chapters I and II shall apply from 2 February 2025, with the exception of Article 5(1), first subparagraph, points (ba) and (bb), and Article 5(1a) and (1b) which shall apply from 2 December 2026;\n (b) Chapter III Section 4, Chapter V, Chapter VII and Chapter XII and Article 78 shall apply from 2 August 2025, with the exception of Article 101;\n-(c) Article 6(1) and the corresponding obligations in this Regulation shall apply from 2 August 2027. This Regulation shall be binding in its entirety and directly applicable in all Member States.\n+(c) Chapter III, Sections 1, 2, and 3, with the exception of Article 6(5), shall apply from:\n+(i) 2 December 2027 as regards AI systems classified as high-risk pursuant to Article 6(2) and Annex III; and\n+(ii) 2 August 2028 as regards AI systems classified as high-risk pursuant to Article 6(1) and Annex I;\n+(d) Articles 102 to 110 shall apply from 27 July 2026. This Regulation shall be binding in its entirety and directly applicable in all Member States.",
+  "from_text": "This Regulation shall enter into force on the twentieth day following that of its publication in the Official Journal of the European Union. It shall apply from 2 August 2026. However: (a) Chapters I and II shall apply from 2 February 2025; (b) Chapter III Section 4, Chapter V, Chapter VII and Chapter XII and Article 78 shall apply from 2 August 2025, with the exception of Article 101; (c) Article 6(1) and the corresponding obligations in this Regulation shall apply from 2 August 2027. This Regulation shall be binding in its entirety and directly applicable in all Member States.",
+  "to_text": "This Regulation shall enter into force on the twentieth day following that of its publication in the Official Journal of the European Union. It shall apply from 2 August 2026. However: (a) Chapters I and II shall apply from 2 February 2025, with the exception of Article 5(1), first subparagraph, points (ba) and (bb), and Article 5(1a) and (1b) which shall apply from 2 December 2026; (b) Chapter III Section 4, Chapter V, Chapter VII and Chapter XII and Article 78 shall apply from 2 August 2025, with the exception of Article 101; (c) Chapter III, Sections 1, 2, and 3, with the exception of Article 6(5), shall apply from: (i) 2 December 2027 as regards AI systems classified as high-risk pursuant to Article 6(2) and Annex III; and (ii) 2 August 2028 as regards AI systems classified as high-risk pursuant to Article 6(1) and Annex I; (d) Articles 102 to 110 shall apply from 27 July 2026. This Regulation shall be binding in its entirety and directly applicable in all Member States.",
+  "title_from": "Entry into force and application",
+  "title_to": "Entry into force and application",
+  "pages_from": [
+    123
+  ],
+  "pages_to": [
+    127
+  ]
+}

@@ -11,9 +11,10 @@ and maps each answer to a Finding. No regex or keyword scanning is performed —
 detection is 100% the AI's responsibility.
 """
 
+import dataclasses
 import os
 import sys
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 
 # Add core to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
@@ -66,7 +67,37 @@ _PROHIBITION_FIELDS = [
     ("has_emotion_recognition_workplace","ART05-PRO-1f", "emotion recognition in workplace/education (Art. 5(1)(f))"),
     ("has_biometric_categorization",     "ART05-PRO-1g", "biometric categorization for sensitive attributes (Art. 5(1)(g))"),
     ("has_real_time_biometric_id",       "ART05-PRO-1h", "real-time remote biometric identification (Art. 5(1)(h))"),
+    # Added by Reg (EU) 2026/1744; applicable_from 2026-12-02 in the obligation JSON.
+    # "Detected" means the Art. 5(1a) test is met: generation/manipulation is the
+    # intended purpose, OR a reasonably foreseeable and reproducible outcome while the
+    # system lacks either reliable prevention safeguards or misuse correction, OR a
+    # deployer uses the system for that purpose.
+    ("has_ncii_generation",              "ART05-PRO-1ba", "non-consensual intimate imagery of identifiable persons (Art. 5(1)(ba))"),
+    ("has_csam_generation",              "ART05-PRO-1bb", "child sexual abuse material within Directive 2011/93/EU Art. 2(c)/(e) (Art. 5(1)(bb))"),
 ]
+
+
+def _today() -> date:
+    """Current UTC date — module-level so tests can pin it."""
+    return datetime.now(timezone.utc).date()
+
+
+def _not_yet_applicable(finding: Finding, applicable_from: str) -> Finding:
+    """Turn a finding for an obligation that does not apply yet into an informational NOT_APPLICABLE.
+
+    The would-be verdict is kept in the description so the team can act before the
+    application date, but it does not count towards the Art. 5 overall level.
+    """
+    return dataclasses.replace(
+        finding,
+        level=ComplianceLevel.NOT_APPLICABLE,
+        is_informational=True,
+        description=(
+            f"[NOT YET APPLICABLE — applies from {applicable_from}] "
+            f"On the current answers this would be {finding.level.value.upper()} once applicable: "
+            f"{finding.description}"
+        ),
+    )
 
 
 class Art05Module(BaseArticleModule):
@@ -157,6 +188,22 @@ class Art05Module(BaseArticleModule):
         if obligations:
             engine = ObligationEngine(obligations)
             findings = [engine.enrich_finding(f) for f in findings]
+            # Obligations with a future applicable_from (Art. 5(1)(ba)/(bb) until
+            # 2026-12-02) become informational NOT_APPLICABLE. Done after
+            # enrich_finding(), which rebuilds Finding without is_informational.
+            today = _today()
+            applicable_from = {
+                o["id"]: o["applicable_from"]
+                for o in obligations.get("obligations", [])
+                if o.get("applicable_from")
+            }
+            findings = [
+                _not_yet_applicable(f, applicable_from[f.obligation_id])
+                if f.obligation_id in applicable_from
+                and today < date.fromisoformat(applicable_from[f.obligation_id])
+                else f
+                for f in findings
+            ]
             gap_findings = engine.gap_findings(findings, ctx.compliance_answers if ctx else None)
             findings.extend(gap_findings)
             details["obligation_coverage"] = {
@@ -209,11 +256,19 @@ class Art05Module(BaseArticleModule):
                 "sensitive attributes (race, political opinions, etc.); "
                 "(h) real-time remote biometric identification in public spaces for "
                 "law enforcement (except in three narrowly defined situations with "
-                "judicial authorization)."
+                "prior authorisation by a judicial or binding independent administrative "
+                "authority). Regulation (EU) 2026/1744 adds, from 2026-12-02: "
+                "(ba) AI generating or manipulating realistic intimate or sexually "
+                "explicit material of identifiable persons without their explicit "
+                "consent; (bb) AI generating or manipulating child sexual abuse material "
+                "within Directive 2011/93/EU. Under Art. 5(1a) these apply where that "
+                "output is the intended purpose, or a reasonably foreseeable and "
+                "reproducible outcome of a system lacking adequate prevention and "
+                "misuse-correction safeguards, or where a deployer uses the system for it."
             ),
             related_articles={
                 "Art. 6": "Classification of high-risk AI systems (systems not banned by Art. 5 may still be high-risk)",
-                "Art. 99(1)": "Penalties: fines up to EUR 35 million or 7% of global annual turnover for Art. 5 violations",
+                "Art. 99(3)": "Penalties: fines up to EUR 35 million or 7% of global annual turnover for Art. 5 violations",
                 "Annex II": "List of criminal offences for which Art. 5(1)(h) exception may apply",
                 "Art. 5(2)-(7)": "Detailed conditions for the law enforcement biometric ID exception",
                 "Recital 29": "Legislative intent: manipulation through subliminal techniques",
@@ -262,7 +317,8 @@ class Art05Module(BaseArticleModule):
             ),
             enforcement_date="2025-02-02",
             waiting_for=(
-                "Art. 5 prohibitions took effect 2025-02-02 (6 months after entry into force). "
+                "Art. 5 prohibitions took effect 2025-02-02 (6 months after entry into force); "
+                "points (ba) and (bb), added by Regulation (EU) 2026/1744, apply from 2026-12-02. "
                 "No harmonized standard needed — the prohibitions are directly applicable. "
                 "AI Office guidelines on Art. 5 interpretation may provide additional clarity."
             ),
@@ -306,7 +362,7 @@ class Art05Module(BaseArticleModule):
                     f"AI evidence: {evidence or 'see evidence_paths'}. "
                     f"Files: {files_str or 'see scan findings'}. "
                     f"Prohibition: {label}. "
-                    "Penalty for violation: up to EUR 35M or 7% global turnover (Art. 99(1))."
+                    "Penalty for violation: up to EUR 35M or 7% global turnover (Art. 99(3))."
                 ),
                 effort="Depends on scope — minimum 2-4 hours legal review per flagged practice",
                 action_type="human_judgment_required",

@@ -1,0 +1,20 @@
+{
+  "slug": "art64",
+  "classification": "ADD_ONLY",
+  "change_type_guess": "ADD",
+  "added_text_blocks": [
+    "3. Without prejudice to the budgetary procedure, the AI Office shall be allocated adequate resources to effectively perform its duties and exercise its powers in relation to the enforcement of this Regulation."
+  ],
+  "removed_text_blocks": [],
+  "unified_diff": "--- art64@from\n+++ art64@to\n@@ -2 +2,2 @@\n 2. Member States shall facilitate the tasks entrusted to the AI Office, as reflected in this Regulation.\n+3. Without prejudice to the budgetary procedure, the AI Office shall be allocated adequate resources to effectively perform its duties and exercise its powers in relation to the enforcement of this Regulation.",
+  "from_text": "1. The Commission shall develop Union expertise and capabilities in the field of AI through the AI Office. 2. Member States shall facilitate the tasks entrusted to the AI Office, as reflected in this Regulation.",
+  "to_text": "1. The Commission shall develop Union expertise and capabilities in the field of AI through the AI Office. 2. Member States shall facilitate the tasks entrusted to the AI Office, as reflected in this Regulation. 3. Without prejudice to the budgetary procedure, the AI Office shall be allocated adequate resources to effectively perform its duties and exercise its powers in relation to the enforcement of this Regulation.",
+  "title_from": "AI Office",
+  "title_to": "AI Office",
+  "pages_from": [
+    95
+  ],
+  "pages_to": [
+    79
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "slug": "art87",
+  "classification": "UNCHANGED",
+  "change_type_guess": null,
+  "added_text_blocks": [],
+  "removed_text_blocks": [],
+  "unified_diff": "",
+  "from_text": "Directive (EU) 2019/1937 shall apply to the reporting of infringements of this Regulation and the protection of persons reporting such infringements.",
+  "to_text": "Directive (EU) 2019/1937 shall apply to the reporting of infringements of this Regulation and the protection of persons reporting such infringements.",
+  "title_from": "Reporting of infringements and protection of reporting persons",
+  "title_to": "Reporting of infringements and protection of reporting persons",
+  "pages_from": [
+    110
+  ],
+  "pages_to": [
+    109
+  ]
+}

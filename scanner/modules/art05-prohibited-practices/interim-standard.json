@@ -2,15 +2,16 @@
   "_metadata": {
     "standard_id": "CL-IS-ART05-v0.1",
     "title": "ComplianceLint Interim Standard for EU AI Act Article 5: Prohibited AI Practices",
-    "version": "0.1.1",
+    "version": "0.2.0",
     "date": "2026-10-02",
     "status": "draft",
-    "disclaimer": "This is an interim standard developed by ComplianceLint. Article 5 prohibitions are directly applicable since 2025-02-02 and do not require harmonized standards for interpretation. This document restates the prohibitions with operational detail for compliance checking. It is NOT legal advice.",
+    "disclaimer": "This is an interim standard developed by ComplianceLint. Article 5 prohibitions are directly applicable since 2025-02-02 (points (ba) and (bb), added by Regulation (EU) 2026/1744, from 2026-12-02) and do not require harmonized standards for interpretation. This document restates the prohibitions with operational detail for compliance checking. It is NOT legal advice.",
     "basis": [
       "EU AI Act Article 5 (official text, Regulation (EU) 2024/1689)",
+      "Regulation (EU) 2026/1744 (Digital Omnibus), Article 1 point (7): inserts Art. 5(1)(ba), (bb), (1a) and (1b); applicable from 2026-12-02 per Art. 113, third paragraph, point (a), as amended (consolidated text CELEX 02024R1689-20260727)",
       "EU AI Act Recitals 29-44 (legislative intent)",
       "EU AI Act Annex II (list of criminal offences for Art. 5(1)(h) exception)",
-      "EU AI Act Article 99(1) (penalties for Art. 5 violations)",
+      "EU AI Act Article 99(3) (penalties for Art. 5 violations)",
       "AI Office guidelines on prohibited practices (when available)",
       "European Data Protection Board guidelines on biometric data processing",
       "Fundamental Rights Agency analysis of AI Act prohibitions"
@@ -36,7 +37,7 @@
         "Persuasive design without subliminal or deceptive component"
       ],
       "exceptions": null,
-      "penalty": "Up to EUR 35,000,000 or 7% of total worldwide annual turnover (Art. 99(1))",
+      "penalty": "Up to EUR 35,000,000 or 7% of total worldwide annual turnover (Art. 99(3))",
       "heuristic_indicators": [
         "Code referencing subliminal messaging or stimulus injection",
         "Dark pattern implementations with AI-driven personalization",
@@ -60,11 +61,61 @@
         "AI systems that account for vulnerability to REDUCE harm"
       ],
       "exceptions": null,
-      "penalty": "Up to EUR 35,000,000 or 7% of total worldwide annual turnover (Art. 99(1))",
+      "penalty": "Up to EUR 35,000,000 or 7% of total worldwide annual turnover (Art. 99(3))",
       "heuristic_indicators": [
         "Code that segments users by age/disability and applies different manipulation strategies",
         "Targeting logic specifically for vulnerable demographics",
         "Exploitation of inferred vulnerability status for commercial advantage"
+      ]
+    },
+    {
+      "id": "PP-ART5-09",
+      "article_ref": "Art. 5(1)(ba)",
+      "obligation_id": "ART05-PRO-1ba",
+      "applicable_from": "2026-12-02",
+      "title": "Non-Consensual Intimate Imagery (NCII)",
+      "prohibition": "The placing on the market, the putting into service or the use of an AI system that generates or manipulates realistic images, videos, audio or similar material of an identifiable natural person's intimate parts, or of an identifiable natural person engaged in sexually explicit activities, without that person's freely-given, specific, informed, unambiguous and explicit consent for that generation or manipulation. Placing on the market / putting into service is prohibited only where that generation or manipulation is the intended purpose, or a reasonably foreseeable and reproducible outcome (without significant technical modification) of a system that lacks reasonable and adequate safeguards to reliably prevent it and to correct observed or reported misuse (Art. 5(1a)(a)); use is prohibited where the deployer uses the system for that purpose (Art. 5(1a)(b)).",
+      "scope": [
+        "AI systems whose intended purpose is to 'undress', 'nudify' or otherwise create intimate or sexually explicit material of real, identifiable people",
+        "General-purpose image, video, audio or face-swap / editing systems for which such output is a reasonably foreseeable and reproducible outcome without significant technical modification, where the system lacks EITHER reasonable and adequate safeguards that reliably prevent it (taking into account reasonably foreseeable misuse) OR measures to correct observed or reported misuse (Art. 5(1a)(a)(ii))",
+        "Deployers using any AI system for the purpose of generating or manipulating such material (Art. 5(1a)(b))"
+      ],
+      "not_in_scope": [
+        "Generation or manipulation with the depicted person's freely-given, specific, informed, unambiguous and explicit consent for that generation or manipulation",
+        "Manipulation that neither increases the exposure of any depicted intimate parts nor alters the nature of any depicted sexually explicit activities (Art. 5(1b))",
+        "Material that does not depict an identifiable natural person (Art. 5(1)(bb) may still apply where the material falls within Directive 2011/93/EU)"
+      ],
+      "exceptions": "Explicit consent of the depicted person meeting all five statutory qualities (freely-given, specific, informed, unambiguous, explicit) for that generation or manipulation. Art. 5(1)(ba) does not specify who must collect, verify or document the consent.",
+      "penalty": "Up to EUR 35,000,000 or, if the offender is an undertaking, up to 7% of total worldwide annual turnover for the preceding financial year, whichever is higher (Art. 99(3))",
+      "heuristic_indicators": [
+        "Image / video / audio generation (diffusion, GAN, voice cloning) or face-swap / inpainting pipelines that accept a real person's photo, video or voice as input",
+        "Generation endpoints without nudity / sexual-content output classifiers or prompt filters",
+        "No abuse-reporting, takedown or misuse-correction workflow for generated content",
+        "Product copy, prompts, model names or features referencing undressing, nudify or deepnude"
+      ]
+    },
+    {
+      "id": "PP-ART5-10",
+      "article_ref": "Art. 5(1)(bb)",
+      "obligation_id": "ART05-PRO-1bb",
+      "applicable_from": "2026-12-02",
+      "title": "Child Sexual Abuse Material (CSAM)",
+      "prohibition": "The placing on the market, the putting into service or the use of an AI system that generates or manipulates material or performance within the meaning of Article 2, points (c) and (e), of Directive 2011/93/EU, except where a 'without right' defence applies under national law. Placing on the market / putting into service is prohibited only where that generation or manipulation is the intended purpose, or a reasonably foreseeable and reproducible outcome (without significant technical modification) of a system that lacks reasonable and adequate safeguards to reliably prevent it and to correct observed or reported misuse (Art. 5(1a)(a)); use is prohibited where the deployer uses the system for that purpose (Art. 5(1a)(b)).",
+      "scope": [
+        "AI systems whose intended purpose is to generate or manipulate material or performance within Directive 2011/93/EU Art. 2(c) or (e)",
+        "General-purpose image, video, audio or editing systems for which such output is a reasonably foreseeable and reproducible outcome without significant technical modification, where the system lacks EITHER reasonable and adequate safeguards that reliably prevent it (taking into account reasonably foreseeable misuse) OR measures to correct observed or reported misuse (Art. 5(1a)(a)(ii))",
+        "Deployers using any AI system for the purpose of generating or manipulating such material or performance (Art. 5(1a)(b))"
+      ],
+      "not_in_scope": [
+        "Cases where a 'without right' defence applies under the national law of the Member State concerned"
+      ],
+      "exceptions": "'Without right' defence under national law. The material scope is defined by Directive 2011/93/EU Art. 2(c) and (e); ComplianceLint cites, and does not paraphrase, that Directive.",
+      "penalty": "Up to EUR 35,000,000 or, if the offender is an undertaking, up to 7% of total worldwide annual turnover for the preceding financial year, whichever is higher (Art. 99(3))",
+      "heuristic_indicators": [
+        "Image / video / audio generation or editing pipelines without sexual-content and minor-detection output classifiers",
+        "No hash-matching or known-CSAM detection on inputs or outputs where users can upload or generate imagery",
+        "No abuse-reporting, takedown or misuse-correction workflow for generated content",
+        "Fine-tuning or LoRA datasets / model cards without documented exclusion of sexual content involving minors"
       ]
     },
     {
@@ -83,7 +134,7 @@
         "Fraud detection scoring within the same service context"
       ],
       "exceptions": null,
-      "penalty": "Up to EUR 35,000,000 or 7% of total worldwide annual turnover (Art. 99(1))",
+      "penalty": "Up to EUR 35,000,000 or 7% of total worldwide annual turnover (Art. 99(3))",
       "heuristic_indicators": [
         "Social scoring variables or functions",
         "Cross-context person rating/ranking systems",
@@ -107,7 +158,7 @@
         "Fraud detection based on transactional patterns (not personality profiling)"
       ],
       "exceptions": "AI supporting human assessment based on objective, verifiable facts directly linked to criminal activity",
-      "penalty": "Up to EUR 35,000,000 or 7% of total worldwide annual turnover (Art. 99(1))",
+      "penalty": "Up to EUR 35,000,000 or 7% of total worldwide annual turnover (Art. 99(3))",
       "heuristic_indicators": [
         "Criminal risk scoring functions",
         "Recidivism prediction models",
@@ -130,7 +181,7 @@
         "Research on publicly available facial recognition benchmark datasets (context-dependent)"
       ],
       "exceptions": null,
-      "penalty": "Up to EUR 35,000,000 or 7% of total worldwide annual turnover (Art. 99(1))",
+      "penalty": "Up to EUR 35,000,000 or 7% of total worldwide annual turnover (Art. 99(3))",
       "heuristic_indicators": [
         "Web scraping combined with face detection/extraction",
         "CCTV feed processing with face extraction pipelines",
@@ -162,7 +213,7 @@
         "Good practice, NOT a statutory condition of Art. 5(1)(f): confirm that emotion inference is needed for that medical or safety purpose",
         "Other law continues to apply (e.g., GDPR for the biometric data processed)"
       ],
-      "penalty": "Up to EUR 35,000,000 or 7% of total worldwide annual turnover (Art. 99(1))",
+      "penalty": "Up to EUR 35,000,000 or 7% of total worldwide annual turnover (Art. 99(3))",
       "heuristic_indicators": [
         "Emotion/sentiment detection libraries in workplace/education context",
         "Facial expression analysis in employee/student monitoring systems",
@@ -189,7 +240,7 @@
         "Gender detection for accessibility purposes (context-dependent, seek legal advice)"
       ],
       "exceptions": "Lawful labelling or filtering of biometric datasets acquired in line with EU or national law; categorization of biometric data in law enforcement",
-      "penalty": "Up to EUR 35,000,000 or 7% of total worldwide annual turnover (Art. 99(1))",
+      "penalty": "Up to EUR 35,000,000 or 7% of total worldwide annual turnover (Art. 99(3))",
       "heuristic_indicators": [
         "Race/ethnicity classification from facial images",
         "Political opinion inference from biometric data",
@@ -230,7 +281,7 @@
           "National law may further restrict or prohibit these exceptions"
         ]
       },
-      "penalty": "Up to EUR 35,000,000 or 7% of total worldwide annual turnover (Art. 99(1))",
+      "penalty": "Up to EUR 35,000,000 or 7% of total worldwide annual turnover (Art. 99(3))",
       "heuristic_indicators": [
         "Real-time facial recognition pipeline with camera/stream input",
         "Live biometric matching against watchlists or databases",

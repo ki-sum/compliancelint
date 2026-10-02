@@ -1,0 +1,18 @@
+{
+  "slug": "art35",
+  "classification": "UNCHANGED",
+  "change_type_guess": null,
+  "added_text_blocks": [],
+  "removed_text_blocks": [],
+  "unified_diff": "",
+  "from_text": "1. The Commission shall assign a single identification number to each notified body, even where a body is notified under more than one Union act. 2. The Commission shall make publicly available the list of the bodies notified under this Regulation, including their identification numbers and the activities for which they have been notified. The Commission shall ensure that the list is kept up to date.",
+  "to_text": "1. The Commission shall assign a single identification number to each notified body, even where a body is notified under more than one Union act. 2. The Commission shall make publicly available the list of the bodies notified under this Regulation, including their identification numbers and the activities for which they have been notified. The Commission shall ensure that the list is kept up to date.",
+  "title_from": "Identification numbers and lists of notified bodies",
+  "title_to": "Identification numbers and lists of notified bodies",
+  "pages_from": [
+    73
+  ],
+  "pages_to": [
+    46
+  ]
+}
