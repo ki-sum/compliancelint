@@ -36,17 +36,41 @@
         {
           "atom": "no_subliminal_techniques",
           "description": "AI systems must not deploy subliminal techniques beyond conscious perception",
-          "requirement": "An AI system SHALL NOT deploy subliminal techniques beyond a person's consciousness that materially distort behaviour and cause or are reasonably likely to cause significant harm"
+          "requirement": "The placing on the market, the putting into service or the use of an AI system that deploys subliminal techniques beyond a person's consciousness SHALL be prohibited where those techniques have the objective, or the effect, of materially distorting the behaviour of a person or a group of persons by appreciably impairing their ability to make an informed decision, thereby causing them to take a decision that they would not otherwise have taken, in a manner that causes or is reasonably likely to cause that person, another person or a group of persons significant harm.",
+          "_history": [
+            {
+              "requirement": "An AI system SHALL NOT deploy subliminal techniques beyond a person's consciousness that materially distort behaviour and cause or are reasonably likely to cause significant harm",
+              "superseded_on": "2026-10-02",
+              "amending_celex": null,
+              "reason": "consensus-lock 2026-10-02 §6 (o3 sweep + Claude verification against Art 5 / Art 3 / Recital 18)"
+            }
+          ]
         },
         {
           "atom": "no_manipulative_techniques",
           "description": "AI systems must not deploy purposefully manipulative techniques",
-          "requirement": "An AI system SHALL NOT deploy purposefully manipulative techniques that appreciably impair informed decision-making and cause or are reasonably likely to cause significant harm"
+          "requirement": "The placing on the market, the putting into service or the use of an AI system that deploys purposefully manipulative techniques SHALL be prohibited where those techniques have the objective, or the effect, of materially distorting the behaviour of a person or a group of persons by appreciably impairing their ability to make an informed decision, thereby causing them to take a decision that they would not otherwise have taken, in a manner that causes or is reasonably likely to cause that person, another person or a group of persons significant harm.",
+          "_history": [
+            {
+              "requirement": "An AI system SHALL NOT deploy purposefully manipulative techniques that appreciably impair informed decision-making and cause or are reasonably likely to cause significant harm",
+              "superseded_on": "2026-10-02",
+              "amending_celex": null,
+              "reason": "consensus-lock 2026-10-02 §6 (o3 sweep + Claude verification against Art 5 / Art 3 / Recital 18)"
+            }
+          ]
         },
         {
           "atom": "no_deceptive_techniques",
           "description": "AI systems must not deploy purposefully deceptive techniques",
-          "requirement": "An AI system SHALL NOT deploy purposefully deceptive techniques that appreciably impair informed decision-making and cause or are reasonably likely to cause significant harm"
+          "requirement": "The placing on the market, the putting into service or the use of an AI system that deploys purposefully deceptive techniques SHALL be prohibited where those techniques have the objective, or the effect, of materially distorting the behaviour of a person or a group of persons by appreciably impairing their ability to make an informed decision, thereby causing them to take a decision that they would not otherwise have taken, in a manner that causes or is reasonably likely to cause that person, another person or a group of persons significant harm.",
+          "_history": [
+            {
+              "requirement": "An AI system SHALL NOT deploy purposefully deceptive techniques that appreciably impair informed decision-making and cause or are reasonably likely to cause significant harm",
+              "superseded_on": "2026-10-02",
+              "amending_celex": null,
+              "reason": "consensus-lock 2026-10-02 §6 (o3 sweep + Claude verification against Art 5 / Art 3 / Recital 18)"
+            }
+          ]
         },
         {
           "atom": "harm_threshold_applies",
@@ -69,23 +93,57 @@
       "decomposed_atoms": [
         {
           "atom": "no_exploitation_age_vulnerability",
-          "description": "AI systems must not exploit age-related vulnerabilities (children, elderly)",
-          "requirement": "An AI system SHALL NOT exploit vulnerabilities due to age (e.g., targeting children or elderly) to materially distort behaviour causing significant harm"
+          "description": "AI systems must not exploit age-related vulnerabilities",
+          "requirement": "The placing on the market, the putting into service or the use of an AI system that exploits any of the vulnerabilities of a natural person or a specific group of persons due to their age SHALL be prohibited where the exploitation has the objective, or the effect, of materially distorting the behaviour of that person or a person belonging to that group in a manner that causes or is reasonably likely to cause that person or another person significant harm.",
+          "_history": [
+            {
+              "requirement": "An AI system SHALL NOT exploit vulnerabilities due to age (e.g., targeting children or elderly) to materially distort behaviour causing significant harm",
+              "description": "AI systems must not exploit age-related vulnerabilities (children, elderly)",
+              "superseded_on": "2026-10-02",
+              "amending_celex": null,
+              "reason": "consensus-lock 2026-10-02 §6 (o3 sweep + Claude verification against Art 5 / Art 3 / Recital 18)"
+            }
+          ]
         },
         {
           "atom": "no_exploitation_disability_vulnerability",
           "description": "AI systems must not exploit disability-related vulnerabilities",
-          "requirement": "An AI system SHALL NOT exploit vulnerabilities due to disability (cognitive, physical, sensory) to materially distort behaviour causing significant harm"
+          "requirement": "The placing on the market, the putting into service or the use of an AI system that exploits any of the vulnerabilities of a natural person or a specific group of persons due to their disability SHALL be prohibited where the exploitation has the objective, or the effect, of materially distorting the behaviour of that person or a person belonging to that group in a manner that causes or is reasonably likely to cause that person or another person significant harm.",
+          "_history": [
+            {
+              "requirement": "An AI system SHALL NOT exploit vulnerabilities due to disability (cognitive, physical, sensory) to materially distort behaviour causing significant harm",
+              "superseded_on": "2026-10-02",
+              "amending_celex": null,
+              "reason": "consensus-lock 2026-10-02 §6 (o3 sweep + Claude verification against Art 5 / Art 3 / Recital 18)"
+            }
+          ]
         },
         {
           "atom": "no_exploitation_socioeconomic_vulnerability",
           "description": "AI systems must not exploit social or economic vulnerability",
-          "requirement": "An AI system SHALL NOT exploit vulnerabilities due to specific social or economic situation (poverty, homelessness, immigration status) to materially distort behaviour causing significant harm"
+          "requirement": "The placing on the market, the putting into service or the use of an AI system that exploits any of the vulnerabilities of a natural person or a specific group of persons due to a specific social or economic situation SHALL be prohibited where the exploitation has the objective, or the effect, of materially distorting the behaviour of that person or a person belonging to that group in a manner that causes or is reasonably likely to cause that person or another person significant harm.",
+          "_history": [
+            {
+              "requirement": "An AI system SHALL NOT exploit vulnerabilities due to specific social or economic situation (poverty, homelessness, immigration status) to materially distort behaviour causing significant harm",
+              "superseded_on": "2026-10-02",
+              "amending_celex": null,
+              "reason": "consensus-lock 2026-10-02 §6 (o3 sweep + Claude verification against Art 5 / Art 3 / Recital 18)"
+            }
+          ]
         },
         {
           "atom": "exploitation_requires_distortion_and_harm",
-          "description": "Both material distortion of behaviour and significant harm must be present",
-          "requirement": "The prohibition is triggered when exploitation BOTH materially distorts behaviour AND causes or is reasonably likely to cause significant harm — both elements are required"
+          "description": "Both a distortion element (objective or effect) and a harm element (actual or reasonably likely) must be present",
+          "requirement": "The prohibition is triggered when exploitation is carried out with the objective OR the effect of materially distorting behaviour (actual distortion is not required where it is the objective) AND causes or is reasonably likely to cause significant harm (actual harm is not required where it is reasonably likely)",
+          "_history": [
+            {
+              "requirement": "The prohibition is triggered when exploitation BOTH materially distorts behaviour AND causes or is reasonably likely to cause significant harm — both elements are required",
+              "description": "Both material distortion of behaviour and significant harm must be present",
+              "superseded_on": "2026-10-02",
+              "amending_celex": null,
+              "reason": "consensus-lock 2026-10-02 §6 (o3 sweep + Claude verification against Art 5 / Art 3 / Recital 18)"
+            }
+          ]
         }
       ],
       "automation_assessment": {
@@ -104,12 +162,28 @@
         {
           "atom": "no_social_scoring_cross_context",
           "description": "AI systems must not produce social scores leading to detrimental treatment in unrelated contexts",
-          "requirement": "An AI system SHALL NOT evaluate or classify persons based on social behaviour or personal characteristics where the resulting score leads to detrimental treatment in social contexts UNRELATED to where the data was originally generated"
+          "requirement": "The placing on the market, the putting into service or the use of AI systems for the evaluation or classification of natural persons or groups of persons over a certain period of time based on their social behaviour or known, inferred or predicted personal or personality characteristics SHALL be prohibited where the resulting social score leads to detrimental or unfavourable treatment of certain natural persons or groups of persons in social contexts unrelated to the contexts in which the data was originally generated or collected.",
+          "_history": [
+            {
+              "requirement": "An AI system SHALL NOT evaluate or classify persons based on social behaviour or personal characteristics where the resulting score leads to detrimental treatment in social contexts UNRELATED to where the data was originally generated",
+              "superseded_on": "2026-10-02",
+              "amending_celex": null,
+              "reason": "consensus-lock 2026-10-02 §6 (o3 sweep + Claude verification against Art 5 / Art 3 / Recital 18)"
+            }
+          ]
         },
         {
           "atom": "no_social_scoring_disproportionate",
           "description": "AI systems must not produce social scores leading to disproportionate treatment",
-          "requirement": "An AI system SHALL NOT evaluate or classify persons based on social behaviour or personal characteristics where the resulting score leads to detrimental treatment that is UNJUSTIFIED or DISPROPORTIONATE to the behaviour or its gravity"
+          "requirement": "The placing on the market, the putting into service or the use of AI systems for the evaluation or classification of natural persons or groups of persons over a certain period of time based on their social behaviour or known, inferred or predicted personal or personality characteristics SHALL be prohibited where the resulting social score leads to detrimental or unfavourable treatment of certain natural persons or groups of persons that is unjustified or disproportionate to their social behaviour or its gravity.",
+          "_history": [
+            {
+              "requirement": "An AI system SHALL NOT evaluate or classify persons based on social behaviour or personal characteristics where the resulting score leads to detrimental treatment that is UNJUSTIFIED or DISPROPORTIONATE to the behaviour or its gravity",
+              "superseded_on": "2026-10-02",
+              "amending_celex": null,
+              "reason": "consensus-lock 2026-10-02 §6 (o3 sweep + Claude verification against Art 5 / Art 3 / Recital 18)"
+            }
+          ]
         },
         {
           "atom": "social_scoring_covers_inferred_characteristics",
@@ -119,7 +193,15 @@
         {
           "atom": "social_scoring_temporal_element",
           "description": "The prohibition covers scoring over a period of time",
-          "requirement": "The prohibition applies to evaluation or classification over a certain period of time — aggregate behavioural scoring, not single-instance assessments in isolation"
+          "requirement": "The prohibition applies to evaluation or classification of natural persons or groups of persons over a certain period of time; the text does not further define the length of that period",
+          "_history": [
+            {
+              "requirement": "The prohibition applies to evaluation or classification over a certain period of time — aggregate behavioural scoring, not single-instance assessments in isolation",
+              "superseded_on": "2026-10-02",
+              "amending_celex": null,
+              "reason": "consensus-lock 2026-10-02 §6 (o3 sweep + Claude verification against Art 5 / Art 3 / Recital 18)"
+            }
+          ]
         }
       ],
       "automation_assessment": {
@@ -212,22 +294,54 @@
         {
           "atom": "no_emotion_recognition_workplace",
           "description": "AI systems must not infer emotions in the workplace",
-          "requirement": "An AI system SHALL NOT be used to infer emotions of persons in the area of workplace — including employee mood detection, engagement monitoring, hiring interview emotion analysis"
+          "requirement": "The placing on the market, the putting into service for this specific purpose, or the use of AI systems to infer emotions of a natural person in the area of workplace SHALL be prohibited, except where the use of the AI system is intended to be put in place or into the market for medical or safety reasons. For purposes of determining whether a system constitutes emotion recognition, Art. 3(39) requires an AI system for the purpose of identifying or inferring emotions or intentions of natural persons on the basis of their biometric data; labels such as \"attention\" or \"engagement\" do not by themselves determine whether Art. 5(1)(f) applies.",
+          "_history": [
+            {
+              "requirement": "An AI system SHALL NOT be used to infer emotions of persons in the area of workplace — including employee mood detection, engagement monitoring, hiring interview emotion analysis",
+              "superseded_on": "2026-10-02",
+              "amending_celex": null,
+              "reason": "consensus-lock 2026-10-02 §6 (o3 sweep + Claude verification against Art 5 / Art 3 / Recital 18)"
+            }
+          ]
         },
         {
           "atom": "no_emotion_recognition_education",
           "description": "AI systems must not infer emotions in educational institutions",
-          "requirement": "An AI system SHALL NOT be used to infer emotions of persons in the area of education institutions — including student attention monitoring, engagement tracking, and emotional state assessment"
+          "requirement": "The placing on the market, the putting into service for this specific purpose, or the use of AI systems to infer emotions of a natural person in the area of education institutions SHALL be prohibited, except where the use of the AI system is intended to be put in place or into the market for medical or safety reasons. For purposes of determining whether a system constitutes emotion recognition, Art. 3(39) requires an AI system for the purpose of identifying or inferring emotions or intentions of natural persons on the basis of their biometric data; labels such as \"attention\" or \"engagement\" do not by themselves determine whether Art. 5(1)(f) applies.",
+          "_history": [
+            {
+              "requirement": "An AI system SHALL NOT be used to infer emotions of persons in the area of education institutions — including student attention monitoring, engagement tracking, and emotional state assessment",
+              "superseded_on": "2026-10-02",
+              "amending_celex": null,
+              "reason": "consensus-lock 2026-10-02 §6 (o3 sweep + Claude verification against Art 5 / Art 3 / Recital 18)"
+            }
+          ]
         },
         {
           "atom": "exception_medical_reasons",
           "description": "Exception for medical purposes",
-          "requirement": "The prohibition does NOT apply when the AI system is intended for medical reasons — e.g., therapeutic monitoring, clinical assessment, mental health support. The medical purpose must be genuine and documented"
+          "requirement": "The prohibition does NOT apply where the use of the AI system is intended to be put in place or into the market for medical reasons (Art. 5(1)(f)); Recital 44 gives systems intended for therapeutical use as an example. Art. 5(1)(f) states no separate documentation condition.",
+          "_history": [
+            {
+              "requirement": "The prohibition does NOT apply when the AI system is intended for medical reasons — e.g., therapeutic monitoring, clinical assessment, mental health support. The medical purpose must be genuine and documented",
+              "superseded_on": "2026-10-02",
+              "amending_celex": null,
+              "reason": "consensus-lock 2026-10-02 §6 (o3 sweep + Claude verification against Art 5 / Art 3 / Recital 18)"
+            }
+          ]
         },
         {
           "atom": "exception_safety_reasons",
           "description": "Exception for safety purposes",
-          "requirement": "The prohibition does NOT apply when the AI system is intended for safety reasons — e.g., driver drowsiness detection, operator fatigue monitoring in safety-critical operations. The safety purpose must be genuine and documented"
+          "requirement": "The prohibition does NOT apply where the use of the AI system is intended to be put in place or into the market for safety reasons. Detecting physical states such as fatigue or pain (e.g., fatigue detection for professional pilots or drivers) is not emotion recognition at all (Recital 18) and therefore falls outside the prohibition rather than within this exception",
+          "_history": [
+            {
+              "requirement": "The prohibition does NOT apply when the AI system is intended for safety reasons — e.g., driver drowsiness detection, operator fatigue monitoring in safety-critical operations. The safety purpose must be genuine and documented",
+              "superseded_on": "2026-10-02",
+              "amending_celex": null,
+              "reason": "consensus-lock 2026-10-02 §6 (o3 sweep + Claude verification against Art 5 / Art 3 / Recital 18)"
+            }
+          ]
         }
       ],
       "automation_assessment": {
@@ -300,12 +414,29 @@
         {
           "atom": "realtime_means_live_processing",
           "description": "Real-time means live or near-live processing without significant delay",
-          "requirement": "The prohibition covers 'real-time' systems — live biometric matching, not post-facto analysis. Post-facto analysis is regulated as high-risk under Art. 6 but not banned"
+          "requirement": "The prohibition covers 'real-time' remote biometric identification: the capturing of biometric data, comparison and identification all occur without a significant delay, comprising instant identification and limited short delays in order to avoid circumvention (Art. 3(42)). Post-remote biometric identification is not prohibited by Art. 5(1)(h) merely by being post-remote; remote biometric identification systems, including post-remote systems, are listed as high-risk under Art. 6(2) and Annex III, point 1(a), in so far as their use is permitted under relevant Union or national law.",
+          "_history": [
+            {
+              "requirement": "The prohibition covers 'real-time' systems — live biometric matching, not post-facto analysis. Post-facto analysis is regulated as high-risk under Art. 6 but not banned",
+              "superseded_on": "2026-10-02",
+              "amending_celex": null,
+              "reason": "consensus-lock 2026-10-02 §6 (o3 sweep + Claude verification against Art 5 / Art 3 / Recital 18)"
+            }
+          ]
         },
         {
           "atom": "public_space_scope",
-          "description": "The prohibition applies only in publicly accessible spaces",
-          "requirement": "The prohibition applies in PUBLICLY ACCESSIBLE spaces — streets, parks, transport hubs, shopping centres. Private or access-controlled spaces are not covered by this specific prohibition"
+          "description": "The prohibition applies only in publicly accessible spaces, whether publicly or privately owned",
+          "requirement": "The prohibition applies in PUBLICLY ACCESSIBLE spaces: any publicly or privately owned physical place accessible to an undetermined number of natural persons, regardless of whether certain conditions for access may apply and regardless of the potential capacity restrictions (Art. 3(44)).",
+          "_history": [
+            {
+              "requirement": "The prohibition applies in PUBLICLY ACCESSIBLE spaces — streets, parks, transport hubs, shopping centres. Private or access-controlled spaces are not covered by this specific prohibition",
+              "description": "The prohibition applies only in publicly accessible spaces",
+              "superseded_on": "2026-10-02",
+              "amending_celex": null,
+              "reason": "consensus-lock 2026-10-02 §6 (o3 sweep + Claude verification against Art 5 / Art 3 / Recital 18)"
+            }
+          ]
         },
         {
           "atom": "exception_victim_search",
@@ -324,13 +455,30 @@
         },
         {
           "atom": "exception_requires_judicial_authorization",
-          "description": "All exceptions require prior judicial authorization",
-          "requirement": "Use under any exception SHALL require prior judicial authorization — except in duly justified urgency, where authorization must be sought within 24 hours. If authorization is refused, use must cease immediately and all data deleted"
+          "description": "All exceptions require prior authorisation by a judicial authority or a binding independent administrative authority",
+          "requirement": "Use under any exception SHALL require prior authorisation granted by a judicial authority or an independent administrative authority whose decision is binding (Art. 5(3)) — except in a duly justified situation of urgency, where authorisation must be requested without undue delay, at the latest within 24 hours. If authorisation is rejected, use must stop with immediate effect and all data, results and outputs must be immediately discarded and deleted",
+          "_history": [
+            {
+              "requirement": "Use under any exception SHALL require prior judicial authorization — except in duly justified urgency, where authorization must be sought within 24 hours. If authorization is refused, use must cease immediately and all data deleted",
+              "description": "All exceptions require prior judicial authorization",
+              "superseded_on": "2026-10-02",
+              "amending_celex": null,
+              "reason": "consensus-lock 2026-10-02 §6 (o3 sweep + Claude verification against Art 5 / Art 3 / Recital 18)"
+            }
+          ]
         },
         {
           "atom": "exception_requires_proportionality",
           "description": "All exceptions must comply with proportionality and necessity requirements",
-          "requirement": "Use under any exception SHALL be subject to temporal, geographic, and personal limitations, fundamental rights impact assessment, notification to market surveillance authority, and registration in the EU database (Art. 49)"
+          "requirement": "Use under any exception SHALL only serve to confirm the identity of the specifically targeted individual (Art. 5(2)) and shall take into account (a) the nature of the situation giving rise to the possible use, in particular the seriousness, probability and scale of the harm that would be caused if the system were not used, and (b) the consequences of the use for the rights and freedoms of all persons concerned, in particular the seriousness, probability and scale of those consequences. The use SHALL comply with necessary and proportionate safeguards and conditions in accordance with the national law authorising the use, in particular temporal, geographic and personal limitations. It may be authorised only if the law enforcement authority has completed a fundamental rights impact assessment under Art. 27 and registered the system in the EU database under Art. 49; in duly justified cases of urgency, use may commence before registration provided registration is completed without undue delay. Each use SHALL be notified to the relevant market surveillance authority and the national data protection authority pursuant to Art. 5(4).",
+          "_history": [
+            {
+              "requirement": "Use under any exception SHALL be subject to temporal, geographic, and personal limitations, fundamental rights impact assessment, notification to market surveillance authority, and registration in the EU database (Art. 49)",
+              "superseded_on": "2026-10-02",
+              "amending_celex": null,
+              "reason": "consensus-lock 2026-10-02 §6 (o3 sweep + Claude verification against Art 5 / Art 3 / Recital 18)"
+            }
+          ]
         }
       ],
       "automation_assessment": {

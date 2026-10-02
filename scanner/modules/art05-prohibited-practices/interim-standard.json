@@ -2,8 +2,8 @@
   "_metadata": {
     "standard_id": "CL-IS-ART05-v0.1",
     "title": "ComplianceLint Interim Standard for EU AI Act Article 5: Prohibited AI Practices",
-    "version": "0.1.0",
-    "date": "2026-03-17",
+    "version": "0.1.1",
+    "date": "2026-10-02",
     "status": "draft",
     "disclaimer": "This is an interim standard developed by ComplianceLint. Article 5 prohibitions are directly applicable since 2025-02-02 and do not require harmonized standards for interpretation. This document restates the prohibitions with operational detail for compliance checking. It is NOT legal advice.",
     "basis": [
@@ -24,7 +24,7 @@
       "id": "PP-ART5-01",
       "article_ref": "Art. 5(1)(a)",
       "title": "Subliminal / Manipulative / Deceptive Techniques",
-      "prohibition": "AI systems that deploy subliminal techniques beyond a person's consciousness, or purposefully manipulative or deceptive techniques, with the objective or effect of materially distorting the behaviour of a person or group, in a manner that causes or is reasonably likely to cause significant harm.",
+      "prohibition": "AI systems that deploy subliminal techniques beyond a person's consciousness, or purposefully manipulative or deceptive techniques, with the objective or effect of materially distorting the behaviour of a person or group by appreciably impairing their ability to make an informed decision, thereby causing them to take a decision that they would not otherwise have taken, in a manner that causes or is reasonably likely to cause that person, another person or a group of persons significant harm.",
       "scope": [
         "Subliminal stimuli (visual, auditory, or other sensory signals below conscious perception threshold)",
         "Deceptive AI-driven interfaces designed to distort decision-making (dark patterns with AI component)",
@@ -52,7 +52,7 @@
         "AI targeting children with manipulative content",
         "AI exploiting elderly persons' reduced digital literacy",
         "AI exploiting disability-related vulnerabilities (cognitive, physical, sensory)",
-        "AI exploiting social/economic vulnerability (poverty, homelessness, immigration status)"
+        "AI exploiting vulnerability due to a specific social or economic situation (Recital 29 examples: persons living in extreme poverty, ethnic or religious minorities)"
       ],
       "not_in_scope": [
         "AI accessibility tools designed to help vulnerable groups",
@@ -71,7 +71,7 @@
       "id": "PP-ART5-03",
       "article_ref": "Art. 5(1)(c)",
       "title": "Social Scoring",
-      "prohibition": "AI systems for the evaluation or classification of natural persons or groups based on their social behaviour or known, inferred, or predicted personal or personality characteristics, with the social score leading to either or both: (i) detrimental or unfavourable treatment in social contexts unrelated to the contexts where the data was originally generated or collected; (ii) detrimental or unfavourable treatment that is unjustified or disproportionate to their social behaviour or its gravity.",
+      "prohibition": "AI systems for the evaluation or classification of natural persons or groups over a certain period of time based on their social behaviour or known, inferred, or predicted personal or personality characteristics, with the social score leading to either or both: (i) detrimental or unfavourable treatment in social contexts unrelated to the contexts where the data was originally generated or collected; (ii) detrimental or unfavourable treatment that is unjustified or disproportionate to their social behaviour or its gravity.",
       "scope": [
         "Systems that aggregate social behaviour data into a 'score' affecting access to services",
         "Systems that use personal characteristics to create trustworthiness ratings with real-world consequences",
@@ -151,16 +151,16 @@
       ],
       "not_in_scope": [
         "Emotion recognition for medical/therapeutic purposes (e.g., mental health monitoring with consent)",
-        "Safety-critical emotion/alertness detection (e.g., driver drowsiness, operator fatigue)",
+        "Detection of physical states such as fatigue or pain (e.g., fatigue detection for professional pilots or drivers) — not emotion recognition at all (Recital 18), so outside the prohibition rather than within the safety exception",
+        "Systems labelled as attention or engagement monitoring that do not infer emotions (Art. 3(39): identifying or inferring emotions or intentions on the basis of biometric data)",
         "Emotion recognition in entertainment, gaming, or voluntary consumer applications",
         "Emotion recognition in customer service (outside workplace/education context)"
       ],
-      "exceptions": "Medical reasons (e.g., therapeutic monitoring, clinical assessment) or safety reasons (e.g., drowsiness detection for vehicle operators, fatigue monitoring in safety-critical operations)",
+      "exceptions": "Use intended to be put in place or into the market for medical reasons (Recital 44 example: systems intended for therapeutical use) or for safety reasons. Art. 5(1)(f) states no separate documentation or other formal condition for these exceptions.",
       "exception_requirements": [
-        "The medical or safety purpose must be clearly documented",
-        "The emotion recognition must be necessary (not merely convenient) for the stated purpose",
-        "Appropriate data protection measures must be in place",
-        "Informed consent should be obtained where possible"
+        "Good practice, NOT a statutory condition of Art. 5(1)(f): record the medical or safety purpose for which the system is intended, so the exception can be evidenced",
+        "Good practice, NOT a statutory condition of Art. 5(1)(f): confirm that emotion inference is needed for that medical or safety purpose",
+        "Other law continues to apply (e.g., GDPR for the biometric data processed)"
       ],
       "penalty": "Up to EUR 35,000,000 or 7% of total worldwide annual turnover (Art. 99(1))",
       "heuristic_indicators": [
@@ -209,23 +209,24 @@
         "Any real-time biometric matching against watchlists in public areas"
       ],
       "not_in_scope": [
-        "Post-facto (non-real-time) biometric identification (regulated under Art. 6 as high-risk)",
+        "Post-remote (non-real-time) biometric identification — not prohibited by Art. 5(1)(h); high-risk under Art. 6(2) and Annex III point 1(a), in so far as its use is permitted under relevant Union or national law",
         "Biometric verification (1:1 matching, e.g., unlocking a phone)",
-        "Biometric identification in non-publicly-accessible spaces (e.g., secure facilities with access control)",
-        "Non-law-enforcement real-time biometric identification (regulated under Art. 6 as high-risk but not banned)"
+        "Biometric identification in places NOT accessible to an undetermined number of natural persons (e.g., areas restricted to authorised staff). Private ownership or conditions for access do not by themselves take a place outside 'publicly accessible space' (Art. 3(44))",
+        "Non-law-enforcement real-time biometric identification (high-risk under Art. 6(2) and Annex III point 1(a), not banned by Art. 5(1)(h))"
       ],
       "exceptions": {
-        "description": "Three strictly limited exceptions for law enforcement, each requiring prior judicial authorization (except in duly justified urgency, where authorization must be sought within 24 hours)",
+        "description": "Three strictly limited exceptions for law enforcement, each requiring prior authorisation by a judicial authority or an independent administrative authority whose decision is binding (Art. 5(3)); in a duly justified situation of urgency, use may start without authorisation provided it is requested without undue delay, at the latest within 24 hours",
         "exception_i": "Targeted search for specific victims of abduction, trafficking, sexual exploitation, or search for missing persons",
         "exception_ii": "Prevention of a specific, substantial, and imminent threat to the life or physical safety of natural persons, or a genuine and present or foreseeable threat of a terrorist attack",
         "exception_iii": "Localization or identification of a person suspected of having committed a criminal offence punishable by a custodial sentence of at least 4 years, for offences listed in Annex II",
         "conditions": [
           "Must be strictly necessary for the stated objective",
-          "Prior judicial authorization required (or within 24 hours in urgent cases)",
-          "Temporal, geographic, and personal limitations must be defined",
-          "Fundamental rights impact assessment required before deployment",
-          "Must register in the EU database (Art. 49)",
-          "Must notify the relevant market surveillance authority",
+          "Only to confirm the identity of the specifically targeted individual, taking into account the seriousness, probability and scale of the harm if not used and of the consequences for the rights and freedoms of all persons concerned (Art. 5(2))",
+          "Prior authorisation by a judicial authority or an independent administrative authority whose decision is binding; in urgency, request without undue delay, at the latest within 24 hours; if rejected, stop immediately and delete all data, results and outputs (Art. 5(3))",
+          "Necessary and proportionate safeguards and conditions in accordance with the national law authorising the use, in particular temporal, geographic and personal limitations (Art. 5(2))",
+          "Completed fundamental rights impact assessment (Art. 27) before authorisation",
+          "Registration in the EU database (Art. 49); in duly justified urgency, use may start before registration provided registration is completed without undue delay",
+          "Each use notified to the relevant market surveillance authority and the national data protection authority (Art. 5(4))",
           "National law may further restrict or prohibit these exceptions"
         ]
       },
