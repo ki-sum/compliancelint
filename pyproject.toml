@@ -65,6 +65,10 @@ scanner = [
     "modules/*/interim-standard.json",
     "obligations/*.json",
     "sources/**/*.json",
+    # Recitals + public regulation-version mirror (scanner/core/obligation_lookup.py)
+    "data/*.json",
+    # Layer 2 interpretive materials (scanner/core/layer2_loader.py)
+    "interpretive-materials/*.json",
 ]
 
 [tool.pytest.ini_options]
