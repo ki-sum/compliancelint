@@ -1,9 +1,9 @@
 {
   "_metadata": {
-    "standard_id": "CL-IS-ART04-v0.1",
+    "standard_id": "CL-IS-ART04-v0.2",
     "title": "ComplianceLint Interim Standard for EU AI Act Article 4: AI Literacy",
-    "version": "0.1.0",
-    "date": "2026-04-03",
+    "version": "0.2.0",
+    "date": "2026-10-03",
     "status": "draft",
     "disclaimer": "This is an interim standard developed by ComplianceLint based on available guidance, industry best practices, and relevant ISO standards. It is NOT an official standard. It will be superseded when CEN-CENELEC publishes guidance for Article 4.",
     "basis": [
@@ -16,14 +16,13 @@
     ],
     "awaiting_standard": "AI Office guidance on Art. 4 implementation (no formal harmonized standard expected)"
   },
-
   "requirements": [
     {
       "id": "IS-ART04-R01",
       "obligation_ref": "ART04-OBL-1",
       "title": "AI Literacy Training Program",
       "requirement": "The organization MUST establish and maintain an AI literacy program for all persons dealing with the operation and use of AI systems.",
-      "rationale": "Art. 4 requires 'measures to ensure a sufficient level of AI literacy.' A structured training program is the primary mechanism for achieving this.",
+      "rationale": "Art. 4(1), as amended by Regulation (EU) 2026/1744, requires providers and deployers to 'take measures to support the development of AI literacy' of their staff and other persons dealing with the operation and use of AI systems on their behalf; it does not require them to guarantee any specific level of AI literacy of any individual.",
       "required_content": [
         "Overview of AI capabilities and limitations relevant to the organization",
         "Risks and potential biases of AI systems in use",
@@ -60,7 +59,7 @@
       "obligation_ref": "ART04-OBL-1",
       "title": "Role-Specific Training Differentiation",
       "requirement": "AI literacy training SHOULD be differentiated based on roles, taking into account technical knowledge, experience, and training of staff.",
-      "rationale": "Art. 4 explicitly requires 'taking into account their technical knowledge, experience, education and training.' One-size-fits-all training does not meet this requirement.",
+      "rationale": "Art. 4(1) requires the measures to take into account the technical knowledge, experience, education and training of the relevant persons. Any measures used must be designed so that those differences are taken into account.",
       "acceptable_implementations": [
         "Developer track: AI/ML fundamentals, bias detection, testing",
         "Operator track: system monitoring, escalation, override procedures",
@@ -69,7 +68,6 @@
       ]
     }
   ],
-
   "scoring": {
     "compliant": "R01 met + at least one of R02, R03 met",
     "partial": "R01 partially met (some training exists) or only R02 met",

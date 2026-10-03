@@ -10,7 +10,30 @@
       "draft": [],
       "published": [],
       "upcoming": []
-    }
+    },
+    "amendments": [
+      {
+        "amending_celex": "32026R1744",
+        "amending_act": "Regulation (EU) 2026/1744 (Digital Omnibus)",
+        "consolidated_celex": "02024R1689-20260727",
+        "change_type": "AMEND",
+        "obligations_amended": [
+          "ART25-OBL-2",
+          "ART25-EXC-2",
+          "ART25-OBL-4"
+        ],
+        "obligations_added": [],
+        "source_pdf": "docs/sources/eu-ai-act-2024-1689-consolidated-20260727-en.pdf",
+        "source_pdf_sha256": "1ccd38d1c78482cf2053b70110115adcc5080700acc8bd7bead8cb3579143ccf",
+        "source_pages": [
+          35,
+          36,
+          37
+        ],
+        "consensus_lock": "omnibus-batch2-2026-10-03",
+        "recorded_on": "2026-10-03"
+      }
+    ]
   },
   "obligations": [
     {
@@ -49,7 +72,7 @@
     {
       "id": "ART25-OBL-2",
       "source": "Art. 25(2)",
-      "source_quote": "That initial provider shall closely cooperate with new providers and shall make available the necessary information and provide the reasonably expected technical access and other assistance that are required for the fulfilment of the obligations set out in this Regulation, in particular regarding the compliance with the conformity assessment of high-risk AI systems.",
+      "source_quote": "That initial provider shall closely cooperate with new providers and shall make available the necessary information and provide the reasonably expected technical access and other assistance that are required for the fulfilment of the obligations set out in this Regulation, in particular with regard to compliance with the conformity assessment of high-risk AI systems. In particular, the obligation laid down in the second subparagraph shall include, where relevant for the purposes specified therein, the following: (a) making available of technical documentation sufficient to assess compliance with the requirements laid down in Article 16; (b) informing the new providers about known limitations and failure modes; and (c) providing the new providers with targeted technical access, including for testing and validation.",
       "deontic_type": "obligation",
       "modality": "shall",
       "addressee": "provider",
@@ -64,16 +87,39 @@
           "atom": "initial_provider_shares_information",
           "description": "Initial provider must make available necessary information and technical access",
           "requirement": "The initial provider SHALL make available the necessary information and provide reasonably expected technical access and other assistance required for compliance"
+        },
+        {
+          "atom": "technical_documentation_made_available",
+          "description": "Cooperation includes making technical documentation available",
+          "requirement": "Where relevant for those purposes, the cooperation SHALL include making available technical documentation sufficient to assess compliance with the requirements laid down in Article 16"
+        },
+        {
+          "atom": "known_limitations_and_failure_modes_shared",
+          "description": "Cooperation includes informing new providers about known limitations and failure modes",
+          "requirement": "Where relevant for those purposes, the cooperation SHALL include informing the new providers about known limitations and failure modes"
+        },
+        {
+          "atom": "targeted_technical_access_provided",
+          "description": "Cooperation includes targeted technical access, including for testing and validation",
+          "requirement": "Where relevant for those purposes, the cooperation SHALL include providing the new providers with targeted technical access, including for testing and validation"
         }
       ],
       "automation_assessment": {
         "level": "partial"
-      }
+      },
+      "_source_quote_history": [
+        {
+          "source_quote": "That initial provider shall closely cooperate with new providers and shall make available the necessary information and provide the reasonably expected technical access and other assistance that are required for the fulfilment of the obligations set out in this Regulation, in particular regarding the compliance with the conformity assessment of high-risk AI systems.",
+          "superseded_on": "2026-10-03",
+          "amending_celex": "32026R1744",
+          "consensus_lock": "omnibus-batch2-2026-10-03"
+        }
+      ]
     },
     {
       "id": "ART25-EXC-2",
       "source": "Art. 25(2)",
-      "source_quote": "This paragraph shall not apply in cases where the initial provider has clearly specified that its AI system is not to be changed into a high-risk AI system and therefore does not fall under the obligation to hand over the documentation.",
+      "source_quote": "This paragraph shall not apply in cases where the initial provider has clearly specified that its AI system is not to be changed into a high-risk AI system and therefore does not fall under the obligation to cooperate with the new providers and hand over the documentation.",
       "deontic_type": "exception",
       "modality": "shall not",
       "addressee": "provider",
@@ -89,7 +135,15 @@
         "level": "partial"
       },
       "linked_obligation": [
-        "ART25-OBL-4"
+        "ART25-OBL-2"
+      ],
+      "_source_quote_history": [
+        {
+          "source_quote": "This paragraph shall not apply in cases where the initial provider has clearly specified that its AI system is not to be changed into a high-risk AI system and therefore does not fall under the obligation to hand over the documentation.",
+          "superseded_on": "2026-10-03",
+          "amending_celex": "32026R1744",
+          "consensus_lock": "omnibus-batch2-2026-10-03"
+        }
       ]
     },
     {
@@ -125,11 +179,11 @@
     {
       "id": "ART25-OBL-4",
       "source": "Art. 25(4)",
-      "source_quote": "The provider of a high-risk AI system and the third party that supplies an AI system, tools, services, components, or processes that are used or integrated in a high-risk AI system shall, by written agreement, specify the necessary information, capabilities, technical access and other assistance based on the generally acknowledged state of the art, in order to enable the provider of the high-risk AI system to fully comply with the obligations set out in this Regulation.",
+      "source_quote": "The provider of a high-risk AI system and the third party that supplies an AI system, AI model, tools, services, components, or processes that are used or integrated in a high-risk AI system shall, by written agreement, specify the necessary information, capabilities, technical access and other assistance based on the generally acknowledged state of the art, in order to enable the provider of the high-risk AI system to fully comply with the obligations set out in this Regulation.",
       "deontic_type": "obligation",
       "modality": "shall",
       "addressee": "provider",
-      "addressee_note": "Provider of a high-risk AI system AND the third party supplying AI components",
+      "addressee_note": "Provider of a high-risk AI system and the third party that supplies an AI system, AI model, tools, services, components or processes used or integrated in that high-risk AI system (written agreement; subject to the second-sentence free and open-source exception in Art. 25(4)).",
       "decomposed_atoms": [
         {
           "atom": "written_agreement_with_third_party",
@@ -144,7 +198,15 @@
       ],
       "automation_assessment": {
         "level": "partial"
-      }
+      },
+      "_source_quote_history": [
+        {
+          "source_quote": "The provider of a high-risk AI system and the third party that supplies an AI system, tools, services, components, or processes that are used or integrated in a high-risk AI system shall, by written agreement, specify the necessary information, capabilities, technical access and other assistance based on the generally acknowledged state of the art, in order to enable the provider of the high-risk AI system to fully comply with the obligations set out in this Regulation.",
+          "superseded_on": "2026-10-03",
+          "amending_celex": "32026R1744",
+          "consensus_lock": "omnibus-batch2-2026-10-03"
+        }
+      ]
     },
     {
       "id": "ART25-EXC-4",

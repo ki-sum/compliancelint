@@ -5,15 +5,20 @@ Art. 43 requires providers of high-risk AI systems to undergo conformity assessm
 procedures. The specific procedure depends on the system's classification:
   - Annex III point 1 (biometric ID): Annex VI or VII (with notified body)
   - Annex III points 2-8: Annex VI internal control only
-  - Annex I product systems: sectoral conformity assessment
+  - Annex I product systems: sectoral conformity assessment, incl. the Art. 17 quality management
+    system and Annex VII points 3, 4.3-4.5, 4.6 (fifth paragraph) and 5 (Art. 43(3), as amended by
+    Reg (EU) 2026/1744); an Annex I product that also falls within Annex III follows the same
+    sectoral procedure (Art. 43(3), fourth subparagraph), so 43(1)/(2) do not apply to it
   - Substantial modifications: new conformity assessment required
 
 Scanning is AI-First: all detection is driven by compliance_answers provided by
 ctx.get_article_answers("art43"). No regex or keyword scanning is performed.
 
 Obligation mapping:
-  ART43-OBL-1   → handled by gap_findings (conditional: is_annex_iii_point_1, manual)
-  ART43-OBL-2   → has_internal_control_assessment (Annex VI self-assessment)
+  ART43-OBL-1   → handled by gap_findings (conditional: is_annex_iii_point_1, manual);
+                  NOT_APPLICABLE when is_annex_i_product is True (Art. 43(3), fourth subparagraph)
+  ART43-OBL-2   → has_internal_control_assessment (Annex VI self-assessment);
+                  NOT_APPLICABLE when is_annex_i_product is True (Art. 43(3), fourth subparagraph)
   ART43-OBL-3   → handled by gap_findings (conditional: is_annex_i_product, manual)
   ART43-OBL-4   → has_change_management_procedures (reassessment on modification)
 
@@ -85,28 +90,54 @@ class Art43Module(BaseArticleModule):
 
         has_internal_control_assessment = answers.get("has_internal_control_assessment")
         has_change_management_procedures = answers.get("has_change_management_procedures")
+        # is_annex_i_product is answered under art8 / art11 (wizard: isAnnexIProduct); read it the
+        # way the obligation engine resolves context_skip_field — all articles flattened, last wins.
+        flat: dict = {}
+        for article_answers in (ctx.compliance_answers or {}).values() if ctx else ():
+            if isinstance(article_answers, dict):
+                flat.update(article_answers)
+        is_annex_i_product = flat.get("is_annex_i_product")
 
-        # ── ART43-OBL-2: Internal control assessment (Annex VI) ──
-        # Annex III points 2-8 systems must follow internal control per Annex VI
-        findings.append(self._finding_from_answer(
-            obligation_id="ART43-OBL-2",
-            answer=has_internal_control_assessment,
-            true_description=(
-                "Internal control assessment documentation found. "
-                "Verify it covers all Annex VI requirements including quality management "
-                "system and technical documentation review."
-            ),
-            false_description=(
-                "No internal control assessment documentation found. "
-                "Art. 43(2) requires providers of Annex III points 2-8 high-risk AI systems "
-                "to follow the Annex VI internal control conformity assessment procedure."
-            ),
-            none_description=(
-                "AI could not determine whether internal control assessment has been performed. "
-                "Art. 43(2) requires Annex VI conformity assessment for Annex III points 2-8 systems."
-            ),
-            gap_type=GapType.PROCESS,
-        ))
+        if is_annex_i_product is True:
+            # ── ART43-OBL-1 / OBL-2: Annex I products take the sectoral route ──
+            for oid, para in (("ART43-OBL-1", "43(1)"), ("ART43-OBL-2", "43(2)")):
+                findings.append(Finding(
+                    obligation_id=oid,
+                    file_path="project-wide",
+                    line_number=None,
+                    level=ComplianceLevel.NOT_APPLICABLE,
+                    confidence=Confidence.MEDIUM,
+                    description=(
+                        "The system is covered by the Union harmonisation legislation listed in "
+                        "Section A of Annex I. Under Art. 43(3), fourth subparagraph, such a system "
+                        "follows the conformity assessment procedure of that legislation even if it "
+                        f"also falls within Annex III, so Art. {para} does not apply (see ART43-OBL-3)."
+                    ),
+                    gap_type=GapType.PROCESS,
+                    is_informational=True,
+                ))
+        else:
+            # ── ART43-OBL-2: Internal control assessment (Annex VI) ──
+            # Annex III points 2-8 systems must follow internal control per Annex VI
+            findings.append(self._finding_from_answer(
+                obligation_id="ART43-OBL-2",
+                answer=has_internal_control_assessment,
+                true_description=(
+                    "Internal control assessment documentation found. "
+                    "Verify it covers all Annex VI requirements including quality management "
+                    "system and technical documentation review."
+                ),
+                false_description=(
+                    "No internal control assessment documentation found. "
+                    "Art. 43(2) requires providers of Annex III points 2-8 high-risk AI systems "
+                    "to follow the Annex VI internal control conformity assessment procedure."
+                ),
+                none_description=(
+                    "AI could not determine whether internal control assessment has been performed. "
+                    "Art. 43(2) requires Annex VI conformity assessment for Annex III points 2-8 systems."
+                ),
+                gap_type=GapType.PROCESS,
+            ))
 
         # ── ART43-OBL-4: Reassessment on substantial modification ──
         # New conformity assessment required when system undergoes substantial modification
@@ -129,13 +160,14 @@ class Art43Module(BaseArticleModule):
             gap_type=GapType.PROCESS,
         ))
 
-        # OBL-1 (conditional: is_annex_iii_point_1, manual) and
+        # OBL-1 (conditional: is_annex_iii_point_1, manual; emitted above for Annex I products) and
         # OBL-3 (conditional: is_annex_i_product, manual) are handled by gap_findings
 
         # Build details dict
         details = {
             "has_internal_control_assessment": has_internal_control_assessment,
             "has_change_management_procedures": has_change_management_procedures,
+            "is_annex_i_product": is_annex_i_product,
         }
 
         # ── Obligation Engine: enrich findings + identify gaps ──
@@ -177,12 +209,21 @@ class Art43Module(BaseArticleModule):
             ),
             official_summary=(
                 "Art. 43 sets out conformity assessment procedures for high-risk AI systems. "
-                "For Annex III point 1 (biometric identification) systems, providers choose between "
-                "Annex VI internal control or Annex VII assessment with a notified body. "
-                "For Annex III points 2-8 systems, providers follow Annex VI internal control only. "
-                "For Annex I product systems, providers follow the relevant sectoral conformity "
-                "assessment procedure. All systems require new conformity assessment upon "
-                "substantial modification."
+                "For Annex III point 1 (biometrics) systems, where the provider has applied the "
+                "harmonised standards referred to in Art. 40 or, where applicable, the common "
+                "specifications referred to in Art. 41, the provider may choose Annex VI "
+                "internal control or Annex VII assessment with a notified body; in the "
+                "circumstances listed in Art. 43(1), second subparagraph, Annex VII is "
+                "mandatory. For Annex III points 2-8, providers follow Annex VI internal "
+                "control. For high-risk AI systems covered by Union harmonisation legislation "
+                "listed in Section A of Annex I, providers follow the conformity assessment "
+                "procedure required by that legislation; the Chapter III Section 2 requirements "
+                "and assessment of the Art. 17 quality management system form part of that "
+                "assessment, and the listed provisions of Annex VII apply. Where such a system "
+                "also falls within Annex III, the same Section A sectoral procedure applies. "
+                "High-risk AI systems already subjected to conformity assessment must undergo a "
+                "new conformity assessment in the event of a substantial modification, subject "
+                "to the second subparagraph of Art. 43(4)."
             ),
             related_articles={
                 "Art. 6": "High-risk classification determining which assessment applies",
@@ -224,7 +265,7 @@ class Art43Module(BaseArticleModule):
         actions = []
         details = scan_result.details
 
-        if details.get("has_internal_control_assessment") is False:
+        if details.get("has_internal_control_assessment") is False and details.get("is_annex_i_product") is not True:
             actions.append(ActionItem(
                 priority="CRITICAL",
                 article="Art. 43(2)",
@@ -259,10 +300,15 @@ class Art43Module(BaseArticleModule):
             article="Art. 43(1)",
             action="Determine applicable conformity assessment procedure",
             details=(
-                "If your system falls under Annex III point 1 (biometric identification), "
-                "choose between Annex VI (internal control) or Annex VII (notified body). "
-                "If your system is an Annex I product, follow the relevant sectoral procedure. "
-                "Document the chosen procedure and rationale."
+                "If your system falls under Annex III point 1 (biometrics), Annex VI may be "
+                "chosen only where the conditions in Art. 43(1), first subparagraph, are met; "
+                "in the circumstances listed in Art. 43(1), second subparagraph, Annex VII is "
+                "required. If your high-risk AI system is covered by Union harmonisation "
+                "legislation listed in Section A of Annex I, follow the conformity assessment "
+                "procedure of that legislation; the Section 2 requirements, assessment of the "
+                "Art. 17 quality management system and the Annex VII provisions listed in Art. "
+                "43(3), first subparagraph, form part of that assessment, even if the system "
+                "also falls within Annex III. Document the applicable procedure and rationale."
             ),
             effort="4-8 hours",
             action_type="human_judgment_required",

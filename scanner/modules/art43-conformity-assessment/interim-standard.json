@@ -1,9 +1,9 @@
 {
   "_metadata": {
-    "standard_id": "CL-IS-ART43-v0.1",
+    "standard_id": "CL-IS-ART43-v0.2",
     "title": "ComplianceLint Interim Standard for EU AI Act Article 43: Conformity Assessment",
-    "version": "0.1.0",
-    "date": "2026-04-03",
+    "version": "0.2.0",
+    "date": "2026-10-03",
     "status": "draft",
     "disclaimer": "This is an interim standard developed by ComplianceLint. It will be superseded by the CEN-CENELEC harmonized standard.",
     "basis": [
@@ -22,9 +22,9 @@
       "requirement": "The provider MUST complete a conformity assessment per the applicable procedure (Annex VI or VII) before market placement.",
       "rationale": "Art. 43(1)-(2) mandates conformity assessment before placing on market.",
       "acceptable_implementations": [
-        "Annex VI internal control self-assessment with documentation",
-        "Annex VII assessment with notified body involvement",
-        "Sectoral conformity assessment per Annex I legislation"
+        "Annex VI internal control for Annex III points 2-8, and for Annex III point 1 only where Art. 43(1) permits that option",
+        "Annex VII assessment with notified-body involvement for Annex III point 1 where chosen or required under Art. 43(1)",
+        "Conformity assessment under the Union harmonisation legislation listed in Section A of Annex I, including the Section 2 requirements, assessment of the Art. 17 quality management system and the Annex VII provisions listed in Art. 43(3)"
       ]
     },
     {

@@ -479,7 +479,7 @@
         {
           "article": 50,
           "paragraph": 2,
-          "context": "Codes of practice facilitate the effective implementation of the Art. 50(2) marking and detection obligations; the Commission's adequacy assessment (ART50-EMP-7a) covers Art. 50(2) and (4)."
+          "context": "Codes of practice facilitate the effective implementation of the Art. 50(2) marking and detection obligations; the Commission's adequacy assessment (ART50-OBL-7a) covers Art. 50(2) and (4)."
         }
       ],
       "_source_quote_history": [
@@ -492,7 +492,7 @@
       ]
     },
     {
-      "id": "ART50-EMP-7a",
+      "id": "ART50-OBL-7a",
       "source": "Art. 50(7)",
       "source_quote": "The Commission, taking utmost account of the opinion of the Board, shall assess whether adherence to those codes of practice is adequate to ensure compliance with the obligations laid down in paragraphs 2 and 4 of this Article, in accordance with the procedure laid down in Article 56(6).",
       "deontic_type": "obligation",
@@ -529,7 +529,7 @@
         {
           "article": 50,
           "paragraph": 7,
-          "context": "Art. 50(7) contains two Commission obligations: ART50-OBL-7 (encourage and facilitate the drawing up of codes of practice) and this record, ART50-EMP-7a (assess whether adherence is adequate); it also contains one Commission empowerment, ART50-EMP-7b (common rules if a code is deemed inadequate)."
+          "context": "Art. 50(7) contains two Commission obligations: ART50-OBL-7 (encourage and facilitate the drawing up of codes of practice) and this record, ART50-OBL-7a (assess whether adherence is adequate); it also contains one Commission empowerment, ART50-EMP-7b (common rules if a code is deemed inadequate)."
         }
       ],
       "_source_quote_history": [
@@ -538,6 +538,14 @@
           "superseded_on": "2026-10-03",
           "amending_celex": "32026R1744",
           "consensus_lock": "omnibus-batch1-2026-10-03"
+        }
+      ],
+      "_id_history": [
+        {
+          "id": "ART50-EMP-7a",
+          "superseded_on": "2026-10-03",
+          "amending_celex": "32026R1744",
+          "consensus_lock": "omnibus-batch2-2026-10-03"
         }
       ]
     },
@@ -548,7 +556,7 @@
       "deontic_type": "empowerment",
       "modality": "may",
       "addressee": "commission",
-      "note": "Commission fallback empowerment: if the Commission deems the code of practice (see ART50-OBL-7 and ART50-EMP-7a) to be inadequate, it may adopt an implementing act specifying common rules for the implementation of the obligations in Art. 50(2) and (4), in accordance with the examination procedure in Art. 98(2).",
+      "note": "Commission fallback empowerment: if the Commission deems the code of practice (see ART50-OBL-7 and ART50-OBL-7a) to be inadequate, it may adopt an implementing act specifying common rules for the implementation of the obligations in Art. 50(2) and (4), in accordance with the examination procedure in Art. 98(2).",
       "_correction_note": "CORRECTION 2026-08-08: previous source_quote (about 'specify and update the list of specific categories of AI systems') was an o3 hallucination from the 2026-03-20 Consensus Lock session — full-text grep of EUR-Lex CELEX:32024R1689 returned zero matches. Repaired to verbatim Art 50(7) sentence 3, with corresponding atom rewrite. ID preserved to avoid breaking 31 downstream references and the CI `total == 247` invariant.",
       "decomposed_atoms": [
         {
@@ -578,7 +586,7 @@
         {
           "article": 50,
           "paragraph": 7,
-          "context": "This is the only Commission empowerment left in Art. 50(7) after Reg (EU) 2026/1744; its counterpart ART50-EMP-7a is now the Commission's obligation to assess the adequacy of codes of practice."
+          "context": "This is the only Commission empowerment left in Art. 50(7) after Reg (EU) 2026/1744; its counterpart ART50-OBL-7a is now the Commission's obligation to assess the adequacy of codes of practice."
         }
       ],
       "_source_quote_history": [
@@ -609,7 +617,7 @@
       "provider_obligations": "ART50-OBL-1 (direct human-interaction disclosure) and ART50-OBL-2 (machine-readable marking and detectability of synthetic content) impose provider obligations within their stated scopes and exceptions.",
       "deployer_obligations": "ART50-OBL-3 (emotion-recognition/biometric-categorisation disclosure) and ART50-OBL-4/4b (deep-fake and public-interest text disclosure) impose deployer obligations within their stated scopes and exceptions.",
       "cross_cutting": "ART50-OBL-5 (manner and timing of information) and ART50-OBL-6 (relationship with Chapter III and other transparency obligations) apply to paragraphs 1 to 4 as specified in Art. 50(5) and (6).",
-      "commission_codes_of_practice": "ART50-OBL-7 — Commission SHALL encourage and facilitate codes of practice for detection, marking and labelling; ART50-EMP-7a — Commission SHALL assess their adequacy for Art. 50(2) and (4).",
+      "commission_codes_of_practice": "ART50-OBL-7 — Commission SHALL encourage and facilitate codes of practice for detection, marking and labelling; ART50-OBL-7a — Commission SHALL assess their adequacy for Art. 50(2) and (4).",
       "commission_empowerment": "ART50-EMP-7b — Commission MAY adopt an implementing act with common rules if a code of practice is deemed inadequate."
     }
   }

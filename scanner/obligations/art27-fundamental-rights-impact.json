@@ -30,7 +30,30 @@
       "upcoming": [
         "CEN-CENELEC harmonized standard for fundamental rights impact assessment (expected Q4 2026)"
       ]
-    }
+    },
+    "amendments": [
+      {
+        "amending_celex": "32026R1744",
+        "amending_act": "Regulation (EU) 2026/1744 (Digital Omnibus)",
+        "consolidated_celex": "02024R1689-20260727",
+        "change_type": "AMEND",
+        "obligations_amended": [
+          "ART27-PERM-4"
+        ],
+        "obligations_added": [],
+        "obligations_renamed": {
+          "ART27-OBL-4": "ART27-PERM-4"
+        },
+        "source_pdf": "docs/sources/eu-ai-act-2024-1689-consolidated-20260727-en.pdf",
+        "source_pdf_sha256": "1ccd38d1c78482cf2053b70110115adcc5080700acc8bd7bead8cb3579143ccf",
+        "source_pages": [
+          39,
+          40
+        ],
+        "consensus_lock": "omnibus-batch2-2026-10-03",
+        "recorded_on": "2026-10-03"
+      }
+    ]
   },
   "obligations": [
     {
@@ -127,30 +150,53 @@
       }
     },
     {
-      "id": "ART27-OBL-4",
+      "id": "ART27-PERM-4",
       "source": "Art. 27(4)",
-      "source_quote": "If any of the obligations laid down in this Article is already met through the data protection impact assessment conducted pursuant to Article 35 of Regulation (EU) 2016/679 or Article 27 of Directive (EU) 2016/680, the fundamental rights impact assessment referred to in paragraph 1 of this Article shall complement that data protection impact assessment.",
-      "deontic_type": "obligation",
-      "modality": "shall",
+      "source_quote": "If any of the obligations laid down in this Article is already met through the data protection impact assessment conducted pursuant to Article 35 of Regulation (EU) 2016/679 or Article 27 of Directive (EU) 2016/680, the deployer may, when conducting the fundamental rights impact assessment referred to in paragraph 1 of this Article, include cross-references to the relevant sections of that data protection impact assessment or include relevant parts thereof in the fundamental rights impact assessment.",
+      "deontic_type": "permission",
+      "modality": "may",
       "addressee": "deployer",
-      "scope_limitation": "Only applies where a DPIA has already been conducted under GDPR",
-      "context_skip_field": "has_existing_dpia",
-      "context_skip_value": false,
       "decomposed_atoms": [
         {
-          "atom": "fria_complement_dpia",
-          "description": "FRIA must complement existing DPIA rather than duplicate it",
-          "requirement": "SHALL complement the existing DPIA when one has been conducted under GDPR"
+          "atom": "fria_may_reuse_dpia",
+          "description": "Deployer may cross-reference or include parts of an existing DPIA in the FRIA",
+          "requirement": "Where any obligation in Art. 27 is already met through a data protection impact assessment under Art. 35 of Regulation (EU) 2016/679 or Art. 27 of Directive (EU) 2016/680, the deployer MAY, when conducting the fundamental rights impact assessment, include cross-references to the relevant sections of that data protection impact assessment or include relevant parts of it in the fundamental rights impact assessment",
+          "_history": [
+            {
+              "requirement": "SHALL complement the existing DPIA when one has been conducted under GDPR",
+              "description": "FRIA must complement existing DPIA rather than duplicate it",
+              "atom": "fria_complement_dpia",
+              "superseded_on": "2026-10-03",
+              "amending_celex": "32026R1744",
+              "consensus_lock": "omnibus-batch2-2026-10-03"
+            }
+          ]
         }
       ],
       "automation_assessment": {
         "level": "partial"
-      }
+      },
+      "_id_history": [
+        {
+          "id": "ART27-OBL-4",
+          "superseded_on": "2026-10-03",
+          "amending_celex": "32026R1744",
+          "consensus_lock": "omnibus-batch2-2026-10-03"
+        }
+      ],
+      "_source_quote_history": [
+        {
+          "source_quote": "If any of the obligations laid down in this Article is already met through the data protection impact assessment conducted pursuant to Article 35 of Regulation (EU) 2016/679 or Article 27 of Directive (EU) 2016/680, the fundamental rights impact assessment referred to in paragraph 1 of this Article shall complement that data protection impact assessment.",
+          "superseded_on": "2026-10-03",
+          "amending_celex": "32026R1744",
+          "consensus_lock": "omnibus-batch2-2026-10-03"
+        }
+      ]
     }
   ],
   "summary": {
     "total_obligations": 4,
-    "obligation_count": 4,
+    "obligation_count": 3,
     "addressee_breakdown": {
       "deployer": 4
     },

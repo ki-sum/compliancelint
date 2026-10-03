@@ -13,11 +13,12 @@ Obligation mapping:
   ART27-OBL-1   → has_fria_documentation (FRIA with all six elements)
   ART27-OBL-2   → has_fria_versioning (FRIA before first use + updated on change)
   ART27-OBL-3   → handled by gap_findings (manual — authority notification)
-  ART27-OBL-4   → handled by gap_findings (conditional: has_existing_dpia, manual)
+  ART27-PERM-4  → no finding: Art. 27(4) as amended by Reg (EU) 2026/1744 is a deployer
+                  permission (cross-reference or include parts of an existing DPIA);
+                  gap_findings() skips permissions
 
-All four obligations have context_skip_field "is_public_law_or_annex_iii_5bc"
-(OBL-1/2/3) or "has_existing_dpia" (OBL-4). When the relevant field is False,
-the obligation is NOT_APPLICABLE. When not provided, it is CONDITIONAL (UTD).
+OBL-1/2/3 have context_skip_field "is_public_law_or_annex_iii_5bc". When it is
+False, the obligation is NOT_APPLICABLE. When not provided, it is CONDITIONAL (UTD).
 
 NOTE — "handled by gap_findings" means:
   ObligationEngine.gap_findings() auto-generates the finding for any obligation
@@ -110,8 +111,8 @@ class Art27Module(BaseArticleModule):
             gap_type=GapType.PROCESS,
         ))
 
-        # OBL-3 (authority notification) and OBL-4 (complement DPIA) are manual —
-        # gap_findings() will auto-generate CONDITIONAL/NOT_APPLICABLE/UTD findings.
+        # OBL-3 (authority notification) is manual — gap_findings() will auto-generate
+        # CONDITIONAL/NOT_APPLICABLE/UTD findings. ART27-PERM-4 is a permission: no finding.
 
         # Build details dict
         details = {
@@ -157,27 +158,31 @@ class Art27Module(BaseArticleModule):
                 "Impact Assessment before first use and keep it updated."
             ),
             official_summary=(
-                "Art. 27 requires deployers that are public law bodies, private entities "
-                "providing public services, or deployers of Annex III point 5(b) and (c) "
-                "systems to perform a Fundamental Rights Impact Assessment (FRIA). The FRIA "
-                "must cover: (a) description of processes, (b) period and frequency of use, "
-                "(c) categories of affected persons, (d) specific risks of harm, (e) human "
-                "oversight measures, and (f) measures when risks materialise. The FRIA must "
-                "be performed before first use (Art. 27(2)), its results notified to the "
-                "market surveillance authority (Art. 27(3)), and it must complement any "
-                "existing DPIA under GDPR (Art. 27(4))."
+                "Art. 27 requires, before deployment, a FRIA for high-risk AI systems referred "
+                "to in Art. 6(2) by deployers that are bodies governed by public law or private "
+                "entities providing public services, except for systems intended for the area "
+                "listed in Annex III point 2, and by deployers of systems referred to in Annex "
+                "III points 5(b) and (c). The FRIA must cover the six elements in Art. 27(1). "
+                "The obligation applies to first use; previous assessments may be relied on in "
+                "similar cases and must be updated when relevant elements change. After the "
+                "assessment, the deployer must notify the market surveillance authority of the "
+                "results, subject to the possible Art. 46(1) exemption. Where a DPIA under GDPR "
+                "Art. 35 or Directive (EU) 2016/680 Art. 27 already meets an Art. 27 "
+                "obligation, the deployer may cross-reference the relevant DPIA sections or "
+                "include relevant parts in the FRIA."
             ),
             related_articles={
                 "Art. 6": "High-risk classification (prerequisite for Art. 27)",
                 "Art. 9": "Risk management system (related risk documentation)",
                 "Art. 26": "Deployer obligations (broader deployer duties)",
-                "Art. 35 GDPR": "Data Protection Impact Assessment (DPIA) that FRIA complements",
+                "Art. 35 GDPR": "Data Protection Impact Assessment (DPIA) whose relevant sections the FRIA may cross-reference or include (Art. 27(4))",
                 "Annex III 5(b)(c)": "High-risk categories triggering FRIA requirement",
             },
             recital=(
-                "Recital 96: Fundamental rights impact assessments complement DPIAs and "
-                "ensure broader consideration of impacts on fundamental rights beyond data "
-                "protection."
+                "Recital 96: The fundamental rights impact assessment identifies specific risks "
+                "to the rights of individuals or groups likely to be affected and measures to "
+                "be taken if those risks materialise; the AI Office should develop a "
+                "questionnaire template to facilitate compliance."
             ),
             automation_summary={
                 "fully_automatable": [],
@@ -188,16 +193,17 @@ class Art27Module(BaseArticleModule):
                 "requires_human_judgment": [
                     "Whether FRIA content is substantively adequate",
                     "Whether all six required elements are covered",
-                    "Whether FRIA was completed before first use",
-                    "Whether authority has been notified",
-                    "Whether FRIA adequately complements existing DPIA",
+                    "Whether the FRIA was completed for first use and updated where required",
+                    "Whether the market surveillance authority was notified or an Art. 46(1) exemption applies",
+                    "Whether DPIA sections cross-referenced or included in the FRIA meet the corresponding Art. 27 obligations",
                 ],
             },
             compliance_checklist_summary=(
-                "ComplianceLint Compliance Checklist v0.1 requires: (1) documented FRIA covering "
-                "all six elements from Art. 27(1), (2) dated and versioned FRIA showing pre-deployment "
-                "completion, (3) evidence of authority notification, (4) DPIA complementarity where "
-                "applicable. Based on: ISO/IEC 42001:2023, ISO/IEC 23894:2023."
+                "ComplianceLint Compliance Checklist v0.1 requires evidence of a FRIA covering "
+                "the Art. 27(1) elements and completed for first use, evidence of notification "
+                "where Art. 27(3) requires it, and, where DPIA material is reused under Art. "
+                "27(4), mapping showing which DPIA sections meet the corresponding Art. 27 "
+                "obligations. Based on: ISO/IEC 42001:2023, ISO/IEC 23894:2023."
             ),
             enforcement_date=applicable_from(27),
             waiting_for="CEN-CENELEC harmonized standard for fundamental rights impact assessment (expected Q4 2026)",
@@ -257,12 +263,13 @@ class Art27Module(BaseArticleModule):
         actions.append(ActionItem(
             priority="LOW",
             article="Art. 27(4)",
-            action="Assess whether FRIA needs to complement an existing DPIA",
+            action="Consider reusing an existing DPIA in the FRIA",
             details=(
-                "If a Data Protection Impact Assessment (DPIA) has been conducted under "
-                "GDPR Art. 35, the FRIA must complement it rather than duplicate it. "
-                "Review existing DPIAs and ensure the FRIA addresses fundamental rights "
-                "beyond data protection."
+                "Under Art. 27(4), as amended by Regulation (EU) 2026/1744, if a Data Protection "
+                "Impact Assessment (DPIA) under GDPR Art. 35 or Art. 27 of Directive (EU) 2016/680 "
+                "already meets any of the Art. 27 obligations, you may include cross-references to "
+                "the relevant sections of that DPIA or include relevant parts of it in the FRIA. "
+                "The FRIA itself is still required (Art. 27(1))."
             ),
             effort="2-4 hours",
             action_type="human_judgment_required",

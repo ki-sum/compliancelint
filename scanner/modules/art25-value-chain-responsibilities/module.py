@@ -3,7 +3,8 @@ Article 25: Responsibilities along the AI value chain — Module implementation.
 
 Art. 25 addresses how provider responsibilities transfer when third parties
 rebrand, substantially modify, or change the intended purpose of an AI system.
-It also requires written agreements between providers and third-party suppliers.
+It also requires written agreements between providers and third parties supplying AI systems,
+AI models, tools, services, components or processes (Art. 25(4), as amended by Reg (EU) 2026/1744).
 
 Scanning is AI-First: all detection is driven by compliance_answers provided by
 ctx.get_article_answers("art25"). No regex or keyword scanning is performed.
@@ -127,13 +128,18 @@ class Art25Module(BaseArticleModule):
                 "Provider cooperation documentation detected. "
                 "Verify the initial provider closely cooperates with new providers and makes "
                 "available necessary information, technical access, and assistance required "
-                "for compliance with this Regulation, per Art. 25(2)."
+                "for compliance with this Regulation, including, where relevant, technical "
+                "documentation sufficient to assess compliance with the requirements laid down "
+                "in Art. 16, information on known limitations and failure modes, and targeted "
+                "technical access, including for testing and validation, per Art. 25(2)."
             ),
             false_description=(
                 "No provider cooperation documentation detected. "
                 "Art. 25(2) requires the initial provider to closely cooperate with new "
                 "providers and make available necessary information, technical access, and "
-                "other assistance for fulfilment of the obligations set out in this Regulation."
+                "other assistance for fulfilment of the obligations set out in this Regulation; "
+                "where relevant, this includes technical documentation, information on known "
+                "limitations and failure modes, and targeted technical access."
             ),
             none_description=(
                 "AI could not determine whether provider cooperation documentation exists. "
@@ -204,11 +210,14 @@ class Art25Module(BaseArticleModule):
                 "art, enabling full compliance with this Regulation, per Art. 25(4)."
             ),
             false_description=(
-                "No written agreement with third-party AI component suppliers detected. "
-                "Art. 25(4) requires the provider and any third party supplying AI tools, "
-                "services, components, or processes to specify by written agreement the "
-                "necessary information, capabilities, technical access, and other assistance "
-                "to enable full compliance with this Regulation."
+                "No written agreement with third-party AI component suppliers detected. Art. "
+                "25(4) requires the provider of a high-risk AI system and a third party "
+                "supplying an AI system, AI model, tools, services, components, or processes "
+                "used or integrated in the high-risk AI system to specify by written agreement "
+                "the necessary information, capabilities, technical access and other assistance "
+                "based on the generally acknowledged state of the art needed to enable full "
+                "compliance, subject to the free and open-source exception in the second "
+                "sentence of Art. 25(4)."
             ),
             none_description=(
                 "AI could not determine whether written agreements exist with third-party "
@@ -266,17 +275,31 @@ class Art25Module(BaseArticleModule):
                 "to make it high-risk, they become the provider and must comply with provider obligations."
             ),
             official_summary=(
-                "Art. 25 determines how provider responsibilities transfer along the AI value chain. "
-                "(1) Any distributor, importer, deployer, or third-party that rebrands, substantially "
-                "modifies, or changes the intended purpose of an AI system making it high-risk becomes "
-                "the provider under Art. 16. "
-                "(2) The initial provider must cooperate with new providers by sharing information and "
-                "technical access. "
-                "(3) For Annex I safety component products, the product manufacturer is considered the "
-                "provider when the AI is marketed under their name. "
-                "(4) Providers and third-party suppliers must have written agreements specifying "
-                "information, capabilities, and technical access for compliance. "
-                "(5) IP and trade secret protections are preserved."
+                "Art. 25 determines responsibilities along the AI value chain. (1) A "
+                "distributor, importer, deployer or other third party becomes the provider of a "
+                "high-risk AI system, and is subject to Art. 16, in the circumstances listed in "
+                "Art. 25(1). (2) The initial provider must closely cooperate with new providers "
+                "by making available the necessary information and providing reasonably "
+                "expected technical access and other assistance; where relevant, this includes "
+                "technical documentation sufficient to assess compliance with Art. 16, "
+                "information on known limitations and failure modes, and targeted technical "
+                "access for testing and validation. Paragraph 2 does not apply where the "
+                "initial provider clearly specified that its AI system is not to be changed "
+                "into a high-risk AI system. (3) For high-risk AI systems that are safety "
+                "components of products covered by Section A of Annex I, the product "
+                "manufacturer is the provider where the high-risk AI system is placed on the "
+                "market together with the product under the manufacturer's name or trademark, "
+                "or is put into service under that name or trademark after the product has been "
+                "placed on the market. (4) The provider of a high-risk AI system and third "
+                "parties supplying AI systems, AI models, tools, services, components or "
+                "processes used or integrated in it must specify by written agreement the "
+                "information, capabilities, technical access and other assistance based on the "
+                "generally acknowledged state of the art needed for compliance, subject to the "
+                "second-sentence free/open-source exception. (5) Paragraphs 2 and 3 are without "
+                "prejudice to the protection of intellectual property rights, confidential "
+                "business information and trade secrets. Art. 99(4), point (da), subjects "
+                "non-compliance with obligations of providers and operators under Art. 25(2) "
+                "and (4) to the fines specified there."
             ),
             related_articles={
                 "Art. 6": "High-risk classification (referenced for substantial modification)",
@@ -286,8 +309,8 @@ class Art25Module(BaseArticleModule):
                 "Annex I Section A": "Union harmonisation legislation (safety components)",
             },
             recital=(
-                "Recital 84: In order to ensure legal certainty, it is necessary to clarify that, "
-                "under certain specific conditions, any distributor, importer, deployer or other "
+                "Recital 84: To ensure legal certainty, it is necessary to clarify that, under "
+                "certain specific conditions, any distributor, importer, deployer or other "
                 "third-party should be considered to be a provider of a high-risk AI system and "
                 "therefore assume all the relevant obligations."
             ),
@@ -350,11 +373,19 @@ class Art25Module(BaseArticleModule):
                 action="Establish provider cooperation documentation",
                 details=(
                     "Art. 25(2) requires the initial provider to closely cooperate with new "
-                    "providers by making available necessary information, technical access, "
-                    "and other assistance for compliance. Document:\n"
-                    "  - Information sharing agreements with upstream providers\n"
-                    "  - Technical access provisions for conformity assessment\n"
-                    "  - Cooperation procedures and contact points"
+                    "providers, make available the necessary information, and provide "
+                    "reasonably expected technical access and other assistance required for "
+                    "fulfilment of obligations under the Regulation, in particular conformity "
+                    "assessment. Where relevant, this includes: (a) technical documentation "
+                    "sufficient to assess compliance with Art. 16; (b) information on known "
+                    "limitations and failure modes; and (c) targeted technical access, "
+                    "including for testing and validation. Paragraph 2 does not apply where the "
+                    "initial provider clearly specified that its AI system is not to be changed "
+                    "into a high-risk AI system.\n\nArt. 25(2) does not prescribe how cooperation "
+                    "is documented; for example, you can keep a record of:\n  - The information "
+                    "and documentation made available to each new provider\n  - The technical "
+                    "access provided, including for testing and validation\n  - Cooperation "
+                    "contact points"
                 ),
                 effort="4-8 hours",
                 action_type="human_judgment_required",
@@ -366,14 +397,17 @@ class Art25Module(BaseArticleModule):
                 article="Art. 25(4)",
                 action="Establish written agreements with third-party AI suppliers",
                 details=(
-                    "Art. 25(4) requires written agreements between providers and third parties "
-                    "supplying AI tools, services, components, or processes. Agreements must "
-                    "specify:\n"
-                    "  - Necessary information for compliance\n"
-                    "  - Capabilities and technical access provisions\n"
-                    "  - Other assistance based on the state of the art\n"
-                    "  - Terms enabling full compliance with the Regulation\n"
-                    "Note: This does not apply to open-source components (Art. 25(4) exception)."
+                    "Art. 25(4) requires written agreements between the provider of a high-risk "
+                    "AI system and third parties supplying AI systems, AI models, tools, "
+                    "services, components, or processes used or integrated in that high-risk AI "
+                    "system. Agreements must specify the necessary information, capabilities, "
+                    "technical access and other assistance based on the generally acknowledged "
+                    "state of the art needed to enable full compliance with the Regulation. "
+                    "Note: The second-sentence exception applies to third parties making tools, "
+                    "services, processes or components accessible to the public under a free "
+                    "and open-source licence, but expressly excludes general-purpose AI models. "
+                    "It does not add AI systems or AI models as categories benefiting from the "
+                    "exception."
                 ),
                 effort="8-16 hours",
                 action_type="human_judgment_required",

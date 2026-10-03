@@ -1,9 +1,9 @@
 {
   "_metadata": {
-    "standard_id": "CL-IS-ART27-v0.1",
+    "standard_id": "CL-IS-ART27-v0.2",
     "title": "ComplianceLint Interim Standard for EU AI Act Article 27: Fundamental Rights Impact Assessment",
-    "version": "0.1.0",
-    "date": "2026-04-03",
+    "version": "0.2.0",
+    "date": "2026-10-03",
     "status": "draft",
     "disclaimer": "This is an interim standard developed by ComplianceLint. It will be superseded when CEN-CENELEC publishes the harmonized standard for fundamental rights impact assessment.",
     "basis": [
@@ -15,7 +15,6 @@
     ],
     "awaiting_standard": "CEN-CENELEC harmonized standard for fundamental rights impact assessment (expected Q4 2026)"
   },
-
   "requirements": [
     {
       "id": "IS-ART27-R01",
@@ -59,18 +58,16 @@
     },
     {
       "id": "IS-ART27-R04",
-      "obligation_ref": "ART27-OBL-4",
-      "title": "DPIA Complementarity",
-      "requirement": "Where a DPIA has been conducted under GDPR, the FRIA MUST complement it rather than duplicate it.",
-      "rationale": "Art. 27(4) requires the FRIA to build upon existing GDPR DPIA where applicable.",
+      "obligation_ref": "ART27-PERM-4",
+      "title": "DPIA Reuse (optional)",
+      "requirement": "Where a data protection impact assessment under GDPR Art. 35 or Art. 27 of Directive (EU) 2016/680 already meets any of the Art. 27 obligations, the FRIA MAY include cross-references to the relevant sections of that assessment or include relevant parts of it.",
+      "rationale": "Art. 27(4), as amended by Regulation (EU) 2026/1744, permits this reuse; it does not replace the FRIA required by Art. 27(1).",
       "acceptable_implementations": [
-        "FRIA document referencing existing DPIA and extending it with AI-specific elements",
-        "Integrated assessment document covering both GDPR and AI Act requirements",
-        "Cross-reference table mapping DPIA findings to FRIA elements"
+        "Cross-reference table mapping DPIA sections to the Art. 27 obligations they meet",
+        "FRIA document that includes the relevant parts of the DPIA"
       ]
     }
   ],
-
   "scoring": {
     "compliant": "R01 + R02 + R03 all met",
     "partial": "At least R01 met",

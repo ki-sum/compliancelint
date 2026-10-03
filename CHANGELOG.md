@@ -21,7 +21,7 @@ This project adheres to [Semantic Versioning](https://semver.org/).
   `ART50-OBL-2`.
 - Art. 11(1) and 17(2): the SME provisions now also cover small mid-cap enterprises (SMCs).
 - Art. 50(7): the Commission (formerly "the AI Office") encourages codes of practice and assesses
-  whether adherence is adequate for Art. 50(2) and (4) (`ART50-EMP-7a` is now an obligation);
+  whether adherence is adequate for Art. 50(2) and (4) (now an obligation, renamed `ART50-EMP-7a` → `ART50-OBL-7a`);
   such codes do not grant a presumption of conformity.
 - Art. 72(3): the Commission adopts guidance including a template by 2 September 2027 (no
   implementing act).
@@ -29,6 +29,24 @@ This project adheres to [Semantic Versioning](https://semver.org/).
   applies to them, no longer 2 August 2026.
 - Superseded quotes and atom wording are kept internally (`_source_quote_history`, `_history`)
   and are not served.
+
+### Added / changed — Regulation (EU) 2026/1744, Art. 4, 25, 27, 43
+- Art. 4(1): providers and deployers must take measures to support the development of AI literacy;
+  the obligation does not require them to guarantee any specific level of AI literacy of any
+  individual (`ART04-OBL-1`).
+- Art. 25(2): the initial provider's cooperation includes, where relevant, technical documentation
+  sufficient to assess compliance with the requirements laid down in Art. 16, information on known
+  limitations and failure modes, and targeted technical access, including for testing and
+  validation. Fixed: an attested `ART25-EXC-2` (the initial provider's opt-out) now makes
+  `ART25-OBL-2` not applicable; it wrongly derogated `ART25-OBL-4` before.
+- Art. 25(4): third parties supplying an AI model are covered by the written-agreement duty.
+- Art. 27(4): reusing a data protection impact assessment in the FRIA is a deployer permission;
+  `ART27-OBL-4` is renamed `ART27-PERM-4` and no longer produces a finding.
+- Art. 43(3): the conformity assessment of high-risk AI systems covered by Annex I Section A
+  legislation also covers the Art. 17 quality management system, and points 3, 4.3, 4.4, 4.5, the
+  fifth paragraph of point 4.6 and point 5 of Annex VII apply. A system covered by Annex I Section A
+  legislation follows that legislation's procedure even if it also falls within Annex III, so
+  `ART43-OBL-1` and `ART43-OBL-2` are not applicable when `is_annex_i_product` is true.
 
 ### Changed
 - Application dates follow Art. 113 as amended (`scanner/data/application_dates.json`):

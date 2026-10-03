@@ -2207,8 +2207,10 @@ class TestClScanArticle27:
         result_json = _scan_single_article(27, project_dir, context=ctx)
         result = json.loads(result_json)
         finding_ids = {f["obligation_id"] for f in result.get("findings", [])}
-        for obl_id in ["ART27-OBL-1", "ART27-OBL-2", "ART27-OBL-3", "ART27-OBL-4"]:
+        for obl_id in ["ART27-OBL-1", "ART27-OBL-2", "ART27-OBL-3"]:
             assert obl_id in finding_ids, f"{obl_id} not in findings. Found: {sorted(finding_ids)}"
+        # Art. 27(4) is a deployer permission since Reg (EU) 2026/1744 — never a finding
+        assert "ART27-PERM-4" not in finding_ids and "ART27-OBL-4" not in finding_ids
 
     def test_scope_gate_open_source(self, project_dir):
         ctx = ProjectContext.from_json(json.dumps({

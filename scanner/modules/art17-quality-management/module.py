@@ -359,7 +359,10 @@ class Art17Module(BaseArticleModule):
                 "(f) data management, (g) risk management (Art. 9), (h) post-market monitoring "
                 "(Art. 72), (i) incident reporting (Art. 73), (j) authority communication, "
                 "(k) record-keeping, (l) resource management, and (m) accountability framework. "
-                "Implementation must be proportionate to organisation size."
+                "Implementation must be proportionate to the size of the provider's organisation, "
+                "in particular where the provider is an SME, including a start-up, or an SMC, while "
+                "the degree of rigour and the level of protection required for compliance must be "
+                "respected in any event (Art. 17(2))."
             ),
             related_articles={
                 "Art. 9": "Risk management system (must be included in QMS)",
@@ -476,8 +479,11 @@ class Art17Module(BaseArticleModule):
             article="Art. 17(2)",
             action="Assess proportionality of QMS to organisation size",
             details=(
-                "Art. 17(2) requires QMS implementation to be proportionate to the provider's "
-                "organisation size while ensuring compliance. Document the proportionality rationale."
+                "Art. 17(2) requires the quality management system to be implemented proportionately "
+                "to the size of the provider's organisation, in particular where the provider is an "
+                "SME, including a start-up, or an SMC; providers must in any event respect the degree "
+                "of rigour and the level of protection required to ensure compliance. Document the "
+                "proportionality rationale."
             ),
             effort="2-4 hours",
             action_type="human_judgment_required",

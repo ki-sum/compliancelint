@@ -21,26 +21,65 @@
       "upcoming": [
         "CEN-CENELEC harmonized standard for AI literacy (expected Q4 2026)"
       ]
-    }
+    },
+    "amendments": [
+      {
+        "amending_celex": "32026R1744",
+        "amending_act": "Regulation (EU) 2026/1744 (Digital Omnibus)",
+        "consolidated_celex": "02024R1689-20260727",
+        "change_type": "AMEND",
+        "obligations_amended": [
+          "ART04-OBL-1"
+        ],
+        "obligations_added": [],
+        "source_pdf": "docs/sources/eu-ai-act-2024-1689-consolidated-20260727-en.pdf",
+        "source_pdf_sha256": "1ccd38d1c78482cf2053b70110115adcc5080700acc8bd7bead8cb3579143ccf",
+        "source_pages": [
+          11,
+          12
+        ],
+        "consensus_lock": "omnibus-batch2-2026-10-03",
+        "recorded_on": "2026-10-03"
+      }
+    ]
   },
   "obligations": [
     {
       "id": "ART04-OBL-1",
-      "source": "Art. 4",
-      "source_quote": "Providers and deployers of AI systems shall take measures to ensure, to their best extent, a sufficient level of AI literacy of their staff and other persons dealing with the operation and use of AI systems on their behalf, taking into account their technical knowledge, experience, education and training and the context the AI systems are to be used in, and considering the persons or groups of persons on whom the AI systems are to be used.",
+      "source": "Art. 4(1)",
+      "source_quote": "Providers and deployers of AI systems shall take measures to support the development of AI literacy of their staff and other persons dealing with the operation and use of AI systems on their behalf, taking into account their technical knowledge, experience, education and training and the context the AI systems are to be used in, and considering the persons or groups of persons on whom the AI systems are to be used. This obligation does not require providers or deployers to guarantee any specific level of AI literacy of any individual.",
       "deontic_type": "obligation",
       "modality": "shall",
       "addressee": "provider_and_deployer",
       "decomposed_atoms": [
         {
-          "atom": "measures_taken_for_ai_literacy",
-          "description": "Provider/deployer must take measures to ensure AI literacy",
-          "requirement": "SHALL take measures to ensure a sufficient level of AI literacy"
+          "atom": "measures_taken_to_support_ai_literacy",
+          "description": "Provider/deployer must take measures to support the development of AI literacy",
+          "requirement": "Providers and deployers SHALL take measures to support the development of AI literacy of their staff and other persons dealing with the operation and use of AI systems on their behalf",
+          "_history": [
+            {
+              "requirement": "SHALL take measures to ensure a sufficient level of AI literacy",
+              "description": "Provider/deployer must take measures to ensure AI literacy",
+              "atom": "measures_taken_for_ai_literacy",
+              "superseded_on": "2026-10-03",
+              "amending_celex": "32026R1744",
+              "consensus_lock": "omnibus-batch2-2026-10-03"
+            }
+          ]
         },
         {
           "atom": "staff_literacy_covered",
-          "description": "AI literacy must cover staff dealing with operation and use",
-          "requirement": "Literacy SHALL cover staff and other persons dealing with operation and use of AI systems on their behalf"
+          "description": "Measures must support the development of AI literacy of staff and other persons dealing with operation and use",
+          "requirement": "The measures SHALL support the development of AI literacy of staff and other persons dealing with the operation and use of AI systems on the provider's or deployer's behalf",
+          "_history": [
+            {
+              "requirement": "Literacy SHALL cover staff and other persons dealing with operation and use of AI systems on their behalf",
+              "description": "AI literacy must cover staff dealing with operation and use",
+              "superseded_on": "2026-10-03",
+              "amending_celex": "32026R1744",
+              "consensus_lock": "omnibus-batch2-2026-10-03"
+            }
+          ]
         },
         {
           "atom": "context_considered",
@@ -51,11 +90,24 @@
           "atom": "affected_persons_considered",
           "description": "Must consider persons on whom the AI systems are to be used",
           "requirement": "SHALL consider the persons or groups of persons on whom the AI systems are to be used"
+        },
+        {
+          "atom": "no_guarantee_of_specific_level",
+          "description": "No duty to guarantee a specific level of AI literacy",
+          "requirement": "The obligation does NOT require providers or deployers to guarantee any specific level of AI literacy of any individual"
         }
       ],
       "automation_assessment": {
         "level": "partial"
-      }
+      },
+      "_source_quote_history": [
+        {
+          "source_quote": "Providers and deployers of AI systems shall take measures to ensure, to their best extent, a sufficient level of AI literacy of their staff and other persons dealing with the operation and use of AI systems on their behalf, taking into account their technical knowledge, experience, education and training and the context the AI systems are to be used in, and considering the persons or groups of persons on whom the AI systems are to be used.",
+          "superseded_on": "2026-10-03",
+          "amending_celex": "32026R1744",
+          "consensus_lock": "omnibus-batch2-2026-10-03"
+        }
+      ]
     }
   ],
   "summary": {

@@ -7,8 +7,10 @@ Obligation mapping:
   has_fria_documentation     → ART27-OBL-1
   has_fria_versioning        → ART27-OBL-2
   Conditional (scope_limitation) → ART27-OBL-3 (is_public_law_or_annex_iii_5bc)
-  Conditional (scope_limitation) → ART27-OBL-4 (has_existing_dpia)
+  Permission (no finding)        → ART27-PERM-4 (Art. 27(4) as amended by Reg (EU) 2026/1744)
 """
+import pytest
+
 from core.protocol import ComplianceLevel, BaseArticleModule
 from conftest import _ctx_with
 
@@ -122,26 +124,18 @@ class TestArt27ConditionalObligations:
         assert len(obl) > 0
         assert obl[0].level == ComplianceLevel.NOT_APPLICABLE
 
-    def test_obl4_conditional_when_no_dpia_context(self, art27_module, tmp_path):
-        """OBL-4 has scope_limitation → CONDITIONAL (UTD) when has_existing_dpia not provided."""
-        BaseArticleModule.set_context(_full_true_ctx())
+    @pytest.mark.parametrize("has_existing_dpia", [None, False, True])
+    def test_perm4_never_produces_a_finding(self, art27_module, tmp_path, has_existing_dpia):
+        """Art. 27(4), as amended by Reg (EU) 2026/1744, is a deployer permission (may
+        cross-reference / include parts of an existing DPIA) — not a checkable duty, whatever
+        the DPIA situation; neither the new nor the old id appears in the findings."""
+        answers = {"has_fria_documentation": True, "has_fria_versioning": True}
+        if has_existing_dpia is not None:
+            answers["has_existing_dpia"] = has_existing_dpia
+        BaseArticleModule.set_context(_ctx_with("art27", answers))
         result = art27_module.scan(str(tmp_path))
-        obl = _find(result, "ART27-OBL-4")
-        assert len(obl) > 0
-        assert obl[0].level == ComplianceLevel.UNABLE_TO_DETERMINE
-
-    def test_obl4_not_applicable_when_no_dpia(self, art27_module, tmp_path):
-        """OBL-4 → NOT_APPLICABLE when has_existing_dpia=False."""
-        ctx = _ctx_with("art27", {
-            "has_fria_documentation": True,
-            "has_fria_versioning": True,
-            "has_existing_dpia": False,
-        })
-        BaseArticleModule.set_context(ctx)
-        result = art27_module.scan(str(tmp_path))
-        obl = _find(result, "ART27-OBL-4")
-        assert len(obl) > 0
-        assert obl[0].level == ComplianceLevel.NOT_APPLICABLE
+        ids = {f.obligation_id for f in result.findings}
+        assert "ART27-PERM-4" not in ids and "ART27-OBL-4" not in ids
 
     def test_obl3_utd_when_in_scope(self, art27_module, tmp_path):
         """OBL-3 (manual) → UTD even when is_public_law_or_annex_iii_5bc=True."""
@@ -153,19 +147,6 @@ class TestArt27ConditionalObligations:
         BaseArticleModule.set_context(ctx)
         result = art27_module.scan(str(tmp_path))
         obl = _find(result, "ART27-OBL-3")
-        assert len(obl) > 0
-        assert obl[0].level == ComplianceLevel.UNABLE_TO_DETERMINE
-
-    def test_obl4_utd_when_dpia_exists(self, art27_module, tmp_path):
-        """OBL-4 (manual) → UTD when has_existing_dpia=True (scope applies, but manual)."""
-        ctx = _ctx_with("art27", {
-            "has_fria_documentation": True,
-            "has_fria_versioning": True,
-            "has_existing_dpia": True,
-        })
-        BaseArticleModule.set_context(ctx)
-        result = art27_module.scan(str(tmp_path))
-        obl = _find(result, "ART27-OBL-4")
         assert len(obl) > 0
         assert obl[0].level == ComplianceLevel.UNABLE_TO_DETERMINE
 
@@ -232,11 +213,12 @@ class TestArt27Structural:
         ]
         assert len(non_compliant) > 0
 
-    def test_all_4_obligations_appear_in_findings(self, art27_module, tmp_path):
-        """All 4 obligations must appear in findings (explicit or gap)."""
+    def test_all_3_obligations_appear_in_findings(self, art27_module, tmp_path):
+        """The 3 obligations appear in findings (explicit or gap); the permission does not."""
         BaseArticleModule.set_context(_full_true_ctx())
         result = art27_module.scan(str(tmp_path))
         found_ids = {f.obligation_id for f in result.findings}
-        expected_ids = {"ART27-OBL-1", "ART27-OBL-2", "ART27-OBL-3", "ART27-OBL-4"}
+        expected_ids = {"ART27-OBL-1", "ART27-OBL-2", "ART27-OBL-3"}
         missing = expected_ids - found_ids
         assert not missing, f"Missing obligation IDs in findings: {missing}"
+        assert "ART27-PERM-4" not in found_ids

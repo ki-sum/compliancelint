@@ -1,9 +1,11 @@
 """
 Article 4: AI Literacy — Module implementation using unified protocol.
 
-Art. 4 requires providers AND deployers of AI systems to take measures to
-ensure a sufficient level of AI literacy of their staff and other persons
-dealing with the operation and use of AI systems on their behalf.
+Art. 4(1), as amended by Regulation (EU) 2026/1744, requires providers AND
+deployers of AI systems to take measures to support the development of AI
+literacy of their staff and other persons dealing with the operation and use of
+AI systems on their behalf; it does not require them to guarantee any specific
+level of AI literacy of any individual.
 
 This applies to ALL AI systems (not just high-risk).
 
@@ -65,10 +67,10 @@ class Art04Module(BaseArticleModule):
         literacy_evidence = answers.get("literacy_evidence") or []
 
         # -- ART04-OBL-1: AI literacy measures for staff --
-        # Art. 4 requires providers and deployers to ensure a sufficient level
-        # of AI literacy. Code scanning can detect documentation artifacts
-        # (AI policies, training docs, competency frameworks) but cannot assess
-        # whether training is actually adequate or sufficient.
+        # Art. 4(1) requires providers and deployers to take measures to support
+        # the development of AI literacy. Code scanning can detect documentation
+        # artifacts (AI policies, training docs, competency frameworks) but cannot
+        # assess whether the measures are appropriate.
         findings.append(self._finding_from_answer(
             obligation_id="ART04-OBL-1",
             answer=has_ai_literacy_measures,
@@ -78,8 +80,8 @@ class Art04Module(BaseArticleModule):
                 else "AI literacy documentation or policy artifacts detected."
             ),
             false_description=(
-                "No AI literacy documentation detected. Art. 4 requires providers "
-                "and deployers to take measures to ensure a sufficient level of AI "
+                "No AI literacy documentation detected. Art. 4(1) requires providers "
+                "and deployers to take measures to support the development of AI "
                 "literacy of their staff and other persons dealing with the operation "
                 "and use of AI systems on their behalf."
             ),
@@ -133,25 +135,35 @@ class Art04Module(BaseArticleModule):
             article_number=4,
             article_title="AI Literacy",
             one_sentence=(
-                "Providers and deployers must ensure their staff have sufficient "
-                "AI literacy for operating and using AI systems."
+                "Providers and deployers must take measures to support the development "
+                "of AI literacy of their staff and others operating or using AI systems "
+                "on their behalf."
             ),
             official_summary=(
-                "Art. 4 requires providers and deployers of AI systems to take "
-                "measures to ensure, to their best extent, a sufficient level of "
-                "AI literacy of their staff and other persons dealing with the "
-                "operation and use of AI systems on their behalf. This must take "
-                "into account technical knowledge, experience, education, training, "
-                "the context of use, and the persons on whom the AI systems are used."
+                "Art. 4(1), as amended by Regulation (EU) 2026/1744, requires providers "
+                "and deployers of AI systems to take measures to support the development "
+                "of AI literacy of their staff and other persons dealing with the "
+                "operation and use of AI systems on their behalf. The measures must take "
+                "into account technical knowledge, experience, education and training, "
+                "the context of use, and the persons or groups of persons on whom the AI "
+                "systems are to be used. The obligation does not require providers or "
+                "deployers to guarantee any specific level of AI literacy of any individual."
             ),
             related_articles={
                 "Art. 3(1)": "Definition of AI system",
                 "Art. 2": "Scope — Art. 4 applies to all AI systems, not just high-risk",
-                "Recital 20": "AI literacy measures should be proportionate",
+                "Art. 4(2)": (
+                    "The Commission and the Member States support and facilitate the efforts of "
+                    "providers and deployers, in particular SMEs; the Commission publishes "
+                    "practical examples of how to comply."
+                ),
+                "Recital 20": "AI literacy should equip providers, deployers and affected persons to make informed decisions regarding AI systems",
             },
             recital=(
-                "Recital 20: Providers and deployers should ensure that their staff "
-                "and other persons involved have a sufficient level of AI literacy."
+                "Recital 8 of Regulation (EU) 2026/1744: Article 4 is amended to require "
+                "providers and deployers to take measures to support the development of AI "
+                "literacy of their staff and of other persons dealing with the operation "
+                "and use of AI systems on their behalf."
             ),
             automation_summary={
                 "fully_automatable": [],
@@ -161,10 +173,9 @@ class Art04Module(BaseArticleModule):
                     "Detection of onboarding materials with AI guidance",
                 ],
                 "requires_human_judgment": [
-                    "Whether literacy measures are sufficient and proportionate",
-                    "Whether staff have actually been trained",
-                    "Whether training quality meets the context requirements",
-                    "Whether affected persons have been considered",
+                    "Whether the measures support the development of AI literacy of staff and other persons dealing with the operation and use of AI systems on the provider's or deployer's behalf",
+                    "Whether the measures take into account their technical knowledge, experience, education and training and the context of use",
+                    "Whether the persons or groups of persons on whom the AI systems are to be used have been considered",
                 ],
             },
             compliance_checklist_summary=(
@@ -185,15 +196,23 @@ class Art04Module(BaseArticleModule):
             actions.append(ActionItem(
                 priority="HIGH",
                 article="Art. 4",
-                action="Create AI literacy program for staff",
+                action=(
+                    "Take measures to support the development of AI literacy of staff and other "
+                    "persons dealing with the operation and use of AI systems on your behalf"
+                ),
                 details=(
-                    "Art. 4 requires measures to ensure AI literacy. Create:\n"
-                    "  (1) AI usage policy document defining acceptable use\n"
-                    "  (2) Training program covering AI system operation\n"
-                    "  (3) Competency framework for staff roles\n"
-                    "  (4) Documentation of training completion\n\n"
-                    "Consider: technical knowledge, experience, education, training context, "
-                    "and the persons on whom the AI systems are used."
+                    "Art. 4(1) requires providers and deployers to take measures to support the "
+                    "development of AI literacy of their staff and other persons dealing with "
+                    "the operation and use of AI systems on their behalf, taking into account "
+                    "their technical knowledge, experience, education and training and the "
+                    "context in which the AI systems are to be used, and considering the "
+                    "persons or groups of persons on whom the AI systems are to be used. Art. "
+                    "4(1) does not require those measures to be documented and does not "
+                    "prescribe a specific policy, training programme, competency framework or "
+                    "training-completion record. Examples of measures (none of them is required "
+                    "by Art. 4(1)): an AI usage policy defining acceptable use; training on "
+                    "operating and using the AI systems; role-based AI competency descriptions; "
+                    "records of the measures taken."
                 ),
                 effort="8-16 hours",
                 action_type="human_judgment_required",
@@ -203,14 +222,13 @@ class Art04Module(BaseArticleModule):
         actions.append(ActionItem(
             priority="MEDIUM",
             article="Art. 4",
-            action="Verify AI literacy measures are proportionate to context",
+            action="Verify AI literacy measures take the required factors into account",
             details=(
-                "Art. 4 requires considering technical knowledge, experience, "
-                "education and training, and the context in which AI systems are used. "
-                "Review whether your training program is appropriate for:\n"
-                "  - The complexity of your AI system\n"
-                "  - The technical background of your staff\n"
-                "  - The persons or groups affected by the AI system"
+                "Art. 4(1) requires the measures to take into account the technical knowledge, "
+                "experience, education and training of the relevant persons and the context in "
+                "which the AI systems are to be used, and to consider the persons or groups of "
+                "persons on whom the AI systems are to be used. Review whether the measures you "
+                "use, including any training where applicable, reflect those factors."
             ),
             effort="2-4 hours",
             action_type="human_judgment_required",
@@ -224,7 +242,7 @@ class Art04Module(BaseArticleModule):
             disclaimer=(
                 "Art. 4 is primarily an organizational obligation. Automated scanning "
                 "detects documentation artifacts (policies, training docs) but cannot "
-                "assess whether actual AI literacy measures are sufficient. "
+                "assess whether actual AI literacy measures are appropriate. "
                 "Human expert review is essential."
             ),
         )

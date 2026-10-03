@@ -6,7 +6,8 @@ as not_applicable on next re-scan.
 
 Covered EXCs (6):
 - ART14-EXC-5b     → ART14-OBL-5
-- ART25-EXC-2      → ART25-OBL-4
+- ART25-EXC-2      → ART25-OBL-2  ("This paragraph shall not apply" — Art 25(2); was
+                    wrongly linked to ART25-OBL-4 until Omnibus batch 2, 2026-10-03)
 - ART25-EXC-4      → ART25-OBL-4
 - ART53-EXC-2      → ART53-OBL-1a, ART53-OBL-1b
 - ART54-EXC-6      → ART54-OBL-1, -2, -3, -4, -5
@@ -34,7 +35,7 @@ OBLIGATIONS_DIR = pathlib.Path(__file__).parent.parent / "obligations"
 
 EXPECTED_DEROGATIONS = {
     "ART14-EXC-5b": ["ART14-OBL-5"],
-    "ART25-EXC-2": ["ART25-OBL-4"],
+    "ART25-EXC-2": ["ART25-OBL-2"],
     "ART25-EXC-4": ["ART25-OBL-4"],
     "ART53-EXC-2": ["ART53-OBL-1a", "ART53-OBL-1b"],
     "ART54-EXC-6": ["ART54-OBL-1", "ART54-OBL-2", "ART54-OBL-3", "ART54-OBL-4", "ART54-OBL-5"],
@@ -250,72 +251,78 @@ class TestArt14Derogation:
         assert state["articles"]["art14"]["findings"]["ART14-OBL-5"]["level"] == "non_compliant"
 
 
+def _art25_scan(level="non_compliant"):
+    return [
+        {"obligation_id": "ART25-OBL-2", "level": level,
+         "description": "initial-provider cooperation not documented", "source_quote": "Q"},
+        {"obligation_id": "ART25-EXC-2", "level": level,
+         "description": "initial-provider statement not provided", "source_quote": "Q"},
+        {"obligation_id": "ART25-EXC-4", "level": level,
+         "description": "FOSS third-party exception not claimed", "source_quote": "Q"},
+        {"obligation_id": "ART25-OBL-4", "level": level,
+         "description": "written agreement with third-party suppliers missing", "source_quote": "Q"},
+    ]
+
+
 @pytest.fixture
 def project_art25(tmp_path):
     _seed_project(tmp_path)
-    _save_scan(tmp_path, 25, [
-        {"obligation_id": "ART25-EXC-2", "level": "non_compliant",
-         "description": "initial-provider statement not provided", "source_quote": "Q"},
-        {"obligation_id": "ART25-EXC-4", "level": "non_compliant",
-         "description": "FOSS third-party exception not claimed", "source_quote": "Q"},
-        {"obligation_id": "ART25-OBL-4", "level": "non_compliant",
-         "description": "written agreement with third-party suppliers missing",
-         "source_quote": "Q"},
-    ])
+    _save_scan(tmp_path, 25, _art25_scan())
     return tmp_path
 
 
 class TestArt25Derogation:
-    def test_attested_exc2_derogates_obl4(self, project_art25):
+    def test_attested_exc2_derogates_obl2_not_obl4(self, project_art25):
+        """Art 25(2), fourth subparagraph: "This paragraph shall not apply ..." — the initial
+        provider's opt-out removes the paragraph 2 cooperation duty (ART25-OBL-2); the
+        paragraph 4 written agreement (ART25-OBL-4) is a different duty and stays."""
         update_finding(str(project_art25), "ART25-EXC-2",
                        "provide_evidence", "text",
                        "Initial provider statement recorded", attester=ATTESTER)
-        _save_scan(project_art25, 25, [
-            {"obligation_id": "ART25-EXC-2", "level": "non_compliant",
-             "description": "still NC", "source_quote": "Q"},
-            {"obligation_id": "ART25-EXC-4", "level": "non_compliant",
-             "description": "still NC", "source_quote": "Q"},
-            {"obligation_id": "ART25-OBL-4", "level": "non_compliant",
-             "description": "still NC", "source_quote": "Q"},
-        ])
-        state = load_state(str(project_art25))
-        assert state["articles"]["art25"]["findings"]["ART25-OBL-4"]["level"] == "not_applicable"
+        _save_scan(project_art25, 25, _art25_scan())
+        findings = load_state(str(project_art25))["articles"]["art25"]["findings"]
+        assert findings["ART25-OBL-2"]["level"] == "not_applicable"
+        assert findings["ART25-OBL-2"].get("derogated_by") == ["ART25-EXC-2"]
+        assert findings["ART25-OBL-4"]["level"] == "non_compliant"
 
-    def test_attested_exc4_also_derogates_obl4(self, project_art25):
+    def test_attested_exc4_derogates_obl4_not_obl2(self, project_art25):
         update_finding(str(project_art25), "ART25-EXC-4",
                        "provide_evidence", "text",
                        "Apache-2.0 licensed third-party component",
                        attester=ATTESTER)
-        _save_scan(project_art25, 25, [
-            {"obligation_id": "ART25-EXC-2", "level": "non_compliant",
-             "description": "still NC", "source_quote": "Q"},
-            {"obligation_id": "ART25-EXC-4", "level": "non_compliant",
-             "description": "still NC", "source_quote": "Q"},
-            {"obligation_id": "ART25-OBL-4", "level": "non_compliant",
-             "description": "still NC", "source_quote": "Q"},
-        ])
-        state = load_state(str(project_art25))
-        assert state["articles"]["art25"]["findings"]["ART25-OBL-4"]["level"] == "not_applicable"
+        _save_scan(project_art25, 25, _art25_scan())
+        findings = load_state(str(project_art25))["articles"]["art25"]["findings"]
+        assert findings["ART25-OBL-4"]["level"] == "not_applicable"
+        assert findings["ART25-OBL-4"].get("derogated_by") == ["ART25-EXC-4"]
+        assert findings["ART25-OBL-2"]["level"] == "non_compliant"
 
-    def test_both_exc2_and_exc4_attested_records_both_derogations(self, project_art25):
-        """When two EXCs both derogate the same main obligation, both must
-        appear in derogated_by — audit trail preserves every legal basis."""
+    def test_both_attested_each_derogates_its_own_paragraph(self, project_art25):
         update_finding(str(project_art25), "ART25-EXC-2",
                        "provide_evidence", "text",
                        "Initial-provider statement", attester=ATTESTER)
         update_finding(str(project_art25), "ART25-EXC-4",
                        "provide_evidence", "text",
                        "FOSS component", attester=ATTESTER)
-        _save_scan(project_art25, 25, [
-            {"obligation_id": "ART25-EXC-2", "level": "non_compliant",
-             "description": "still NC", "source_quote": "Q"},
-            {"obligation_id": "ART25-EXC-4", "level": "non_compliant",
-             "description": "still NC", "source_quote": "Q"},
-            {"obligation_id": "ART25-OBL-4", "level": "non_compliant",
-             "description": "still NC", "source_quote": "Q"},
-        ])
-        state = load_state(str(project_art25))
-        obl4 = state["articles"]["art25"]["findings"]["ART25-OBL-4"]
+        _save_scan(project_art25, 25, _art25_scan())
+        findings = load_state(str(project_art25))["articles"]["art25"]["findings"]
+        assert findings["ART25-OBL-2"].get("derogated_by") == ["ART25-EXC-2"]
+        assert findings["ART25-OBL-4"].get("derogated_by") == ["ART25-EXC-4"]
+
+    def test_two_exceptions_derogating_one_obligation_are_both_recorded(self, project_art25, monkeypatch):
+        """Audit trail: when two attested exceptions derogate the same main obligation, both
+        appear in derogated_by. No shipped obligation pair does this since the ART25-EXC-2 fix,
+        so the map is patched to keep the code path covered."""
+        import core.state as state_mod
+        monkeypatch.setattr(state_mod, "_DEROGATION_MAP",
+                            {"ART25-EXC-2": ["ART25-OBL-4"], "ART25-EXC-4": ["ART25-OBL-4"]})
+        update_finding(str(project_art25), "ART25-EXC-2",
+                       "provide_evidence", "text",
+                       "Initial-provider statement", attester=ATTESTER)
+        update_finding(str(project_art25), "ART25-EXC-4",
+                       "provide_evidence", "text",
+                       "FOSS component", attester=ATTESTER)
+        _save_scan(project_art25, 25, _art25_scan())
+        obl4 = load_state(str(project_art25))["articles"]["art25"]["findings"]["ART25-OBL-4"]
         assert obl4["level"] == "not_applicable"
         assert sorted(obl4.get("derogated_by", [])) == ["ART25-EXC-2", "ART25-EXC-4"]
 

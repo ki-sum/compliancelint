@@ -28,7 +28,7 @@ MIGRATED = {
 AMENDED = {
     "ART11-OBL-1b": 11, "ART11-PERM-1d": 11, "ART11-OBL-1e": 11, "ART11-OBL-1f": 11,
     "ART17-OBL-2": 17,
-    "ART50-OBL-7": 50, "ART50-EMP-7a": 50, "ART50-EMP-7b": 50,
+    "ART50-OBL-7": 50, "ART50-OBL-7a": 50, "ART50-EMP-7b": 50,
     "ART72-OBL-3": 72,
     "ART111-OBL-2": 111,
 }
@@ -86,7 +86,7 @@ def test_art111_4_added():
 
 
 def test_art50_7a_is_a_commission_duty_not_an_empowerment():
-    o = _obligations(50)["ART50-EMP-7a"]
+    o = _obligations(50)["ART50-OBL-7a"]  # ART50-EMP-7a until batch 2
     assert (o["addressee"], o["deontic_type"], o["modality"]) == ("commission", "obligation", "shall")
     served = json.dumps({k: v for k, v in o.items() if not k.startswith("_")}, ensure_ascii=False)
     served = re.sub(r'"_history": \[.*?\]', "", served)

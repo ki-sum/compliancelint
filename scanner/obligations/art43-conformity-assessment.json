@@ -30,7 +30,28 @@
       "upcoming": [
         "CEN-CENELEC harmonized standard for Art. 43 (expected Q4 2026)"
       ]
-    }
+    },
+    "amendments": [
+      {
+        "amending_celex": "32026R1744",
+        "amending_act": "Regulation (EU) 2026/1744 (Digital Omnibus)",
+        "consolidated_celex": "02024R1689-20260727",
+        "change_type": "AMEND",
+        "obligations_amended": [
+          "ART43-OBL-3"
+        ],
+        "obligations_added": [],
+        "source_pdf": "docs/sources/eu-ai-act-2024-1689-consolidated-20260727-en.pdf",
+        "source_pdf_sha256": "1ccd38d1c78482cf2053b70110115adcc5080700acc8bd7bead8cb3579143ccf",
+        "source_pages": [
+          52,
+          53,
+          54
+        ],
+        "consensus_lock": "omnibus-batch2-2026-10-03",
+        "recorded_on": "2026-10-03"
+      }
+    ]
   },
   "obligations": [
     {
@@ -40,7 +61,7 @@
       "deontic_type": "obligation",
       "modality": "shall",
       "addressee": "provider",
-      "scope_limitation": "Applies to Annex III point 1 (biometric identification) high-risk AI systems",
+      "scope_limitation": "Applies to Annex III point 1 (biometrics) high-risk AI systems that are not covered by the Union harmonisation legislation listed in Section A of Annex I (those follow the procedure of that legislation, Art. 43(3), fourth subparagraph)",
       "context_skip_field": "is_annex_iii_point_1",
       "context_skip_value": false,
       "decomposed_atoms": [
@@ -52,7 +73,13 @@
       ],
       "automation_assessment": {
         "level": "partial"
-      }
+      },
+      "cross_references": [
+        {
+          "article": 43,
+          "context": "Art. 43(3), fourth subparagraph: \"Where a high-risk AI system is both covered by the Union harmonisation legislation listed in Section A of Annex I and it falls within one of the categories listed in Annex III, the provider of that system shall follow the relevant conformity assessment procedure as required pursuant to the relevant Union harmonisation legislation listed in Section A of Annex I.\""
+        }
+      ]
     },
     {
       "id": "ART43-OBL-2",
@@ -70,12 +97,21 @@
       ],
       "automation_assessment": {
         "level": "partial"
-      }
+      },
+      "scope_limitation": "Applies to Annex III points 2-8 high-risk AI systems that are not covered by the Union harmonisation legislation listed in Section A of Annex I (those follow the procedure of that legislation, Art. 43(3), fourth subparagraph)",
+      "cross_references": [
+        {
+          "article": 43,
+          "context": "Art. 43(3), fourth subparagraph: \"Where a high-risk AI system is both covered by the Union harmonisation legislation listed in Section A of Annex I and it falls within one of the categories listed in Annex III, the provider of that system shall follow the relevant conformity assessment procedure as required pursuant to the relevant Union harmonisation legislation listed in Section A of Annex I.\""
+        }
+      ],
+      "context_skip_field": "is_annex_i_product",
+      "context_skip_value": true
     },
     {
       "id": "ART43-OBL-3",
       "source": "Art. 43(3)",
-      "source_quote": "For high-risk AI systems covered by the Union harmonisation legislation listed in Section A of Annex I, the provider shall follow the relevant conformity assessment procedure as required under those legal acts.",
+      "source_quote": "For high-risk AI systems covered by the Union harmonisation legislation listed in Section A of Annex I, the provider of the system shall follow the relevant conformity assessment procedure as required in accordance with the relevant Union harmonisation legislation. The requirements set out in Section 2 of this Chapter shall apply to those high-risk AI systems and shall be part of that assessment. Assessment of the quality management system set out in Article 17 shall also be undertaken, and points 3, 4.3, 4.4. and 4.5, the fifth paragraph of point 4.6 and point 5 of Annex VII shall apply.",
       "deontic_type": "obligation",
       "modality": "shall",
       "addressee": "provider",
@@ -85,13 +121,45 @@
       "decomposed_atoms": [
         {
           "atom": "sectoral_assessment",
-          "description": "Annex I product systems follow sectoral conformity assessment",
-          "requirement": "SHALL follow relevant sectoral conformity assessment procedure"
+          "description": "High-risk AI systems covered by Union harmonisation legislation listed in Section A of Annex I follow the relevant sectoral conformity assessment",
+          "requirement": "The provider SHALL follow the relevant conformity assessment procedure required by the Union harmonisation legislation listed in Section A of Annex I",
+          "_history": [
+            {
+              "requirement": "SHALL follow relevant sectoral conformity assessment procedure",
+              "description": "Annex I product systems follow sectoral conformity assessment",
+              "superseded_on": "2026-10-03",
+              "amending_celex": "32026R1744",
+              "consensus_lock": "omnibus-batch2-2026-10-03"
+            }
+          ]
+        },
+        {
+          "atom": "section_2_requirements_in_assessment",
+          "description": "The Section 2 requirements are part of that assessment",
+          "requirement": "The requirements of Chapter III Section 2 SHALL apply to the system and SHALL be part of that conformity assessment"
+        },
+        {
+          "atom": "qms_assessment_included",
+          "description": "The assessment also covers the Art. 17 quality management system",
+          "requirement": "Assessment of the quality management system set out in Article 17 SHALL also be undertaken as part of that conformity assessment"
+        },
+        {
+          "atom": "annex_vii_points_apply",
+          "description": "Listed points of Annex VII apply to the assessment",
+          "requirement": "Points 3, 4.3, 4.4 and 4.5, the fifth paragraph of point 4.6 and point 5 of Annex VII SHALL apply"
         }
       ],
       "automation_assessment": {
         "level": "partial"
-      }
+      },
+      "_source_quote_history": [
+        {
+          "source_quote": "For high-risk AI systems covered by the Union harmonisation legislation listed in Section A of Annex I, the provider shall follow the relevant conformity assessment procedure as required under those legal acts.",
+          "superseded_on": "2026-10-03",
+          "amending_celex": "32026R1744",
+          "consensus_lock": "omnibus-batch2-2026-10-03"
+        }
+      ]
     },
     {
       "id": "ART43-OBL-4",

@@ -16,7 +16,7 @@ class TestObligationParsing:
     @pytest.fixture
     def art12_obligations(self):
         path = os.path.join(os.path.dirname(__file__), "..", "obligations", "art12-record-keeping.json")
-        with open(path, "r") as f:
+        with open(path, "r", encoding="utf-8") as f:
             return json.load(f)
 
     def test_loads_obligations(self, art12_obligations):
@@ -53,7 +53,7 @@ class TestCoverageGaps:
     @pytest.fixture
     def art12_obligations(self):
         path = os.path.join(os.path.dirname(__file__), "..", "obligations", "art12-record-keeping.json")
-        with open(path, "r") as f:
+        with open(path, "r", encoding="utf-8") as f:
             return json.load(f)
 
     def test_full_coverage_no_gaps(self, art12_obligations):
@@ -84,7 +84,7 @@ class TestEnrichFinding:
     @pytest.fixture
     def art12_obligations(self):
         path = os.path.join(os.path.dirname(__file__), "..", "obligations", "art12-record-keeping.json")
-        with open(path, "r") as f:
+        with open(path, "r", encoding="utf-8") as f:
             return json.load(f)
 
     def test_enriches_with_source_quote(self, art12_obligations):
@@ -120,7 +120,7 @@ class TestAllObligationFiles:
         assert len(files) >= 25, f"Expected at least 25 obligation files, found {len(files)}"
         for fname in files:
             path = os.path.join(obligations_dir, fname)
-            with open(path, "r") as f:
+            with open(path, "r", encoding="utf-8") as f:
                 data = json.load(f)
             engine = ObligationEngine(data)
             assert len(engine.obligations) > 0, f"{fname} has no obligations"
@@ -132,7 +132,7 @@ class TestAllObligationFiles:
         for fname in os.listdir(obligations_dir):
             if not fname.endswith(".json"):
                 continue
-            with open(os.path.join(obligations_dir, fname), "r") as f:
+            with open(os.path.join(obligations_dir, fname), "r", encoding="utf-8") as f:
                 data = json.load(f)
             total += len(data.get("obligations", []))
         assert total >= 247, f"Expected at least 247 obligations, found {total}"
