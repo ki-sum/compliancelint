@@ -4,8 +4,12 @@ and general-purpose AI models already placed on the market — Module implementa
 
 Art. 111 covers transitional provisions for existing AI systems and GPAI models:
   ART111-OBL-1 → has_transition_plan (Annex X legacy systems compliance by 31 Dec 2030)
-  ART111-OBL-2 → has_significant_change_tracking (pre-existing high-risk systems + public authority compliance by 2 Aug 2030)
+  ART111-OBL-2 → has_significant_change_tracking (high-risk systems placed before the Chapter III
+                 application date + public authority compliance by 2 Aug 2030)
   ART111-OBL-3 → has_gpai_compliance_timeline (GPAI models placed before 2 Aug 2025 comply by 2 Aug 2027)
+  ART111-OBL-4 → informational only (Art. 111(4), Reg (EU) 2026/1744: generative AI systems placed on
+                 the market before 2 Aug 2026 had until 2 Dec 2026 to comply with Art. 50(2); compliance
+                 with Art. 50(2) is assessed under ART50-OBL-2)
 
 This module reads AI-provided compliance_answers["art111"] and maps each answer
 to a Finding. No regex, keyword, or AST scanning is performed — detection is
@@ -25,12 +29,19 @@ from datetime import datetime, timezone
 # Add core to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
-from core.application_dates import applicable_from
+from core.application_dates import applicable_from, chapter_iii_dates, long_date, milestone_date
 from core.protocol import (
     BaseArticleModule, ScanResult, Explanation, ActionPlan, ActionItem,
     Finding, ComplianceLevel, Confidence, GapType,
 )
 from core.obligation_engine import ObligationEngine
+
+# Art. 111(2) cut-off: "the date of application of Chapter III referred to in Article 113"
+# (Art. 113, third paragraph, point (c), as amended by Reg (EU) 2026/1744).
+_CH3 = chapter_iii_dates()
+_CUT_OFF = (f"the date Chapter III applies to them ({long_date(_CH3['annex_iii'])} for Annex III "
+            f"systems, {long_date(_CH3['annex_i'])} for Annex I systems)")
+_ART111_4_DEADLINE = long_date(milestone_date("Art. 111(4)"))
 
 
 class Art111Module(BaseArticleModule):
@@ -112,22 +123,35 @@ class Art111Module(BaseArticleModule):
             answer=has_significant_change_tracking,
             true_description=(
                 "Significant change tracking and/or public authority compliance "
-                "planning found. Art. 111(2) requires pre-existing high-risk AI "
-                "systems to comply when subject to significant design changes after "
-                "2 August 2026. Public authority systems must comply by 2 August 2030."
+                "planning found. Without prejudice to Art. 5 and excluding systems "
+                "referred to in Art. 111(1), Art. 111(2) applies this Regulation to "
+                "operators of high-risk AI systems placed on the market or put into "
+                f"service before {_CUT_OFF} only if, as from that date, those systems are "
+                "subject to significant changes in their designs. In any case, providers "
+                "and deployers of high-risk AI systems intended to be used by public "
+                "authorities must comply with the applicable requirements and obligations "
+                "by 2 August 2030."
                 f"{(' Evidence: ' + change_tracking_evidence) if change_tracking_evidence else ''}"
             ),
             false_description=(
                 "No significant change tracking or public authority compliance "
-                "planning found. Art. 111(2) requires compliance for pre-existing "
-                "high-risk AI systems subject to significant design changes after "
-                "2 August 2026, and for all public authority systems by 2 August 2030."
+                "planning found. Without prejudice to Art. 5 and excluding systems "
+                "referred to in Art. 111(1), Art. 111(2) applies this Regulation to "
+                "operators of high-risk AI systems placed on the market or put into "
+                f"service before {_CUT_OFF} if, as from that date, those systems are "
+                "subject to significant changes in their designs; in any case, providers "
+                "and deployers of systems intended to be used by public authorities must "
+                "comply with the applicable requirements and obligations by 2 August 2030."
             ),
             none_description=(
                 "AI could not determine whether significant change tracking or "
-                "public authority compliance planning is in place. Art. 111(2) "
-                "applies to pre-existing high-risk AI systems with significant "
-                "design changes and public authority systems."
+                "public authority compliance planning is in place. Without prejudice to "
+                "Art. 5 and excluding systems referred to in Art. 111(1), Art. 111(2) "
+                "concerns high-risk AI systems placed on the market or put into service "
+                "before the date Chapter III applies to them that undergo significant "
+                "design changes from that date, and separately requires providers and "
+                "deployers of high-risk AI systems intended to be used by public "
+                "authorities to comply by 2 August 2030."
             ),
             gap_type=GapType.PROCESS,
         ))
@@ -156,6 +180,26 @@ class Art111Module(BaseArticleModule):
             gap_type=GapType.PROCESS,
         ))
 
+        # ── ART111-OBL-4: Art. 50(2) transitional deadline (informational) ──
+        # Founder decision 2026-10-03: handled as from 2 December 2026, when the
+        # transitional period is spent; Art. 50(2) itself is evaluated by ART50-OBL-2.
+        findings.append(Finding(
+            obligation_id="ART111-OBL-4",
+            file_path="project-wide",
+            line_number=None,
+            level=ComplianceLevel.NOT_APPLICABLE,
+            confidence=Confidence.HIGH,
+            description=(
+                "Art. 111(4) gives providers of AI systems, including general-purpose AI "
+                "systems, generating synthetic audio, image, video or text content that "
+                "were placed on the market before 2 August 2026 until "
+                f"{_ART111_4_DEADLINE} to comply with Art. 50(2). Compliance with "
+                "Art. 50(2) is assessed under ART50-OBL-2."
+            ),
+            gap_type=GapType.PROCESS,
+            is_informational=True,
+        ))
+
         details = {
             "has_transition_plan": has_transition_plan,
             "transition_evidence": transition_evidence,
@@ -165,10 +209,17 @@ class Art111Module(BaseArticleModule):
             "gpai_timeline_evidence": gpai_timeline_evidence,
             "note": (
                 "Art. 111 establishes transitional provisions for existing AI systems "
-                "and GPAI models. Different compliance deadlines apply: Annex X legacy "
-                "systems (31 Dec 2030), pre-existing high-risk with significant changes "
-                "(from 2 Aug 2026), public authority systems (2 Aug 2030), and GPAI "
-                "models (2 Aug 2027)."
+                "and GPAI models. Different rules apply: Annex X large-scale IT system "
+                "components placed on the market or put into service before 2 Aug 2027 "
+                "(compliance by 31 Dec 2030, without prejudice to Art. 5); high-risk "
+                "systems other than Art. 111(1) systems placed on the market or put into "
+                f"service before {_CUT_OFF} (the Regulation applies on significant design "
+                "changes from that date, without prejudice to Art. 5); high-risk systems "
+                "intended to be used by public authorities (compliance by 2 Aug 2030); "
+                "GPAI models placed on the market before 2 Aug 2025 (compliance by "
+                "2 Aug 2027); and AI systems generating synthetic audio, image, video or "
+                "text content placed on the market before 2 Aug 2026 (Art. 50(2) "
+                f"compliance by {_ART111_4_DEADLINE})."
             ),
         }
 
@@ -212,16 +263,24 @@ class Art111Module(BaseArticleModule):
                 "existing AI systems and GPAI models already on the market."
             ),
             official_summary=(
-                "Art. 111 provides transitional provisions for AI systems and GPAI "
-                "models already placed on the market before the EU AI Act's application "
-                "dates. Annex X large-scale IT system components placed before 2 Aug 2027 "
-                "must comply by 31 Dec 2030. Pre-existing high-risk systems must comply "
-                "only if subject to significant design changes after 2 Aug 2026, though "
-                "public authority systems must comply by 2 Aug 2030 regardless. GPAI "
-                "models placed before 2 Aug 2025 must comply by 2 Aug 2027."
+                "Art. 111 provides transitional provisions for existing AI systems and "
+                "GPAI models. Annex X large-scale IT system components placed on the "
+                "market or put into service before 2 Aug 2027 must be brought into "
+                "compliance by 31 Dec 2030, without prejudice to Art. 5. For high-risk AI "
+                "systems other than those in Art. 111(1) placed on the market or put into "
+                f"service before {_CUT_OFF}, the Regulation applies, without prejudice to "
+                "Art. 5, if they undergo significant design changes from that date; "
+                "providers and deployers of high-risk systems intended to be used by "
+                "public authorities must comply with the applicable requirements and "
+                "obligations by 2 Aug 2030 in any case. GPAI models placed on the market "
+                "before 2 Aug 2025 must comply by 2 Aug 2027. Under Art. 111(4), AI "
+                "systems generating synthetic audio, image, video or text content placed "
+                f"on the market before 2 Aug 2026 must comply with Art. 50(2) by "
+                f"{_ART111_4_DEADLINE}."
             ),
             related_articles={
-                "Art. 5": "Prohibited practices (apply without transitional relief per Art. 113(3))",
+                "Art. 5": "Prohibited practices (Art. 111(1) and (2) apply without prejudice to Art. 5)",
+                "Art. 50": "Art. 111(4) sets the Art. 50(2) deadline for AI systems generating synthetic audio, image, video or text content placed on the market before 2 Aug 2026",
                 "Art. 113": "Entry into force and application dates",
                 "Annex X": "List of large-scale IT systems (SIS, VIS, EES, ETIAS, etc.)",
             },
@@ -242,6 +301,7 @@ class Art111Module(BaseArticleModule):
                     "Whether design changes qualify as 'significant' under Art. 111(2)",
                     "Whether the system is intended for use by public authorities",
                     "Whether the GPAI model was placed on market before 2 Aug 2025",
+                    "Whether a generative AI system was placed on the market before 2 Aug 2026 (Art. 111(4))",
                 ],
             },
             compliance_checklist_summary=(
@@ -287,15 +347,24 @@ class Art111Module(BaseArticleModule):
                 article="Art. 111(2)",
                 action="Establish significant change tracking for pre-existing high-risk AI systems",
                 details=(
-                    "Art. 111(2) applies the full Regulation to pre-existing high-risk "
-                    "AI systems that undergo significant design changes after 2 Aug 2026. "
-                    "Public authority systems must comply by 2 Aug 2030 regardless.\n"
+                    "Without prejudice to Art. 5 and excluding systems referred to in "
+                    "Art. 111(1), Art. 111(2) applies this Regulation to operators of "
+                    "high-risk AI systems placed on the market or put into service before "
+                    f"{_CUT_OFF} if they undergo significant design changes from that date. "
+                    "Providers and deployers of high-risk AI systems intended to be used by "
+                    "public authorities must comply with the applicable requirements and "
+                    "obligations by 2 Aug 2030 in any case.\n"
                     "\n"
-                    "  1. Document when your system was first placed on the market\n"
-                    "  2. Implement change tracking for system design modifications\n"
-                    "  3. Define criteria for 'significant changes' per your system\n"
-                    "  4. If used by public authorities, create a compliance roadmap for 2 Aug 2030\n"
-                    "  5. Monitor for regulatory guidance on 'significant change' definition"
+                    "  1. Document when the first unit of the system's type and model was placed "
+                    "on the market or put into service (Reg. (EU) 2026/1744, Recital 39)\n"
+                    "  2. Record design changes made from the applicable cut-off date\n"
+                    "  3. Assess whether each design change is significant for Art. 111(2) purposes\n"
+                    "  4. If a significant design change occurs, trigger compliance with all relevant "
+                    "provisions applicable to the high-risk AI system, including applicable "
+                    "conformity-assessment requirements\n"
+                    "  5. If the system is intended to be used by public authorities, ensure compliance "
+                    "with the applicable requirements and obligations by 2 Aug 2030 regardless of "
+                    "design change."
                 ),
                 effort="4-8 hours (initial setup), ongoing maintenance",
                 action_type="human_judgment_required",

@@ -10,7 +10,28 @@
       "draft": [],
       "published": [],
       "upcoming": []
-    }
+    },
+    "amendments": [
+      {
+        "amending_celex": "32026R1744",
+        "amending_act": "Regulation (EU) 2026/1744 (Digital Omnibus)",
+        "consolidated_celex": "02024R1689-20260727",
+        "change_type": "AMEND+ADD",
+        "obligations_amended": [
+          "ART111-OBL-2"
+        ],
+        "obligations_added": [
+          "ART111-OBL-4"
+        ],
+        "source_pdf": "docs/sources/eu-ai-act-2024-1689-consolidated-20260727-en.pdf",
+        "source_pdf_sha256": "1ccd38d1c78482cf2053b70110115adcc5080700acc8bd7bead8cb3579143ccf",
+        "source_pages": [
+          124
+        ],
+        "consensus_lock": "omnibus-batch1-2026-10-03",
+        "recorded_on": "2026-10-03"
+      }
+    ]
   },
   "obligations": [
     {
@@ -42,21 +63,38 @@
     {
       "id": "ART111-OBL-2",
       "source": "Art. 111(2)",
-      "source_quote": "Without prejudice to the application of Article 5 as referred to in Article 113(3), point (a), this Regulation shall apply to operators of high-risk AI systems, other than the systems referred to in paragraph 1 of this Article, that have been placed on the market or put into service before 2 August 2026, only if, as from that date, those systems are subject to significant changes in their designs. In any case, the providers and deployers of high-risk AI systems intended to be used by public authorities shall take the necessary steps to comply with the requirements and obligations of this Regulation by 2 August 2030.",
+      "source_quote": "Without prejudice to the application of Article 5 as referred to in Article 113, third paragraph, point (a), this Regulation shall apply to operators of high-risk AI systems, other than the systems referred to in paragraph 1 of this Article, that have been placed on the market or put into service before the date of application of Chapter III referred to in Article 113, only if, as from that date, those systems are subject to significant changes in their designs. In any case, the providers and deployers of high-risk AI systems intended to be used by public authorities shall take the necessary steps to comply with the requirements and obligations laid down in this Regulation by 2 August 2030.",
       "deontic_type": "obligation",
       "modality": "shall",
       "addressee": "both",
-      "addressee_note": "Providers and deployers of high-risk AI systems used by public authorities",
+      "addressee_note": "Operators of high-risk AI systems (Art. 3(8)) for the first sentence; providers and deployers of high-risk AI systems intended to be used by public authorities for the second sentence",
       "decomposed_atoms": [
         {
           "atom": "significant_change_triggers_compliance",
-          "description": "Pre-existing high-risk systems only need to comply if significantly changed after 2 Aug 2026",
-          "requirement": "This Regulation SHALL apply to pre-existing high-risk AI systems only if, from 2 August 2026, they are subject to significant changes in their designs"
+          "description": "Pre-existing high-risk systems fall under the Regulation only if their design changes significantly from the date Chapter III applies to them",
+          "requirement": "Without prejudice to the application of Art. 5, this Regulation SHALL apply to operators of high-risk AI systems, other than those referred to in Art. 111(1), placed on the market or put into service before the date of application of Chapter III referred to in Art. 113 (third paragraph, point (c)), only if, as from that date, those systems are subject to significant changes in their designs",
+          "_history": [
+            {
+              "requirement": "This Regulation SHALL apply to pre-existing high-risk AI systems only if, from 2 August 2026, they are subject to significant changes in their designs",
+              "description": "Pre-existing high-risk systems only need to comply if significantly changed after 2 Aug 2026",
+              "superseded_on": "2026-10-03",
+              "amending_celex": "32026R1744",
+              "consensus_lock": "omnibus-batch1-2026-10-03"
+            }
+          ]
         },
         {
           "atom": "public_authority_systems_compliant_by_2030",
           "description": "Public authority high-risk AI systems must comply by 2 August 2030",
-          "requirement": "Providers and deployers of high-risk AI systems intended for public authority use SHALL comply by 2 August 2030"
+          "requirement": "Providers and deployers of high-risk AI systems intended to be used by public authorities SHALL take the necessary steps to comply with the requirements and obligations laid down in this Regulation by 2 August 2030",
+          "_history": [
+            {
+              "requirement": "Providers and deployers of high-risk AI systems intended for public authority use SHALL comply by 2 August 2030",
+              "superseded_on": "2026-10-03",
+              "amending_celex": "32026R1744",
+              "consensus_lock": "omnibus-batch1-2026-10-03"
+            }
+          ]
         }
       ],
       "automation_assessment": {
@@ -64,8 +102,17 @@
       },
       "cross_references": [
         "Art. 5",
-        "Art. 113(3)"
-      ]
+        "Art. 113"
+      ],
+      "_source_quote_history": [
+        {
+          "source_quote": "Without prejudice to the application of Article 5 as referred to in Article 113(3), point (a), this Regulation shall apply to operators of high-risk AI systems, other than the systems referred to in paragraph 1 of this Article, that have been placed on the market or put into service before 2 August 2026, only if, as from that date, those systems are subject to significant changes in their designs. In any case, the providers and deployers of high-risk AI systems intended to be used by public authorities shall take the necessary steps to comply with the requirements and obligations of this Regulation by 2 August 2030.",
+          "superseded_on": "2026-10-03",
+          "amending_celex": "32026R1744",
+          "consensus_lock": "omnibus-batch1-2026-10-03"
+        }
+      ],
+      "note": "Cut-off: the date of application of Chapter III referred to in Art. 113 (third paragraph, point (c)), which depends on whether the system is high-risk under Art. 6(2) and Annex III or under Art. 6(1) and Annex I. Reg (EU) 2026/1744, Recital 39: the grace period applies where the type and model of the system was already placed on the market; the decisive date is when the first unit of that type and model was placed on the market or put into service."
     },
     {
       "id": "ART111-OBL-3",
@@ -85,20 +132,50 @@
       "automation_assessment": {
         "level": "partial"
       }
+    },
+    {
+      "id": "ART111-OBL-4",
+      "source": "Art. 111(4)",
+      "source_quote": "Providers of AI systems, including general-purpose AI systems, generating synthetic audio, image, video or text content, that have been placed on the market before 2 August 2026 shall take the necessary steps in order to comply with Article 50(2) by 2 December 2026.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "decomposed_atoms": [
+        {
+          "atom": "legacy_generative_systems_comply_with_art50_2",
+          "description": "Generative AI systems already on the market before 2 August 2026 must comply with Art. 50(2) by 2 December 2026",
+          "requirement": "Providers of AI systems, including general-purpose AI systems, generating synthetic audio, image, video or text content that were placed on the market before 2 August 2026 SHALL take the necessary steps to comply with Article 50(2) by 2 December 2026"
+        },
+        {
+          "atom": "scope_placed_on_market_before_2026_08_02",
+          "description": "Transitional deadline covers only systems placed on the market before 2 August 2026",
+          "requirement": "The 2 December 2026 deadline applies only where the AI system was placed on the market before 2 August 2026; the paragraph does not mention systems that were only put into service"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial"
+      },
+      "addressee_note": "Providers of AI systems, including general-purpose AI systems, that generate synthetic audio, image, video or text content",
+      "scope_limitation": "Only applies to such systems placed on the market before 2 August 2026",
+      "cross_references": [
+        "Art. 50(2)",
+        "Art. 113"
+      ],
+      "note": "The four-month transitional period ends on 2 December 2026 (Reg. (EU) 2026/1744, Recital 38). Providers within Art. 111(4) must comply with Art. 50(2) by that date; compliance with Art. 50(2) is assessed under ART50-OBL-2, so the scanner reports this record as informational."
     }
   ],
   "summary": {
-    "total_obligations": 3,
-    "obligation_count": 3,
+    "total_obligations": 4,
+    "obligation_count": 4,
     "prohibition_count": 0,
     "permission_count": 0,
     "addressee_breakdown": {
-      "provider": 2,
+      "provider": 3,
       "both": 1
     },
     "automation_breakdown": {
       "full": 0,
-      "partial": 3,
+      "partial": 4,
       "manual": 0
     }
   }

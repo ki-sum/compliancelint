@@ -143,3 +143,22 @@ def test_summary_does_not_promise_standards_by_a_past_date(tmp_path):
     """The checklist note said harmonised standards were 'expected 2026-08-02' — unsourced and past."""
     s = _summary(12, {"has_logging": True, "has_retention_config": True}, tmp_path)
     assert "expected 2026-08-02" not in s["compliance_checklist_note"]
+
+
+# ── helpers for copy that names a date (Omnibus batch 1, 2026-10-03) ─────────
+
+def test_milestone_date_by_basis():
+    assert ad.milestone_date("Art. 111(4)") == "2026-12-02"
+    assert ad.milestone_date("Art. 111(2)") == "2030-08-02"
+    with pytest.raises(KeyError):
+        ad.milestone_date("Art. 999")
+
+
+def test_chapter_iii_dates_follow_art_113_point_c():
+    assert ad.chapter_iii_dates() == {"annex_iii": "2027-12-02", "annex_i": "2028-08-02"}
+
+
+@pytest.mark.parametrize("iso,text", [("2027-12-02", "2 December 2027"), ("2028-08-02", "2 August 2028"),
+                                      ("2030-12-31", "31 December 2030")])
+def test_long_date(iso, text):
+    assert ad.long_date(iso) == text

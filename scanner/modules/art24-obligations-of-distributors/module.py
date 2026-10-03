@@ -97,7 +97,6 @@ class Art24Module(BaseArticleModule):
                         "distributors of high-risk AI systems."
                     ),
                     gap_type=GapType.PROCESS,
-                    is_informational=True,
                 ))
         else:
             # ── ART24-OBL-1: Pre-market verification ──

@@ -58,7 +58,29 @@
       "celex": "32024R1689",
       "oj_citation": "OJ L 2024/1689, 12.7.2024",
       "eli_note": "ELI (European Legislation Identifier) is designed for permanent persistence. Preferred over CELEX-based URLs."
-    }
+    },
+    "amendments": [
+      {
+        "amending_celex": "32026R1744",
+        "amending_act": "Regulation (EU) 2026/1744 (Digital Omnibus)",
+        "consolidated_celex": "02024R1689-20260727",
+        "change_type": "AMEND",
+        "obligations_amended": [
+          "ART50-OBL-7",
+          "ART50-EMP-7a",
+          "ART50-EMP-7b"
+        ],
+        "obligations_added": [],
+        "source_pdf": "docs/sources/eu-ai-act-2024-1689-consolidated-20260727-en.pdf",
+        "source_pdf_sha256": "1ccd38d1c78482cf2053b70110115adcc5080700acc8bd7bead8cb3579143ccf",
+        "source_pages": [
+          59,
+          60
+        ],
+        "consensus_lock": "omnibus-batch1-2026-10-03",
+        "recorded_on": "2026-10-03"
+      }
+    ]
   },
   "obligations": [
     {
@@ -413,21 +435,41 @@
     {
       "id": "ART50-OBL-7",
       "source": "Art. 50(7)",
-      "source_quote": "The AI Office shall encourage and facilitate the drawing up of codes of practice at Union level to facilitate the effective implementation of the obligations regarding the detection and labelling of artificially generated or manipulated content.",
+      "source_quote": "The Commission shall encourage and facilitate the drawing up of codes of practice at Union level to facilitate the effective implementation of the obligations regarding the detection, marking and labelling of artificially generated or manipulated content.",
       "deontic_type": "obligation",
       "modality": "shall",
-      "addressee": "ai_office",
-      "addressee_note": "The AI Office (not providers or deployers). The AI Office is tasked with encouraging and facilitating industry codes of practice for detection and labelling of AI-generated content.",
+      "addressee": "commission",
+      "addressee_note": "The Commission (not providers or deployers). Reg (EU) 2026/1744 replaced 'The AI Office' with 'The Commission'; under Art. 3(47) references to the AI Office are construed as references to the Commission. The Commission encourages and facilitates Union-level codes of practice for the detection, marking and labelling of artificially generated or manipulated content.",
       "decomposed_atoms": [
         {
-          "atom": "ai_office_encourages_codes_of_practice",
-          "description": "AI Office must encourage development of codes of practice at Union level",
-          "requirement": "The AI Office SHALL encourage and facilitate the drawing up of codes of practice at Union level"
+          "atom": "commission_encourages_codes_of_practice",
+          "description": "Commission must encourage and facilitate Union-level codes of practice",
+          "requirement": "The Commission SHALL encourage and facilitate the drawing up of codes of practice at Union level",
+          "_history": [
+            {
+              "requirement": "The AI Office SHALL encourage and facilitate the drawing up of codes of practice at Union level",
+              "description": "AI Office must encourage development of codes of practice at Union level",
+              "atom": "ai_office_encourages_codes_of_practice",
+              "superseded_on": "2026-10-03",
+              "amending_celex": "32026R1744",
+              "consensus_lock": "omnibus-batch1-2026-10-03"
+            }
+          ]
         },
         {
-          "atom": "codes_target_detection_and_labelling",
-          "description": "Codes of practice must target detection and labelling of artificially generated/manipulated content",
-          "requirement": "Codes of practice SHALL facilitate effective implementation of obligations regarding detection and labelling of artificially generated or manipulated content"
+          "atom": "codes_target_detection_marking_and_labelling",
+          "description": "Codes of practice target detection, marking and labelling of AI-generated or manipulated content",
+          "requirement": "The codes of practice drawn up at Union level are intended to facilitate the effective implementation of the obligations regarding the detection, marking and labelling of artificially generated or manipulated content",
+          "_history": [
+            {
+              "requirement": "Codes of practice SHALL facilitate effective implementation of obligations regarding detection and labelling of artificially generated or manipulated content",
+              "description": "Codes of practice must target detection and labelling of artificially generated/manipulated content",
+              "atom": "codes_target_detection_and_labelling",
+              "superseded_on": "2026-10-03",
+              "amending_celex": "32026R1744",
+              "consensus_lock": "omnibus-batch1-2026-10-03"
+            }
+          ]
         }
       ],
       "automation_assessment": {
@@ -437,23 +479,42 @@
         {
           "article": 50,
           "paragraph": 2,
-          "context": "AI Office codes of practice target effective implementation of the Art. 50(2) marking obligation"
+          "context": "Codes of practice facilitate the effective implementation of the Art. 50(2) marking and detection obligations; the Commission's adequacy assessment (ART50-EMP-7a) covers Art. 50(2) and (4)."
+        }
+      ],
+      "_source_quote_history": [
+        {
+          "source_quote": "The AI Office shall encourage and facilitate the drawing up of codes of practice at Union level to facilitate the effective implementation of the obligations regarding the detection and labelling of artificially generated or manipulated content.",
+          "superseded_on": "2026-10-03",
+          "amending_celex": "32026R1744",
+          "consensus_lock": "omnibus-batch1-2026-10-03"
         }
       ]
     },
     {
       "id": "ART50-EMP-7a",
       "source": "Art. 50(7)",
-      "source_quote": "The Commission may adopt implementing acts to approve those codes of practice in accordance with the procedure laid down in Article 56 (6).",
-      "deontic_type": "empowerment",
-      "modality": "may",
+      "source_quote": "The Commission, taking utmost account of the opinion of the Board, shall assess whether adherence to those codes of practice is adequate to ensure compliance with the obligations laid down in paragraphs 2 and 4 of this Article, in accordance with the procedure laid down in Article 56(6).",
+      "deontic_type": "obligation",
+      "modality": "shall",
       "addressee": "commission",
-      "note": "Commission empowerment to approve Union-level codes of practice on detection and labelling of AI-generated/manipulated content (drawn up by the AI Office under ART50-OBL-7). Adherence to an approved code of practice provides a presumption of compliance with Art. 50(2), (4) and (5) obligations. Providers and deployers should monitor for the Commission's approval decision and consider signing approved codes. Procedural cross-reference: Article 56 (6). Per EC Guidelines C(2026) 5054 §8.1 ¶146-149. CORRECTION 2026-08-08: previous source_quote (about 'technical specifications for machine-readable format') was an o3 hallucination from the 2026-03-20 Consensus Lock session — full-text grep of EUR-Lex CELEX:32024R1689 returned zero matches. Repaired to verbatim Art 50(7) sentence 2, with corresponding atom rewrite. ID preserved to avoid breaking 31 downstream references and the CI `total == 247` invariant.",
+      "note": "Commission obligation: taking utmost account of the opinion of the Board, the Commission shall assess whether adherence to the codes of practice drawn up under ART50-OBL-7 is adequate to ensure compliance with Art. 50(2) and (4), in accordance with the procedure laid down in Art. 56(6). Such codes do not grant a presumption of conformity (Reg. (EU) 2026/1744, Recital 41). Providers and deployers falling within Art. 50(2) and (4) may demonstrate compliance by adhering to a code assessed as adequate, or by adequate alternative means (EC Guidelines C(2026) 5054 §8.1 ¶146-147).",
+      "_correction_note": "CORRECTION 2026-08-08: previous source_quote (about 'technical specifications for machine-readable format') was an o3 hallucination from the 2026-03-20 Consensus Lock session — full-text grep of EUR-Lex CELEX:32024R1689 returned zero matches. Repaired to verbatim Art 50(7) sentence 2, with corresponding atom rewrite. ID preserved to avoid breaking 31 downstream references and the CI `total == 247` invariant.",
       "decomposed_atoms": [
         {
-          "atom": "commission_may_approve_codes_of_practice",
-          "description": "Commission may adopt implementing acts to approve codes of practice on detection and labelling of AI-generated content",
-          "requirement": "The Commission MAY adopt implementing acts to approve codes of practice (drawn up under ART50-OBL-7) in accordance with the procedure laid down in Article 56 (6). Approval status confers a presumption of compliance for signatories."
+          "atom": "commission_assesses_code_adequacy",
+          "description": "Commission must assess whether adherence to the codes of practice is adequate",
+          "requirement": "The Commission, taking utmost account of the opinion of the Board, SHALL assess whether adherence to the codes of practice is adequate to ensure compliance with the obligations in Art. 50(2) and (4), in accordance with the procedure in Art. 56(6)",
+          "_history": [
+            {
+              "requirement": "The Commission MAY adopt implementing acts to approve codes of practice (drawn up under ART50-OBL-7) in accordance with the procedure laid down in Article 56 (6). Approval status confers a presumption of compliance for signatories.",
+              "description": "Commission may adopt implementing acts to approve codes of practice on detection and labelling of AI-generated content",
+              "atom": "commission_may_approve_codes_of_practice",
+              "superseded_on": "2026-10-03",
+              "amending_celex": "32026R1744",
+              "consensus_lock": "omnibus-batch1-2026-10-03"
+            }
+          ]
         }
       ],
       "automation_assessment": {
@@ -463,28 +524,46 @@
         {
           "article": 56,
           "paragraph": 6,
-          "context": "Article 56 (6) sets out the procedure for Commission approval of codes of practice — the empowerment above operates within that procedural framework."
+          "context": "Article 56(6) sets out the procedure for the Commission's adequacy assessment of codes of practice — the assessment above follows that procedure."
         },
         {
           "article": 50,
           "paragraph": 7,
-          "context": "This EMP is one of two Commission empowerments in Art 50(7). Its counterpart ART50-EMP-7b covers the fallback empowerment when a code is deemed inadequate."
+          "context": "Art. 50(7) contains two Commission obligations: ART50-OBL-7 (encourage and facilitate the drawing up of codes of practice) and this record, ART50-EMP-7a (assess whether adherence is adequate); it also contains one Commission empowerment, ART50-EMP-7b (common rules if a code is deemed inadequate)."
+        }
+      ],
+      "_source_quote_history": [
+        {
+          "source_quote": "The Commission may adopt implementing acts to approve those codes of practice in accordance with the procedure laid down in Article 56 (6).",
+          "superseded_on": "2026-10-03",
+          "amending_celex": "32026R1744",
+          "consensus_lock": "omnibus-batch1-2026-10-03"
         }
       ]
     },
     {
       "id": "ART50-EMP-7b",
       "source": "Art. 50(7)",
-      "source_quote": "If it deems the code is not adequate, the Commission may adopt an implementing act specifying common rules for the implementation of those obligations in accordance with the examination procedure laid down in Article 98(2).",
+      "source_quote": "If it deems the code of practice to be inadequate, the Commission may adopt an implementing act specifying common rules for the implementation of those obligations in accordance with the examination procedure laid down in Article 98(2).",
       "deontic_type": "empowerment",
       "modality": "may",
       "addressee": "commission",
-      "note": "Commission fallback empowerment: if the AI Office code of practice (see ART50-OBL-7 and ART50-EMP-7a) is deemed inadequate, the Commission may issue common rules directly. This is a residual power ensuring baseline compliance obligations exist even without industry consensus. Procedural cross-reference: Article 98(2) (examination procedure — comitology). Per EC Guidelines C(2026) 5054 §8.1 ¶150. CORRECTION 2026-08-08: previous source_quote (about 'specify and update the list of specific categories of AI systems') was an o3 hallucination from the 2026-03-20 Consensus Lock session — full-text grep of EUR-Lex CELEX:32024R1689 returned zero matches. Repaired to verbatim Art 50(7) sentence 3, with corresponding atom rewrite. ID preserved to avoid breaking 31 downstream references and the CI `total == 247` invariant.",
+      "note": "Commission fallback empowerment: if the Commission deems the code of practice (see ART50-OBL-7 and ART50-EMP-7a) to be inadequate, it may adopt an implementing act specifying common rules for the implementation of the obligations in Art. 50(2) and (4), in accordance with the examination procedure in Art. 98(2).",
+      "_correction_note": "CORRECTION 2026-08-08: previous source_quote (about 'specify and update the list of specific categories of AI systems') was an o3 hallucination from the 2026-03-20 Consensus Lock session — full-text grep of EUR-Lex CELEX:32024R1689 returned zero matches. Repaired to verbatim Art 50(7) sentence 3, with corresponding atom rewrite. ID preserved to avoid breaking 31 downstream references and the CI `total == 247` invariant.",
       "decomposed_atoms": [
         {
           "atom": "commission_may_specify_common_rules_if_code_inadequate",
-          "description": "Commission may adopt implementing act with common rules if code of practice is deemed inadequate",
-          "requirement": "IF the Commission deems the code of practice (per ART50-EMP-7a) is not adequate, the Commission MAY adopt an implementing act specifying common rules for the implementation of the Art. 50(2)/(4)/(5) obligations, in accordance with the examination procedure laid down in Article 98(2)."
+          "description": "Commission may adopt an implementing act with common rules if the code of practice is inadequate",
+          "requirement": "If the Commission deems the code of practice to be inadequate, the Commission MAY adopt an implementing act specifying common rules for the implementation of the obligations in Art. 50(2) and (4), in accordance with the examination procedure in Art. 98(2)",
+          "_history": [
+            {
+              "requirement": "IF the Commission deems the code of practice (per ART50-EMP-7a) is not adequate, the Commission MAY adopt an implementing act specifying common rules for the implementation of the Art. 50(2)/(4)/(5) obligations, in accordance with the examination procedure laid down in Article 98(2).",
+              "description": "Commission may adopt implementing act with common rules if code of practice is deemed inadequate",
+              "superseded_on": "2026-10-03",
+              "amending_celex": "32026R1744",
+              "consensus_lock": "omnibus-batch1-2026-10-03"
+            }
+          ]
         }
       ],
       "automation_assessment": {
@@ -499,7 +578,15 @@
         {
           "article": 50,
           "paragraph": 7,
-          "context": "This EMP is the second of two Commission empowerments in Art 50(7). Its counterpart ART50-EMP-7a covers the primary empowerment (approval of codes of practice)."
+          "context": "This is the only Commission empowerment left in Art. 50(7) after Reg (EU) 2026/1744; its counterpart ART50-EMP-7a is now the Commission's obligation to assess the adequacy of codes of practice."
+        }
+      ],
+      "_source_quote_history": [
+        {
+          "source_quote": "If it deems the code is not adequate, the Commission may adopt an implementing act specifying common rules for the implementation of those obligations in accordance with the examination procedure laid down in Article 98(2).",
+          "superseded_on": "2026-10-03",
+          "amending_celex": "32026R1744",
+          "consensus_lock": "omnibus-batch1-2026-10-03"
         }
       ]
     }
@@ -510,8 +597,7 @@
       "provider": 2,
       "deployer": 4,
       "provider_and_deployer": 2,
-      "ai_office": 1,
-      "commission": 2
+      "commission": 3
     },
     "automation_breakdown": {
       "full": 2,
@@ -519,12 +605,12 @@
       "manual": 4
     },
     "scope_notes": {
-      "broad_scope": "Art. 50 applies to ALMOST ALL AI systems — not limited to high-risk. This is the broadest transparency obligation in the EU AI Act.",
-      "provider_obligations": "ART50-OBL-1 (human interaction disclosure), ART50-OBL-2 (synthetic content marking) — provider must build transparency into the system",
-      "deployer_obligations": "ART50-OBL-3 (emotion/biometric disclosure), ART50-OBL-4 (deep fake image/audio/video), ART50-OBL-4b (deep fake text for public interest) — deployer must inform persons at deployment time",
-      "cross_cutting": "ART50-OBL-5 (presentation and timing), ART50-OBL-6 (cumulative obligations) — apply to all Art. 50 obligations",
-      "ai_office": "ART50-OBL-7 — AI Office SHALL facilitate codes of practice for detection and labelling",
-      "commission_empowerments": "ART50-EMP-7a (machine-readable format specs), ART50-EMP-7b (system category list) — Commission MAY adopt implementing acts"
+      "broad_scope": "Art. 50 is not limited to high-risk AI systems; paragraphs 1 to 4 apply to the specific categories of AI systems and uses described there.",
+      "provider_obligations": "ART50-OBL-1 (direct human-interaction disclosure) and ART50-OBL-2 (machine-readable marking and detectability of synthetic content) impose provider obligations within their stated scopes and exceptions.",
+      "deployer_obligations": "ART50-OBL-3 (emotion-recognition/biometric-categorisation disclosure) and ART50-OBL-4/4b (deep-fake and public-interest text disclosure) impose deployer obligations within their stated scopes and exceptions.",
+      "cross_cutting": "ART50-OBL-5 (manner and timing of information) and ART50-OBL-6 (relationship with Chapter III and other transparency obligations) apply to paragraphs 1 to 4 as specified in Art. 50(5) and (6).",
+      "commission_codes_of_practice": "ART50-OBL-7 — Commission SHALL encourage and facilitate codes of practice for detection, marking and labelling; ART50-EMP-7a — Commission SHALL assess their adequacy for Art. 50(2) and (4).",
+      "commission_empowerment": "ART50-EMP-7b — Commission MAY adopt an implementing act with common rules if a code of practice is deemed inadequate."
     }
   }
 }

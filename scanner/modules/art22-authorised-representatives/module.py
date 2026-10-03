@@ -95,7 +95,6 @@ class Art22Module(BaseArticleModule):
                         "obligations only apply to providers established in third countries (non-EU)."
                     ),
                     gap_type=GapType.PROCESS,
-                    is_informational=True,
                 ))
         else:
             # ── ART22-OBL-1: Appoint authorised representative ──

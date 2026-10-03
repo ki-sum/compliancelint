@@ -31,7 +31,27 @@
       "upcoming": [
         "CEN-CENELEC harmonized standard for Art. 17 (expected Q4 2026)"
       ]
-    }
+    },
+    "amendments": [
+      {
+        "amending_celex": "32026R1744",
+        "amending_act": "Regulation (EU) 2026/1744 (Digital Omnibus)",
+        "consolidated_celex": "02024R1689-20260727",
+        "change_type": "AMEND",
+        "obligations_amended": [
+          "ART17-OBL-2"
+        ],
+        "obligations_added": [],
+        "source_pdf": "docs/sources/eu-ai-act-2024-1689-consolidated-20260727-en.pdf",
+        "source_pdf_sha256": "1ccd38d1c78482cf2053b70110115adcc5080700acc8bd7bead8cb3579143ccf",
+        "source_pages": [
+          29,
+          30
+        ],
+        "consensus_lock": "omnibus-batch1-2026-10-03",
+        "recorded_on": "2026-10-03"
+      }
+    ]
   },
   "obligations": [
     {
@@ -317,20 +337,42 @@
     {
       "id": "ART17-OBL-2",
       "source": "Art. 17(2)",
-      "source_quote": "The implementation of the aspects referred to in paragraph 1 shall be proportionate to the size of the provider's organisation. Providers shall, in any event, respect the degree of rigour and the level of protection required to ensure the compliance of their high-risk AI systems with this Regulation.",
+      "source_quote": "The implementation of the aspects referred to in paragraph 1 shall be proportionate to the size of the provider’s organisation, in particular, if the provider is an SME, including a start-up, or an SMC. Providers shall, in any event, respect the degree of rigour and the level of protection required to ensure the compliance of their high-risk AI systems with this Regulation.",
       "deontic_type": "obligation",
       "modality": "shall",
       "addressee": "provider",
       "decomposed_atoms": [
         {
           "atom": "proportionate_implementation",
-          "description": "QMS implementation must be proportionate but always ensure compliance",
-          "requirement": "SHALL be proportionate to size but always ensure compliance"
+          "description": "QMS implementation proportionate to the size of the organisation",
+          "requirement": "The implementation of the quality management system aspects referred to in Art. 17(1) SHALL be proportionate to the size of the provider's organisation, in particular where the provider is an SME, including a start-up, or an SMC",
+          "_history": [
+            {
+              "requirement": "SHALL be proportionate to size but always ensure compliance",
+              "description": "QMS implementation must be proportionate but always ensure compliance",
+              "superseded_on": "2026-10-03",
+              "amending_celex": "32026R1744",
+              "consensus_lock": "omnibus-batch1-2026-10-03"
+            }
+          ]
+        },
+        {
+          "atom": "rigour_and_protection_floor",
+          "description": "Proportionality never lowers the required rigour or level of protection",
+          "requirement": "Providers SHALL in any event respect the degree of rigour and the level of protection required to ensure the compliance of their high-risk AI systems with this Regulation"
         }
       ],
       "automation_assessment": {
         "level": "manual"
-      }
+      },
+      "_source_quote_history": [
+        {
+          "source_quote": "The implementation of the aspects referred to in paragraph 1 shall be proportionate to the size of the provider's organisation. Providers shall, in any event, respect the degree of rigour and the level of protection required to ensure the compliance of their high-risk AI systems with this Regulation.",
+          "superseded_on": "2026-10-03",
+          "amending_celex": "32026R1744",
+          "consensus_lock": "omnibus-batch1-2026-10-03"
+        }
+      ]
     },
     {
       "id": "ART17-PERM-3",

@@ -598,4 +598,6 @@ class ObligationEngine:
             remediation=finding.remediation,
             source_quote=obl.source_quote,
             gap_type=finding.gap_type,
+            is_informational=finding.is_informational,
+            human_gate_hint=finding.human_gate_hint,
         )

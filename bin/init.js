@@ -409,7 +409,7 @@ ${bold("Next steps:")}
      ${dim("the scanner then narrows to obligations that apply to you.")}
   3. Then ask your AI:
      ${cyan('"Scan this project for EU AI Act compliance"')}
-     ${dim("If you skip step 2, the scanner runs all 246 obligations and")}
+     ${dim("If you skip step 2, the scanner runs all 247 obligations and")}
      ${dim("most return 'unable to determine' (safe but noisy fallback).")}
 `);
 

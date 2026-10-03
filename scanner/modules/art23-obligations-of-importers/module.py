@@ -100,7 +100,6 @@ class Art23Module(BaseArticleModule):
                         "importers of high-risk AI systems."
                     ),
                     gap_type=GapType.PROCESS,
-                    is_informational=True,
                 ))
         else:
             # ── ART23-OBL-1: Pre-market conformity verification ──

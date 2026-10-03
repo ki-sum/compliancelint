@@ -40,6 +40,30 @@ def eur_lex_url() -> str:
     return load()["eur_lex_url"]
 
 
+def milestone_date(basis: str) -> str:
+    """Date of the single milestone whose basis is `basis` (e.g. "Art. 111(4)")."""
+    hits = [m["date"] for m in load()["milestones"] if m["basis"] == basis]
+    if len(hits) != 1:
+        raise KeyError(f"{basis}: {len(hits)} milestones")
+    return hits[0]
+
+
+def chapter_iii_dates() -> dict:
+    """Art. 113, third paragraph, point (c): when Chapter III Sections 1-3 apply."""
+    entry = article(9)
+    return {"annex_iii": entry["applicable_from"], "annex_i": entry["applicable_from_annex_i"]}
+
+
+_MONTHS = ("January", "February", "March", "April", "May", "June", "July", "August", "September",
+           "October", "November", "December")
+
+
+def long_date(iso: str) -> str:
+    """'2027-12-02' -> '2 December 2027' (the Official Journal style used in finding texts)."""
+    d = date.fromisoformat(iso)
+    return f"{d.day} {_MONTHS[d.month - 1]} {d.year}"
+
+
 def milestones_status() -> list[dict]:
     """Every Art. 113 / Art. 111 milestone with APPLICABLE / UPCOMING (+ days_remaining) as of today."""
     today = _today()

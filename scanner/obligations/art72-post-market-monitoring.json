@@ -30,7 +30,27 @@
       "upcoming": [
         "CEN-CENELEC harmonized standard for post-market monitoring of AI systems (expected Q4 2026)"
       ]
-    }
+    },
+    "amendments": [
+      {
+        "amending_celex": "32026R1744",
+        "amending_act": "Regulation (EU) 2026/1744 (Digital Omnibus)",
+        "consolidated_celex": "02024R1689-20260727",
+        "change_type": "AMEND",
+        "obligations_amended": [
+          "ART72-OBL-3"
+        ],
+        "obligations_added": [],
+        "source_pdf": "docs/sources/eu-ai-act-2024-1689-consolidated-20260727-en.pdf",
+        "source_pdf_sha256": "1ccd38d1c78482cf2053b70110115adcc5080700acc8bd7bead8cb3579143ccf",
+        "source_pages": [
+          87,
+          88
+        ],
+        "consensus_lock": "omnibus-batch1-2026-10-03",
+        "recorded_on": "2026-10-03"
+      }
+    ]
   },
   "obligations": [
     {
@@ -87,7 +107,7 @@
     {
       "id": "ART72-OBL-3",
       "source": "Art. 72(3)",
-      "source_quote": "The post-market monitoring system shall be based on a post-market monitoring plan. The post-market monitoring plan shall be part of the technical documentation referred to in Annex IV. The Commission shall adopt an implementing act laying down detailed provisions establishing a template for the post-market monitoring plan and the list of elements to be included in the plan by 2 February 2026. That implementing act shall be adopted in accordance with the examination procedure referred to in Article 98(2).",
+      "source_quote": "The post-market monitoring system shall be based on a post-market monitoring plan. The post-market monitoring plan shall be part of the technical documentation referred to in Annex IV. The Commission, taking utmost account of the opinion of the Board, shall adopt guidance, including a template, on the post-market monitoring plan by 2 September 2027.",
       "deontic_type": "obligation",
       "modality": "shall",
       "addressee": "provider",
@@ -95,17 +115,42 @@
         {
           "atom": "pmm_plan_exists",
           "description": "Must have a post-market monitoring plan",
-          "requirement": "SHALL be based on a post-market monitoring plan"
+          "requirement": "The post-market monitoring system SHALL be based on a post-market monitoring plan",
+          "_history": [
+            {
+              "requirement": "SHALL be based on a post-market monitoring plan",
+              "superseded_on": "2026-10-03",
+              "amending_celex": "32026R1744",
+              "consensus_lock": "omnibus-batch1-2026-10-03"
+            }
+          ]
         },
         {
           "atom": "pmm_plan_in_technical_docs",
           "description": "Plan must be part of Annex IV technical documentation",
-          "requirement": "SHALL include the post-market monitoring plan as part of the technical documentation referred to in Annex IV"
+          "requirement": "The post-market monitoring plan SHALL be part of the technical documentation referred to in Annex IV",
+          "_history": [
+            {
+              "requirement": "SHALL include the post-market monitoring plan as part of the technical documentation referred to in Annex IV",
+              "superseded_on": "2026-10-03",
+              "amending_celex": "32026R1744",
+              "consensus_lock": "omnibus-batch1-2026-10-03"
+            }
+          ]
         }
       ],
       "automation_assessment": {
         "level": "full"
-      }
+      },
+      "_source_quote_history": [
+        {
+          "source_quote": "The post-market monitoring system shall be based on a post-market monitoring plan. The post-market monitoring plan shall be part of the technical documentation referred to in Annex IV. The Commission shall adopt an implementing act laying down detailed provisions establishing a template for the post-market monitoring plan and the list of elements to be included in the plan by 2 February 2026. That implementing act shall be adopted in accordance with the examination procedure referred to in Article 98(2).",
+          "superseded_on": "2026-10-03",
+          "amending_celex": "32026R1744",
+          "consensus_lock": "omnibus-batch1-2026-10-03"
+        }
+      ],
+      "note": "The last sentence binds the Commission only: taking utmost account of the opinion of the Board, it shall adopt guidance, including a template, on the post-market monitoring plan by 2 September 2027. Reg (EU) 2026/1744, Recital 41: the template is voluntary; the earlier empowerment to adopt an implementing act with a template and a list of elements (by 2 February 2026) was removed."
     },
     {
       "id": "ART72-PER-1",

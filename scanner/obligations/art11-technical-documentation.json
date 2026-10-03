@@ -30,7 +30,29 @@
       "upcoming": [
         "CEN-CENELEC harmonized standard for Art. 11 (expected Q4 2026)"
       ]
-    }
+    },
+    "amendments": [
+      {
+        "amending_celex": "32026R1744",
+        "amending_act": "Regulation (EU) 2026/1744 (Digital Omnibus)",
+        "consolidated_celex": "02024R1689-20260727",
+        "change_type": "AMEND",
+        "obligations_amended": [
+          "ART11-OBL-1b",
+          "ART11-PERM-1d",
+          "ART11-OBL-1e",
+          "ART11-OBL-1f"
+        ],
+        "obligations_added": [],
+        "source_pdf": "docs/sources/eu-ai-act-2024-1689-consolidated-20260727-en.pdf",
+        "source_pdf_sha256": "1ccd38d1c78482cf2053b70110115adcc5080700acc8bd7bead8cb3579143ccf",
+        "source_pages": [
+          24
+        ],
+        "consensus_lock": "omnibus-batch1-2026-10-03",
+        "recorded_on": "2026-10-03"
+      }
+    ]
   },
   "obligations": [
     {
@@ -64,7 +86,7 @@
     {
       "id": "ART11-OBL-1b",
       "source": "Art. 11(1)",
-      "source_quote": "The technical documentation shall be drawn up in such a way as to demonstrate that the high-risk AI system complies with the requirements set out in this Section and to provide national competent authorities and notified bodies with the necessary information in a clear and comprehensive form to assess the compliance of the AI system with those requirements.",
+      "source_quote": "That technical documentation shall be drawn up in such a way as to demonstrate that the high-risk AI system complies with the requirements set out in this Section and to provide national competent authorities and notified bodies with the necessary information in a clear and comprehensive form to assess the compliance of the AI system with those requirements.",
       "deontic_type": "obligation",
       "modality": "shall",
       "addressee": "provider",
@@ -72,22 +94,54 @@
         {
           "atom": "demonstrates_compliance",
           "description": "Documentation must demonstrate compliance",
-          "requirement": "Documentation SHALL demonstrate compliance with Section requirements"
+          "requirement": "The technical documentation SHALL be drawn up in such a way as to demonstrate that the high-risk AI system complies with the requirements set out in Chapter III, Section 2",
+          "_history": [
+            {
+              "requirement": "Documentation SHALL demonstrate compliance with Section requirements",
+              "superseded_on": "2026-10-03",
+              "amending_celex": "32026R1744",
+              "consensus_lock": "omnibus-batch1-2026-10-03"
+            }
+          ]
         },
         {
           "atom": "clear_and_comprehensive",
           "description": "Documentation must be clear and comprehensive",
-          "requirement": "Documentation SHALL provide information in a clear and comprehensive form"
+          "requirement": "The technical documentation SHALL provide the necessary information in a clear and comprehensive form",
+          "_history": [
+            {
+              "requirement": "Documentation SHALL provide information in a clear and comprehensive form",
+              "superseded_on": "2026-10-03",
+              "amending_celex": "32026R1744",
+              "consensus_lock": "omnibus-batch1-2026-10-03"
+            }
+          ]
         },
         {
           "atom": "enables_authority_assessment",
           "description": "Documentation must enable authority assessment",
-          "requirement": "Documentation SHALL enable national authorities and notified bodies to assess compliance"
+          "requirement": "The technical documentation SHALL provide national competent authorities and notified bodies with the information necessary to assess the compliance of the AI system with those requirements",
+          "_history": [
+            {
+              "requirement": "Documentation SHALL enable national authorities and notified bodies to assess compliance",
+              "superseded_on": "2026-10-03",
+              "amending_celex": "32026R1744",
+              "consensus_lock": "omnibus-batch1-2026-10-03"
+            }
+          ]
         }
       ],
       "automation_assessment": {
         "level": "partial"
-      }
+      },
+      "_source_quote_history": [
+        {
+          "source_quote": "The technical documentation shall be drawn up in such a way as to demonstrate that the high-risk AI system complies with the requirements set out in this Section and to provide national competent authorities and notified bodies with the necessary information in a clear and comprehensive form to assess the compliance of the AI system with those requirements.",
+          "superseded_on": "2026-10-03",
+          "amending_celex": "32026R1744",
+          "consensus_lock": "omnibus-batch1-2026-10-03"
+        }
+      ]
     },
     {
       "id": "ART11-OBL-1c",
@@ -130,64 +184,118 @@
     {
       "id": "ART11-PERM-1d",
       "source": "Art. 11(1)",
-      "source_quote": "SMEs, including start-ups, may provide the elements of the technical documentation specified in Annex IV in a simplified manner.",
+      "source_quote": "SMEs, including start-ups, and SMCs, may provide the elements of the technical documentation specified in Annex IV in a simplified manner.",
       "deontic_type": "permission",
       "modality": "may",
       "addressee": "provider",
-      "scope_limitation": "Only applies to SMEs and start-ups",
+      "scope_limitation": "Only applies to SMEs, including start-ups, and SMCs",
       "context_skip_field": "is_sme",
       "context_skip_value": false,
-      "note": "SME simplification permission — SMEs are not required to use the full Annex IV format. If is_sme=false, this permission is not applicable to the project.",
+      "note": "Simplification permission for SMEs, including start-ups, and SMCs (Art. 3(14a), (14b)): they may provide the Annex IV elements in a simplified manner instead of the full format; if they do, they must use the Commission form (ART11-OBL-1f).",
       "decomposed_atoms": [
         {
-          "atom": "sme_may_simplify_documentation",
-          "description": "SMEs may use simplified technical documentation",
-          "requirement": "SMEs and start-ups MAY provide Annex IV technical documentation in a simplified manner"
+          "atom": "sme_or_smc_may_simplify_documentation",
+          "description": "SMEs (including start-ups) and SMCs may use simplified technical documentation",
+          "requirement": "SMEs, including start-ups, and SMCs MAY provide the elements of the technical documentation specified in Annex IV in a simplified manner",
+          "_history": [
+            {
+              "requirement": "SMEs and start-ups MAY provide Annex IV technical documentation in a simplified manner",
+              "description": "SMEs may use simplified technical documentation",
+              "atom": "sme_may_simplify_documentation",
+              "superseded_on": "2026-10-03",
+              "amending_celex": "32026R1744",
+              "consensus_lock": "omnibus-batch1-2026-10-03"
+            }
+          ]
         }
       ],
       "automation_assessment": {
         "level": "manual"
-      }
+      },
+      "_source_quote_history": [
+        {
+          "source_quote": "SMEs, including start-ups, may provide the elements of the technical documentation specified in Annex IV in a simplified manner.",
+          "superseded_on": "2026-10-03",
+          "amending_celex": "32026R1744",
+          "consensus_lock": "omnibus-batch1-2026-10-03"
+        }
+      ]
     },
     {
       "id": "ART11-OBL-1e",
       "source": "Art. 11(1)",
-      "source_quote": "To that end, the Commission shall establish a simplified technical documentation form targeted at the needs of small and microenterprises.",
+      "source_quote": "To that end, the Commission shall establish a simplified technical documentation form targeted at the needs of SMEs, including start-ups, and SMCs.",
       "deontic_type": "obligation",
       "modality": "shall",
       "addressee": "commission",
-      "note": "Commission obligation to establish an SME-friendly simplified documentation form. NOT a provider obligation — included for completeness so providers know the form should exist.",
+      "note": "Commission obligation to establish a simplified technical documentation form targeted at the needs of SMEs, including start-ups, and SMCs. NOT a provider obligation — included for completeness so providers know the form should exist.",
       "decomposed_atoms": [
         {
-          "atom": "commission_establishes_sme_form",
-          "description": "Commission must create simplified documentation form",
-          "requirement": "The Commission SHALL establish a simplified technical documentation form targeted at small and microenterprises"
+          "atom": "commission_establishes_simplified_form",
+          "description": "Commission must create a simplified documentation form for SMEs and SMCs",
+          "requirement": "The Commission SHALL establish a simplified technical documentation form targeted at the needs of SMEs, including start-ups, and SMCs",
+          "_history": [
+            {
+              "requirement": "The Commission SHALL establish a simplified technical documentation form targeted at small and microenterprises",
+              "description": "Commission must create simplified documentation form",
+              "atom": "commission_establishes_sme_form",
+              "superseded_on": "2026-10-03",
+              "amending_celex": "32026R1744",
+              "consensus_lock": "omnibus-batch1-2026-10-03"
+            }
+          ]
         }
       ],
       "automation_assessment": {
         "level": "manual"
-      }
+      },
+      "_source_quote_history": [
+        {
+          "source_quote": "To that end, the Commission shall establish a simplified technical documentation form targeted at the needs of small and microenterprises.",
+          "superseded_on": "2026-10-03",
+          "amending_celex": "32026R1744",
+          "consensus_lock": "omnibus-batch1-2026-10-03"
+        }
+      ]
     },
     {
       "id": "ART11-OBL-1f",
       "source": "Art. 11(1)",
-      "source_quote": "Where an SME, including a start-up, opts to provide the information required in Annex IV in a simplified manner, it shall use the form referred to in this paragraph.",
+      "source_quote": "Where an SME, including a start-up, or an SMC, opts to provide the information required in Annex IV in a simplified manner, it shall use the form referred to in this paragraph.",
       "deontic_type": "obligation",
       "modality": "shall",
       "addressee": "provider",
-      "scope_limitation": "Only applies to SMEs and start-ups that opt to use simplified documentation",
+      "scope_limitation": "Only applies to SMEs, including start-ups, and SMCs that opt to use simplified documentation",
       "context_skip_field": "is_sme",
       "context_skip_value": false,
       "decomposed_atoms": [
         {
-          "atom": "sme_must_use_official_form",
-          "description": "SMEs opting for simplified documentation must use the official Commission form",
-          "requirement": "Where an SME opts for simplified Annex IV documentation, it SHALL use the Commission form"
+          "atom": "sme_or_smc_must_use_official_form",
+          "description": "SMEs and SMCs opting for simplified documentation must use the Commission form",
+          "requirement": "Where an SME, including a start-up, or an SMC opts to provide the information required in Annex IV in a simplified manner, it SHALL use the form referred to in Art. 11(1)",
+          "_history": [
+            {
+              "requirement": "Where an SME opts for simplified Annex IV documentation, it SHALL use the Commission form",
+              "description": "SMEs opting for simplified documentation must use the official Commission form",
+              "atom": "sme_must_use_official_form",
+              "superseded_on": "2026-10-03",
+              "amending_celex": "32026R1744",
+              "consensus_lock": "omnibus-batch1-2026-10-03"
+            }
+          ]
         }
       ],
       "automation_assessment": {
         "level": "partial"
-      }
+      },
+      "_source_quote_history": [
+        {
+          "source_quote": "Where an SME, including a start-up, opts to provide the information required in Annex IV in a simplified manner, it shall use the form referred to in this paragraph.",
+          "superseded_on": "2026-10-03",
+          "amending_celex": "32026R1744",
+          "consensus_lock": "omnibus-batch1-2026-10-03"
+        }
+      ]
     },
     {
       "id": "ART11-OBL-1g",
@@ -267,9 +375,9 @@
     },
     "scope_notes": {
       "general_obligations": "ART11-OBL-1, ART11-OBL-1b, ART11-OBL-1c — apply to ALL high-risk AI systems",
-      "sme_provisions": "ART11-PERM-1d, ART11-OBL-1f — only for SMEs and start-ups (context_skip_field: is_sme)",
+      "sme_provisions": "ART11-PERM-1d, ART11-OBL-1f — only for SMEs, including start-ups, and SMCs.",
       "commission_obligations": "ART11-OBL-1e — Commission SHALL establish simplified form; ART11-EMP-3 — Commission empowered to amend Annex IV",
-      "notified_body": "ART11-OBL-1g — notified bodies SHALL accept the simplified SME form",
+      "notified_body": "ART11-OBL-1g — notified bodies SHALL accept the simplified form",
       "conditional": "ART11-OBL-2 — only for Annex I products",
       "empowerment": "ART11-EMP-3 — Commission power, not provider obligation"
     }

@@ -245,18 +245,18 @@ class TestArt111Summary:
 
 class TestArt111ObligationIds:
 
-    def test_all_3_obligation_ids_in_json(self, art111_module):
-        """Obligation JSON must have exactly 3 obligations."""
+    def test_obligation_ids_in_json(self, art111_module):
+        """Art. 111(1)-(4): ART111-OBL-4 added by Reg (EU) 2026/1744 (Art. 111(4))."""
         data = art111_module._load_obligations()
-        obligations = data.get("obligations", [])
-        assert len(obligations) == 3
+        ids = [o["id"] for o in data.get("obligations", [])]
+        assert ids == ["ART111-OBL-1", "ART111-OBL-2", "ART111-OBL-3", "ART111-OBL-4"]
 
-    def test_all_3_obligations_appear_in_findings(self, art111_module, tmp_path):
-        """All 3 obligations must appear in findings (explicit or gap)."""
+    def test_all_obligations_appear_in_findings(self, art111_module, tmp_path):
+        """All 4 obligations must appear in findings (explicit or gap)."""
         BaseArticleModule.set_context(_full_true_ctx())
         result = art111_module.scan(str(tmp_path))
         found_ids = {f.obligation_id for f in result.findings}
-        expected_ids = {"ART111-OBL-1", "ART111-OBL-2", "ART111-OBL-3"}
+        expected_ids = {"ART111-OBL-1", "ART111-OBL-2", "ART111-OBL-3", "ART111-OBL-4"}
         missing = expected_ids - found_ids
         assert not missing, f"Missing obligation IDs in findings: {missing}"
 
@@ -287,3 +287,51 @@ class TestArt111Structural:
             assert not f.description.startswith("[ART"), (
                 f"{f.obligation_id} description starts with legal citation: {f.description[:60]}"
             )
+
+
+# ── Omnibus (Reg (EU) 2026/1744): Art. 111(2) cut-off and new Art. 111(4) ──
+
+class TestArt111Omnibus:
+
+    def _texts(self, result, oid):
+        return " ".join(f.description for f in _find(result, oid))
+
+    def test_obl2_no_longer_names_2_august_2026(self, art111_module, tmp_path):
+        for ctx in (_full_true_ctx(), _full_false_ctx(), _empty_ctx()):
+            BaseArticleModule.set_context(ctx)
+            text = self._texts(art111_module.scan(str(tmp_path)), "ART111-OBL-2")
+            assert text and "2 August 2026" not in text
+
+    def test_obl2_true_and_false_name_both_chapter_iii_dates(self, art111_module, tmp_path):
+        from core.application_dates import chapter_iii_dates, long_date
+        dates = chapter_iii_dates()
+        for ctx in (_full_true_ctx(), _full_false_ctx()):
+            BaseArticleModule.set_context(ctx)
+            text = self._texts(art111_module.scan(str(tmp_path)), "ART111-OBL-2")
+            assert long_date(dates["annex_iii"]) in text and long_date(dates["annex_i"]) in text
+
+    def test_obl4_is_informational_and_points_to_art50_2(self, art111_module, tmp_path):
+        from core.application_dates import long_date, milestone_date
+        for ctx in (_full_true_ctx(), _full_false_ctx(), _empty_ctx()):
+            BaseArticleModule.set_context(ctx)
+            found = _find(art111_module.scan(str(tmp_path)), "ART111-OBL-4")
+            assert len(found) == 1
+            f = found[0]
+            assert f.is_informational and f.level == ComplianceLevel.NOT_APPLICABLE
+            assert "ART50-OBL-2" in f.description
+            assert long_date(milestone_date("Art. 111(4)")) in f.description
+
+    def test_obl4_does_not_change_the_overall_level(self, art111_module, tmp_path):
+        BaseArticleModule.set_context(_full_true_ctx())
+        result = art111_module.scan(str(tmp_path))
+        assert result.overall_level != ComplianceLevel.NON_COMPLIANT
+
+    def test_explain_and_action_plan_have_no_stale_cut_off(self, art111_module, tmp_path):
+        import re
+        stale = re.compile(r"(after|from) 2 Aug(ust)? 2026")
+        exp = art111_module.explain()
+        assert not stale.search(exp.official_summary) and "111(4)" in exp.official_summary
+        BaseArticleModule.set_context(_full_false_ctx())
+        plan = art111_module.action_plan(art111_module.scan(str(tmp_path)))
+        text = " ".join(a.details for a in plan.actions)
+        assert not stale.search(text) and "Recital 39" in text

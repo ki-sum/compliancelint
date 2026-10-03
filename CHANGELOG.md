@@ -14,6 +14,22 @@ This project adheres to [Semantic Versioning](https://semver.org/).
   `art5.has_csam_generation`.
 - Obligations are now verified against the EUR-Lex consolidated text **02024R1689-20260727**.
 
+### Added / changed — Regulation (EU) 2026/1744, Art. 11, 17, 50, 72, 111
+- **ART111-OBL-4** (Art. 111(4)): providers of AI systems generating synthetic audio, image, video
+  or text content placed on the market before 2 August 2026 must comply with Art. 50(2) by
+  2 December 2026. Reported as an informational finding; Art. 50(2) itself is assessed under
+  `ART50-OBL-2`.
+- Art. 11(1) and 17(2): the SME provisions now also cover small mid-cap enterprises (SMCs).
+- Art. 50(7): the Commission (formerly "the AI Office") encourages codes of practice and assesses
+  whether adherence is adequate for Art. 50(2) and (4) (`ART50-EMP-7a` is now an obligation);
+  such codes do not grant a presumption of conformity.
+- Art. 72(3): the Commission adopts guidance including a template by 2 September 2027 (no
+  implementing act).
+- Art. 111(2): the cut-off for high-risk AI systems already on the market is the date Chapter III
+  applies to them, no longer 2 August 2026.
+- Superseded quotes and atom wording are kept internally (`_source_quote_history`, `_history`)
+  and are not served.
+
 ### Changed
 - Application dates follow Art. 113 as amended (`scanner/data/application_dates.json`):
   `compliance_summary.applicable_from` (plus `applicable_from_annex_i` for Chapter III
@@ -21,7 +37,7 @@ This project adheres to [Semantic Versioning](https://semver.org/).
   today) and `cl_explain` `enforcement_date`.
 - `cl_version` reports the regulation text version(s) the obligations were verified against.
 - EUR-Lex links point at the consolidated text.
-- Obligation count in messages and docs is derived from the data: 246 unique obligations
+- Obligation count in messages and docs is derived from the data: 247 unique obligations
   (three IDs are listed in two article files).
 
 ### Fixed
@@ -34,6 +50,10 @@ This project adheres to [Semantic Versioning](https://semver.org/).
   Art. 9/10/12/15/19 legacy aliases) onto other answer fields.
 - The paid strict gate no longer requires answers for obligations that do not apply yet.
 - The wheel now ships `scanner/data/*.json` and `scanner/interpretive-materials/*.json`.
+- Informational findings keep their `is_informational` flag and `human_gate_hint` when the
+  obligation's source quote is added. As a result the Art. 25 classification findings
+  (`ART25-CLS-1`, `ART25-CLS-3`) no longer change the Art. 25 overall level; the Art. 22/23/24
+  "not in scope" findings still make those articles not applicable.
 
 ## [1.1.0] — 2026-04-11 (unreleased)
 
