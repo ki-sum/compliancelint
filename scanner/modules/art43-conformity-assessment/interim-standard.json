@@ -19,11 +19,11 @@
       "id": "IS-ART43-R01",
       "obligation_ref": "ART43-OBL-2",
       "title": "Conformity Assessment Completion",
-      "requirement": "The provider MUST complete a conformity assessment per the applicable procedure (Annex VI or VII) before market placement.",
-      "rationale": "Art. 43(1)-(2) mandates conformity assessment before placing on market.",
+      "requirement": "The provider MUST complete the applicable conformity assessment procedure (Annex VI, Annex VII, or the procedure required by the Union harmonisation legislation listed in Section A of Annex I) before the high-risk AI system is placed on the market or put into service.",
+      "rationale": "Art. 16(f), together with Art. 43(1)-(3), requires the relevant conformity assessment before placing the high-risk AI system on the market or putting it into service.",
       "acceptable_implementations": [
-        "Annex VI internal control for Annex III points 2-8, and for Annex III point 1 only where Art. 43(1) permits that option",
-        "Annex VII assessment with notified-body involvement for Annex III point 1 where chosen or required under Art. 43(1)",
+        "Annex VI internal control for Annex III points 2-8 systems that are not also covered by Union harmonisation legislation listed in Section A of Annex I, and for Annex III point 1 systems not so covered only where Art. 43(1) permits that option",
+        "Annex VII assessment with notified-body involvement for Annex III point 1 systems not also covered by Union harmonisation legislation listed in Section A of Annex I where chosen or required under Art. 43(1)",
         "Conformity assessment under the Union harmonisation legislation listed in Section A of Annex I, including the Section 2 requirements, assessment of the Art. 17 quality management system and the Annex VII provisions listed in Art. 43(3)"
       ]
     },

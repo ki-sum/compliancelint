@@ -3,7 +3,8 @@ Article 43: Conformity Assessment — Module implementation using unified protoc
 
 Art. 43 requires providers of high-risk AI systems to undergo conformity assessment
 procedures. The specific procedure depends on the system's classification:
-  - Annex III point 1 (biometric ID): Annex VI or VII (with notified body)
+  - Annex III point 1 (biometrics): Annex VI or VII (with notified body) where harmonised standards /
+    common specifications were applied, otherwise Annex VII (Art. 43(1))
   - Annex III points 2-8: Annex VI internal control only
   - Annex I product systems: sectoral conformity assessment, incl. the Art. 17 quality management
     system and Annex VII points 3, 4.3-4.5, 4.6 (fifth paragraph) and 5 (Art. 43(3), as amended by
@@ -253,9 +254,10 @@ class Art43Module(BaseArticleModule):
             },
             compliance_checklist_summary=(
                 "ComplianceLint Compliance Checklist v0.1 requires: (1) conformity assessment "
-                "documentation per the applicable procedure (Annex VI or VII), (2) change "
-                "management procedures for tracking substantial modifications and triggering "
-                "reassessment. Based on: ISO/IEC 42001:2023, ISO/IEC 17065:2012."
+                "documentation per the applicable procedure (Annex VI, Annex VII, or the "
+                "procedure of the Union harmonisation legislation listed in Section A of Annex "
+                "I), (2) change management procedures for tracking substantial modifications "
+                "and triggering reassessment. Based on: ISO/IEC 42001:2023, ISO/IEC 17065:2012."
             ),
             enforcement_date=applicable_from(43),
             waiting_for="CEN-CENELEC harmonized standard for Art. 43 (expected Q4 2026)",

@@ -179,10 +179,12 @@ class Art04Module(BaseArticleModule):
                 ],
             },
             compliance_checklist_summary=(
-                "ComplianceLint Compliance Checklist v0.1 requires: (1) AI usage policy "
-                "document, (2) staff training documentation or competency framework, "
-                "(3) evidence of context-appropriate training. "
-                "Based on: ISO/IEC 42001:2023 Clause 7.2 (Competence), 7.3 (Awareness)."
+                "ComplianceLint Compliance Checklist v0.1 looks for evidence of the measures "
+                "taken under Art. 4(1), for example: (1) an AI usage policy, (2) staff training "
+                "documentation or a competency framework, (3) evidence that the measures take "
+                "the context of use and the persons concerned into account. Art. 4(1) does not "
+                "prescribe these specific measures. Based on: ISO/IEC 42001:2023 Clause 7.2 "
+                "(Competence), 7.3 (Awareness)."
             ),
             enforcement_date=applicable_from(4),
             waiting_for="CEN-CENELEC harmonized standard for AI literacy (expected Q4 2026)",

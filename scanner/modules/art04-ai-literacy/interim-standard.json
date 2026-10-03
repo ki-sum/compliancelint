@@ -20,8 +20,8 @@
     {
       "id": "IS-ART04-R01",
       "obligation_ref": "ART04-OBL-1",
-      "title": "AI Literacy Training Program",
-      "requirement": "The organization MUST establish and maintain an AI literacy program for all persons dealing with the operation and use of AI systems.",
+      "title": "AI Literacy Measures",
+      "requirement": "The organization MUST take measures to support the development of AI literacy of all persons dealing with the operation and use of AI systems on its behalf; a structured AI literacy programme is the recommended way to do so.",
       "rationale": "Art. 4(1), as amended by Regulation (EU) 2026/1744, requires providers and deployers to 'take measures to support the development of AI literacy' of their staff and other persons dealing with the operation and use of AI systems on their behalf; it does not require them to guarantee any specific level of AI literacy of any individual.",
       "required_content": [
         "Overview of AI capabilities and limitations relevant to the organization",
@@ -70,7 +70,7 @@
   ],
   "scoring": {
     "compliant": "R01 met + at least one of R02, R03 met",
-    "partial": "R01 partially met (some training exists) or only R02 met",
-    "non_compliant": "No training program and no AI usage policy"
+    "partial": "R01 partially met (some measures exist) or only R02 met",
+    "non_compliant": "No AI literacy measures and no AI usage policy"
   }
 }
