@@ -94,41 +94,17 @@
         {
           "atom": "demonstrates_compliance",
           "description": "Documentation must demonstrate compliance",
-          "requirement": "The technical documentation SHALL be drawn up in such a way as to demonstrate that the high-risk AI system complies with the requirements set out in Chapter III, Section 2",
-          "_history": [
-            {
-              "requirement": "Documentation SHALL demonstrate compliance with Section requirements",
-              "superseded_on": "2026-10-03",
-              "amending_celex": "32026R1744",
-              "consensus_lock": "omnibus-batch1-2026-10-03"
-            }
-          ]
+          "requirement": "Documentation SHALL demonstrate compliance with Section requirements"
         },
         {
           "atom": "clear_and_comprehensive",
           "description": "Documentation must be clear and comprehensive",
-          "requirement": "The technical documentation SHALL provide the necessary information in a clear and comprehensive form",
-          "_history": [
-            {
-              "requirement": "Documentation SHALL provide information in a clear and comprehensive form",
-              "superseded_on": "2026-10-03",
-              "amending_celex": "32026R1744",
-              "consensus_lock": "omnibus-batch1-2026-10-03"
-            }
-          ]
+          "requirement": "Documentation SHALL provide information in a clear and comprehensive form"
         },
         {
           "atom": "enables_authority_assessment",
           "description": "Documentation must enable authority assessment",
-          "requirement": "The technical documentation SHALL provide national competent authorities and notified bodies with the information necessary to assess the compliance of the AI system with those requirements",
-          "_history": [
-            {
-              "requirement": "Documentation SHALL enable national authorities and notified bodies to assess compliance",
-              "superseded_on": "2026-10-03",
-              "amending_celex": "32026R1744",
-              "consensus_lock": "omnibus-batch1-2026-10-03"
-            }
-          ]
+          "requirement": "Documentation SHALL enable national authorities and notified bodies to assess compliance"
         }
       ],
       "automation_assessment": {

@@ -56,3 +56,17 @@ def test_art22_scope_verdict_still_drives_the_overall_level(art22_module, tmp_pa
     BaseArticleModule.set_context(_ctx_with("art22", {"is_eu_established_provider": True}))
     result = art22_module.scan(str(tmp_path))
     assert result.overall_level == ComplianceLevel.NOT_APPLICABLE
+
+
+def test_art25_unanswered_duties_are_not_masked_by_classification_findings(art25_module, tmp_path):
+    """15 of 243 answer combinations changed with the fix, all PARTIAL -> UNABLE_TO_DETERMINE: when the
+    classification rules say the party may be a provider (CLS-1/CLS-3 PARTIAL) but the duties
+    (ART25-OBL-2, ART25-OBL-4) are unanswered, the article no longer reports PARTIAL progress."""
+    BaseArticleModule.set_context(_ctx_with("art25", {
+        "has_rebranding_or_modification": True, "is_safety_component_annex_i": True,
+        "has_provider_cooperation_documentation": None, "has_third_party_written_agreement": None}))
+    result = art25_module.scan(str(tmp_path))
+    cls = {f.obligation_id: f for f in result.findings if f.obligation_id in ("ART25-CLS-1", "ART25-CLS-3")}
+    assert set(cls) == {"ART25-CLS-1", "ART25-CLS-3"}
+    assert all(f.level == ComplianceLevel.PARTIAL and f.is_informational for f in cls.values())
+    assert result.overall_level == ComplianceLevel.UNABLE_TO_DETERMINE

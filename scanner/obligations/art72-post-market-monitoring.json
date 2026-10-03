@@ -115,28 +115,12 @@
         {
           "atom": "pmm_plan_exists",
           "description": "Must have a post-market monitoring plan",
-          "requirement": "The post-market monitoring system SHALL be based on a post-market monitoring plan",
-          "_history": [
-            {
-              "requirement": "SHALL be based on a post-market monitoring plan",
-              "superseded_on": "2026-10-03",
-              "amending_celex": "32026R1744",
-              "consensus_lock": "omnibus-batch1-2026-10-03"
-            }
-          ]
+          "requirement": "SHALL be based on a post-market monitoring plan"
         },
         {
           "atom": "pmm_plan_in_technical_docs",
           "description": "Plan must be part of Annex IV technical documentation",
-          "requirement": "The post-market monitoring plan SHALL be part of the technical documentation referred to in Annex IV",
-          "_history": [
-            {
-              "requirement": "SHALL include the post-market monitoring plan as part of the technical documentation referred to in Annex IV",
-              "superseded_on": "2026-10-03",
-              "amending_celex": "32026R1744",
-              "consensus_lock": "omnibus-batch1-2026-10-03"
-            }
-          ]
+          "requirement": "SHALL include the post-market monitoring plan as part of the technical documentation referred to in Annex IV"
         }
       ],
       "automation_assessment": {

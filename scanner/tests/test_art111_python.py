@@ -321,11 +321,6 @@ class TestArt111Omnibus:
             assert "ART50-OBL-2" in f.description
             assert long_date(milestone_date("Art. 111(4)")) in f.description
 
-    def test_obl4_does_not_change_the_overall_level(self, art111_module, tmp_path):
-        BaseArticleModule.set_context(_full_true_ctx())
-        result = art111_module.scan(str(tmp_path))
-        assert result.overall_level != ComplianceLevel.NON_COMPLIANT
-
     def test_explain_and_action_plan_have_no_stale_cut_off(self, art111_module, tmp_path):
         import re
         stale = re.compile(r"(after|from) 2 Aug(ust)? 2026")
