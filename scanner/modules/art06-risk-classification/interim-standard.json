@@ -26,7 +26,7 @@
     "step_2": {
       "question": "Does the AI system fall under one of the use-case categories listed in Annex III?",
       "if_yes": "Proceed to Step 3",
-      "if_no": "NOT HIGH-RISK under Art. 6 — may still be subject to other AI Act provisions (e.g., Art. 52 transparency obligations for certain AI)"
+      "if_no": "NOT HIGH-RISK under Art. 6 — may still be subject to other AI Act provisions (e.g., Art. 50 transparency obligations for certain AI systems)"
     },
     "step_3": {
       "question": "Does the Art. 6(3) exception apply? The system is NOT high-risk if it does NOT pose a significant risk of harm to health, safety, or fundamental rights AND it meets at least one of: (a) performs a narrow procedural task, (b) improves the result of a previously completed human activity, (c) detects decision-making patterns without replacing human assessment, (d) performs a preparatory task for an assessment listed in Annex III.",
@@ -36,21 +36,26 @@
   },
 
   "annex_i_product_categories": [
-    "Machinery and machinery products (Regulation (EU) 2023/1230)",
-    "Toys (Directive 2009/48/EC)",
-    "Recreational craft and personal watercraft (Directive 2013/53/EU)",
-    "Lifts (Directive 2014/33/EU)",
-    "Equipment for potentially explosive atmospheres (Directive 2014/34/EU)",
-    "Radio equipment (Directive 2014/53/EU)",
-    "Pressure equipment (Directive 2014/68/EU)",
-    "Cableway installations (Regulation (EU) 2016/424)",
-    "Personal protective equipment (Regulation (EU) 2016/425)",
-    "Appliances burning gaseous fuels (Regulation (EU) 2016/426)",
-    "Medical devices (Regulation (EU) 2017/745)",
-    "In vitro diagnostic medical devices (Regulation (EU) 2017/746)",
-    "Civil aviation (Regulation (EU) 2018/1139)",
-    "Motor vehicles type-approval (Regulation (EU) 2019/2144)",
-    "Marine equipment (Directive 2014/90/EU)"
+    "Section A — Toys (Directive 2009/48/EC)",
+    "Section A — Recreational craft and personal watercraft (Directive 2013/53/EU)",
+    "Section A — Lifts and safety components for lifts (Directive 2014/33/EU)",
+    "Section A — Equipment and protective systems for potentially explosive atmospheres (Directive 2014/34/EU)",
+    "Section A — Radio equipment (Directive 2014/53/EU)",
+    "Section A — Pressure equipment (Directive 2014/68/EU)",
+    "Section A — Cableway installations (Regulation (EU) 2016/424)",
+    "Section A — Personal protective equipment (Regulation (EU) 2016/425)",
+    "Section A — Appliances burning gaseous fuels (Regulation (EU) 2016/426)",
+    "Section A — Medical devices (Regulation (EU) 2017/745)",
+    "Section A — In vitro diagnostic medical devices (Regulation (EU) 2017/746)",
+    "Section B — Civil aviation security (Regulation (EC) No 300/2008)",
+    "Section B — Two- or three-wheel vehicles and quadricycles (Regulation (EU) No 168/2013)",
+    "Section B — Agricultural and forestry vehicles (Regulation (EU) No 167/2013)",
+    "Section B — Marine equipment (Directive 2014/90/EU)",
+    "Section B — Interoperability of the rail system (Directive (EU) 2016/797)",
+    "Section B — Motor vehicles and their trailers (Regulation (EU) 2018/858)",
+    "Section B — Motor vehicles, type-approval and general safety (Regulation (EU) 2019/2144)",
+    "Section B — Civil aviation: unmanned aircraft and their engines, propellers, parts and remote-control equipment (Regulation (EU) 2018/1139)",
+    "Section B — Machinery and machinery products (Regulation (EU) 2023/1230)"
   ],
 
   "annex_iii_categories": [

@@ -69,6 +69,14 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 - `scanner/data/application_dates.json` also lists the articles inserted by Regulation (EU)
   2026/1744 (4a, 60a, 75a-75d).
 
+### Changed — Regulation (EU) 2026/1744, Annex I and Art. 63
+- Art. 6 interim standard: the Annex I product list now states the section of each act — Section A
+  (toys, lifts, medical devices, …) or Section B (civil aviation security, vehicles, marine
+  equipment, rail, specified unmanned aircraft, and machinery, Regulation (EU) 2023/1230, moved to
+  Section B). Fixed: the decision tree named Art. 52 for transparency obligations; it is Art. 50.
+- Art. 17 action plan: the Art. 17(2) proportionality item also mentions the Art. 63(1) option for
+  SMEs, including start-ups, without partner or linked enterprises.
+
 ### Changed
 - Application dates follow Art. 113 as amended (`scanner/data/application_dates.json`):
   `compliance_summary.applicable_from` (plus `applicable_from_annex_i` for Chapter III

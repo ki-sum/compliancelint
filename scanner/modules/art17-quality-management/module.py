@@ -479,11 +479,16 @@ class Art17Module(BaseArticleModule):
             article="Art. 17(2)",
             action="Assess proportionality of QMS to organisation size",
             details=(
-                "Art. 17(2) requires the quality management system to be implemented proportionately "
-                "to the size of the provider's organisation, in particular where the provider is an "
-                "SME, including a start-up, or an SMC; providers must in any event respect the degree "
-                "of rigour and the level of protection required to ensure compliance. Document the "
-                "proportionality rationale."
+                "Art. 17(2) requires the quality management system to be implemented "
+                "proportionately to the size of the provider's organisation, in particular "
+                "where the provider is an SME, including a start-up, or an SMC; providers must "
+                "in any event respect the degree of rigour and the level of protection required "
+                "to ensure compliance. Document the proportionality rationale. Separately, an "
+                "SME, including a start-up, without partner or linked enterprises within the "
+                "meaning of Recommendation 2003/361/EC may comply with certain elements of the "
+                "quality management system in a simplified manner under Art. 63(1), as "
+                "specified in Commission guidelines; Art. 63(2) keeps every other obligation, "
+                "and SMCs are not covered."
             ),
             effort="2-4 hours",
             action_type="human_judgment_required",
