@@ -2170,7 +2170,8 @@ def cl_action_guide(obligation_id: str) -> str:
     # matched as [A-Z] (1a / 2b / 1ba / 1bb). Until 2026-10-02 it was
     # [a-z]?, which rejected all 83 letter-suffixed IDs (e.g. every
     # ART05-PRO-1x) — tests/test_cl_action_guide_oid_format.py.
-    if not re.match(r"^ART\d+-[A-Z]{2,5}-\d+[A-Z]{0,2}$", obligation_id.upper()):
+    # Lettered articles (ART04a-PERM-1, Art 4a inserted by Reg (EU) 2026/1744): [A-Z]? after the number.
+    if not re.match(r"^ART\d+[A-Z]?-[A-Z]{2,5}-\d+[A-Z]{0,2}$", obligation_id.upper()):
         return append_upgrade_hint(
             json.dumps({
                 "error": f"Invalid obligation ID format: {obligation_id}",

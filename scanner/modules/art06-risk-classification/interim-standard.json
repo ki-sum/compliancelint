@@ -1,9 +1,9 @@
 {
   "_metadata": {
-    "standard_id": "CL-IS-ART06-v0.1",
+    "standard_id": "CL-IS-ART06-v0.2",
     "title": "ComplianceLint Interim Standard for EU AI Act Article 6: Classification Rules for High-Risk AI Systems",
-    "version": "0.1.0",
-    "date": "2026-03-17",
+    "version": "0.2.0",
+    "date": "2026-10-04",
     "status": "draft",
     "disclaimer": "This is an interim standard developed by ComplianceLint based on available guidance and the official EU AI Act text. It is NOT an official standard. It will be superseded when CEN-CENELEC publishes the harmonized standard for Article 6 (expected Q4 2026).",
     "basis": [
@@ -19,8 +19,8 @@
 
   "classification_decision_tree": {
     "step_1": {
-      "question": "Is the AI system a safety component of a product covered by EU harmonisation legislation listed in Annex I, OR is it itself such a product?",
-      "if_yes": "HIGH-RISK via Art. 6(1) — subject to third-party conformity assessment under Annex I legislation",
+      "question": "Does the AI system satisfy Art. 6(1)(a) — i.e. is it intended to be used as a safety component, interpreted in accordance with Art. 3(14) and Art. 6(1a)-(1b), of a product covered by the Union harmonisation legislation listed in Annex I, or is it itself such a product — AND does it also satisfy Art. 6(1)(b), meaning that the relevant product is required to undergo a third-party conformity assessment under that legislation? Apply Art. 6(1c): an assessment required solely because of risks other than risks to health and safety does not meet point (b).",
+      "if_yes": "HIGH-RISK via Art. 6(1) (both conditions met)",
       "if_no": "Proceed to Step 2"
     },
     "step_2": {
@@ -190,7 +190,7 @@
   },
 
   "scoring": {
-    "high_risk_art6_1": "System is a safety component or product under Annex I legislation — HIGH-RISK",
+    "high_risk_art6_1": "System is a safety component of, or itself, a product under Annex I legislation and that product is required to undergo a third-party conformity assessment (Art. 6(1), (1a)-(1c)) — HIGH-RISK",
     "high_risk_art6_2": "System falls under Annex III and Art. 6(3) exception does NOT apply — HIGH-RISK",
     "not_high_risk_exception": "System falls under Annex III but Art. 6(3) exception applies — NOT HIGH-RISK (must document reasoning)",
     "not_high_risk": "System does not fall under Annex I products or Annex III use cases — NOT HIGH-RISK under Art. 6",

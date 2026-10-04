@@ -29,10 +29,11 @@ _registry: Optional[Dict[str, List[str]]] = None
 _OBLIGATIONS_DIR = Path(__file__).resolve().parent.parent / "obligations"
 
 
-def _article_sort_key(art_key: str) -> int:
-    """Extract numeric value from article key for sorting (e.g., 'art09' -> 9)."""
-    match = re.search(r"\d+", art_key)
-    return int(match.group()) if match else 0
+def _article_sort_key(art_key: str) -> tuple:
+    """Legal-order sort key of an article key: 'art09' -> (9, ''), 'art4a' -> (4, 'a').
+    Lettered articles were inserted by an amending act (Art 4a, Regulation (EU) 2026/1744)."""
+    match = re.search(r"(\d+)([a-z]?)", art_key)
+    return (int(match.group(1)), match.group(2)) if match else (0, "")
 
 
 def _build_registry(obligations_dir: Optional[Path] = None) -> Dict[str, List[str]]:

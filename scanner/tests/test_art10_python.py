@@ -7,7 +7,7 @@ Obligation mapping:
   has_data_governance_doc → ART10-OBL-1 (quality criteria), ART10-OBL-2 (governance practices)
   has_bias_mitigation     → ART10-OBL-2f (bias examination), ART10-OBL-2g (bias measures)
   Manual (always UTD)     → ART10-OBL-2h, OBL-3, OBL-3b, OBL-4
-  Permissions (gap)       → ART10-PERM-3, ART10-PERM-5
+  Permissions (gap)       → ART10-PERM-3 (former 10(5) is Art 4a since Reg (EU) 2026/1744)
   Scope rule (gap)        → ART10-OBL-6
 """
 from core.protocol import ComplianceLevel, BaseArticleModule
@@ -195,11 +195,12 @@ class TestArt10ManualObligations:
 
 class TestArt10Structural:
 
-    def test_all_11_obligation_ids_in_json(self, art10_module):
-        """Obligation JSON must have exactly 11 obligations."""
+    def test_all_10_obligation_ids_in_json(self, art10_module):
+        """Obligation JSON has exactly these 10 obligations (ART10-PERM-5 moved to Art 4a, Omnibus batch 3)."""
         data = art10_module._load_obligations()
-        obligations = data.get("obligations", [])
-        assert len(obligations) == 11
+        ids = [o["id"] for o in data.get("obligations", [])]
+        assert ids == ["ART10-OBL-1", "ART10-OBL-2", "ART10-OBL-2f", "ART10-OBL-2g", "ART10-OBL-2h",
+                       "ART10-OBL-3", "ART10-OBL-3b", "ART10-PERM-3", "ART10-OBL-4", "ART10-OBL-6"]
 
     def test_obligation_coverage_present(self, art10_module, tmp_path):
         """ScanResult must include obligation_coverage metadata."""

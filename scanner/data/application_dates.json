@@ -81,6 +81,11 @@
       "applicable_from": "2025-02-02",
       "basis": "Art. 113, third paragraph, point (a)"
     },
+    "4a": {
+      "chapter": "CHAPTER I",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date), read with Recital 9 of Regulation (EU) 2026/1744: Art. 4a was inserted into Chapter I by that Regulation, after the Chapter I date in Art. 113, third paragraph, point (a), and applies from the date of entry into application of Regulation (EU) 2024/1689"
+    },
     "5": {
       "chapter": "CHAPTER II",
       "applicable_from": "2025-02-02",
@@ -419,6 +424,11 @@
       "applicable_from": "2026-08-02",
       "basis": "Art. 113, second paragraph (general application date)"
     },
+    "60a": {
+      "chapter": "CHAPTER VI",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
     "61": {
       "chapter": "CHAPTER VI",
       "applicable_from": "2026-08-02",
@@ -490,6 +500,26 @@
       "basis": "Art. 113, second paragraph (general application date)"
     },
     "75": {
+      "chapter": "CHAPTER IX SECTION 3",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "75a": {
+      "chapter": "CHAPTER IX SECTION 3",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "75b": {
+      "chapter": "CHAPTER IX SECTION 3",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "75c": {
+      "chapter": "CHAPTER IX SECTION 3",
+      "applicable_from": "2026-08-02",
+      "basis": "Art. 113, second paragraph (general application date)"
+    },
+    "75d": {
       "chapter": "CHAPTER IX SECTION 3",
       "applicable_from": "2026-08-02",
       "basis": "Art. 113, second paragraph (general application date)"

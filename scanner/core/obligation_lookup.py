@@ -258,8 +258,15 @@ def unique_obligation_count() -> int:
     return len(_unique_ids())
 
 
+def covered_articles() -> list[str]:
+    """Article numbers with at least one obligation, in legal order ("4" < "4a" < "5"). Lettered
+    articles were inserted by an amending act (Art 4a by Regulation (EU) 2026/1744)."""
+    keys = {(int(m.group(1)), m.group(2)) for m in (re.match(r"ART0*(\d+)([a-z]?)-", i) for i in _unique_ids())}
+    return [f"{n}{letter}" for n, letter in sorted(keys)]
+
+
 def article_count() -> int:
-    return len({int(re.match(r"ART0*(\d+)-", i).group(1)) for i in _unique_ids()})
+    return len(covered_articles())
 
 
 def reset_cache() -> None:

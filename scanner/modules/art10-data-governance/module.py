@@ -17,7 +17,7 @@ Obligation mapping:
   ART10-OBL-3   → UNABLE_TO_DETERMINE always (data quality — manual)
   ART10-OBL-3b  → UNABLE_TO_DETERMINE always (statistical properties — manual)
   ART10-OBL-4   → UNABLE_TO_DETERMINE always (deployment context — manual)
-  ART10-PERM-5  → permission — handled by gap_findings
+  (former Art. 10(5) special-category data for bias detection: now Art. 4a, ART04a-PERM-1 — permissions only, no scanner module)
   ART10-OBL-6   → scope rule — handled by gap_findings
 """
 
@@ -259,16 +259,23 @@ class Art10Module(BaseArticleModule):
             ),
             official_summary=(
                 "Art. 10 requires data governance covering design choices, collection "
-                "processes, preparation operations, assumptions, and availability. Data must "
-                "be examined for biases with appropriate mitigation. Datasets must be relevant, "
-                "representative, error-free (best effort), and complete. Special category "
-                "personal data may be processed for bias detection under strict conditions."
+                "processes, preparation operations, assumptions, and availability. Data must be "
+                "examined for biases with appropriate mitigation. Datasets must be relevant, "
+                "representative, error-free (best effort), and complete. Art. 10(1) and (6) "
+                "refer to Art. 4a(1), under which providers may exceptionally process special "
+                "categories of personal data for bias detection and correction under strict "
+                "conditions."
             ),
             related_articles={
+                "Art. 4a": (
+                    "Processing of special categories of personal data for bias detection and "
+                    "correction (Art. 4a(1) replaces former Art. 10(5); Art. 4a(2) extends the "
+                    "permission to additional providers and deployers)."
+                ),
                 "Art. 9": "Risk management (data risks feed into risk assessment)",
                 "Art. 15": "Accuracy (data quality directly affects accuracy)",
-                "Art. 71": "AI regulatory sandboxes (may allow controlled data testing)",
-                "GDPR": "Art. 10(5) references Regulation (EU) 2016/679",
+                "Art. 71": "EU database for high-risk AI systems listed in Annex III",
+                "GDPR": "Art. 4a(1) applies in addition to Regulation (EU) 2016/679",
             },
             recital=(
                 "Recital 67: Data governance is critical for ensuring AI system quality. "

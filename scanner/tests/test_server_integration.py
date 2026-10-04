@@ -944,10 +944,11 @@ class TestClScanArticle10:
         }))
         result_json = _scan_single_article(10, project_dir, context=ctx)
         result = json.loads(result_json)
-        # ART10-PERM-5 is a permission → skipped (no finding).
+        # ART10-PERM-3 is a permission → skipped (no finding). (ART10-PERM-5 moved to Art 4a, Omnibus batch 3.)
         # ART10-OBL-6 is an obligation → should have a finding.
-        perm5 = [f for f in result["findings"] if f["obligation_id"] == "ART10-PERM-5"]
-        assert len(perm5) == 0, "ART10-PERM-5 is a permission, should not generate finding"
+        perm3 = [f for f in result["findings"] if f["obligation_id"] == "ART10-PERM-3"]
+        assert len(perm3) == 0, "ART10-PERM-3 is a permission, should not generate finding"
+        assert not [f for f in result["findings"] if f["obligation_id"] in ("ART10-PERM-5", "ART04a-PERM-1")]
         obl6 = [f for f in result["findings"] if f["obligation_id"] == "ART10-OBL-6"]
         assert len(obl6) > 0, "ART10-OBL-6 not in findings"
 

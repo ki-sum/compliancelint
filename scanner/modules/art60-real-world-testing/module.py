@@ -1,8 +1,9 @@
 """
 Article 60: Testing of high-risk AI systems in real world conditions — Module implementation.
 
-Art. 60 requires providers conducting real-world testing of Annex III high-risk AI
-systems outside regulatory sandboxes to meet specific conditions: testing plan with
+Art. 60 requires providers conducting real-world testing of high-risk AI systems listed
+in Annex III or covered by Union harmonisation legislation listed in Section A of Annex I
+(Reg (EU) 2026/1744) outside AI regulatory sandboxes to meet specific conditions: testing plan with
 authority approval, incident reporting and mitigation, authority notification of
 outcomes, and liability for testing damage.
 
@@ -199,19 +200,27 @@ class Art60Module(BaseArticleModule):
             article_number=60,
             article_title="Testing of high-risk AI systems in real world conditions",
             one_sentence=(
-                "Providers testing Annex III high-risk AI systems in real world conditions "
-                "must follow strict testing plans, incident reporting, and authority notification procedures."
+                "Providers or prospective providers testing high-risk AI systems listed in "
+                "Annex III or covered by the Union harmonisation legislation listed in Section "
+                "A of Annex I in real world conditions must follow the testing-plan, "
+                "incident-reporting and authority-notification rules in Art. 60."
             ),
             official_summary=(
-                "Art. 60 governs testing of high-risk AI systems in real world conditions "
-                "outside regulatory sandboxes. Providers must: (1) draw up and submit a "
-                "real-world testing plan to the market surveillance authority (Art. 60(4)); "
-                "(2) meet 12 conditions including authority approval, EU database registration, "
-                "informed consent, effective oversight, and reversible decisions (Art. 60(4)(a)-(l)); "
-                "(3) report serious incidents and adopt immediate mitigation or suspend testing "
-                "(Art. 60(7)); (4) notify the authority of suspension/termination and final "
-                "outcomes (Art. 60(8)); (5) be liable for any damage caused during testing "
-                "(Art. 60(9))."
+                "Art. 60 governs testing of high-risk AI systems listed in Annex III or covered "
+                "by the Union harmonisation legislation listed in Section A of Annex I in real "
+                "world conditions outside AI regulatory sandboxes. Providers or prospective "
+                "providers must: (1) draw up a real-world testing plan and submit it to the "
+                "market surveillance authority (Art. 60(4)(a)); (2) meet all conditions in Art. "
+                "60(4), points (a) to (k), including the approval procedure, registration as "
+                "specified in point (c) (with a Union-wide unique single identification number "
+                "where that point requires one), informed consent or the law-enforcement "
+                "alternative in point (i), effective oversight, and effectively reversible and "
+                "disregardable predictions, recommendations or decisions; (3) report serious "
+                "incidents and adopt immediate mitigation measures or suspend/terminate testing "
+                "as required by Art. 60(7); (4) notify the authority of suspension or "
+                "termination and final outcomes (Art. 60(8)); and (5) bear liability under "
+                "applicable Union and national liability law for damage caused in the course of "
+                "testing (Art. 60(9))."
             ),
             related_articles={
                 "Art. 6": "High-risk classification (prerequisite for Art. 60)",
@@ -219,8 +228,16 @@ class Art60Module(BaseArticleModule):
                 "Art. 57": "AI regulatory sandboxes (Art. 60 is for testing OUTSIDE sandboxes)",
                 "Art. 61": "Informed consent of test subjects referenced in Art. 60(4)(k)",
                 "Art. 73": "Serious incident reporting referenced in Art. 60(7)",
-                "Annex III": "High-risk AI system categories (Art. 60 applies to Annex III systems)",
-                "Annex IX": "Real-world testing plan content requirements",
+                "Annex III": (
+                    "High-risk AI system categories (Art. 60 applies to Annex III systems and "
+                    "to systems covered by the Union harmonisation legislation listed in "
+                    "Section A of Annex I)"
+                ),
+                "Annex IX": (
+                    "Information to be submitted upon the registration of high-risk AI systems "
+                    "listed in Annex III in relation to testing in real world conditions in "
+                    "accordance with Article 60"
+                ),
             },
             recital=(
                 "Recital 140: Testing in real world conditions outside regulatory sandboxes "
@@ -352,10 +369,13 @@ class Art60Module(BaseArticleModule):
             project_path=scan_result.project_path,
             actions=actions,
             disclaimer=(
-                "Art. 60 applies to providers testing Annex III high-risk AI systems in "
-                "real world conditions outside regulatory sandboxes. Testing requires prior "
-                "authority approval. Based on ComplianceLint compliance checklist. Official "
-                "CEN-CENELEC standards (expected Q4 2026) may modify these requirements."
+                "Art. 60 applies to providers or prospective providers testing high-risk AI "
+                "systems listed in Annex III or covered by the Union harmonisation legislation "
+                "listed in Section A of Annex I in real world conditions outside AI regulatory "
+                "sandboxes. Testing is subject to the approval procedure in Art. 60(4)(b); if "
+                "the market surveillance authority does not answer within 30 days, approval is "
+                "deemed granted where national law permits tacit approval. Based on "
+                "ComplianceLint compliance checklist."
             ),
         )
 

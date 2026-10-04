@@ -12,31 +12,98 @@
     "pdf_pages": [
       53,
       54
+    ],
+    "amendments": [
+      {
+        "amending_celex": "32026R1744",
+        "amending_act": "Regulation (EU) 2026/1744 (Digital Omnibus)",
+        "consolidated_celex": "02024R1689-20260727",
+        "change_type": "AMEND",
+        "obligations_amended": [
+          "ART06-CLS-1"
+        ],
+        "obligations_added": [],
+        "source_pdf": "docs/sources/eu-ai-act-2024-1689-consolidated-20260727-en.pdf",
+        "source_pdf_sha256": "1ccd38d1c78482cf2053b70110115adcc5080700acc8bd7bead8cb3579143ccf",
+        "source_pages": [
+          17,
+          18,
+          19
+        ],
+        "consensus_lock": "omnibus-batch3-2026-10-04",
+        "recorded_on": "2026-10-04"
+      }
     ]
   },
   "obligations": [
     {
       "id": "ART06-CLS-1",
-      "source": "Art. 6(1)",
-      "source_quote": "Irrespective of whether an AI system is placed on the market or put into service independently of the products referred to in points (a) and (b), that AI system shall be considered to be high-risk where both of the following conditions are fulfilled:",
+      "source": "Art. 6(1), (1a)-(1c)",
+      "source_quote": "Irrespective of whether an AI system is placed on the market or put into service independently of the products referred to in points (a) and (b), that AI system shall be considered to be high-risk where both of the following conditions are fulfilled: (a) the AI system is intended to be used as a safety component of a product, or the AI system is itself a product, covered by the Union harmonisation legislation listed in Annex I; (b) the product whose safety component pursuant to point (a) is the AI system, or the AI system itself as a product, is required to undergo a third-party conformity assessment, with a view to the placing on the market or the putting into service of that product pursuant to the Union harmonisation legislation listed in Annex I. 1a. For the purposes of this Regulation, including paragraph 1 of this Article, AI systems that are solely used for non-safety related aspects of user assistance, performance optimisation, service efficiency, automation or convenience or quality control shall not qualify as safety components. 1b. Notwithstanding paragraph 1a, AI systems the failure or malfunctioning of which would endanger health and safety shall qualify as safety components. 1c. A product that is required to undergo a third-party conformity assessment solely due to risks other than risks to health and safety, in particular risks relating to the distribution of radio spectrum or electromagnetic interference that do not affect health and safety, shall not be considered as fulfilling the condition in paragraph 1, point (b).",
       "deontic_type": "classification_rule",
       "modality": "shall",
       "addressee": "provider",
       "decomposed_atoms": [
         {
+          "atom": "both_conditions_required",
+          "description": "An AI system is classified as high-risk under the Article 6(1) product route when both required conditions are fulfilled.",
+          "requirement": "SHALL consider the AI system to be high-risk only where both Article 6(1)(a) and Article 6(1)(b) are fulfilled."
+        },
+        {
           "atom": "safety_component_or_product",
-          "description": "Art.6(1)(a): AI is safety component of product or is product itself, covered by Annex I",
-          "requirement": "System SHALL be considered high-risk if it is a safety component or product under Annex I harmonisation legislation"
+          "description": "The AI system must be a safety component of an Annex I product or itself an Annex I product.",
+          "requirement": "Only where the AI system is intended to be used as a safety component of a product, or is itself a product, covered by Union harmonisation legislation listed in Annex I.",
+          "_history": [
+            {
+              "requirement": "System SHALL be considered high-risk if it is a safety component or product under Annex I harmonisation legislation",
+              "description": "Art.6(1)(a): AI is safety component of product or is product itself, covered by Annex I",
+              "superseded_on": "2026-10-04",
+              "amending_celex": "32026R1744",
+              "consensus_lock": "omnibus-batch3-2026-10-04"
+            }
+          ]
         },
         {
           "atom": "requires_third_party_assessment",
-          "description": "Art.6(1)(b): Product requires third-party conformity assessment",
-          "requirement": "System SHALL be considered high-risk if the product requires third-party conformity assessment under Annex I"
+          "description": "The relevant product must be required by Annex I legislation to undergo third-party conformity assessment for market placement or putting into service.",
+          "requirement": "Only where the relevant product or the AI system itself as a product is required to undergo a third-party conformity assessment pursuant to the Union harmonisation legislation listed in Annex I.",
+          "_history": [
+            {
+              "requirement": "System SHALL be considered high-risk if the product requires third-party conformity assessment under Annex I",
+              "description": "Art.6(1)(b): Product requires third-party conformity assessment",
+              "superseded_on": "2026-10-04",
+              "amending_celex": "32026R1744",
+              "consensus_lock": "omnibus-batch3-2026-10-04"
+            }
+          ]
+        },
+        {
+          "atom": "non_safety_aspects_not_safety_component",
+          "description": "Systems used solely for non-safety aspects are not safety components",
+          "requirement": "AI systems solely used for non-safety related aspects of user assistance, performance optimisation, service efficiency, automation or convenience or quality control SHALL NOT qualify as safety components, for the whole Regulation including Art. 6(1)"
+        },
+        {
+          "atom": "endangering_failure_is_safety_component",
+          "description": "Failure that would endanger health and safety makes the system a safety component",
+          "requirement": "Notwithstanding Art. 6(1a), AI systems the failure or malfunctioning of which would endanger health and safety SHALL qualify as safety components"
+        },
+        {
+          "atom": "non_safety_third_party_assessment_excluded",
+          "description": "Third-party assessment required only for non-safety risks does not meet point (b)",
+          "requirement": "A product required to undergo a third-party conformity assessment solely due to risks other than risks to health and safety (in particular radio spectrum or electromagnetic interference not affecting health and safety) does NOT fulfil the condition in Art. 6(1), point (b)"
         }
       ],
       "automation_assessment": {
         "level": "partial"
-      }
+      },
+      "_source_quote_history": [
+        {
+          "source_quote": "Irrespective of whether an AI system is placed on the market or put into service independently of the products referred to in points (a) and (b), that AI system shall be considered to be high-risk where both of the following conditions are fulfilled:",
+          "superseded_on": "2026-10-04",
+          "amending_celex": "32026R1744",
+          "consensus_lock": "omnibus-batch3-2026-10-04"
+        }
+      ]
     },
     {
       "id": "ART06-CLS-2",

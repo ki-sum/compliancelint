@@ -50,6 +50,9 @@ class TestBuildRegistry:
         registry = _build_registry(tmp_path)
         assert registry["eu-ai-act"] == ["art5", "art50", "art111"]
 
+    def test_lettered_article_sorts_after_its_number(self):
+        assert _article_sort_key("art4") < _article_sort_key("art4a") < _article_sort_key("art5")
+
     def test_regulation_field_groups_correctly(self, tmp_path):
         _write_obligation(tmp_path, "art04-literacy.json", 4, "AI Literacy")
         _write_obligation(tmp_path, "art01-scope.json", 1, "Scope", regulation="gdpr")
@@ -97,11 +100,12 @@ class TestBuildRegistry:
 class TestArticleSortKey:
 
     def test_simple(self):
-        assert _article_sort_key("art4") == 4
-        assert _article_sort_key("art111") == 111
+        assert _article_sort_key("art4") == (4, "")
+        assert _article_sort_key("art4a") == (4, "a")
+        assert _article_sort_key("art111") == (111, "")
 
     def test_no_digits(self):
-        assert _article_sort_key("nodigits") == 0
+        assert _article_sort_key("nodigits") == (0, "")
 
 
 # ---------------------------------------------------------------------------
@@ -112,16 +116,19 @@ class TestArticleSortKey:
 class TestRealObligations:
     """Tests that run against the actual scanner/obligations/ directory."""
 
-    def test_discovers_all_44_articles(self):
+    def test_discovers_all_45_articles(self):
         reload()  # Force fresh scan
         articles = get_articles("eu-ai-act")
-        assert len(articles) == 44, f"Expected 44 articles, got {len(articles)}: {articles}"
+        # 44 scanned articles + Art 4a (permissions only, inserted by Reg (EU) 2026/1744)
+        assert len(articles) == 45, f"Expected 45 articles, got {len(articles)}: {articles}"
+        assert "art4a" in articles and "art10" in articles
 
     def test_articles_sorted_numerically(self):
         reload()
         articles = get_articles("eu-ai-act")
-        nums = [int(a.replace("art", "")) for a in articles]
-        assert nums == sorted(nums), f"Articles not sorted: {articles}"
+        keys = [_article_sort_key(a) for a in articles]
+        assert keys == sorted(keys), f"Articles not sorted: {articles}"
+        assert articles.index("art4") + 1 == articles.index("art4a") == articles.index("art5") - 1
 
     def test_first_and_last_article(self):
         reload()
@@ -151,4 +158,4 @@ class TestRealObligations:
         a = get_articles("eu-ai-act")
         a.clear()
         b = get_articles("eu-ai-act")
-        assert len(b) == 44
+        assert len(b) == 45 and "art4a" in b

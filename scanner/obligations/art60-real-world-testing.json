@@ -28,7 +28,7 @@
       "deontic_type": "obligation",
       "modality": "shall",
       "addressee": "provider",
-      "addressee_note": "Provider or prospective provider conducting real-world testing of Annex III high-risk AI systems",
+      "addressee_note": "Provider or prospective provider conducting real-world testing of high-risk AI systems listed in Annex III or covered by the Union harmonisation legislation listed in Section A of Annex I",
       "decomposed_atoms": [
         {
           "atom": "testing_plan_drawn_up",
@@ -100,7 +100,7 @@
         "Art. 71(4)",
         "Annex IX"
       ],
-      "scope_limitation": "Only applies to testing of Annex III high-risk AI systems in real world conditions outside regulatory sandboxes",
+      "scope_limitation": "Only applies to testing of high-risk AI systems listed in Annex III or covered by the Union harmonisation legislation listed in Section A of Annex I in real world conditions outside AI regulatory sandboxes",
       "context_skip_field": "conducts_real_world_testing"
     },
     {

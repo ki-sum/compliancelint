@@ -48,6 +48,27 @@ This project adheres to [Semantic Versioning](https://semver.org/).
   legislation follows that legislation's procedure even if it also falls within Annex III, so
   `ART43-OBL-1` and `ART43-OBL-2` are not applicable when `is_annex_i_product` is true.
 
+### Added / changed — Regulation (EU) 2026/1744, Art. 4a, 6, 10, 60
+- New Art. 4a: providers of high-risk AI systems may exceptionally process special categories of
+  personal data to the extent strictly necessary to ensure bias detection and correction in
+  accordance with Art. 10(2), points (f) and (g), subject to all the conditions in points (a)-(f)
+  (`ART04a-PERM-1`; formerly Art. 10(5), `ART10-PERM-5` is removed). Providers and deployers of other
+  AI systems and models and deployers of high-risk AI systems may do so on the conditions of
+  Art. 4a(2), which does not create any obligation to conduct bias detection and correction
+  (`ART04a-PERM-2`). Art. 4a contains permissions only and has no scanning module; it applies from
+  2 August 2026.
+- Art. 10(1) and (6) refer to Art. 10(2), (3) and (4) and Art. 4a(1).
+- Art. 6(1a)-(1c): AI systems solely used for non-safety related aspects of user assistance,
+  performance optimisation, service efficiency, automation or convenience or quality control are
+  not safety components unless their failure or malfunctioning would endanger health and safety;
+  a third-party conformity assessment required solely because of risks other than risks to health
+  and safety does not meet Art. 6(1), point (b). `ART06-CLS-1` covers points (a) and (b) and
+  paragraphs 1a-1c and requires both conditions.
+- Art. 60(1) and (2): testing in real world conditions outside AI regulatory sandboxes also covers
+  high-risk AI systems covered by Union harmonisation legislation listed in Section A of Annex I.
+- `scanner/data/application_dates.json` also lists the articles inserted by Regulation (EU)
+  2026/1744 (4a, 60a, 75a-75d).
+
 ### Changed
 - Application dates follow Art. 113 as amended (`scanner/data/application_dates.json`):
   `compliance_summary.applicable_from` (plus `applicable_from_annex_i` for Chapter III
@@ -55,8 +76,8 @@ This project adheres to [Semantic Versioning](https://semver.org/).
   today) and `cl_explain` `enforcement_date`.
 - `cl_version` reports the regulation text version(s) the obligations were verified against.
 - EUR-Lex links point at the consolidated text.
-- Obligation count in messages and docs is derived from the data: 247 unique obligations
-  (three IDs are listed in two article files).
+- Obligation count in messages and docs is derived from the data: 248 unique obligations
+  (three IDs are listed in two article files) across 45 articles (44 with a scanning module).
 
 ### Fixed
 - Art. 5(1)(a)/(b)/(c)/(f)/(h) obligation atoms corrected after a two-model review

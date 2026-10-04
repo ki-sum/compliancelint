@@ -85,14 +85,25 @@ class Art06Module(BaseArticleModule):
                 confidence=Confidence.LOW,
                 description=(
                     f"Potential Annex I product detected: {annex_i_product_type}. "
-                    "Manual classification required. If this AI system is a safety "
-                    "component of (or is itself) a product covered by EU harmonisation "
-                    "legislation, it is HIGH-RISK under Art. 6(1)."
+                    "Manual classification required. Under Art. 6(1) this AI system is "
+                    "HIGH-RISK only where both conditions are met: (a) it is intended to be "
+                    "used as a safety component of a product, or is itself a product, covered "
+                    "by the Union harmonisation legislation listed in Annex I, and (b) that "
+                    "product is required to undergo a third-party conformity assessment under "
+                    "that legislation."
                 ),
                 remediation=(
-                    "Determine whether this AI system is a safety component of a product "
-                    "under Annex I legislation. If yes, it must comply with Chapter 2 "
-                    "requirements (Arts. 8-15) and undergo third-party conformity assessment."
+                    "Determine whether both Art. 6(1) conditions are met, taking the definition "
+                    "of safety component in Art. 3(14) and Art. 6(1a)-(1c) into account. An AI "
+                    "system solely used for the non-safety related aspects listed in Art. 6(1a) "
+                    "is not a safety component, subject to Art. 6(1b), and a third-party "
+                    "conformity assessment required solely because of risks other than risks to "
+                    "health and safety does not meet point (b) (Art. 6(1c)). If the system is "
+                    "high-risk and is related to a product covered by Section A of Annex I, the "
+                    "requirements of Chapter III, Section 2 apply, subject to Art. 2(13). If it "
+                    "is related to a product covered by Section B of Annex I, apply the "
+                    "limitation in Art. 2(2); Arts. 8-15 do not apply by virtue of this "
+                    "Regulation."
                 ),
                 gap_type=GapType.PROCESS,
             ))
@@ -246,17 +257,18 @@ class Art06Module(BaseArticleModule):
                 "falling under specific use-case categories (Annex III)."
             ),
             official_summary=(
-                "Art. 6 establishes the rules for classifying AI systems as high-risk. "
-                "There are two paths: (1) Art. 6(1) — the system is itself or is a safety "
-                "component of a product covered by EU harmonisation legislation listed in "
-                "Annex I (medical devices, machinery, toys, etc.), requiring third-party "
-                "conformity assessment; (2) Art. 6(2) — the system falls under one of eight "
-                "use-case categories in Annex III (biometrics, critical infrastructure, "
-                "education, employment, essential services, law enforcement, migration, "
-                "administration of justice). Art. 6(3) provides an exception: an Annex III "
-                "system is NOT high-risk if it does not pose significant risk and only "
-                "performs narrow procedural tasks, improves prior human work, detects "
-                "patterns without replacing judgment, or performs preparatory tasks."
+                "Art. 6 establishes the rules for classifying AI systems as high-risk. There "
+                "are two paths: (1) Art. 6(1) — the system is itself or is a safety component "
+                "of a product covered by Union harmonisation legislation listed in Annex I and "
+                "that product is required to undergo a third-party conformity assessment; the "
+                "meaning of safety component is set by Art. 3(14), as qualified by Art. "
+                "6(1a)-(1b), and Art. 6(1c) excludes third-party assessment required solely "
+                "because of risks other than health and safety; (2) Art. 6(2) — the system "
+                "falls under a use case listed in Annex III. Under Art. 6(3), an Annex III "
+                "system is not high-risk where it does not pose a significant risk of harm to "
+                "health, safety or fundamental rights and one of points (a)-(d) applies; "
+                "notwithstanding that exception, an Annex III system that performs profiling of "
+                "natural persons is always high-risk."
             ),
             related_articles={
                 "Annex I": "List of EU harmonisation legislation (product safety)",
@@ -316,7 +328,9 @@ class Art06Module(BaseArticleModule):
             action="Complete formal Art. 6 risk classification",
             details=(
                 "Walk through the Art. 6 classification decision tree: "
-                "(1) Is this a safety component or product under Annex I? "
+                "(1) Is this a safety component of a product, or itself a product, covered by "
+                "Annex I legislation, AND is that product required to undergo a third-party "
+                "conformity assessment (taking Art. 6(1a)-(1c) into account)? "
                 "(2) Does it fall under an Annex III category? "
                 "(3) Does the Art. 6(3) exception apply? "
                 "Document the reasoning and conclusion."
@@ -334,8 +348,13 @@ class Art06Module(BaseArticleModule):
                 action="Verify Annex I product classification",
                 details=(
                     f"Potential Annex I product indicator detected: {product_type}. "
-                    "Determine if this AI system is a safety component of (or is itself) a product "
-                    "covered by this legislation. If yes, third-party conformity assessment is required."
+                    "Determine whether this AI system is a safety component of (or is itself) a product "
+                    "covered by this legislation AND whether that product is required to undergo a "
+                    "third-party conformity assessment under it; Art. 6(1) requires both. Apply "
+                    "Art. 6(1a)-(1c): systems solely used for non-safety related aspects are not "
+                    "safety components unless their failure or malfunctioning would endanger health "
+                    "and safety, and an assessment required solely for risks other than health and "
+                    "safety does not count."
                 ),
                 effort="4-8 hours (may require legal counsel)",
                 action_type="human_judgment_required",

@@ -187,3 +187,19 @@ def test_art19_obl1_canonical_is_kept_under_control_not_retention():
         f"ART19-OBL-1b source_quote should be the 6-month retention "
         f"clause. Got: {quote_1b[:100]!r}"
     )
+
+
+# ──────────────────────────────────────────────────────────────────────
+# 4. Lettered articles (Art 4a, inserted by Reg (EU) 2026/1744) count as their own article
+# ──────────────────────────────────────────────────────────────────────
+
+def test_article_count_includes_lettered_articles():
+    import glob
+    from core import obligation_lookup as ol
+
+    articles = ol.covered_articles()
+    assert "4" in articles and "4a" in articles and "10" in articles
+    assert articles.index("4") < articles.index("4a") < articles.index("5")   # legal order
+    files = [p for p in glob.glob(os.path.join(SCANNER_ROOT, "obligations", "art*.json"))
+             if json.load(open(p, encoding="utf-8")).get("obligations")]
+    assert ol.article_count() == len(articles) == len(files)

@@ -31,21 +31,92 @@
       "upcoming": [
         "CEN-CENELEC harmonized standard for Art. 10 (expected Q4 2026)"
       ]
-    }
+    },
+    "removed_obligations": [
+      {
+        "record": {
+          "id": "ART10-PERM-5",
+          "source": "Art. 10(5)",
+          "source_quote": "To the extent that it is strictly necessary for the purpose of ensuring bias detection and correction in relation to the high-risk AI systems in accordance with paragraph (2), points (f) and (g) of this Article, the providers of such systems may exceptionally process special categories of personal data, subject to appropriate safeguards for the fundamental rights and freedoms of natural persons.",
+          "deontic_type": "permission",
+          "modality": "may",
+          "addressee": "provider",
+          "note": "Conditional permission with 6 mandatory conditions (a-f). Only applies when processing special category personal data for bias detection.",
+          "scope_limitation": "Only applies when processing special categories of personal data for bias detection/correction",
+          "context_skip_field": "processes_special_category_data",
+          "context_skip_value": false,
+          "decomposed_atoms": [
+            {
+              "atom": "special_data_strictly_necessary",
+              "description": "Processing must be strictly necessary for bias detection",
+              "requirement": "Special category data processing MAY occur only when strictly necessary for bias detection/correction"
+            },
+            {
+              "atom": "appropriate_safeguards",
+              "description": "Appropriate safeguards must be in place",
+              "requirement": "Processing SHALL include appropriate safeguards for fundamental rights"
+            }
+          ],
+          "automation_assessment": {
+            "level": "partial"
+          }
+        },
+        "moved_to": [
+          "ART04a-PERM-1"
+        ],
+        "reason": "Art. 10(5) deleted by Regulation (EU) 2026/1744; its content is now Art. 4a(1)",
+        "superseded_on": "2026-10-04",
+        "amending_celex": "32026R1744",
+        "consensus_lock": "omnibus-batch3-2026-10-04"
+      }
+    ],
+    "amendments": [
+      {
+        "amending_celex": "32026R1744",
+        "amending_act": "Regulation (EU) 2026/1744 (Digital Omnibus)",
+        "consolidated_celex": "02024R1689-20260727",
+        "change_type": "AMEND+REMOVE",
+        "obligations_amended": [
+          "ART10-OBL-1",
+          "ART10-OBL-6"
+        ],
+        "obligations_added": [],
+        "obligations_removed": [
+          "ART10-PERM-5"
+        ],
+        "source_pdf": "docs/sources/eu-ai-act-2024-1689-consolidated-20260727-en.pdf",
+        "source_pdf_sha256": "1ccd38d1c78482cf2053b70110115adcc5080700acc8bd7bead8cb3579143ccf",
+        "source_pages": [
+          22,
+          23
+        ],
+        "consensus_lock": "omnibus-batch3-2026-10-04",
+        "recorded_on": "2026-10-04"
+      }
+    ]
   },
   "obligations": [
     {
       "id": "ART10-OBL-1",
       "source": "Art. 10(1)",
-      "source_quote": "High-risk AI systems which make use of techniques involving the training of AI models with data shall be developed on the basis of training, validation and testing data sets that meet the quality criteria referred to in paragraphs 2 to 5 whenever such data sets are used.",
+      "source_quote": "High-risk AI systems which make use of techniques involving the training of AI models with data shall be developed on the basis of training, validation and testing data sets that meet the quality criteria referred to in paragraphs 2, 3 and 4 of this Article and in Article 4a(1) whenever such data sets are used.",
       "deontic_type": "obligation",
       "modality": "shall",
       "addressee": "provider",
       "decomposed_atoms": [
         {
           "atom": "uses_quality_datasets",
-          "description": "Training/validation/testing data must meet quality criteria",
-          "requirement": "Systems SHALL be developed on data sets meeting quality criteria of paragraphs 2-5"
+          "description": "Training, validation and testing data sets must meet the quality criteria of Art. 10(2)-(4) and Art. 4a(1)",
+          "requirement": "High-risk AI systems that use techniques involving the training of AI models with data SHALL be developed on the basis of training, validation and testing data sets that meet the quality criteria referred to in Art. 10(2), (3) and (4) and in Art. 4a(1), whenever such data sets are used",
+          "_history": [
+            {
+              "requirement": "Systems SHALL be developed on data sets meeting quality criteria of paragraphs 2-5",
+              "description": "Training/validation/testing data must meet quality criteria",
+              "superseded_on": "2026-10-04",
+              "amending_celex": "32026R1744",
+              "consensus_lock": "omnibus-batch3-2026-10-04"
+            }
+          ]
         },
         {
           "atom": "all_dataset_types_covered",
@@ -55,7 +126,15 @@
       ],
       "automation_assessment": {
         "level": "partial"
-      }
+      },
+      "_source_quote_history": [
+        {
+          "source_quote": "High-risk AI systems which make use of techniques involving the training of AI models with data shall be developed on the basis of training, validation and testing data sets that meet the quality criteria referred to in paragraphs 2 to 5 whenever such data sets are used.",
+          "superseded_on": "2026-10-04",
+          "amending_celex": "32026R1744",
+          "consensus_lock": "omnibus-batch3-2026-10-04"
+        }
+      ]
     },
     {
       "id": "ART10-OBL-2",
@@ -288,36 +367,9 @@
       }
     },
     {
-      "id": "ART10-PERM-5",
-      "source": "Art. 10(5)",
-      "source_quote": "To the extent that it is strictly necessary for the purpose of ensuring bias detection and correction in relation to the high-risk AI systems in accordance with paragraph (2), points (f) and (g) of this Article, the providers of such systems may exceptionally process special categories of personal data, subject to appropriate safeguards for the fundamental rights and freedoms of natural persons.",
-      "deontic_type": "permission",
-      "modality": "may",
-      "addressee": "provider",
-      "note": "Conditional permission with 6 mandatory conditions (a-f). Only applies when processing special category personal data for bias detection.",
-      "scope_limitation": "Only applies when processing special categories of personal data for bias detection/correction",
-      "context_skip_field": "processes_special_category_data",
-      "context_skip_value": false,
-      "decomposed_atoms": [
-        {
-          "atom": "special_data_strictly_necessary",
-          "description": "Processing must be strictly necessary for bias detection",
-          "requirement": "Special category data processing MAY occur only when strictly necessary for bias detection/correction"
-        },
-        {
-          "atom": "appropriate_safeguards",
-          "description": "Appropriate safeguards must be in place",
-          "requirement": "Processing SHALL include appropriate safeguards for fundamental rights"
-        }
-      ],
-      "automation_assessment": {
-        "level": "partial"
-      }
-    },
-    {
       "id": "ART10-OBL-6",
       "source": "Art. 10(6)",
-      "source_quote": "For the development of high-risk AI systems not using techniques involving the training of AI models, paragraphs 2 to 5 apply only to the testing data sets.",
+      "source_quote": "For the development of high-risk AI systems not using techniques involving the training of AI models, paragraphs 2, 3 and 4 of this Article and Article 4a(1) shall apply only to the testing data sets.",
       "deontic_type": "obligation",
       "modality": "shall",
       "addressee": "provider",
@@ -325,32 +377,49 @@
       "decomposed_atoms": [
         {
           "atom": "non_training_systems_test_data_only",
-          "description": "For non-training systems, requirements apply only to test data",
-          "requirement": "For systems not using training, paragraphs 2-5 SHALL apply only to testing data sets"
+          "description": "For systems not using training techniques, the data requirements apply only to testing data sets",
+          "requirement": "For high-risk AI systems not using techniques involving the training of AI models, Art. 10(2), (3) and (4) and Art. 4a(1) SHALL apply only to the testing data sets",
+          "_history": [
+            {
+              "requirement": "For systems not using training, paragraphs 2-5 SHALL apply only to testing data sets",
+              "description": "For non-training systems, requirements apply only to test data",
+              "superseded_on": "2026-10-04",
+              "amending_celex": "32026R1744",
+              "consensus_lock": "omnibus-batch3-2026-10-04"
+            }
+          ]
         }
       ],
       "automation_assessment": {
         "level": "partial"
-      }
+      },
+      "_source_quote_history": [
+        {
+          "source_quote": "For the development of high-risk AI systems not using techniques involving the training of AI models, paragraphs 2 to 5 apply only to the testing data sets.",
+          "superseded_on": "2026-10-04",
+          "amending_celex": "32026R1744",
+          "consensus_lock": "omnibus-batch3-2026-10-04"
+        }
+      ]
     }
   ],
   "summary": {
-    "total_obligations": 11,
+    "total_obligations": 10,
     "obligation_count": 9,
-    "permission_count": 2,
+    "permission_count": 1,
     "addressee_breakdown": {
-      "provider": 10,
+      "provider": 9,
       "deployer": 0,
       "commission": 0
     },
     "automation_breakdown": {
       "full": 0,
-      "partial": 11,
+      "partial": 10,
       "manual": 0
     },
     "scope_notes": {
       "general_obligations": "ART10-OBL-1 through ART10-OBL-4 — apply to ALL high-risk AI systems using training data",
-      "conditional": "ART10-PERM-5 — permission for special category data processing with 6 conditions",
+      "conditional": "Special categories of personal data for bias detection and correction: Art. 4a (ART04a-PERM-1, ART04a-PERM-2) — Art. 4a(1) replaces former Art. 10(5), while Art. 4a(2), inserted by Regulation (EU) 2026/1744, extends the permission to additional providers and deployers.",
       "scope_rule": "ART10-OBL-6 — non-training systems: only testing data subject to requirements"
     }
   }

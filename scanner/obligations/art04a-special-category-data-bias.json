@@ -1,0 +1,164 @@
+{
+  "_metadata": {
+    "article": "4a",
+    "title": "Processing of special categories of personal data for bias detection and correction",
+    "prerequisites": [],
+    "decomposition_date": "2026-10-04",
+    "primary_official_source": {
+      "name": "EUR-Lex — Official Journal of the European Union",
+      "eli_uri": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng",
+      "celex": "32024R1689",
+      "oj_citation": "OJ L 2024/1689, 12.7.2024",
+      "consolidated_celex": "02024R1689-20260727",
+      "inserted_by": "Regulation (EU) 2026/1744 (Digital Omnibus), CELEX 32026R1744"
+    },
+    "pdf_pages": [
+      12,
+      13
+    ],
+    "related_standards": {
+      "published": [
+        "ISO/IEC TR 24027:2021 — Bias in AI systems"
+      ],
+      "upcoming": []
+    },
+    "amendments": [
+      {
+        "amending_celex": "32026R1744",
+        "amending_act": "Regulation (EU) 2026/1744 (Digital Omnibus)",
+        "consolidated_celex": "02024R1689-20260727",
+        "change_type": "ADD",
+        "obligations_amended": [],
+        "obligations_added": [
+          "ART04a-PERM-1",
+          "ART04a-PERM-2"
+        ],
+        "source_pdf": "docs/sources/eu-ai-act-2024-1689-consolidated-20260727-en.pdf",
+        "source_pdf_sha256": "1ccd38d1c78482cf2053b70110115adcc5080700acc8bd7bead8cb3579143ccf",
+        "source_pages": [
+          12,
+          13
+        ],
+        "consensus_lock": "omnibus-batch3-2026-10-04",
+        "recorded_on": "2026-10-04"
+      }
+    ]
+  },
+  "obligations": [
+    {
+      "id": "ART04a-PERM-1",
+      "source": "Art. 4a(1)",
+      "source_quote": "To the extent strictly necessary to ensure bias detection and correction in relation to high-risk AI systems in accordance with Article 10(2), points (f) and (g), of this Regulation, providers of such systems may exceptionally process special categories of personal data, subject to appropriate safeguards for the fundamental rights and freedoms of natural persons. In addition to the provisions set out in Regulations (EU) 2016/679 and (EU) 2018/1725 and Directive (EU) 2016/680, as applicable, all the following conditions shall be met in order for such processing to occur: (a) the bias detection and correction cannot be effectively fulfilled by processing other data, including synthetic or anonymised data; (b) the special categories of personal data are subject to technical limitations on the re-use of personal data, and state-of-the-art security and privacy-preserving measures, including pseudonymisation; (c) the special categories of personal data are subject to measures to ensure that the personal data processed are secured and protected, subject to suitable safeguards, including strict controls and documentation of the access, to avoid misuse and to ensure that only authorised persons have access to those personal data with appropriate confidentiality obligations; (d) the special categories of personal data are not transmitted, transferred or otherwise accessed by other parties; (e) the special categories of personal data are deleted once the bias has been corrected or the personal data has reached the end of its retention period, whichever comes first; and (f) the records of processing activities pursuant to Regulations (EU) 2016/679 and (EU) 2018/1725 and Directive (EU) 2016/680 include the reasons why the processing of special categories of personal data was strictly necessary to detect and correct biases, and why that objective could not be achieved by processing other data.",
+      "deontic_type": "permission",
+      "modality": "may",
+      "addressee": "provider",
+      "note": "Conditional permission: all of the conditions in points (a)-(f) must be met. Moved from Art. 10(5) by Regulation (EU) 2026/1744.",
+      "scope_limitation": "Only applies to providers of high-risk AI systems where processing special categories of personal data is strictly necessary to ensure bias detection and correction in relation to those systems in accordance with Art. 10(2), points (f) and (g).",
+      "context_skip_field": "processes_special_category_data",
+      "context_skip_value": false,
+      "cross_references": [
+        "Art. 10(2)(f)",
+        "Art. 10(2)(g)"
+      ],
+      "decomposed_atoms": [
+        {
+          "atom": "special_data_strictly_necessary",
+          "description": "Processing must be strictly necessary for bias detection",
+          "requirement": "Providers of high-risk AI systems MAY exceptionally process special categories of personal data only to the extent strictly necessary to ensure bias detection and correction in relation to those systems in accordance with Art. 10(2), points (f) and (g)."
+        },
+        {
+          "atom": "appropriate_safeguards",
+          "description": "Appropriate safeguards must be in place",
+          "requirement": "Such processing SHALL be subject to appropriate safeguards for the fundamental rights and freedoms of natural persons."
+        },
+        {
+          "atom": "data_protection_law_applies",
+          "description": "The conditions apply in addition to the EU data protection instruments",
+          "requirement": "The conditions in points (a)-(f) apply IN ADDITION TO Regulations (EU) 2016/679 and (EU) 2018/1725 and Directive (EU) 2016/680, as applicable"
+        },
+        {
+          "atom": "other_data_insufficient",
+          "description": "Bias detection and correction cannot be achieved with other data",
+          "requirement": "Processing SHALL occur only where bias detection and correction cannot be effectively fulfilled by processing other data, including synthetic or anonymised data"
+        },
+        {
+          "atom": "reuse_limits_and_privacy_measures",
+          "description": "Technical limits on re-use and state-of-the-art security and privacy-preserving measures",
+          "requirement": "The special categories of personal data SHALL be subject to technical limitations on re-use and to state-of-the-art security and privacy-preserving measures, including pseudonymisation"
+        },
+        {
+          "atom": "access_controls_and_confidentiality",
+          "description": "Secured and protected data, strict and documented access controls, authorised persons only",
+          "requirement": "The special categories of personal data SHALL be secured and protected, subject to suitable safeguards including strict controls and documentation of the access, so that only authorised persons with appropriate confidentiality obligations have access"
+        },
+        {
+          "atom": "no_access_by_other_parties",
+          "description": "No transmission, transfer or other access by other parties",
+          "requirement": "The special categories of personal data SHALL NOT be transmitted, transferred or otherwise accessed by other parties"
+        },
+        {
+          "atom": "deletion_after_correction",
+          "description": "Deletion once the bias is corrected or the retention period ends, whichever is first",
+          "requirement": "The special categories of personal data SHALL be deleted once the bias has been corrected or the personal data has reached the end of its retention period, whichever comes first"
+        },
+        {
+          "atom": "processing_records_state_reasons",
+          "description": "Records of processing activities state why the processing was strictly necessary",
+          "requirement": "The records of processing activities under Regulations (EU) 2016/679 and (EU) 2018/1725 and Directive (EU) 2016/680 SHALL include why the processing was strictly necessary to detect and correct biases and why other data could not achieve that objective"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial"
+      }
+    },
+    {
+      "id": "ART04a-PERM-2",
+      "source": "Art. 4a(2)",
+      "source_quote": "Providers and deployers of other AI systems and models and deployers of high-risk AI systems may exceptionally process special categories of personal data to the extent that: (a) such processing is strictly necessary to ensure bias detection and correction in view of possible biases that are likely to affect the health and safety of persons, have a negative impact on fundamental rights or lead to discrimination prohibited pursuant to Union law, especially where data outputs influence inputs for future operations; and (b) all of the conditions and safeguards set out in paragraph 1 are applied. This paragraph does not create any obligation to conduct such bias detection and correction.",
+      "deontic_type": "permission",
+      "modality": "may",
+      "addressee": "provider_and_deployer",
+      "note": "Does not create any obligation to conduct bias detection and correction (Art. 4a(2), last sentence).",
+      "scope_limitation": "Only applies to providers and deployers of other AI systems and models and deployers of high-risk AI systems where processing special categories of personal data is strictly necessary to ensure bias detection and correction in view of possible biases likely to affect health and safety, negatively impact fundamental rights or lead to discrimination prohibited under Union law, especially where data outputs influence inputs for future operations.",
+      "context_skip_field": "processes_special_category_data",
+      "context_skip_value": false,
+      "cross_references": [
+        "Art. 4a(1)"
+      ],
+      "decomposed_atoms": [
+        {
+          "atom": "bias_processing_strictly_necessary",
+          "description": "Processing only where strictly necessary for bias detection and correction",
+          "requirement": "Providers and deployers of other AI systems and models and deployers of high-risk AI systems MAY exceptionally process special categories of personal data only to the extent strictly necessary to ensure bias detection and correction in view of possible biases likely to affect the health and safety of persons, have a negative impact on fundamental rights or lead to discrimination prohibited pursuant to Union law, especially where data outputs influence inputs for future operations."
+        },
+        {
+          "atom": "paragraph_1_conditions_applied",
+          "description": "All conditions and safeguards of Art. 4a(1) apply",
+          "requirement": "Such processing SHALL apply all of the conditions and safeguards set out in Art. 4a(1)"
+        },
+        {
+          "atom": "no_duty_to_detect_bias",
+          "description": "No obligation to conduct bias detection and correction",
+          "requirement": "Art. 4a(2) does NOT create any obligation to conduct bias detection and correction"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial"
+      }
+    }
+  ],
+  "summary": {
+    "total_obligations": 2,
+    "obligation_count": 0,
+    "permission_count": 2,
+    "addressee_breakdown": {
+      "provider": 1,
+      "provider_and_deployer": 1
+    },
+    "automation_breakdown": {
+      "full": 0,
+      "partial": 2,
+      "manual": 0
+    }
+  }
+}

@@ -31,7 +31,8 @@ def _unique() -> int:
 
 
 def _articles() -> int:
-    return len({int(re.match(r"ART0*(\d+)-", i).group(1)) for i in _rows()})
+    # lettered articles (Art 4a, inserted by Reg (EU) 2026/1744) are articles of their own
+    return len({re.match(r"ART0*(\d+[a-z]?)-", i).group(1) for i in _rows()})
 
 
 def test_helper_counts_unique_ids():
@@ -63,8 +64,11 @@ def test_no_hardcoded_count_in_scanner_messages(rel):
 def test_static_docs_state_the_data_count(rel):
     with open(os.path.join(REPO_ROOT, rel), encoding="utf-8") as f:
         text = f.read()
-    stated = {int(n) for n in re.findall(r"\b(\d{3}) (?:atomic )?obligations\b", text)}
+    # " " in prose, "_" in the README shields.io badge ("EU_AI_Act-248_obligations")
+    stated = {int(n) for n in re.findall(r"\b(\d{3})[ _](?:atomic )?obligations\b", text)}
     assert stated <= {_unique()}, f"{rel} states {sorted(stated)}; data has {_unique()}"
+    articles = {int(n) for n in re.findall(r"\b(\d{2}) (?:EU AI Act )?articles\b", text)}
+    assert articles <= {_articles()}, f"{rel} states {sorted(articles)} articles; data has {_articles()}"
 
 
 def test_ci_workflow_does_not_pin_a_row_count():
