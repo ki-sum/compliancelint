@@ -150,7 +150,8 @@ _BOOL_FIELDS: dict = {
                # schema didn't recognize the field.
                "is_authorised_representative"],
     # NOTE on sme_status: this is a STRING enum (microenterprise/small/
-    # medium/large per Recommendation 2003/361/EC), NOT a bool. It MUST
+    # medium per Recommendation 2003/361/EC, small_mid_cap per
+    # Recommendation (EU) 2025/1099, large), NOT a bool. It MUST
     # NOT live in _BOOL_FIELDS — the coerce step would try to map the
     # string to bool/None and silently destroy it. Like risk_classification,
     # sme_status is read directly from _scope when needed and is populated
