@@ -371,7 +371,7 @@ class Art50Module(BaseArticleModule):
                 ],
             },
             compliance_checklist_summary=(
-                "ComplianceLint Compliance Checklist v0.1 requires: "
+                "ComplianceLint Compliance Checklist v0.2 requires: "
                 "(1) Clear AI interaction disclosure for chatbots/assistants, shown at point of contact; "
                 "(2) C2PA content credentials for AI-generated media (images, audio, video); "
                 "(3) Machine-readable AI-generation markers for text content; "

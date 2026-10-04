@@ -199,7 +199,7 @@ class Art27Module(BaseArticleModule):
                 ],
             },
             compliance_checklist_summary=(
-                "ComplianceLint Compliance Checklist v0.1 requires evidence of a FRIA covering "
+                "ComplianceLint Compliance Checklist v0.2 requires evidence of a FRIA covering "
                 "the Art. 27(1) elements and completed for first use, evidence of notification "
                 "where Art. 27(3) requires it, and, where DPIA material is reused under Art. "
                 "27(4), mapping showing which DPIA sections meet the corresponding Art. 27 "

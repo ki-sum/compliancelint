@@ -31,7 +31,7 @@
     "step_3": {
       "question": "Does the Art. 6(3) exception apply? The system is NOT high-risk if it does NOT pose a significant risk of harm to health, safety, or fundamental rights AND it meets at least one of: (a) performs a narrow procedural task, (b) improves the result of a previously completed human activity, (c) detects decision-making patterns without replacing human assessment, (d) performs a preparatory task for an assessment listed in Annex III.",
       "if_yes": "NOT HIGH-RISK (Art. 6(3) exception) — provider must document this reasoning",
-      "if_no": "HIGH-RISK via Art. 6(2) — subject to Chapter 2 requirements (Arts. 8-15)"
+      "if_no": "HIGH-RISK via Art. 6(2) — subject to the requirements of Chapter III, Section 2 (Arts. 8-15)"
     }
   },
 

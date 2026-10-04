@@ -253,7 +253,7 @@ class Art43Module(BaseArticleModule):
                 ],
             },
             compliance_checklist_summary=(
-                "ComplianceLint Compliance Checklist v0.1 requires: (1) conformity assessment "
+                "ComplianceLint Compliance Checklist v0.2 requires: (1) conformity assessment "
                 "documentation per the applicable procedure (Annex VI, Annex VII, or the "
                 "procedure of the Union harmonisation legislation listed in Section A of Annex "
                 "I), (2) change management procedures for tracking substantial modifications "

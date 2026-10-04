@@ -179,7 +179,7 @@ class Art04Module(BaseArticleModule):
                 ],
             },
             compliance_checklist_summary=(
-                "ComplianceLint Compliance Checklist v0.1 looks for evidence of the measures "
+                "ComplianceLint Compliance Checklist v0.2 looks for evidence of the measures "
                 "taken under Art. 4(1), for example: (1) an AI usage policy, (2) staff training "
                 "documentation or a competency framework, (3) evidence that the measures take "
                 "the context of use and the persons concerned into account. Art. 4(1) does not "

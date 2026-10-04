@@ -138,8 +138,10 @@ class Art06Module(BaseArticleModule):
                 ),
                 remediation=(
                     f"Review whether this system actually falls under Annex III ({categories_str}). "
-                    "Check whether the Art. 6(3) exception applies. If no exception, the system "
-                    "is HIGH-RISK and must comply with Chapter 2 (Arts. 8-15)."
+                    "Check whether the Art. 6(3) exception applies (an Annex III system that "
+                    "performs profiling of natural persons is always high-risk). If no exception "
+                    "applies, the system is HIGH-RISK and must comply with the requirements of "
+                    "Chapter III, Section 2 (Arts. 8-15)."
                 ),
                 gap_type=GapType.PROCESS,
             ))
@@ -274,7 +276,7 @@ class Art06Module(BaseArticleModule):
                 "Annex I": "List of EU harmonisation legislation (product safety)",
                 "Annex III": "List of high-risk AI use-case categories",
                 "Art. 7": "Amendments to Annex III (Commission can update the list)",
-                "Art. 8-15": "Requirements for high-risk AI systems (Chapter 2)",
+                "Art. 8-15": "Requirements for high-risk AI systems (Chapter III, Section 2)",
                 "Art. 43": "Conformity assessment procedures",
                 "Art. 52": "Transparency obligations for certain AI systems",
             },
@@ -303,7 +305,7 @@ class Art06Module(BaseArticleModule):
                 ],
             },
             compliance_checklist_summary=(
-                "ComplianceLint Compliance Checklist v0.1 provides: (1) a three-step classification "
+                "ComplianceLint Compliance Checklist v0.2 provides: (1) a three-step classification "
                 "decision tree (Annex I check -> Annex III check -> Art. 6(3) exception), "
                 "(2) keyword and library detection patterns for all 8 Annex III categories, "
                 "(3) Annex I product category indicators, (4) Art. 6(3) exception criteria "
@@ -399,13 +401,22 @@ class Art06Module(BaseArticleModule):
             actions.append(ActionItem(
                 priority="HIGH",
                 article="Arts. 8-15",
-                action="Plan Chapter 2 compliance if confirmed high-risk",
+                action="Plan Chapter III, Section 2 compliance if confirmed high-risk",
                 details=(
-                    "If the system is confirmed high-risk, it must comply with all Chapter 2 "
-                    "requirements: Art. 8 (compliance), Art. 9 (risk management), Art. 10 "
-                    "(data governance), Art. 11 (technical documentation), Art. 12 (record-keeping), "
-                    "Art. 13 (transparency), Art. 14 (human oversight), Art. 15 (accuracy/robustness). "
-                    "Start with risk management (Art. 9) and record-keeping (Art. 12)."
+                    "For a high-risk AI system to which the Section B rule in Art. 2(2) does "
+                    "not apply, the requirements of Chapter III, Section 2 are Arts. 8 "
+                    "(compliance), 9 (risk management), 10 (data governance), 11 (technical "
+                    "documentation), 12 (record-keeping), 13 (transparency), 14 (human "
+                    "oversight) and 15 (accuracy, robustness and cybersecurity). For a "
+                    "high-risk AI system under Art. 6(1) related to a product covered by "
+                    "Section A of Annex I, specific requirements in Arts. 9-15 may be limited "
+                    "only where and to the extent permitted by Art. 2(13). For an AI system "
+                    "classified as high-risk under Art. 6(1) and related to a product covered "
+                    "by Section B of Annex I, Art. 2(2) provides that only Art. 6(1), Art. 60a "
+                    "and Arts. 102-112 apply directly; Arts. 57-59 apply only insofar as the AI "
+                    "Act high-risk requirements have been integrated into the relevant Union "
+                    "harmonisation legislation. For systems to which Chapter III, Section 2 "
+                    "applies, start with risk management (Art. 9) and record-keeping (Art. 12)."
                 ),
                 effort="Significant — plan for 3-6 months of compliance work",
                 action_type="human_judgment_required",
