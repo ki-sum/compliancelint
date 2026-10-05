@@ -55,12 +55,8 @@ class Art14Module(BaseArticleModule):
         answers = ctx.get_article_answers("art14")
 
         has_oversight = answers.get("has_human_oversight")
-        if has_oversight is None:
-            has_oversight = answers.get("has_hitl")  # alias
         oversight_evidence = answers.get("oversight_evidence") or []
         has_override = answers.get("has_override_mechanism")
-        if has_override is None:
-            has_override = answers.get("has_kill_switch")  # alias
         override_evidence = answers.get("override_evidence") or []
 
         ov_evidence = oversight_evidence or None

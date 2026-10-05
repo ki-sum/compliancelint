@@ -53,12 +53,8 @@ class Art13Module(BaseArticleModule):
         answers = ctx.get_article_answers("art13")
 
         has_explainability = answers.get("has_explainability")
-        if has_explainability is None:
-            has_explainability = answers.get("has_interpretability")  # alias
         explainability_evidence = answers.get("explainability_evidence") or []
         has_transparency_info = answers.get("has_transparency_info")
-        if has_transparency_info is None:
-            has_transparency_info = answers.get("has_instructions_for_use")  # alias
         transparency_paths = answers.get("transparency_paths") or []
 
         expl_evidence = explainability_evidence or None

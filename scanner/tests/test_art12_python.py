@@ -338,21 +338,3 @@ class TestArt12Structural:
 
 
 # ── Alias tests ──
-
-class TestArt12Aliases:
-
-    def test_has_retention_policy_alias(self, art12_module, tmp_path):
-        """has_retention_policy (alias for has_retention_config) should work."""
-        ctx = _ctx_with("art12", {
-            "has_logging": True,
-            "logging_description": "test",
-            "logging_evidence": [],
-            "has_retention_policy": False,
-            "retention_days": None,
-            "retention_evidence": "",
-        })
-        BaseArticleModule.set_context(ctx)
-        result = art12_module.scan(str(tmp_path))
-        obl = _find(result, "ART19-OBL-1b")
-        assert len(obl) > 0
-        assert obl[0].level == ComplianceLevel.NON_COMPLIANT

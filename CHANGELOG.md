@@ -6,6 +6,24 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [1.2.0] — unreleased
 
+### Fixed — compliance_answers template now covers every field the article modules read
+- 51 answer fields that article modules read were missing from the template returned by
+  `cl_analyze_project`, so the AI was never asked for them and the obligations they decide were
+  always `unable_to_determine` — e.g. Art. 16(d)-(l) (documentation kept, log retention, conformity
+  assessment, EU declaration, CE marking, registration, corrective actions, conformity on request,
+  accessibility), Art. 53(1)(c)-(d) (copyright policy, training-content summary), Art. 55(1)(c)-(d),
+  Art. 22(3), Art. 25(4), Art. 26(6) and (11), Art. 6(4). They are now in the template, each with a
+  description in `compliance_answers_field_descriptions` (verified against the consolidated text).
+- New number fields: `retention_days` (Art. 12 / 19 / 26) and `art51.training_compute_flops`. Numeric
+  strings such as `"180"`, `"180 days"`, `"1e25"` or `"3.5 x 10^26"` are converted; other values are
+  reported as format errors.
+- **ART10-OBL-6** (Art. 10(6)) is `not_applicable` when the new field `art10.uses_model_training` is
+  `true` (the paragraph covers systems developed without training techniques).
+- Removed: the 15 legacy answer-field aliases (e.g. `art15.has_cybersecurity` was read as
+  `has_fallback_behavior`, a different Art. 15 duty), and the validation gate's fuzzy renaming of
+  unknown field names (it could turn a near-miss name into another obligation's answer). Unknown
+  fields are now kept unread and listed as `unknown_field` in the coercion log.
+
 ### Added — Regulation (EU) 2026/1744 (Digital Omnibus), Art. 5
 - **ART05-PRO-1ba** (Art. 5(1)(ba), non-consensual intimate material) and **ART05-PRO-1bb**
   (Art. 5(1)(bb), child sexual abuse material). Both apply from **2026-12-02** (Art. 113, third

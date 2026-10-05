@@ -391,25 +391,6 @@ class TestClScanArticle12:
                    "[CONDITIONAL]" in findings[0].get("description", ""), \
                 f"{obl_id} should be informational/conditional"
 
-    def test_retention_policy_alias_works(self, project_dir):
-        """AI may use has_retention_policy instead of has_retention_config."""
-        ctx = ProjectContext.from_json(json.dumps({
-            "art12": {
-                "has_logging": True, "logging_description": "test",
-                "logging_evidence": [],
-                "has_retention_policy": False,
-                "retention_days": None,
-                "retention_evidence": "",
-            }
-        }))
-        result_json = _scan_single_article(12, project_dir, context=ctx)
-        result = json.loads(result_json)
-        retention = [f for f in result["findings"] if f["obligation_id"] == "ART19-OBL-1b"]
-        assert len(retention) > 0
-        assert retention[0]["level"] == "non_compliant", (
-            f"has_retention_policy=False should give non_compliant, got {retention[0]['level']}"
-        )
-
     def test_string_coercion_through_server(self, project_dir):
         """String "true" in JSON should be coerced to True."""
         ctx = ProjectContext.from_json(
@@ -580,21 +561,6 @@ class TestClScanArticle9:
         assert len(obl9) > 0
         assert obl9[0]["level"] == "not_applicable"
 
-    def test_alias_has_testing_works(self, project_dir):
-        """AI may use has_testing instead of has_testing_infrastructure."""
-        ctx = ProjectContext.from_json(json.dumps({
-            "art9": {
-                "has_risk_docs": True,
-                "has_testing": True,
-                "has_risk_code_patterns": True,
-                "has_defined_metrics": True,
-            }
-        }))
-        result_json = _scan_single_article(9, project_dir, context=ctx)
-        result = json.loads(result_json)
-        obl6 = [f for f in result["findings"] if f["obligation_id"] == "ART09-OBL-6"]
-        assert obl6[0]["level"] == "partial"
-
     def test_no_context_returns_error(self, project_dir):
         """Missing project_context returns error."""
         result_json = _scan_single_article(9, project_dir, context=None)
@@ -668,28 +634,6 @@ class TestClScanArticle9:
         result = json.loads(result_json)
         obl = [f for f in result["findings"] if f["obligation_id"] == "ART09-OBL-2c"]
         assert obl[0]["level"] == "unable_to_determine"
-
-    def test_alias_has_risk_code_works(self, project_dir):
-        """AI may use has_risk_code instead of has_risk_code_patterns."""
-        ctx = ProjectContext.from_json(json.dumps({
-            "art9": {"has_risk_docs": True, "has_risk_code": True,
-                     "has_testing_infrastructure": True, "has_defined_metrics": True},
-        }))
-        result_json = _scan_single_article(9, project_dir, context=ctx)
-        result = json.loads(result_json)
-        obl = [f for f in result["findings"] if f["obligation_id"] == "ART09-OBL-2d"]
-        assert obl[0]["level"] == "partial"
-
-    def test_alias_has_metrics_works(self, project_dir):
-        """AI may use has_metrics instead of has_defined_metrics."""
-        ctx = ProjectContext.from_json(json.dumps({
-            "art9": {"has_risk_docs": True, "has_risk_code_patterns": True,
-                     "has_testing_infrastructure": True, "has_metrics": True},
-        }))
-        result_json = _scan_single_article(9, project_dir, context=ctx)
-        result = json.loads(result_json)
-        obl = [f for f in result["findings"] if f["obligation_id"] == "ART09-OBL-8b"]
-        assert obl[0]["level"] == "partial"
 
     def test_string_coercion_through_server(self, project_dir):
         """String "true" should be coerced to True."""
@@ -876,15 +820,6 @@ class TestClScanArticle10:
             findings = [f for f in result["findings"] if f["obligation_id"] == obl_id]
             assert findings[0]["level"] == "unable_to_determine"
 
-    def test_alias_has_bias_detection(self, project_dir):
-        ctx = ProjectContext.from_json(json.dumps({
-            "art10": {"has_data_governance_doc": True, "has_bias_detection": True}
-        }))
-        result_json = _scan_single_article(10, project_dir, context=ctx)
-        result = json.loads(result_json)
-        obl = [f for f in result["findings"] if f["obligation_id"] == "ART10-OBL-2f"]
-        assert obl[0]["level"] == "partial"
-
     def test_shorthand_context_works(self, project_dir):
         ctx = ProjectContext.from_json(json.dumps({
             "art10": {"has_data_governance_doc": True, "data_doc_paths": ["d.md"],
@@ -1057,15 +992,6 @@ class TestClScanArticle11:
         obl1c = [f for f in result["findings"] if f["obligation_id"] == "ART11-OBL-1c"]
         assert obl1c[0]["level"] == "unable_to_determine"
 
-    def test_alias_has_documentation(self, project_dir):
-        ctx = ProjectContext.from_json(json.dumps({
-            "art11": {"has_documentation": True, "doc_paths": ["README.md"]}
-        }))
-        result_json = _scan_single_article(11, project_dir, context=ctx)
-        result = json.loads(result_json)
-        obl1 = [f for f in result["findings"] if f["obligation_id"] == "ART11-OBL-1"]
-        assert obl1[0]["level"] == "partial"
-
     def test_conditional_obl2_informational(self, project_dir):
         """OBL-2 without is_annex_i_product → CONDITIONAL."""
         ctx = ProjectContext.from_json(json.dumps({
@@ -1182,24 +1108,6 @@ class TestClScanArticle13:
         obl1 = [f for f in result["findings"] if f["obligation_id"] == "ART13-OBL-1"]
         assert obl1[0]["level"] == "partial"
 
-    def test_alias_has_interpretability(self, project_dir):
-        ctx = ProjectContext.from_json(json.dumps({
-            "art13": {"has_interpretability": True, "has_transparency_info": True}
-        }))
-        result_json = _scan_single_article(13, project_dir, context=ctx)
-        result = json.loads(result_json)
-        obl1 = [f for f in result["findings"] if f["obligation_id"] == "ART13-OBL-1"]
-        assert obl1[0]["level"] == "partial"
-
-    def test_alias_has_instructions_for_use(self, project_dir):
-        ctx = ProjectContext.from_json(json.dumps({
-            "art13": {"has_explainability": True, "has_instructions_for_use": True}
-        }))
-        result_json = _scan_single_article(13, project_dir, context=ctx)
-        result = json.loads(result_json)
-        obl2 = [f for f in result["findings"] if f["obligation_id"] == "ART13-OBL-2"]
-        assert obl2[0]["level"] == "partial"
-
     def test_obl3_always_utd(self, project_dir):
         ctx = ProjectContext.from_json(json.dumps({
             "art13": {"has_explainability": True, "has_transparency_info": True}
@@ -1303,24 +1211,6 @@ class TestClScanArticle14:
         result = json.loads(result_json)
         obl1 = [f for f in result["findings"] if f["obligation_id"] == "ART14-OBL-1"]
         assert obl1[0]["level"] == "partial"
-
-    def test_alias_has_hitl(self, project_dir):
-        ctx = ProjectContext.from_json(json.dumps({
-            "art14": {"has_hitl": True, "has_override_mechanism": True}
-        }))
-        result_json = _scan_single_article(14, project_dir, context=ctx)
-        result = json.loads(result_json)
-        obl1 = [f for f in result["findings"] if f["obligation_id"] == "ART14-OBL-1"]
-        assert obl1[0]["level"] == "partial"
-
-    def test_alias_has_kill_switch(self, project_dir):
-        ctx = ProjectContext.from_json(json.dumps({
-            "art14": {"has_human_oversight": True, "has_kill_switch": True}
-        }))
-        result_json = _scan_single_article(14, project_dir, context=ctx)
-        result = json.loads(result_json)
-        obl3 = [f for f in result["findings"] if f["obligation_id"] == "ART14-OBL-3"]
-        assert obl3[0]["level"] == "partial"
 
     def test_obl2_always_utd(self, project_dir):
         ctx = ProjectContext.from_json(json.dumps({
@@ -1458,16 +1348,6 @@ class TestClScanArticle15:
         ctx = ProjectContext.from_json(
             '{"art15": {"has_accuracy_testing": "true", "has_robustness_testing": "false", "has_fallback_behavior": "false"}}'
         )
-        result_json = _scan_single_article(15, project_dir, context=ctx)
-        result = json.loads(result_json)
-        obl1 = [f for f in result["findings"] if f["obligation_id"] == "ART15-OBL-1"]
-        assert obl1[0]["level"] == "partial"
-
-    def test_alias_has_accuracy_metrics(self, project_dir):
-        ctx = ProjectContext.from_json(json.dumps({
-            "art15": {"has_accuracy_metrics": True, "has_robustness_testing": True,
-                      "has_fallback_behavior": True}
-        }))
         result_json = _scan_single_article(15, project_dir, context=ctx)
         result = json.loads(result_json)
         obl1 = [f for f in result["findings"] if f["obligation_id"] == "ART15-OBL-1"]

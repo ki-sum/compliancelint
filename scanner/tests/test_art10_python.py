@@ -259,29 +259,3 @@ class TestArt10Structural:
 
 
 # ── Alias tests ──
-
-class TestArt10Aliases:
-
-    def test_has_bias_detection_alias(self, art10_module, tmp_path):
-        """has_bias_detection (alias for has_bias_mitigation) should work."""
-        ctx = _ctx_with("art10", {
-            "has_data_governance_doc": True,
-            "has_bias_detection": True,
-        })
-        BaseArticleModule.set_context(ctx)
-        result = art10_module.scan(str(tmp_path))
-        obl = _find(result, "ART10-OBL-2f")
-        assert obl[0].level == ComplianceLevel.PARTIAL
-
-    def test_has_data_versioning_alias(self, art10_module, tmp_path):
-        """has_data_versioning (alias for has_data_lineage) should work."""
-        ctx = _ctx_with("art10", {
-            "has_data_governance_doc": True,
-            "has_bias_mitigation": True,
-            "has_data_versioning": True,
-        })
-        BaseArticleModule.set_context(ctx)
-        result = art10_module.scan(str(tmp_path))
-        # has_data_lineage is not directly mapped to an obligation finding,
-        # but should be stored in details
-        assert result.details.get("has_data_lineage") is True

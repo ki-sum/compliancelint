@@ -76,7 +76,7 @@ def _build_minimal_project_context() -> str:
         don't care about compliance result, just that scan completes)
       - Add `ai_model` for assessor attribution
     """
-    from core.context import _build_answers_template
+    from core.context import _BOOL_FIELDS, _build_answers_template
 
     template = _build_answers_template()
     answers = json.loads(json.dumps(template))  # deep copy
@@ -99,10 +99,9 @@ def _build_minimal_project_context() -> str:
         if not isinstance(art_data, dict):
             continue
         for field_key, field_value in list(art_data.items()):
-            if field_value is None:
-                # Distinguish bool fields (set to False) from list fields
-                # (leave [] which template already has). We only see
-                # `None` for bool fields per template construction.
+            # Only bool fields get False. Since the template-gap task (2026-10-04) number fields are also
+            # None in the template (e.g. retention_days), so "None means bool" no longer holds.
+            if field_value is None and field_key in _BOOL_FIELDS.get(art_key, []):
                 art_data[field_key] = False
 
     answers["ai_model"] = "test-fixture/opus47"

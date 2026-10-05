@@ -169,6 +169,33 @@ _BOOL_FIELDS: dict = {
 # string (Art 5) or the canonical answer with the alias (self-audit A1,
 # 2026-10-02). tests/test_validation_gate_aux_fields.py keeps this in sync
 # with every `answers.get("...")` in modules/.
+# Number answers (int or float; null when unknown) — template-gap task 2026-10-04. Coerced from numeric
+# strings by the validation gate; anything else is a validation error (never renamed or turned into a bool).
+_NUMBER_FIELDS: dict = {}
+
+_NUMBER_RE = re.compile(
+    r"^\s*(?:(?P<mant>[-+]?\d+(?:\.\d+)?)\s*(?:x|×|\*)\s*)?10\s*\^\s*(?P<exp>[-+]?\d+)\s*[a-zA-Z ]*$"
+    r"|^\s*(?P<plain>[-+]?(?:\d+(?:\.\d+)?|\.\d+)(?:[eE][-+]?\d+)?)\s*[a-zA-Z ]*$"
+)
+
+
+def _parse_number(val):
+    """A number answer: int / float as is; a string such as "180", "180 days", "1e25", "1.5e25 FLOPs",
+    "10^26" or "3.5 x 10^26" → int / float; anything else (bool, text, list, NaN, inf) → None."""
+    if isinstance(val, bool):
+        return None
+    if isinstance(val, (int, float)):
+        return val if val == val and val not in (float("inf"), float("-inf")) else None
+    if not isinstance(val, str):
+        return None
+    m = _NUMBER_RE.match(val)
+    if not m:
+        return None
+    if m.group("plain") is not None:
+        text = m.group("plain")
+        return int(text) if re.fullmatch(r"[-+]?\d+", text) else float(text)
+    return float(m.group("mant") or 1) * 10.0 ** int(m.group("exp"))
+
 _AUX_FIELDS: dict = {
     # module.py reads `<has_ field minus "has_">_evidence` next to each boolean
     "art5":  ["subliminal_manipulation_evidence", "exploitation_of_vulnerabilities_evidence",
@@ -176,11 +203,9 @@ _AUX_FIELDS: dict = {
               "facial_recognition_scraping_evidence", "emotion_recognition_workplace_evidence",
               "biometric_categorization_evidence", "real_time_biometric_id_evidence",
               "ncii_generation_evidence", "csam_generation_evidence"],
-    "art9":  ["has_risk_code", "has_metrics", "has_testing"],
-    "art10": ["has_bias_detection"],
-    "art12": ["has_retention_policy"],
-    "art15": ["has_accuracy_metrics"],
-    "art19": ["has_retention_policy"],
+    # The legacy aliases (art9 has_risk_code / has_metrics / has_testing, art10 has_bias_detection,
+    # art12 / art19 has_retention_policy, art15 has_accuracy_metrics, + 8 unregistered ones) were removed
+    # 2026-10-04 (template-gap T1): modules read only template fields; free-text slots are added below.
 }
 
 
@@ -265,6 +290,67 @@ for _has in list(_FIELD_DESCRIPTIONS["art5"]):
         f"Free text: what you found (files, functions, configuration, documentation) that supports your "
         f"answer to {_has}. Leave empty if there is nothing to report."
     )
+
+# Template-gap task (2026-10-04): answer keys the article modules read that were missing from the template —
+# the AI was never asked for them, so the obligations they decide were always UNABLE_TO_DETERMINE.
+# Descriptions (o3-verified) live in data/answer_field_descriptions.json; tests/test_template_gap.py also
+# fails when a module reads a key that is not in the template.
+_TEMPLATE_GAP_FIELDS: dict = {
+    "bool": {
+        "art6": ["has_risk_classification_doc"], "art10": ["uses_model_training"],
+        "art16": ["has_documentation_kept", "has_log_retention", "has_conformity_assessment", "has_eu_declaration",
+                  "has_ce_marking", "has_registration", "has_corrective_actions_process", "has_conformity_evidence",
+                  "has_accessibility_compliance"],
+        "art22": ["has_mandate_authority_contact"],
+        "art25": ["has_third_party_written_agreement", "has_open_source_exception"],
+        "art26": ["has_log_retention", "has_affected_persons_notification"],
+        "art51": ["has_systemic_risk_assessment", "has_commission_designation"],
+        "art53": ["has_copyright_policy", "has_training_data_summary", "training_data_summary_public",
+                  "is_open_source_gpai", "has_systemic_risk"],
+        "art54": ["is_open_source_gpai", "has_systemic_risk"],
+        "art55": ["has_incident_tracking", "has_cybersecurity_protection"],
+    },
+    "list": {
+        "art53": ["copyright_policy_evidence", "training_data_evidence"], "art54": ["mandate_evidence"],
+        "art55": ["incident_evidence", "cybersecurity_evidence"], "art86": ["explanation_evidence"],
+    },
+    "number": {"art12": ["retention_days"], "art19": ["retention_days"], "art26": ["retention_days"],
+               "art51": ["training_compute_flops"]},
+    "text": {
+        "art4": ["literacy_description"], "art6": ["annex_i_product_type", "reasoning"],
+        "art12": ["logging_description", "retention_evidence"], "art18": ["retention_policy_evidence"],
+        "art19": ["retention_evidence"], "art26": ["retention_evidence"], "art51": ["reasoning"],
+        "art52": ["notification_evidence"], "art91": ["readiness_evidence"], "art92": ["cooperation_evidence"],
+        "art111": ["transition_evidence", "change_tracking_evidence", "gpai_timeline_evidence"],
+    },
+}
+for _kind, _registry in (("bool", _BOOL_FIELDS), ("list", _LIST_FIELDS), ("number", _NUMBER_FIELDS),
+                         ("text", _AUX_FIELDS)):
+    for _art, _keys in _TEMPLATE_GAP_FIELDS[_kind].items():
+        _registry.setdefault(_art, [])
+        _registry[_art].extend(k for k in _keys if k not in _registry[_art])
+
+with open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data",
+                       "answer_field_descriptions.json"), encoding="utf-8") as _f:
+    for _art, _descs in json.load(_f).items():
+        if not _art.startswith("_"):
+            _FIELD_DESCRIPTIONS.setdefault(_art, {}).update(_descs)
+
+
+def _fill_application_date_placeholders() -> None:
+    """Art. 113 dates are never typed into texts (template check 9): the data file holds placeholders."""
+    from core.application_dates import chapter_iii_dates, long_date
+    dates = chapter_iii_dates()
+    values = {"{chapter_iii_annex_iii}": long_date(dates["annex_iii"]),
+              "{chapter_iii_annex_i}": long_date(dates["annex_i"])}
+    for _descs in _FIELD_DESCRIPTIONS.values():
+        for _key, _text in list(_descs.items()):
+            for token, value in values.items():
+                _text = _text.replace(token, value)
+            _descs[_key] = _text
+
+
+_fill_application_date_placeholders()
 
 
 @dataclass
@@ -505,6 +591,12 @@ class ProjectContext:
                 elif isinstance(val, int) and not isinstance(val, bool):
                     result[field] = bool(val)
 
+        # Number fields: a numeric string → int / float; any other non-number → None (unknown), so a module
+        # comparing e.g. retention_days >= 180 never meets a string (the validation gate reports the bad value).
+        for field in _NUMBER_FIELDS.get(article_key, []):
+            if field in result:
+                result[field] = _parse_number(result[field])
+
         return result
 
 
@@ -527,9 +619,12 @@ def _build_answers_template() -> dict:
             fields[field_name] = None
         for field_name in _LIST_FIELDS.get(art_key, []):
             fields[field_name] = []
-        # Free-text evidence slots the module reads next to each answer (not legacy aliases)
+        for field_name in _NUMBER_FIELDS.get(art_key, []):
+            fields[field_name] = None
+        # Free-text slots the module reads (evidence, reasoning, descriptions) — the ones with a description;
+        # legacy aliases have none and stay out of the template.
         for field_name in _AUX_FIELDS.get(art_key, []):
-            if field_name.endswith("_evidence") and field_name in _FIELD_DESCRIPTIONS.get(art_key, {}):
+            if field_name in _FIELD_DESCRIPTIONS.get(art_key, {}):
                 fields[field_name] = ""
         template[art_key] = fields
 

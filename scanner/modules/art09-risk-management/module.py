@@ -89,16 +89,10 @@ class Art09Module(BaseArticleModule):
         has_risk_docs = answers.get("has_risk_docs")
         risk_doc_paths = answers.get("risk_doc_paths") or []
         has_risk_code = answers.get("has_risk_code_patterns")
-        if has_risk_code is None:
-            has_risk_code = answers.get("has_risk_code")  # alias
         risk_code_evidence = answers.get("risk_code_evidence") or []
         has_testing = answers.get("has_testing_infrastructure")
-        if has_testing is None:
-            has_testing = answers.get("has_testing")  # alias
         testing_evidence = answers.get("testing_evidence") or []
         has_defined_metrics = answers.get("has_defined_metrics")
-        if has_defined_metrics is None:
-            has_defined_metrics = answers.get("has_metrics")  # alias
         metrics_evidence = answers.get("metrics_evidence") or []
 
         doc_evidence = risk_doc_paths or None

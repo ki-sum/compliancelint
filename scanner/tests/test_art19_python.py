@@ -297,45 +297,6 @@ class TestArt19Structural:
 
 # ── Alias tests ──
 
-class TestArt19Aliases:
-
-    def test_has_retention_policy_alias(self, art19_module, tmp_path):
-        """has_retention_policy (alias for has_retention_config) should work."""
-        ctx = _ctx_with("art19", {
-            "has_log_retention": True,
-            "has_retention_policy": True,
-            "retention_days": 365,
-        })
-        BaseArticleModule.set_context(ctx)
-        result = art19_module.scan(str(tmp_path))
-        obl = _find(result, "ART19-OBL-1b")
-        assert len(obl) > 0
-        assert obl[0].level == ComplianceLevel.PARTIAL
-
-    def test_has_retention_policy_alias_false(self, art19_module, tmp_path):
-        """has_retention_policy=False (alias) → ART19-OBL-1b NON_COMPLIANT."""
-        ctx = _ctx_with("art19", {
-            "has_log_retention": True,
-            "has_retention_policy": False,
-        })
-        BaseArticleModule.set_context(ctx)
-        result = art19_module.scan(str(tmp_path))
-        obl = _find(result, "ART19-OBL-1b")
-        assert len(obl) > 0
-        assert obl[0].level == ComplianceLevel.NON_COMPLIANT
-
-    def test_has_log_retention_fallback_to_retention_config(self, art19_module, tmp_path):
-        """has_log_retention not set but has_retention_config=True → ART19-OBL-1 PARTIAL."""
-        ctx = _ctx_with("art19", {
-            "has_retention_config": True,
-            "retention_days": 365,
-        })
-        BaseArticleModule.set_context(ctx)
-        result = art19_module.scan(str(tmp_path))
-        obl = _find(result, "ART19-OBL-1")
-        assert len(obl) > 0
-        assert obl[0].level == ComplianceLevel.PARTIAL
-
 
 # ── High-risk gate test ──
 

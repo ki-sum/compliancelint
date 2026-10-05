@@ -50,6 +50,16 @@ class TestArt6RiskClassification:
         obl = [f for f in result.findings if f.obligation_id in ("ART06-CLS-1", "ART06-CLS-2")]
         assert all(f.level == ComplianceLevel.UNABLE_TO_DETERMINE for f in obl)
 
+    def test_empty_annex_i_product_type_is_no_indicator(self, art06_module, tmp_path):
+        """Template-gap task (2026-10-04): annex_i_product_type is a text field whose template default is ""
+        (the AI leaves it empty when there is no Annex I product). Empty must not count as a detected product."""
+        ctx = _ctx_with("art6", {"annex_iii_categories": [], "annex_i_product_type": "", "reasoning": ""})
+        BaseArticleModule.set_context(ctx)
+        result = art06_module.scan(str(tmp_path))
+        cls1 = [f for f in result.findings if f.obligation_id == "ART06-CLS-1"]
+        assert cls1 and all(f.level == ComplianceLevel.UNABLE_TO_DETERMINE for f in cls1)
+        assert not any("Potential Annex I product detected" in f.description for f in result.findings)
+
     # ── OBL-4: Provider documentation (uses _finding_from_answer) ──
 
     def test_obl4_has_doc_true_compliant(self, art06_module, tmp_path):

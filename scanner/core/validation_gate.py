@@ -19,7 +19,7 @@ Design principles:
 import difflib
 from typing import Any
 
-from core.context import _AUX_FIELDS, _BOOL_FIELDS, _LIST_FIELDS
+from core.context import _AUX_FIELDS, _BOOL_FIELDS, _LIST_FIELDS, _NUMBER_FIELDS, _parse_number
 
 
 # ── Article scope classification ──
@@ -408,29 +408,42 @@ def _coerce_article_fields(article_key: str, fields: dict) -> tuple[dict, list[d
                 "original_type": type(val).__name__,
             })
 
-    # Fuzzy match field names within the article. Keys the module reads under
-    # their own name (_AUX_FIELDS) are not typos; a rename never overwrites a
-    # field the AI already supplied.
-    known_fields = set(_BOOL_FIELDS.get(article_key, [])) | set(_LIST_FIELDS.get(article_key, []))
-    unknown_fields = set(result.keys()) - known_fields - set(_AUX_FIELDS.get(article_key, []))
-    for uf in sorted(unknown_fields):
-        matches = difflib.get_close_matches(uf, known_fields, n=1, cutoff=0.7)
-        if matches and matches[0] in result:
-            log.append({
-                "action": "field_rename_skipped",
-                "key": f"{article_key}.{uf}",
-                "reason": f"'{uf}' resembles '{matches[0]}', which is already set — kept both",
-            })
-        elif matches:
-            result[matches[0]] = result.pop(uf)
-            log.append({
-                "action": "field_renamed",
-                "key": f"{article_key}.{uf}",
-                "corrected": f"{article_key}.{matches[0]}",
-                "reason": f"Fuzzy matched '{uf}' to '{matches[0]}'",
-            })
+    # Coerce number fields: a numeric string → int / float; anything else is left for validation to report
+    # (never turned into a bool or renamed). Template-gap task 2026-10-04.
+    for field_name in _NUMBER_FIELDS.get(article_key, []):
+        val = result.get(field_name)
+        if isinstance(val, str):
+            number = _coerce_string_to_number(val)
+            if number is not None:
+                result[field_name] = number
+                log.append({
+                    "action": "number_coerced",
+                    "key": f"{article_key}.{field_name}",
+                    "original": val,
+                    "corrected": number,
+                })
+
+    # Unknown field names are kept as sent and logged — never renamed (template-gap T5, founder 2026-10-04).
+    # The former fuzzy rename (difflib, cutoff 0.7) turned near-miss names into another obligation's answer
+    # (self-audit A1: has_risk_code → has_risk_docs). Every key a module reads is in the template, so an
+    # unknown key is a mistake the AI should fix; the module never reads it.
+    known_fields = (set(_BOOL_FIELDS.get(article_key, [])) | set(_LIST_FIELDS.get(article_key, []))
+                    | set(_NUMBER_FIELDS.get(article_key, [])) | set(_AUX_FIELDS.get(article_key, [])))
+    for uf in sorted(set(result.keys()) - known_fields):
+        log.append({
+            "action": "unknown_field",
+            "key": f"{article_key}.{uf}",
+            "reason": f"'{uf}' is not a field of {article_key} in the answers template — ignored; use the "
+                      f"template's field names",
+        })
 
     return result, log
+
+
+def _coerce_string_to_number(val: str) -> int | float | None:
+    """The scanner's one number parser (core/context.py _parse_number): "180", "180 days", "1e25",
+    "10^26", "3.5 x 10^26" → number; None when the string is not a number."""
+    return _parse_number(val)
 
 
 # Sentinel for "could not coerce"
@@ -544,6 +557,18 @@ def _validate_article_fields(article_key: str, fields: dict) -> tuple[list[Valid
                 fix=f"Set '{article_key}.{field_name}' to true, false, or null (not a string description)",
             ))
 
+    # Check number fields (optional; null = unknown)
+    for field_name in _NUMBER_FIELDS.get(article_key, []):
+        val = fields.get(field_name)
+        if val is not None and (isinstance(val, bool) or not isinstance(val, (int, float))):
+            errors.append(ValidationError(
+                article=article_key,
+                field=field_name,
+                expected="number | null",
+                received=f"{type(val).__name__}: {str(val)[:80]}",
+                fix=f"Set '{article_key}.{field_name}' to a number (e.g. 180) or null",
+            ))
+
     # Check list fields
     for field_name in _LIST_FIELDS.get(article_key, []):
         if field_name not in fields:
@@ -630,6 +655,8 @@ def _build_article_schema_hint(article_key: str) -> dict:
         hint[field_name] = "true | false | null"
     for field_name in _LIST_FIELDS.get(article_key, []):
         hint[field_name] = '["evidence text", ...]'
+    for field_name in _NUMBER_FIELDS.get(article_key, []):
+        hint[field_name] = "number | null"
     return hint
 
 

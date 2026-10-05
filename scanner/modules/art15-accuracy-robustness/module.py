@@ -56,16 +56,10 @@ class Art15Module(BaseArticleModule):
         answers = ctx.get_article_answers("art15")
 
         has_accuracy = answers.get("has_accuracy_testing")
-        if has_accuracy is None:
-            has_accuracy = answers.get("has_accuracy_metrics")  # alias
         accuracy_evidence = answers.get("accuracy_evidence") or []
         has_robustness = answers.get("has_robustness_testing")
-        if has_robustness is None:
-            has_robustness = answers.get("has_error_handling")  # alias
         robustness_evidence = answers.get("robustness_evidence") or []
         has_fallback = answers.get("has_fallback_behavior")
-        if has_fallback is None:
-            has_fallback = answers.get("has_cybersecurity")  # alias
 
         acc_ev = accuracy_evidence or None
         rob_ev = robustness_evidence or None

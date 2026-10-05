@@ -72,8 +72,6 @@ class Art12Module(BaseArticleModule):
         logging_evidence = answers.get("logging_evidence", [])
         # Accept both "has_retention_config" and "has_retention_policy" (AI may use either)
         has_retention_config = answers.get("has_retention_config")  # bool | None
-        if has_retention_config is None:
-            has_retention_config = answers.get("has_retention_policy")
         retention_days = answers.get("retention_days")             # int | None
         retention_evidence = answers.get("retention_evidence", "")
 

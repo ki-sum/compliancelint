@@ -594,6 +594,11 @@ _WIZARD_TO_SCANNER_FIELDS: dict = {
     "isOpenSource": [
         ("_scope", "is_open_source"),
     ],
+    # Template-gap task (2026-10-04): ART10-OBL-6 (Art. 10(6)) applies only to systems developed without
+    # training techniques; skipped when art10.uses_model_training is true.
+    "usesTrainingData": [
+        ("art10", "uses_model_training"),
+    ],
     "isMilitaryDefense": [
         ("_scope", "is_military_defense"),
     ],

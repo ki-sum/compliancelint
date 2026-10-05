@@ -374,6 +374,8 @@
       "modality": "shall",
       "addressee": "provider",
       "scope_limitation": "Only applies to systems not using training techniques (rule-based, expert systems)",
+      "context_skip_field": "uses_model_training",
+      "context_skip_value": true,
       "decomposed_atoms": [
         {
           "atom": "non_training_systems_test_data_only",

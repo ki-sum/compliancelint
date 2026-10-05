@@ -99,8 +99,6 @@ class Art19Module(BaseArticleModule):
             has_log_retention = answers.get("has_retention_config")
 
         has_retention_config = answers.get("has_retention_config")
-        if has_retention_config is None:
-            has_retention_config = answers.get("has_retention_policy")  # alias
         retention_days = answers.get("retention_days")
         retention_evidence = answers.get("retention_evidence", "")
 

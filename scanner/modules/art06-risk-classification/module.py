@@ -70,7 +70,7 @@ class Art06Module(BaseArticleModule):
 
         answers = ctx.get_article_answers("art6")
 
-        annex_i_product_type = answers.get("annex_i_product_type")       # None | str
+        annex_i_product_type = answers.get("annex_i_product_type") or None  # empty text = no product
         annex_iii_categories = answers.get("annex_iii_categories", [])   # list[str]
         is_high_risk = answers.get("is_high_risk")                       # bool | None
         reasoning = answers.get("reasoning", "")

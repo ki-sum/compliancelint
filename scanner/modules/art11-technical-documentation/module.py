@@ -55,8 +55,6 @@ class Art11Module(BaseArticleModule):
         answers = ctx.get_article_answers("art11")
 
         has_tech_docs = answers.get("has_technical_docs")
-        if has_tech_docs is None:
-            has_tech_docs = answers.get("has_documentation")  # alias
         doc_paths = answers.get("doc_paths") or []
         documented_aspects = answers.get("documented_aspects") or []
 

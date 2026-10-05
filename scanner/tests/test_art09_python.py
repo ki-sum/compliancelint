@@ -491,38 +491,3 @@ class TestArt09Structural:
 
 
 # ── Alias tests ──
-
-class TestArt09Aliases:
-
-    def test_has_risk_code_alias(self, art09_module, tmp_path):
-        """has_risk_code (alias for has_risk_code_patterns) should work."""
-        ctx = _ctx_with("art9", {
-            "has_risk_docs": True, "has_risk_code": True,
-            "has_testing_infrastructure": True, "has_defined_metrics": True,
-        })
-        BaseArticleModule.set_context(ctx)
-        result = art09_module.scan(str(tmp_path))
-        obl = _find(result, "ART09-OBL-2d")
-        assert obl[0].level == ComplianceLevel.PARTIAL
-
-    def test_has_testing_alias(self, art09_module, tmp_path):
-        """has_testing (alias for has_testing_infrastructure) should work."""
-        ctx = _ctx_with("art9", {
-            "has_risk_docs": True, "has_risk_code_patterns": True,
-            "has_testing": True, "has_defined_metrics": True,
-        })
-        BaseArticleModule.set_context(ctx)
-        result = art09_module.scan(str(tmp_path))
-        obl = _find(result, "ART09-OBL-6")
-        assert obl[0].level == ComplianceLevel.PARTIAL
-
-    def test_has_metrics_alias(self, art09_module, tmp_path):
-        """has_metrics (alias for has_defined_metrics) should work."""
-        ctx = _ctx_with("art9", {
-            "has_risk_docs": True, "has_risk_code_patterns": True,
-            "has_testing_infrastructure": True, "has_metrics": True,
-        })
-        BaseArticleModule.set_context(ctx)
-        result = art09_module.scan(str(tmp_path))
-        obl = _find(result, "ART09-OBL-8b")
-        assert obl[0].level == ComplianceLevel.PARTIAL

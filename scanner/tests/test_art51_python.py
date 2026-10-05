@@ -113,7 +113,9 @@ class TestArt51Cls2:
         result = art51_module.scan(str(tmp_path))
         obl = _find(result, "ART51-CLS-2")
         assert len(obl) > 0
-        assert "3.5 x 10^26" in obl[0].description
+        # training_compute_flops is a number field since the template-gap task (2026-10-04): the AI's
+        # "3.5 x 10^26" is parsed to 3.5e26 before the module reads it, so the description shows the number.
+        assert "3.5e+26" in obl[0].description
 
 
 # ── ART51-EMP-3: Commission empowerment ──

@@ -69,27 +69,36 @@ class TestArt5EvidenceFields:
             assert coerced["art5"] == {ev_field: "Image pipeline with NSFW filter"}, ev_field
 
 
-# (article, alias read as fallback, canonical schema field the module prefers)
-_ALIASES = [
+# Former legacy aliases (removed 2026-10-04, template-gap T1): modules no longer read them and the AI is
+# not asked for them — sent anyway, they are unknown keys: kept as sent, never renamed onto a schema field.
+# (article, former alias, schema field it used to fall back to)
+_FORMER_ALIASES = [
     ("art9", "has_risk_code", "has_risk_code_patterns"),
     ("art9", "has_metrics", "has_defined_metrics"),
     ("art10", "has_bias_detection", "has_bias_mitigation"),
     ("art12", "has_retention_policy", "has_retention_config"),
+    ("art14", "has_kill_switch", "has_override_mechanism"),
     ("art15", "has_accuracy_metrics", "has_accuracy_testing"),
+    ("art15", "has_cybersecurity", "has_fallback_behavior"),
     ("art19", "has_retention_policy", "has_retention_config"),
 ]
 
 
-class TestModuleAliasesNotRenamed:
+class TestUnknownFieldsNeverRenamed:
+    """T5 (founder 2026-10-04): the field-level fuzzy rename is disabled. It turned near-miss names into
+    another obligation's answer (self-audit A1: has_risk_code → has_risk_docs)."""
 
-    @pytest.mark.parametrize("art,alias,canonical", _ALIASES)
-    def test_alias_does_not_overwrite_canonical(self, art, alias, canonical):
-        coerced, _ = coerce_answers({art: {canonical: True, alias: False}})
+    @pytest.mark.parametrize("art,alias,canonical", _FORMER_ALIASES)
+    def test_former_alias_stays_unknown_and_is_logged(self, art, alias, canonical):
+        coerced, log = coerce_answers({art: {canonical: True, alias: False}})
         assert coerced[art] == {canonical: True, alias: False}
+        coerced, log = coerce_answers({art: {alias: False}})
+        assert coerced[art] == {alias: False}, f"{art}.{alias} renamed to {sorted(coerced[art])}"
+        assert any(l["action"] == "unknown_field" and l["key"] == f"{art}.{alias}" for l in log)
 
-    def test_art9_risk_code_alias_does_not_land_on_risk_docs(self):
-        coerced, _ = coerce_answers({"art9": {"has_risk_docs": True, "has_risk_code": False}})
-        assert coerced["art9"] == {"has_risk_docs": True, "has_risk_code": False}
+    def test_art9_risk_code_does_not_land_on_risk_docs(self):
+        coerced, _ = coerce_answers({"art9": {"has_risk_code": False}})
+        assert coerced["art9"] == {"has_risk_code": False}
 
     @pytest.mark.parametrize("art,key", _module_read_keys())
     def test_every_module_read_key_survives_coercion(self, art, key):
@@ -102,24 +111,16 @@ class TestModuleAliasesNotRenamed:
             coerced, _ = coerce_answers({"art5": {ev_field: "sentinel"}})
             assert ev_field in coerced["art5"]
 
-
-class TestFuzzyRenameNeverOverwrites:
-
-    def test_typo_still_renamed_when_canonical_absent(self):
+    def test_a_typo_is_not_renamed_but_logged(self):
         coerced, log = coerce_answers({"art50": {"has_ai_disclosure_to_user": False}})
-        assert coerced["art50"] == {"has_ai_disclosure_to_users": False}
-        assert any(l["action"] == "field_renamed" for l in log)
+        assert coerced["art50"] == {"has_ai_disclosure_to_user": False}
+        assert not [l for l in log if l["action"] in ("field_renamed", "field_rename_skipped")]
+        assert any(l["action"] == "unknown_field" and l["key"] == "art50.has_ai_disclosure_to_user" for l in log)
 
-    def test_typo_does_not_overwrite_present_canonical(self):
-        coerced, log = coerce_answers({"art50": {
-            "has_ai_disclosure_to_users": True,
-            "has_ai_disclosure_to_user": False,
-        }})
-        assert coerced["art50"]["has_ai_disclosure_to_users"] is True
-        assert coerced["art50"]["has_ai_disclosure_to_user"] is False
-        assert any(l["action"] == "field_rename_skipped" for l in log)
-
-    def test_schema_fields_disjoint_from_module_aliases(self):
-        for art, alias, canonical in _ALIASES:
-            assert alias not in set(_BOOL_FIELDS.get(art, [])) | set(_LIST_FIELDS.get(art, []))
-            assert canonical in _BOOL_FIELDS[art]
+    def test_no_aliases_left(self):
+        """_AUX_FIELDS holds only described free-text slots; modules read no alias fallbacks."""
+        from core.context import _AUX_FIELDS, _FIELD_DESCRIPTIONS
+        for art, keys in _AUX_FIELDS.items():
+            assert set(keys) <= set(_FIELD_DESCRIPTIONS.get(art, {})), (art, sorted(set(keys) - set(_FIELD_DESCRIPTIONS.get(art, {}))))
+        for path in glob.glob(os.path.join(SCANNER_ROOT, "modules", "art*", "module.py")):
+            assert "# alias" not in open(path, encoding="utf-8").read(), path

@@ -65,12 +65,8 @@ class Art10Module(BaseArticleModule):
         has_data_doc = answers.get("has_data_governance_doc")
         data_doc_paths = answers.get("data_doc_paths") or []
         has_bias = answers.get("has_bias_mitigation")
-        if has_bias is None:
-            has_bias = answers.get("has_bias_detection")  # alias
         bias_evidence = answers.get("bias_evidence") or []
         has_lineage = answers.get("has_data_lineage")
-        if has_lineage is None:
-            has_lineage = answers.get("has_data_versioning")  # alias
 
         doc_evidence = data_doc_paths or None
         bias_ev = bias_evidence or None
