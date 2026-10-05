@@ -40,8 +40,15 @@
       "source_quote": "Without prejudice to the application of Article 5 as referred to in Article 113(3), point (a), AI systems which are components of the large-scale IT systems established by the legal acts listed in Annex X that have been placed on the market or put into service before 2 August 2027 shall be brought into compliance with this Regulation by 31 December 2030.",
       "deontic_type": "obligation",
       "modality": "shall",
-      "addressee": "provider",
-      "addressee_note": "Operators of AI systems that are components of Annex X large-scale IT systems",
+      "addressee": "provider_and_deployer",
+      "addressee_note": "Art. 111(1) does not name an operator (\"shall be brought into compliance\"); compliance is role-specific — provider obligations (Art. 16) and deployer obligations (Art. 26) for AI systems that are components of Annex X large-scale IT systems. Recorded as provider_and_deployer, the closest available value; obligations of other operators under Art. 3(8) are not excluded (Claude sealed extraction + o3, 2026-10-05).",
+      "_addressee_history": [
+        {
+          "addressee": "provider",
+          "superseded_on": "2026-10-05",
+          "basis": "art111-obl1-2026-10-05"
+        }
+      ],
       "decomposed_atoms": [
         {
           "atom": "annex_x_systems_compliant_by_2030",
@@ -153,10 +160,12 @@
         }
       ],
       "automation_assessment": {
-        "level": "partial"
+        "level": "full"
       },
       "addressee_note": "Providers of AI systems, including general-purpose AI systems, that generate synthetic audio, image, video or text content",
       "scope_limitation": "Only applies to such systems placed on the market before 2 August 2026",
+      "context_skip_field": "is_generating_synthetic_content",
+      "context_skip_value": false,
       "cross_references": [
         "Art. 50(2)",
         "Art. 113"
@@ -174,8 +183,8 @@
       "both": 1
     },
     "automation_breakdown": {
-      "full": 0,
-      "partial": 4,
+      "full": 1,
+      "partial": 3,
       "manual": 0
     }
   }

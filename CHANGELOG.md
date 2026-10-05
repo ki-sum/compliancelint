@@ -6,6 +6,15 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [1.2.0] — unreleased
 
+### Changed — Art. 111(1) and 111(4) records
+- **ART111-OBL-1** (Art. 111(1), AI systems that are components of the Annex X large-scale IT
+  systems): addressee `provider` → `provider_and_deployer`. The paragraph names no operator ("shall be
+  brought into compliance"); compliance is role-specific (Art. 16 for providers, Art. 26 for deployers),
+  so deployers now see the 31 December 2030 deadline too.
+- **ART111-OBL-4** (Art. 111(4)): `context_skip_field` `is_generating_synthetic_content` (not
+  applicable when false); automation level `full` — the record is reported as informational without a
+  human attestation (Art. 50(2) itself is assessed under ART50-OBL-2).
+
 ### Fixed — compliance_answers template now covers every field the article modules read
 - 51 answer fields that article modules read were missing from the template returned by
   `cl_analyze_project`, so the AI was never asked for them and the obligations they decide were

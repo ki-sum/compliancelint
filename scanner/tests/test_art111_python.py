@@ -330,3 +330,29 @@ class TestArt111Omnibus:
         plan = art111_module.action_plan(art111_module.scan(str(tmp_path)))
         text = " ".join(a.details for a in plan.actions)
         assert not stale.search(text) and "Recital 39" in text
+
+
+def test_art111_obl1_addressee_is_provider_and_deployer():
+    """Art. 111(1) names no operator ("shall be brought into compliance"); compliance is role-specific
+    (provider: Art. 16, deployer: Art. 26). Recorded as provider_and_deployer (founder 2026-10-05, Claude
+    sealed extraction + o3); the note keeps the role-neutral reading."""
+    import json
+    import os
+    path = os.path.join(os.path.dirname(__file__), "..", "obligations", "art111-transitional-provisions.json")
+    rec = next(o for o in json.load(open(path, encoding="utf-8"))["obligations"] if o["id"] == "ART111-OBL-1")
+    assert rec["addressee"] == "provider_and_deployer"
+    assert "does not name" in rec["addressee_note"] and "Art. 3(8)" in rec["addressee_note"]
+
+
+# ART111-OBL-4 (Art. 111(4)) — founder 2026-10-05 option A: the record applies only to providers of AI systems
+# generating synthetic content -> context_skip_field art50.is_generating_synthetic_content (false = not applicable).
+# The module itself always reports the record as informational (founder 2026-10-03; Art. 50(2) is assessed under
+# ART50-OBL-2); the skip field serves the Logic Lock and the dashboard auto-NA. The placing-on-the-market date
+# (before 2 August 2026) cannot be read from code and stays in the scope note.
+def test_art111_obl4_record_declares_the_skip_field():
+    import json
+    import os
+    path = os.path.join(os.path.dirname(__file__), "..", "obligations", "art111-transitional-provisions.json")
+    rec = next(o for o in json.load(open(path, encoding="utf-8"))["obligations"] if o["id"] == "ART111-OBL-4")
+    assert rec["context_skip_field"] == "is_generating_synthetic_content"
+    assert rec.get("context_skip_value", False) is False
