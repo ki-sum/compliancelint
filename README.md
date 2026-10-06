@@ -33,7 +33,7 @@ Track compliance across all your AI systems. Export audit-ready PDF reports.
 
 ### Documentation
 
-Full user manual at **[compliancelint.dev/docs](https://compliancelint.dev/docs/quick-start)** — 33 chapters covering setup, daily use, persona-specific reference (Provider / Product Manufacturer / Deployer / Importer / Distributor / Authorised Representative), and troubleshooting.
+Full user manual at **[compliancelint.dev/docs](https://compliancelint.dev/docs/quick-start)** — 35 chapters covering setup, daily use, persona-specific reference (Provider / Product Manufacturer / Deployer / Importer / Distributor / Authorised Representative), and troubleshooting.
 
 ---
 
