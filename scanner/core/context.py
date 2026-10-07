@@ -229,7 +229,22 @@ _ART5_1A = (
 # What each answer field means — returned by cl_analyze_project as
 # compliance_answers_field_descriptions (self-audit B2, 2026-10-02). "true" for an
 # Art. 5 field means the prohibited practice IS present (a violation signal).
+_SCOPE_RISK_FIELDS = ("risk_classification", "risk_classification_confidence", "risk_reasoning")
+
 _FIELD_DESCRIPTIONS: dict = {
+    "_scope": {
+        "risk_classification": (
+            "REQUIRED. The EU AI Act risk class of the system, one of: 'prohibited' (an Art. 5 practice), "
+            "'high-risk' (Art. 6: a safety component / product under Annex I, or an Annex III use case), "
+            "'limited-risk' (only the Art. 50 transparency obligations), 'minimal-risk' (none of these). Put any "
+            "uncertainty in risk_classification_confidence, not in this value."
+        ),
+        "risk_classification_confidence": (
+            "'high', 'medium' or 'low' — how certain the risk_classification is. With 'low', the articles that "
+            "apply only to high-risk systems are still scanned."
+        ),
+        "risk_reasoning": "One or two sentences on why the system has this risk class (cite the files you read).",
+    },
     "art5": {
         "has_subliminal_manipulation": (
             "true if the system deploys subliminal techniques beyond a person's consciousness, or purposefully "
@@ -646,6 +661,10 @@ def _build_answers_template() -> dict:
     template["_scope"] = {}
     for field_name in _BOOL_FIELDS.get("_scope", []):
         template["_scope"][field_name] = None
+    # The risk class is required by validation_gate.validate_scope; it was missing from the template, so an AI that
+    # filled the template exactly hit the scope error (acceptance run A1, 2026-10-07).
+    for field_name in _SCOPE_RISK_FIELDS:
+        template["_scope"][field_name] = ""
 
     # B1 self-audit follow-up 2026-04-30 — _oid_answers field for
     # per-obligation questionnaire answers (paid feature). When SaaS

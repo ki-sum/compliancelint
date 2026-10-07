@@ -363,17 +363,17 @@
       "legal_basis": "Art. 49 applies only to high-risk AI systems; risk_classification='not high-risk' with high confidence"
     },
     "art51": {
-      "overall": "unable_to_determine"
+      "overall": "not_applicable"
     },
     "art53": {
-      "overall": "unable_to_determine",
+      "overall": "not_applicable",
       "legal_basis": "Art. 53(1): all compliance_answers fields are null \u2014 cannot determine GPAI provider obligation compliance without evidence"
     },
     "art54": {
-      "overall": "unable_to_determine"
+      "overall": "not_applicable"
     },
     "art55": {
-      "overall": "unable_to_determine"
+      "overall": "not_applicable"
     },
     "art27": {
       "overall": "not_applicable"

@@ -73,6 +73,12 @@ def project_file(project_path: str) -> Path:
     return local_dir(project_path) / "project.json"
 
 
+def last_context_file(project_path: str) -> Path:
+    """The project context (scan answers) of the last cl_scan / cl_scan_all — cl_action_plan reads it in a new MCP
+    process (acceptance run A5a, 2026-10-07). Local only, like the rest of local/."""
+    return local_dir(project_path) / "last_context.json"
+
+
 def articles_dir(project_path: str) -> Path:
     return local_dir(project_path) / _ARTICLES_DIR
 

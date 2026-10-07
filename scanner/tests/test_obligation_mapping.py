@@ -159,7 +159,9 @@ def _all_false_answers():
         "art47": {"has_doc_declaration": False,
                   "has_annex_v_content": False},
         "art49": {"has_eu_database_registration": False},
-        "art51": {"is_gpai_model": False,
+        # is_gpai_model stays True (like art54.is_third_country_provider / art55.has_systemic_risk below): false
+        # makes Chapter V NOT_APPLICABLE (_scope_gate, acceptance run A2 2026-10-07) and no obligation would be mapped.
+        "art51": {"is_gpai_model": True,
                   "has_high_impact_capabilities": False,
                   "training_compute_exceeds_threshold": False,
                   "has_commission_designation": False,

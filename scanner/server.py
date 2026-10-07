@@ -1757,6 +1757,7 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
     # config already loaded above (before SaaS settings fetch)
     BaseArticleModule.set_config(config)
     BaseArticleModule.set_context(ctx)
+    _save_last_context(project_path, ctx)
 
     # Apply config overrides and generate warnings based on final context values
     _dummy = list(_modules.values())[0] if _modules else None
@@ -2259,6 +2260,71 @@ def cl_action_guide(obligation_id: str) -> str:
     return append_upgrade_hint(json.dumps(response), "cl_action_guide")
 
 
+_OBLIGATION_INDEX: tuple[dict[str, list[str]], dict[str, list[str]]] | None = None
+
+
+def _obligation_index() -> tuple[dict[str, list[str]], dict[str, list[str]]]:
+    """(source → obligation ids, article key → obligation ids) from scanner/obligations/*.json, loaded once. The
+    article key keeps a letter suffix ("4" vs "4a"): Art. 4a (Omnibus) is a separate article."""
+    global _OBLIGATION_INDEX
+    if _OBLIGATION_INDEX is None:
+        import glob as _glob
+        import re as _re
+        by_source: dict[str, list[str]] = {}
+        by_article: dict[str, list[str]] = {}
+        for path in sorted(_glob.glob(os.path.join(os.path.dirname(os.path.abspath(__file__)), "obligations", "*.json"))):
+            with open(path, "r", encoding="utf-8") as f:
+                for obl in json.load(f).get("obligations", []):
+                    oid = obl.get("id", "")
+                    m = _re.match(r"^ART0*(\d+)([a-z]?)-", oid)
+                    if not m:
+                        continue
+                    by_source.setdefault(obl.get("source", ""), []).append(oid)
+                    by_article.setdefault(f"{int(m.group(1))}{m.group(2)}", []).append(oid)
+        _OBLIGATION_INDEX = (by_source, by_article)
+    return _OBLIGATION_INDEX
+
+
+def _action_obligation_ids(action: dict) -> list[str]:
+    """The obligations an action-plan entry is about (acceptance run A6, 2026-10-07): its obligation_id when set,
+    else the obligations whose `source` equals its article reference ("Art. 12(2)(a)" → ART12-OBL-2a), else every
+    obligation of the article(s) it cites ("Art. 4", "Art. 9(1)-(2)", "Arts. 8-15")."""
+    import re as _re
+    oid = action.get("obligation_id") or action.get("obligationId")
+    if isinstance(oid, str) and oid:
+        return [oid]
+    ref = action.get("article")
+    if not isinstance(ref, str) or not ref.strip():
+        return []
+    by_source, by_article = _obligation_index()
+    if ref.strip() in by_source:
+        return list(by_source[ref.strip()])
+    ids: list[str] = []
+    for m in _re.finditer(r"Arts?\.\s*(\d+)([a-z]?)(?:\s*-\s*(\d+))?", ref):
+        first = int(m.group(1))
+        last = int(m.group(3)) if m.group(3) else first
+        keys = [f"{first}{m.group(2)}"] if m.group(2) else [str(n) for n in range(first, last + 1)]
+        for key in keys:
+            for o in by_article.get(key, []):
+                if o not in ids:
+                    ids.append(o)
+    return ids
+
+
+def _dashboard_status_for(oids: list[str], saas_status_map: dict[str, str]) -> str | None:
+    """COMPLIANT / NOT_APPLICABLE when every obligation of the action that the dashboard lists has that status;
+    None otherwise. Obligations the dashboard does not list (not applicable — omitted — or not in the scan) do not
+    block; an action none of whose obligations is listed gets None."""
+    listed = [saas_status_map[o] for o in oids if o in saas_status_map]
+    if not listed:
+        return None
+    if all(s == "COMPLIANT" for s in listed):
+        return "COMPLIANT"
+    if all(s == "NOT_APPLICABLE" for s in listed):
+        return "NOT_APPLICABLE"
+    return None
+
+
 def _fetch_effective_status_from_saas(project_path: str) -> dict[str, str]:
     """§AT.19 Phase 4 (2026-05-13) — cross-surface consistency overlay.
 
@@ -2297,11 +2363,16 @@ def _fetch_effective_status_from_saas(project_path: str) -> dict[str, str]:
                         config.project_id = json.load(_f).get("project_id", "")
                 except Exception:
                     pass
-        if not config.project_id:
-            return {}
-
         saas_url = config.saas_url or "https://compliancelint.dev"
-        url = f"{saas_url}/api/v1/projects/{config.project_id}/effective-status"
+        if config.project_id:
+            url = f"{saas_url}/api/v1/projects/{config.project_id}/effective-status"
+        elif config.repo_name:
+            # No project_id (it is written by `npx compliancelint init`, for git repos only): look the repo up by the
+            # rc's repo_name, as cl_sync does (acceptance run A5b, 2026-10-07).
+            from urllib.parse import quote
+            url = f"{saas_url}/api/v1/repos/effective-status?repo={quote(config.repo_name, safe='')}"
+        else:
+            return {}
         import subprocess as _sp
         curl_flags = {}
         if hasattr(_sp, "CREATE_NO_WINDOW"):
@@ -2371,6 +2442,12 @@ def cl_action_plan(project_path: str, regulation: str = "eu-ai-act", article: in
         return dump_error(f"Directory not found: {project_path}")
 
     _ensure_all_modules_loaded()
+
+    # This project's last scan context from disk, so the plan works in a new MCP process and never uses another
+    # project's in-memory context (acceptance run A5a, 2026-10-07).
+    saved_ctx = _load_last_context(project_path)
+    if saved_ctx is not None:
+        BaseArticleModule.set_context(saved_ctx)
 
     # Check if project context is available (needed for scanning)
     if not BaseArticleModule.get_context():
@@ -2472,10 +2549,14 @@ def cl_action_plan(project_path: str, regulation: str = "eu-ai-act", article: in
     }
     if saas_status_map:
         for action_dict in action_dicts:
-            oid = action_dict.get("obligation_id") or action_dict.get("obligationId")
-            if not oid or not isinstance(oid, str):
+            # ActionItems carry an article reference, not an obligation id — map it (acceptance run A6, 2026-10-07:
+            # matching on action.obligation_id never marked anything).
+            oids = _action_obligation_ids(action_dict)
+            if not oids:
                 continue
-            dashboard_status = saas_status_map.get(oid)
+            dashboard_status = _dashboard_status_for(oids, saas_status_map)
+            if dashboard_status is not None:
+                action_dict["obligation_ids"] = oids
             if dashboard_status == "COMPLIANT":
                 action_dict["already_attested_in_dashboard"] = True
                 action_dict["dashboard_status"] = "COMPLIANT"
@@ -3448,6 +3529,31 @@ def cl_verify_evidence(project_path: str) -> str:
 
 # ── Internal helpers ──
 
+def _save_last_context(project_path: str, ctx) -> None:
+    """Keep the scan's project context on disk for cl_action_plan (best effort — never fails a scan)."""
+    try:
+        if not isinstance(ctx, ProjectContext):
+            return
+        from core import paths as cl_paths
+        cl_paths.ensure_local_dir(project_path)
+        cl_paths.last_context_file(project_path).write_text(ctx.to_json(), encoding="utf-8")
+    except Exception as e:  # disk full / permissions — the scan result matters more
+        logger.warning("could not save last_context.json: %s", e)
+
+
+def _load_last_context(project_path: str):
+    """The project context saved by the last scan of this project, or None."""
+    try:
+        from core import paths as cl_paths
+        f = cl_paths.last_context_file(project_path)
+        if not f.is_file():
+            return None
+        return ProjectContext.from_json(f.read_text(encoding="utf-8"))
+    except Exception as e:
+        logger.warning("could not read last_context.json: %s", e)
+        return None
+
+
 def _scan_single_article(article_number: int, project_path: str, context=None, regulation: str = "eu-ai-act") -> str:
     """Scan a project for a specific article's compliance.
 
@@ -3492,6 +3598,7 @@ def _scan_single_article(article_number: int, project_path: str, context=None, r
         })
 
     BaseArticleModule.set_context(context)
+    _save_last_context(project_path, context)
 
     try:
         result = mod.scan(project_path)
@@ -4509,6 +4616,19 @@ def cl_sync(project_path: str, regulation: str = "") -> str:
         result_payload["warning"] = monitor_warning
         result_payload["message"] = (
             f"{result_payload['message']}\n\n⚠️ {monitor_warning}"
+        )
+    # Acceptance run A3 (2026-10-07): evidence the repo's plan does not include is not stored by the dashboard; relay it
+    # so the user learns the evidence was not saved and which plan it needs.
+    evidence_skipped = resp_data.get("evidence_skipped") if isinstance(resp_data, dict) else None
+    if isinstance(evidence_skipped, list) and evidence_skipped:
+        result_payload["evidence_skipped"] = evidence_skipped
+        lines = [
+            f"- {e.get('obligation_id', '?')} ({e.get('evidence_type', '?')}): {e.get('message', '')}"
+            for e in evidence_skipped if isinstance(e, dict)
+        ]
+        result_payload["message"] = (
+            f"{result_payload['message']}\n\nEvidence not saved — your plan does not include it:\n"
+            + "\n".join(lines)
         )
     if human_prompt:
         # Surface the prompt at top-level so MCP clients (Claude Code,

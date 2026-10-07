@@ -257,3 +257,36 @@ def test_sync_surfaces_array_warnings_unchanged(tmp_path, monkeypatch):
     assert "warning" not in parsed or parsed["warning"] is None or isinstance(
         parsed.get("warning"), str
     )
+
+
+def test_sync_relays_evidence_skipped_by_plan(tmp_path, monkeypatch):
+    """Acceptance run A3 (2026-10-07): POST /api/v1/scans applies the evidence tier gate and returns the evidence it
+    did not store in `evidence_skipped`. cl_sync must relay it (top-level field + a line in `message`) so the AI tells
+    the user the evidence was not saved and which plan it needs — otherwise "synced" reads as "evidence saved"."""
+    _seed_rc_with_saas(str(tmp_path))
+    _seed_article_state(str(tmp_path))
+
+    captured: dict = {}
+    skipped = [{
+        "obligation_id": "ART12-OBL-1",
+        "evidence_type": "repo_file",
+        "required_plan": "pro",
+        "message": "File-upload evidence requires Pro plan or higher. Upgrade at /dashboard/plans",
+    }]
+    fake_scans = {
+        "status": 201,
+        "body": json.dumps({
+            "scan_id": "scan-fake-skip",
+            "dashboard_url": "https://dash.test.local/dashboard/scans/scan-fake-skip",
+            "evidence_skipped": skipped,
+        }),
+    }
+    monkeypatch.setattr(subprocess, "run", _make_fake_run(fake_scans, captured))
+
+    parsed = json.loads(server.cl_sync(str(tmp_path), regulation=""))
+
+    assert "error" not in parsed, parsed
+    assert parsed["evidence_skipped"] == skipped
+    assert "ART12-OBL-1" in parsed["message"]
+    assert "Pro plan" in parsed["message"]
+    assert "not saved" in parsed["message"]

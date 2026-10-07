@@ -717,6 +717,21 @@ class BaseArticleModule:
             )
 
         # ── Art. 2(12): Open-source exemption ──
+        # Chapter V (Art. 51-55) — obligations of providers of general-purpose AI models. Acceptance run A2
+        # (2026-10-07): a project whose answers say it is not one got Art. 51-53 NON_COMPLIANT findings.
+        if 51 <= self._article_number <= 55:
+            art51 = ctx.get_article_answers("art51") or {}
+            if scope.get("is_gpai_provider") is False or art51.get("is_gpai_model") is False:
+                return self._not_applicable_result(
+                    project_path, lang, obl_prefix,
+                    legal_basis="Art. 3(63)",
+                    reason=(
+                        "Chapter V (Art. 51-55) sets obligations for providers of general-purpose AI models "
+                        "(Art. 3(63)). The scope answers state that this project does not provide one "
+                        "(_scope.is_gpai_provider or art51.is_gpai_model is false)."
+                    ),
+                )
+
         if scope.get("is_open_source") is True:
             if self._article_number not in self._OPEN_SOURCE_APPLICABLE:
                 license_name = scope.get("open_source_license", "unknown")

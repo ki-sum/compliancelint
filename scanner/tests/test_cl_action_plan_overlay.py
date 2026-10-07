@@ -200,55 +200,6 @@ class TestClActionPlanOverlay:
     without asserting the specific count of unrelated actions.
     """
 
-    def test_overlay_tags_COMPLIANT_actions_when_saas_says_compliant(self, tmp_path, monkeypatch):
-        _seed_rc(str(tmp_path))
-        _seed_minimal_scan_context(str(tmp_path))
-        captured = {}
-        monkeypatch.setattr(subprocess, "run", _make_fake_run("complaint-art10", captured))
-
-        raw = server.cl_action_plan(str(tmp_path), article=10)
-        plan = json.loads(raw)
-
-        # The plan must include `dashboard_overlay_summary` regardless of
-        # whether any action matched.
-        assert "dashboard_overlay_summary" in plan
-        summary = plan["dashboard_overlay_summary"]
-        assert summary["fetched_from_dashboard"] is True
-
-        # Find actions matching ART10-OBL-1; assert they are tagged.
-        # cl_action_plan may emit multiple actions per OID (e.g., scan +
-        # follow-up); ALL with matching obligation_id should be overlaid.
-        matching = [a for a in plan.get("actions", [])
-                    if a.get("obligation_id") == "ART10-OBL-1"]
-        if matching:
-            for action in matching:
-                assert action.get("already_attested_in_dashboard") is True
-                assert action.get("dashboard_status") == "COMPLIANT"
-                assert action.get("priority") == "LOW"
-                assert "marked COMPLIANT in the" in (action.get("details") or "")
-            assert summary["actions_marked_already_attested"] == len(matching)
-
-    def test_overlay_tags_NA_actions_when_saas_says_not_applicable(self, tmp_path, monkeypatch):
-        _seed_rc(str(tmp_path))
-        _seed_minimal_scan_context(str(tmp_path))
-        captured = {}
-        monkeypatch.setattr(subprocess, "run", _make_fake_run("na-art12", captured))
-
-        raw = server.cl_action_plan(str(tmp_path), article=12)
-        plan = json.loads(raw)
-        summary = plan["dashboard_overlay_summary"]
-        assert summary["fetched_from_dashboard"] is True
-
-        matching = [a for a in plan.get("actions", [])
-                    if a.get("obligation_id") == "ART12-OBL-1"]
-        if matching:
-            for action in matching:
-                assert action.get("already_attested_in_dashboard") is True
-                assert action.get("dashboard_status") == "NOT_APPLICABLE"
-                assert action.get("priority") == "LOW"
-                assert "NOT_APPLICABLE" in (action.get("details") or "")
-            assert summary["actions_marked_na_in_dashboard"] == len(matching)
-
     def test_no_api_key_no_overlay_plan_still_returns(self, tmp_path):
         # No .compliancelintrc → no api key → no curl call → no overlay
         _seed_minimal_scan_context(str(tmp_path))
@@ -292,31 +243,108 @@ class TestClActionPlanOverlay:
         assert summary["actions_marked_already_attested"] == 0
         assert summary["actions_marked_na_in_dashboard"] == 0
 
-    def test_mixed_compliant_and_na_both_tag_correctly(self, tmp_path, monkeypatch):
-        _seed_rc(str(tmp_path))
-        _seed_minimal_scan_context(str(tmp_path))
+class TestFetchEffectiveStatusByRepoName:
+    """Acceptance run A5b (2026-10-07): project_id is written only by `npx compliancelint init` for git repos; a project
+    connected through cl_connect alone has just its repo_name, and the overlay used to return {} silently."""
+
+    def test_without_project_id_falls_back_to_repo_name(self, tmp_path, monkeypatch):
+        _seed_rc(str(tmp_path), project_id="")
         captured = {}
-        monkeypatch.setattr(subprocess, "run", _make_fake_run("mixed", captured))
+        monkeypatch.setattr(subprocess, "run", _make_fake_run("complaint-art10", captured))
 
-        # Run across ALL articles so both ART10 + ART12 can match.
-        raw = server.cl_action_plan(str(tmp_path), article=0)
-        plan = json.loads(raw)
-        summary = plan["dashboard_overlay_summary"]
-        assert summary["fetched_from_dashboard"] is True
+        result = server._fetch_effective_status_from_saas(str(tmp_path))
+        assert result == {"ART10-OBL-1": "COMPLIANT"}
+        assert any(u == "https://dash.test.local/api/v1/repos/effective-status?repo=acme%2Ftest" for u in captured["urls"]), captured["urls"]
 
-        compliant_actions = [a for a in plan.get("actions", [])
-                              if a.get("dashboard_status") == "COMPLIANT"]
-        na_actions = [a for a in plan.get("actions", [])
-                      if a.get("dashboard_status") == "NOT_APPLICABLE"]
+    def test_project_id_still_wins(self, tmp_path, monkeypatch):
+        _seed_rc(str(tmp_path))
+        captured = {}
+        monkeypatch.setattr(subprocess, "run", _make_fake_run("complaint-art10", captured))
 
-        # Both buckets should have entries (assuming ART10 + ART12 modules exist)
-        # If the module isn't registered the action might not be in the plan
-        # at all; this branch handles both cases.
-        if compliant_actions:
-            for a in compliant_actions:
-                assert a.get("obligation_id") == "ART10-OBL-1"
-        if na_actions:
-            for a in na_actions:
-                assert a.get("obligation_id") == "ART12-OBL-1"
-        assert summary["actions_marked_already_attested"] == len(compliant_actions)
-        assert summary["actions_marked_na_in_dashboard"] == len(na_actions)
+        server._fetch_effective_status_from_saas(str(tmp_path))
+        assert all("/api/v1/repos/effective-status" not in u for u in captured["urls"])
+
+
+def _real_context():
+    """The full answers template (the scan asks for every applicable article), scope filled. Under it the Art 12
+    plan has exactly two actions: "Art. 12(2)(a)" and "Art. 12(2)(c)"."""
+    from core.context import ProjectContext, _build_answers_template
+    from core.protocol import BaseArticleModule
+    server._ensure_all_modules_loaded()
+    answers = _build_answers_template()
+    answers["_scope"].update({"is_ai_system": True, "risk_classification": "high-risk", "risk_classification_confidence": "high"})
+    BaseArticleModule.set_context(ProjectContext(
+        primary_language="python", risk_classification="high-risk", risk_classification_confidence="high",
+        compliance_answers=answers,
+    ))
+
+
+def _plan_with_dashboard(tmp_path, monkeypatch, statuses):
+    _real_context()
+    monkeypatch.setattr(server, "_fetch_effective_status_from_saas", lambda _p: dict(statuses))
+    plan = json.loads(server.cl_action_plan(str(tmp_path), article=12))
+    return {a["article"]: a for a in plan["actions"]}, plan["dashboard_overlay_summary"]
+
+
+class TestOverlayMapsActionsToObligations:
+    """Acceptance run A6 (2026-10-07, founder: "用條文編號對應"): ActionItems carry no obligation_id, so the overlay —
+    which matched on action.obligation_id — never marked anything; the old tests asserted only inside `if matching:`
+    (always empty). Actions now map to obligations by their article reference: an exact `source` match
+    ("Art. 12(2)(a)" → ART12-OBL-2a), else every obligation of the cited article(s)."""
+
+    def test_answered_yes_on_the_dashboard_marks_that_action(self, tmp_path, monkeypatch):
+        # The acceptance-run case: Art 12(2)(a) attested yes in the Human Gates questionnaire, (2)(c) still open.
+        actions, summary = _plan_with_dashboard(
+            tmp_path, monkeypatch, {"ART12-OBL-2a": "COMPLIANT", "ART12-OBL-2c": "NON_COMPLIANT"})
+        assert set(actions) == {"Art. 12(2)(a)", "Art. 12(2)(c)"}
+        done = actions["Art. 12(2)(a)"]
+        assert done["already_attested_in_dashboard"] is True
+        assert done["dashboard_status"] == "COMPLIANT"
+        assert done["priority"] == "LOW"
+        assert done["obligation_ids"] == ["ART12-OBL-2a"]
+        assert "marked COMPLIANT in the" in done["details"]
+        assert "already_attested_in_dashboard" not in actions["Art. 12(2)(c)"]
+        assert summary == {"fetched_from_dashboard": True, "actions_marked_already_attested": 1,
+                           "actions_marked_na_in_dashboard": 0}
+
+    def test_not_applicable_on_the_dashboard_marks_that_action(self, tmp_path, monkeypatch):
+        actions, summary = _plan_with_dashboard(tmp_path, monkeypatch, {"ART12-OBL-2c": "NOT_APPLICABLE"})
+        na = actions["Art. 12(2)(c)"]
+        assert na["dashboard_status"] == "NOT_APPLICABLE"
+        assert na["priority"] == "LOW"
+        assert "already_attested_in_dashboard" not in actions["Art. 12(2)(a)"]
+        assert summary["actions_marked_na_in_dashboard"] == 1
+        assert summary["actions_marked_already_attested"] == 0
+
+    def test_both_marked(self, tmp_path, monkeypatch):
+        actions, summary = _plan_with_dashboard(
+            tmp_path, monkeypatch, {"ART12-OBL-2a": "COMPLIANT", "ART12-OBL-2c": "NOT_APPLICABLE"})
+        assert actions["Art. 12(2)(a)"]["dashboard_status"] == "COMPLIANT"
+        assert actions["Art. 12(2)(c)"]["dashboard_status"] == "NOT_APPLICABLE"
+        assert (summary["actions_marked_already_attested"], summary["actions_marked_na_in_dashboard"]) == (1, 1)
+
+
+class TestActionObligationIds:
+    def test_exact_source(self):
+        assert server._action_obligation_ids({"article": "Art. 12(2)(a)"}) == ["ART12-OBL-2a"]
+
+    def test_explicit_obligation_id_wins(self):
+        assert server._action_obligation_ids({"article": "Art. 12", "obligation_id": "ART12-OBL-1"}) == ["ART12-OBL-1"]
+
+    def test_whole_article_and_ranges_map_to_every_obligation_of_the_article(self):
+        art4 = server._action_obligation_ids({"article": "Art. 4"})
+        assert art4 and all(o.startswith("ART04-") for o in art4)
+        art9 = server._action_obligation_ids({"article": "Art. 9(1)-(2)"})
+        assert "ART09-OBL-1" in art9 and all(o.startswith("ART09-") for o in art9)
+        arts = server._action_obligation_ids({"article": "Arts. 8-15"})
+        assert {o.split("-")[0] for o in arts} == {f"ART{n:02d}" for n in range(8, 16)}
+
+    def test_whole_article_marked_only_when_every_listed_obligation_is_compliant(self):
+        ids = server._action_obligation_ids({"article": "Art. 12"})
+        assert len(ids) > 1
+        assert server._dashboard_status_for(ids, {o: "COMPLIANT" for o in ids}) == "COMPLIANT"
+        assert server._dashboard_status_for(ids, {**{o: "COMPLIANT" for o in ids}, ids[-1]: "NON_COMPLIANT"}) is None
+        # an obligation the dashboard does not list (not applicable, or not in the scan) does not block
+        assert server._dashboard_status_for(ids, {ids[0]: "COMPLIANT"}) == "COMPLIANT"
+        assert server._dashboard_status_for(["ART12-OBL-2a"], {}) is None
+
