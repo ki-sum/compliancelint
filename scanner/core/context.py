@@ -540,7 +540,21 @@ class ProjectContext:
             data = other
 
         filtered = {k: v for k, v in data.items() if k in known_fields}
-        return cls(**filtered)
+        ctx = cls(**filtered)
+
+        # S-B15 (2026-10-07): cl_scan's gate requires the risk class in compliance_answers._scope (where the
+        # answers template puts it), but only cl_scan_all copied it onto the context before the modules'
+        # high-risk-only check — a single-article cl_scan saw "" and scanned the 28 high-risk-only articles of a
+        # minimal-risk project. Take the _scope values here when the top-level fields are absent (the top-level
+        # fields and .compliancelintrc overrides still win).
+        scope = ctx.compliance_answers.get("_scope") if isinstance(ctx.compliance_answers, dict) else None
+        if isinstance(scope, dict) and not ctx.risk_classification and scope.get("risk_classification"):
+            ctx.risk_classification = str(scope["risk_classification"])
+            if not ctx.risk_classification_confidence:
+                ctx.risk_classification_confidence = str(scope.get("risk_classification_confidence") or "")
+            if not ctx.risk_reasoning:
+                ctx.risk_reasoning = str(scope.get("risk_reasoning") or "")
+        return ctx
 
     @classmethod
     def from_json(cls, json_str: str) -> "ProjectContext":
