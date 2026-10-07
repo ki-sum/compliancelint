@@ -287,7 +287,7 @@ def _plan_with_dashboard(tmp_path, monkeypatch, statuses):
 
 
 class TestOverlayMapsActionsToObligations:
-    """Acceptance run A6 (2026-10-07, founder: "用條文編號對應"): ActionItems carry no obligation_id, so the overlay —
+    """Acceptance run A6 (2026-10-07, founder: map by article reference): ActionItems carry no obligation_id, so the overlay —
     which matched on action.obligation_id — never marked anything; the old tests asserted only inside `if matching:`
     (always empty). Actions now map to obligations by their article reference: an exact `source` match
     ("Art. 12(2)(a)" → ART12-OBL-2a), else every obligation of the cited article(s)."""
