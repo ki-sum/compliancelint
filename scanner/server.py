@@ -1048,7 +1048,7 @@ def cl_scan(
         project_context: JSON string with AI-enriched project context.
             Call cl_analyze_project() first, read the codebase, then pass your answers.
         regulation: Which regulation to scan against. Currently supported:
-            - "eu-ai-act" (default) — EU AI Act (Regulation (EU) 2024/1689)
+            - "eu-ai-act" (default) — EU AI Act (Regulation (EU) 2024/1689, as amended by Regulation (EU) 2026/1744)
             Future: "gdpr", "nist-ai-rmf", etc.
         articles: Which articles to scan. Options:
             - "all" (default) — scan all articles (returns summary)
@@ -2034,7 +2034,7 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
         "overall_compliance": overall,
         "articles_scanned": articles_scanned,
         "total_modules": len(modules_to_scan),
-        "regulation": "EU AI Act (Regulation (EU) 2024/1689)",
+        "regulation": "EU AI Act (Regulation (EU) 2024/1689, as amended by Regulation (EU) 2026/1744)",
         "scan_date": datetime.now(timezone.utc).isoformat(),
         "config": {
             "loaded": config.has_config,
@@ -2771,7 +2771,8 @@ def cl_interim_standard(article_number: int) -> str:  # Tool name kept for backw
                     "official EU / ISO / CEN-CENELEC standard and "
                     "carries no binding legal authority. Use it as a "
                     "practical implementation guide; consult the "
-                    "official Regulation (EU) 2024/1689 text for "
+                    "official consolidated text of Regulation (EU) 2024/1689, as amended by "
+                    "Regulation (EU) 2026/1744, for "
                     "binding requirements."
                 ),
                 "superseded_when": (

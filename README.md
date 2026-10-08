@@ -214,7 +214,7 @@ You can ask any AI to review your code. But here's the difference:
 
 ## Coverage
 
-**EU AI Act** (Regulation (EU) 2024/1689) — 45 articles, 248 obligations:
+**EU AI Act** (Regulation (EU) 2024/1689, as amended by Regulation (EU) 2026/1744) — 45 articles, 248 obligations:
 
 | Article | Topic | Obligations |
 |---------|-------|:-----------:|
