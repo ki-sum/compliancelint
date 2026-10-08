@@ -373,7 +373,7 @@ def cl_analyze_project(project_path: str) -> str:
 # Smart, contextual suggestions after scan/fix operations.
 # Rules: value-driven (explain WHY), conditional (don't repeat), non-pushy.
 
-def _fetch_saas_scan_settings(config) -> dict | None:
+def _fetch_saas_scan_settings(config, project_path: str) -> dict | None:
     """Fetch scan settings (roles, riskClassification) from SaaS API.
 
     Returns None on any error (network, auth, timeout) — scanner silently
@@ -385,12 +385,13 @@ def _fetch_saas_scan_settings(config) -> dict | None:
     if not config.saas_api_key:
         return None
 
-    # We need repo_id — read from .compliancelint/local/metadata.json
+    # We need repo_id — read from the PROJECT's .compliancelint/local/metadata.json (acceptance run E, 2026-10-08:
+    # this read `config._project_path`, which ProjectConfig never sets, so it fell back to "." — the MCP server's
+    # working directory. Clients that do not start the server in the project root silently got no dashboard settings.)
     try:
         import os
         from core import paths as cl_paths
-        _proj = config._project_path if hasattr(config, '_project_path') else "."
-        meta_path = cl_paths.metadata_file_str(_proj)
+        meta_path = cl_paths.metadata_file_str(project_path)
         if not os.path.isfile(meta_path):
             return None
         with open(meta_path, "r", encoding="utf-8") as f:
@@ -415,6 +416,35 @@ def _fetch_saas_scan_settings(config) -> dict | None:
         logger.debug("SaaS scan-settings fetch failed (silent fallback): %s", e)
 
     return None
+
+
+def _apply_saas_scan_settings(ctx, config, project_path: str, tool: str) -> None:
+    """Dashboard settings (roles / risk / applicability / wizard answers) onto the scan context when connected —
+    cl_scan_all and, since acceptance run E (2026-10-08), cl_scan, which ignored them."""
+    if not config.saas_api_key:
+        return
+    saas_settings = _fetch_saas_scan_settings(config, project_path)
+    if not saas_settings:
+        return
+    scope = ctx.compliance_answers.get("_scope", {})
+    _apply_saas_settings_to_scope(scope, saas_settings)
+    ctx.compliance_answers["_scope"] = scope
+    # §AT.19 Phase 2 (2026-05-13) — wizard answers override AI's
+    # non-deterministic scope answers. Wizard is the single source
+    # of truth for scope fields the user explicitly answered;
+    # AI variance on those fields is structurally eliminated.
+    # Free tier / unanswered fields fall back to AI's value.
+    wizard_answers = saas_settings.get("wizard_answers")
+    if wizard_answers:
+        _apply_wizard_overrides_to_answers(ctx.compliance_answers, wizard_answers)
+        logger.info(
+            "%s — wizard overrides applied: %d fields",
+            tool, sum(1 for v in wizard_answers.values() if v is not None),
+        )
+    logger.info(
+        "%s — SaaS settings applied: roles=%s, risk=%s",
+        tool, saas_settings.get("roles"), saas_settings.get("riskClassification"),
+    )
 
 
 def _apply_saas_settings_to_scope(scope: dict, saas_settings: dict) -> dict:
@@ -1045,6 +1075,9 @@ def cl_scan(
         except (json.JSONDecodeError, TypeError) as e:
             return dump_error(f"Invalid project_context JSON: {e}")
 
+        # Dashboard settings, as cl_scan_all (acceptance run E, 2026-10-08: single-article scans ignored them).
+        _apply_saas_scan_settings(ctx, ProjectConfig.load(project_path), project_path, "cl_scan")
+
         # ── Validation Gate for per-article scan ──
         from core.validation_gate import run_gate
         gate = run_gate(ctx.compliance_answers)
@@ -1656,31 +1689,7 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
 
     # ── SaaS Source of Truth: fetch role/risk settings if connected ──
     config = ProjectConfig.load(project_path)
-    if config.saas_api_key:
-        saas_settings = _fetch_saas_scan_settings(config)
-        if saas_settings:
-            scope = ctx.compliance_answers.get("_scope", {})
-            _apply_saas_settings_to_scope(scope, saas_settings)
-            ctx.compliance_answers["_scope"] = scope
-            # §AT.19 Phase 2 (2026-05-13) — wizard answers override AI's
-            # non-deterministic scope answers. Wizard is the single source
-            # of truth for scope fields the user explicitly answered;
-            # AI variance on those fields is structurally eliminated.
-            # Free tier / unanswered fields fall back to AI's value.
-            wizard_answers = saas_settings.get("wizard_answers")
-            if wizard_answers:
-                _apply_wizard_overrides_to_answers(
-                    ctx.compliance_answers, wizard_answers,
-                )
-                logger.info(
-                    "cl_scan_all — wizard overrides applied: %d fields",
-                    sum(1 for v in wizard_answers.values() if v is not None),
-                )
-            logger.info(
-                "cl_scan_all — SaaS settings applied: roles=%s, risk=%s",
-                saas_settings.get("roles"),
-                saas_settings.get("riskClassification"),
-            )
+    _apply_saas_scan_settings(ctx, config, project_path, "cl_scan_all")
 
     # ── Validation Gate: coerce + validate compliance_answers ──
     from core.validation_gate import run_gate
@@ -1745,9 +1754,24 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
     # evidence, return AI-first prompt JSON so AI clients chain
     # cl_sync → cl_scan_all automatically. Lenient mode logs warnings
     # and proceeds. Spec §B + §H.
+    # Acceptance run E (founder 2026-10-08: do not block the scan, list the missing evidence): the check no longer blocks the scan — every
+    # paid tier is "strict", so once a repo had synced a paying user could not rescan until each required obligation
+    # had evidence and an answer, and the suggested cl_sync → cl_scan_all chain returned the same refusal. The
+    # obligations still missing something come back with the scan result (`pending_evidence`).
     paid_gate = _check_paid_completion_gate(ctx, project_path)
+    pending_evidence = None
     if paid_gate is not None:
-        return paid_gate
+        pending_rows = json.loads(paid_gate).get("pending_obligations") or []
+        if pending_rows:
+            pending_evidence = {
+                "count": len(pending_rows),
+                "obligations": pending_rows[:50],
+                "note": (
+                    f"The scan ran. {len(pending_rows)} obligation(s) still need evidence and/or an answer on the "
+                    "dashboard (Human Gates questionnaire, evidence upload). They are listed here — tell the user; "
+                    "they do not block scanning."
+                ),
+            }
 
     # Lazy-load all modules now (deferred from startup)
     logger.info("cl_scan_all — loading all modules...")
@@ -1792,6 +1816,14 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
         """
         return _scan_with_retry_module_level(art_num, mod, project_path_local)
 
+    # Articles the dashboard's applicability engine excludes (only when the dashboard sent its list).
+    _scope_now = ctx.compliance_answers.get("_scope", {}) if ctx else {}
+    saas_excluded = (
+        set(gate.skipped_articles) if gate is not None and "_applicable_articles_from_saas" in _scope_now else set()
+    )
+    _saas_obls = _scope_now.get("_applicable_obligations_from_saas")
+    saas_obligations = set(_saas_obls) if isinstance(_saas_obls, list) and _saas_obls else None
+
     def _scan_one(art_num: int, mod) -> dict:
         """Run a single article scan and return a compact summary dict."""
         try:
@@ -1805,10 +1837,37 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
                     effective_ctx.risk_classification_confidence = scope.get("risk_classification_confidence", "")
                     effective_ctx.risk_reasoning = scope.get("risk_reasoning", "")
             skip_result = mod._high_risk_only_check(effective_ctx, project_path)
+            if skip_result is None and f"art{art_num}" in saas_excluded:
+                # The dashboard's applicability engine excludes the article for this repo (Profiling Wizard
+                # answers) — §16.1 Anna: deployer, not high-risk → no Art 26. compute_applicable_articles listed it as
+                # skipped but every module was scanned anyway (acceptance run E, 2026-10-08).
+                skip_result = mod._not_applicable_result(
+                    project_path, effective_ctx.primary_language or "unknown", f"ART{art_num:02d}",
+                    legal_basis="dashboard applicability profile",
+                    reason=(
+                        "The repo's applicability profile on the ComplianceLint dashboard (Profiling Wizard "
+                        "answers) excludes this article. Change the answers there if they are wrong."
+                    ),
+                )
             if skip_result is not None:
                 result = skip_result
             else:
                 result = _scan_with_retry(art_num, mod, project_path)
+            # Obligations the dashboard's applicability engine excludes (applicable_obligations) are not applicable
+            # even when another article's module reports them — e.g. Art 12's module reports ART26-OBL-6 (deployer
+            # log keeping), excluded for a deployer that is not high-risk (§16.1; acceptance run E, 2026-10-08).
+            if saas_obligations is not None:
+                from core.protocol import ComplianceLevel as _CL
+                for f in result.findings:
+                    oid = f.obligation_id or ""
+                    if oid.endswith(("-NOT-APPLICABLE", "-SCAN")) or oid in saas_obligations:
+                        continue
+                    if f.level != _CL.NOT_APPLICABLE:
+                        f.level = _CL.NOT_APPLICABLE
+                        f.description = (
+                            "Not applicable per the repo's applicability profile on the ComplianceLint dashboard "
+                            "(Profiling Wizard answers). " + (f.description or "")
+                        ).strip()
             # Inject AI model attribution
             if ctx and getattr(ctx, "ai_model", ""):
                 result.assessed_by = ctx.ai_model
@@ -2000,6 +2059,7 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
             ctx.compliance_answers.get("_scope", {}).get("_paid_gate_state_load_warning")
             if ctx else None
         ),
+        **({"pending_evidence": pending_evidence} if pending_evidence else {}),
         # 2026-06-15 — articles whose AI scan failed all 3 retries.
         # Empty when scan was fully successful. When non-empty,
         # overall_compliance is forced to "partial" above so the
@@ -4300,6 +4360,16 @@ def cl_sync(project_path: str, regulation: str = "") -> str:
 
     # Apply attestation overrides: rebutted → not_applicable, evidenced → compliant
     articles_data = json.loads(json.dumps(state.get("articles", {})))  # deep copy
+    # Obligations the latest scan of the article no longer reports stay in the local file as baselineState "absent"
+    # (audit trail) with their old level; they are not current findings, so they are not uploaded (acceptance run E,
+    # 2026-10-08: an article turned not applicable kept sending its old obligations to the dashboard).
+    for _art_key, art_data in articles_data.items():
+        findings_map = art_data.get("findings")
+        if isinstance(findings_map, dict):
+            art_data["findings"] = {
+                oid: f for oid, f in findings_map.items()
+                if not (isinstance(f, dict) and f.get("baselineState") == "absent")
+            }
     for _art_key, art_data in articles_data.items():
         for _obl_id, finding in (art_data.get("findings") or {}).items():
             if isinstance(finding, dict):

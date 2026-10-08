@@ -290,3 +290,30 @@ def test_sync_relays_evidence_skipped_by_plan(tmp_path, monkeypatch):
     assert "ART12-OBL-1" in parsed["message"]
     assert "Pro plan" in parsed["message"]
     assert "not saved" in parsed["message"]
+
+
+def test_sync_does_not_upload_findings_the_last_scan_no_longer_reports(tmp_path, monkeypatch):
+    """Acceptance run E (2026-10-08): save_article_result keeps an obligation the latest scan no longer reports, marked
+    baselineState "absent" (audit trail), with its old level — and cl_sync uploaded it as a current finding. §16.1 Anna:
+    Art 26 turned NOT_APPLICABLE (only ART26-NOT-APPLICABLE reported) yet the dashboard received the 16 old
+    unable_to_determine ART26-OBL-* findings. Same for renamed obligation ids after a regulation update."""
+    _seed_rc_with_saas(str(tmp_path))
+    art_dir = os.path.join(str(tmp_path), ".compliancelint", "local", "articles")
+    os.makedirs(art_dir, exist_ok=True)
+    with open(os.path.join(art_dir, "art26.json"), "w", encoding="utf-8") as f:
+        json.dump({
+            "overall_level": "not_applicable",
+            "findings": {
+                "ART26-NOT-APPLICABLE": {"level": "not_applicable", "status": "open", "description": "excluded",
+                                         "baselineState": "new", "history": [], "evidence": []},
+                "ART26-OBL-1": {"level": "unable_to_determine", "status": "open", "description": "old scan",
+                                "baselineState": "absent", "history": [], "evidence": []},
+            },
+        }, f)
+    captured: dict = {}
+    fake_scans = {"status": 201, "body": json.dumps({"scan_id": "s", "dashboard_url": "https://dash.test.local/x"})}
+    monkeypatch.setattr(subprocess, "run", _make_fake_run(fake_scans, captured))
+
+    parsed = json.loads(server.cl_sync(str(tmp_path), regulation=""))
+    assert parsed.get("status") == "synced", parsed
+    assert list(captured["last_payload"]["articles"]["art26"]["findings"]) == ["ART26-NOT-APPLICABLE"]
