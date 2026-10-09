@@ -743,9 +743,10 @@ class BaseArticleModule:
                         project_path, lang, obl_prefix,
                         legal_basis="Art. 3(63)",
                         reason=(
-                            "The scope answers state that this project is not a general-purpose AI model within "
-                            "Article 3(63) and do not state that this organisation is the authorised representative "
-                            "of a third-country provider of one (Article 54)."
+                            "The scope answers state that the model assessed in this project is not a general-purpose "
+                            "AI model within Article 3(63) and do not identify this organisation as the authorised "
+                            "representative of a provider established in a third country for a general-purpose AI "
+                            "model under Article 54."
                         ),
                     )
                 if not_gpai_provider and representative is False:
@@ -753,9 +754,9 @@ class BaseArticleModule:
                         project_path, lang, obl_prefix,
                         legal_basis="Art. 54",
                         reason=(
-                            "The scope answers state that this organisation does not provide a general-purpose AI "
-                            "model and is not the authorised representative of a third-country provider of one "
-                            "(Article 54)."
+                            "The scope answers state that this organisation is not a provider within Article 3(3) of "
+                            "a general-purpose AI model within Article 3(63) and is not the authorised representative "
+                            "of a provider established in a third country for such a model under Article 54."
                         ),
                     )
             elif not_gpai_model:
@@ -769,9 +770,9 @@ class BaseArticleModule:
                     project_path, lang, obl_prefix,
                     legal_basis="Art. 3(63)",
                     reason=(
-                        "The scope answers state that this organisation is not the provider of a general-purpose "
-                        "AI model within Article 3(63); this article sets out provider duties or the "
-                        "classification of the provider's model."
+                        "The scope answers state that this organisation is not a provider within Article 3(3) of a "
+                        "general-purpose AI model within Article 3(63); this article sets out classification or "
+                        "procedural rules for such models, or obligations for their providers."
                     ),
                 )
 
@@ -790,7 +791,9 @@ class BaseArticleModule:
     def _open_source_carve_out_applies(self, ctx, scope: dict) -> bool:
         """Art. 2(12) applies to an is_open_source=true answer only when no other answer says the system is high-risk,
         engages in an Art. 5 practice, or falls under Art. 50 — then the exclusion itself does not apply (o3 Prompt D
-        R10: the "yes" is an attestation; contradicting answers are detected)."""
+        R10: the "yes" is an attestation; contradicting answers are detected). Second legal review (2026-10-09, C2): only an
+        Art. 6 high-risk determination counts — Annex III membership or an Annex I product type alone does not (Art. 6(1)
+        has further conditions; Art. 6(3) can take an Annex III system out of high-risk)."""
         if scope.get("is_open_source") is not True:
             return False
         risk = (ctx.risk_classification or scope.get("risk_classification") or "").lower().strip()
@@ -808,7 +811,7 @@ class BaseArticleModule:
         )):
             return False
         art6 = ctx.get_article_answers("art6") or {}
-        if art6.get("is_high_risk") is True or art6.get("annex_iii_categories") or art6.get("annex_i_product_type"):
+        if art6.get("is_high_risk") is True:
             return False
         return True
 

@@ -262,11 +262,22 @@ def cl_analyze_project(project_path: str) -> str:
       ║     fields numbers (compliance_answers_field_descriptions). ║
       ║  3. Fill ALL articles in the template, not just relevant ones║
       ║  4. _scope.risk_classification is REQUIRED                  ║
-      ║  5. A duty that does not concern this organisation (e.g.    ║
-      ║     deployer duties of a provider-only system):             ║
-      ║     answer null, not false — false means the measure is     ║
-      ║     missing. Scope fields (_scope.is_importer, ...): false  ║
-      ║     when the role does not apply.                           ║
+      ║  5. A duty addressed solely to another operator does not    ║
+      ║     apply to this organisation in that capacity. Never      ║
+      ║     answer false solely because the operator role does not  ║
+      ║     apply (false means the measure is missing). If a        ║
+      ║     _scope field covers the role (is_importer,              ║
+      ║     is_distributor, is_gpai_provider,                       ║
+      ║     is_authorised_representative), set it to false.         ║
+      ║     Deployer and provider duties have no offline role       ║
+      ║     field: answer null when the duty is inapplicable        ║
+      ║     solely because of the operator role. The offline        ║
+      ║     scanner displays null as "unable to determine", which   ║
+      ║     is a tool limitation, not a legal finding. On a paid    ║
+      ║     dashboard plan, the Profiling Wizard can exclude        ║
+      ║     deployer duties based on deployer answers. Provider     ║
+      ║     duties are not excluded solely on the basis of          ║
+      ║     provider role.                                          ║
       ╚═══════════════════════════════════════════════════════════════╝
 
       ╔═══════════════════════════════════════════════════════════════╗

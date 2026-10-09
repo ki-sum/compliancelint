@@ -108,7 +108,7 @@ def test_open_source_with_a_contradicting_risk_class_is_not_excluded(risk, tmp_p
     {"art5": {"has_social_scoring": True}},
     {"art50": {"is_generating_synthetic_content": True}},
     {"art50": {"is_chatbot_or_interactive_ai": True}},
-    {"art6": {"annex_iii_categories": ["employment"]}},
+    {"art50": {"is_deep_fake_system": True}},
     {"art6": {"is_high_risk": True}},
 ])
 def test_open_source_with_an_art5_art50_or_high_risk_answer_is_not_excluded(answers, tmp_path):
@@ -117,19 +117,38 @@ def test_open_source_with_an_art5_art50_or_high_risk_answer_is_not_excluded(answ
         assert result.overall_level != NA or "[Art. 2(12)]" not in result.findings[0].description, (art, answers)
 
 
+# Second legal review (2026-10-09, A6 / C2): Annex III membership or an Annex I product type alone does not establish
+# high-risk status (Art. 6(1) has further conditions; Art. 6(3) can take an Annex III system out of high-risk) — only an
+# Art. 6 high-risk determination, an Art. 5 practice or an Art. 50 case contradicts the open-source attestation.
+@pytest.mark.parametrize("answers", [
+    {"art6": {"annex_iii_categories": ["4(a)"]}},
+    {"art6": {"annex_i_product_type": "Medical device"}},
+])
+def test_open_source_attestation_stands_against_raw_annex_answers(answers, tmp_path):
+    result = _scan(4, _oss(**{k: dict(v) for k, v in answers.items()}), tmp_path)
+    assert result.overall_level == NA
+    assert "[Art. 2(12)]" in result.findings[0].description
+
+
 # ── Chapter V ──
 
 @pytest.mark.parametrize("art", [51, 52, 53, 54, 55])
 def test_not_a_gpai_model_gates_the_whole_chapter(art, tmp_path):
     result = _scan(art, {"art51": {"is_gpai_model": False}}, tmp_path)
     assert result.overall_level == NA
-    assert "not a general-purpose AI model within Article 3(63)" in result.findings[0].description
+    d = result.findings[0].description
+    if art == 54:
+        assert "the model assessed in this project is not a general-purpose AI model within Article 3(63)" in d
+        assert "under Article 54" in d
+    else:
+        assert "not a general-purpose AI model within Article 3(63)" in d
 
 
 @pytest.mark.parametrize("art", [51, 52, 53, 55])
 def test_not_a_gpai_provider_gates_the_provider_articles(art, tmp_path):
     result = _scan(art, {"_scope": {"is_gpai_provider": False}}, tmp_path)
     assert result.overall_level == NA
+    assert "not a provider within Article 3(3) of a general-purpose AI model within Article 3(63)" in result.findings[0].description
 
 
 def test_not_a_gpai_provider_keeps_art54_while_the_representative_question_is_unanswered(tmp_path):
@@ -146,6 +165,7 @@ def test_neither_provider_nor_representative_gates_art54(tmp_path):
     result = _scan(54, {"_scope": {"is_gpai_provider": False, "is_authorised_representative": False}}, tmp_path)
     assert result.overall_level == NA
     assert "[Art. 54]" in result.findings[0].description
+    assert "not the authorised representative of a provider established in a third country" in result.findings[0].description
 
 
 def test_not_a_gpai_model_keeps_art54_for_an_authorised_representative(tmp_path):
@@ -156,4 +176,4 @@ def test_not_a_gpai_model_keeps_art54_for_an_authorised_representative(tmp_path)
 def test_not_a_gpai_model_art54_reason_names_the_representative_question(tmp_path):
     result = _scan(54, {"art51": {"is_gpai_model": False}}, tmp_path)
     assert result.overall_level == NA
-    assert "do not state that this organisation is the authorised representative" in result.findings[0].description
+    assert "do not identify this organisation as the authorised representative" in result.findings[0].description

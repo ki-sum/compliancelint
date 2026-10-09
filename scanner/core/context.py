@@ -259,15 +259,15 @@ _FIELD_DESCRIPTIONS: dict = {
             "exceptions applies; null if you cannot determine it from the project."
         ),
         "is_gpai_provider": (
-            "true if this organisation is the provider of a general-purpose AI model within Art. 3(63) — it develops "
-            "the model, or has it developed, and places it on the market under its own name or trademark; false if "
-            "it is not; null if you cannot determine it from the project."
+            "true if this organisation is a provider within Art. 3(3) of a general-purpose AI model within Art. 3(63) "
+            "— it develops the model, or has it developed, and places it on the market under its own name or "
+            "trademark; false if it is not; null if you cannot determine it from the project."
         ),
         "is_authorised_representative": (
-            "true if this organisation is established in the Union and has accepted a written mandate to act as "
-            "the authorised representative of a provider established in a third country (Art. 3(5)) — for a "
-            "general-purpose AI model the Art. 54 duties apply; false if it has not; null if you cannot determine "
-            "it from the project."
+            "true if this organisation is established in the Union, has received and accepted a written mandate "
+            "within Art. 3(5), and the appointing provider is established in a third country; for a high-risk AI "
+            "system the Art. 22 duties apply, and for a general-purpose AI model the Art. 54 duties apply; false if "
+            "these conditions are not met; null if you cannot determine it from the project."
         ),
     },
     "art5": {

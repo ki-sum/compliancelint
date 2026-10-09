@@ -42,9 +42,10 @@ def test_is_open_source_is_an_attestation():
 
 
 def test_gpai_and_representative_scope_fields_are_described():
-    assert "Art. 3(63)" in SCOPE["is_gpai_provider"]
-    assert "Art. 3(5)" in SCOPE["is_authorised_representative"]
-    assert "Art. 54" in SCOPE["is_authorised_representative"]
+    assert "provider within Art. 3(3) of a general-purpose AI model within Art. 3(63)" in SCOPE["is_gpai_provider"]
+    ar = SCOPE["is_authorised_representative"]
+    assert "received and accepted a written mandate within Art. 3(5)" in ar
+    assert "established in a third country" in ar and "Art. 22" in ar and "Art. 54" in ar
 
 
 def test_every_described_scope_field_is_in_the_template():
@@ -56,6 +57,7 @@ def test_every_described_scope_field_is_in_the_template():
 def test_annex_iii_categories_has_a_value_format():
     d = _FIELD_DESCRIPTIONS["art6"]["annex_iii_categories"]
     assert '"5(b)"' in d
+    assert '"2"' in d  # Annex III point 2 has no letter
     assert "[]" in d
 
 
@@ -67,9 +69,21 @@ def test_rule_2_names_the_boolean_fields_only():
 
 
 def test_null_vs_false_guidance_for_duties_that_do_not_concern_the_organisation():
-    src = _server_source()
-    assert re.search(r"does not concern this organisation", src)
-    assert re.search(r"answer null, not false", src)
+    # Second legal review (2026-10-09, D6): a duty addressed to another operator is not applicable, not uncertain —
+    # never false; scope fields carry the role where one exists; the rule says honestly how the rest is reported.
+    src = re.sub(r"\s+", " ", _server_source().replace("║", " "))
+    # Third review (2026-10-09, F1): the null shown as "unable to determine" is a tool limitation, not a legal finding.
+    final = (
+        "5. A duty addressed solely to another operator does not apply to this organisation in that capacity. Never "
+        "answer false solely because the operator role does not apply (false means the measure is missing). If a "
+        "_scope field covers the role (is_importer, is_distributor, is_gpai_provider, is_authorised_representative), "
+        "set it to false. Deployer and provider duties have no offline role field: answer null when the duty is "
+        "inapplicable solely because of the operator role. The offline scanner displays null as \"unable to "
+        "determine\", which is a tool limitation, not a legal finding. On a paid dashboard plan, the Profiling Wizard "
+        "can exclude deployer duties based on deployer answers. Provider duties are not excluded solely on the basis "
+        "of provider role."
+    )
+    assert final in src
 
 
 def test_risk_classification_example_uses_the_canonical_values():
