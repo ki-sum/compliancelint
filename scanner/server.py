@@ -241,7 +241,7 @@ def cl_analyze_project(project_path: str) -> str:
 
       A. Fill _scope (REQUIRED — determines which articles apply):
          "_scope": {
-           "risk_classification": "high-risk" | "limited-risk" | "not high-risk",
+           "risk_classification": "prohibited" | "high-risk" | "limited-risk" | "minimal-risk",
            "risk_classification_confidence": "high" | "medium" | "low",
            "is_ai_system": true,
            "territorial_scope_applies": true,
@@ -257,9 +257,16 @@ def cl_analyze_project(project_path: str) -> str:
       ║  CRITICAL RULES:                                            ║
       ║                                                             ║
       ║  1. Use template keys EXACTLY: "art50" not "art50_transparency"  ║
-      ║  2. Values must be: true, false, or null — NEVER strings    ║
+      ║  2. Boolean fields: true, false or null — never strings.    ║
+      ║     Text fields take strings, list fields arrays, number    ║
+      ║     fields numbers (compliance_answers_field_descriptions). ║
       ║  3. Fill ALL articles in the template, not just relevant ones║
       ║  4. _scope.risk_classification is REQUIRED                  ║
+      ║  5. A duty that does not concern this organisation (e.g.    ║
+      ║     deployer duties of a provider-only system):             ║
+      ║     answer null, not false — false means the measure is     ║
+      ║     missing. Scope fields (_scope.is_importer, ...): false  ║
+      ║     when the role does not apply.                           ║
       ╚═══════════════════════════════════════════════════════════════╝
 
       ╔═══════════════════════════════════════════════════════════════╗

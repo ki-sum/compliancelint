@@ -244,6 +244,31 @@ _FIELD_DESCRIPTIONS: dict = {
             "apply only to high-risk systems are still scanned."
         ),
         "risk_reasoning": "One or two sentences on why the system has this risk class (cite the files you read).",
+        # Answer-template key fixes before release (acceptance run A, 2026-10-08): these fields drive the scope gates.
+        "is_biometric_system": (
+            "true only if the system is a remote biometric identification system referred to in Annex III point 1(a) "
+            "— the Art. 12(3) logging and Art. 14(5) separate-verification duties apply only to these. false for "
+            "biometric verification whose sole purpose is to confirm that a specific person is who they claim to be, "
+            "and for every other system; null if you cannot determine it from the project."
+        ),
+        "is_open_source": (
+            "true only if the system is released under a free and open-source licence AND it is not high-risk "
+            "(Art. 6), involves no Art. 5 practice and does not fall under Art. 50 — Art. 2(12) then excludes the AI "
+            "system from the Regulation; obligations for general-purpose AI models (Art. 51-55) are assessed "
+            "separately. false for proprietary or source-available-but-restricted licences, or if any of these "
+            "exceptions applies; null if you cannot determine it from the project."
+        ),
+        "is_gpai_provider": (
+            "true if this organisation is the provider of a general-purpose AI model within Art. 3(63) — it develops "
+            "the model, or has it developed, and places it on the market under its own name or trademark; false if "
+            "it is not; null if you cannot determine it from the project."
+        ),
+        "is_authorised_representative": (
+            "true if this organisation is established in the Union and has accepted a written mandate to act as "
+            "the authorised representative of a provider established in a third country (Art. 3(5)) — for a "
+            "general-purpose AI model the Art. 54 duties apply; false if it has not; null if you cannot determine "
+            "it from the project."
+        ),
     },
     "art5": {
         "has_subliminal_manipulation": (
@@ -405,7 +430,7 @@ class ProjectContext:
         "csam_generation_evidence": "what was found, or empty string",
       },
       "art6": {
-        "annex_iii_categories": ["Biometrics", "Employment", ...],  # detected categories
+        "annex_iii_categories": ["1(a)", "4(a)", ...],  # Annex III points, point + letter
         "annex_i_product_type": null | "Medical device" | ...,
         "is_high_risk": true | false | null,
         "reasoning": "one sentence explanation"

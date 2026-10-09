@@ -620,9 +620,17 @@ class BaseArticleModule:
     # Articles that apply only to HIGH-RISK AI systems (Chapter III, Section 2)
     _HIGH_RISK_ONLY_ARTICLES = frozenset({8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 25, 26, 27, 41, 43, 47, 49, 60, 61, 71, 72, 73, 86})
 
-    # Articles that apply even to open-source systems (Art. 2(12) exceptions)
-    # Art. 4 (AI literacy) and Art. 51-55 (GPAI) have their own scope rules
-    _OPEN_SOURCE_APPLICABLE = frozenset({4, 5, 50, 51, 52, 53, 54, 55})
+    # Art. 2(12): a free and open-source AI system that is not placed on the market or put into service as a high-risk
+    # AI system and does not fall under Art. 5 or 50 is outside the Regulation. Chapter V (Art. 51-55) concerns
+    # general-purpose AI MODELS and is assessed by its own gates, not kept by Art. 2(12). The previous set also kept
+    # Art. 4, 5 and 50, which Art. 2(12) does not preserve (o3 Prompt D R10, 2026-10-08).
+    _OPEN_SOURCE_APPLICABLE = frozenset({51, 52, 53, 54, 55})
+
+    _OPEN_SOURCE_REASON = (
+        "this AI system is released under a free and open-source licence and, according to the profile, is not "
+        "placed on the market or put into service as a high-risk AI system and does not fall under Article 5 or 50; "
+        "Article 2(12) therefore excludes the AI system from the Regulation"
+    )
 
     # Risk classification strings that clearly mean "not high-risk"
     # (i.e. AI Act articles 9-15 do NOT apply, scan can be skipped).
@@ -716,42 +724,93 @@ class BaseArticleModule:
                 ),
             )
 
-        # ── Art. 2(12): Open-source exemption ──
-        # Chapter V (Art. 51-55) — obligations of providers of general-purpose AI models. Acceptance run A2
-        # (2026-10-07): a project whose answers say it is not one got Art. 51-53 NON_COMPLIANT findings.
+        # ── Chapter V (Art. 51-55): general-purpose AI models ──
+        # Acceptance run A2 (2026-10-07): a project whose answers say it is not a GPAI model got Art. 51-53
+        # NON_COMPLIANT findings. o3 Prompt D R26 (2026-10-08): "not a GPAI model" gates Art. 51-53 / 55;
+        # "not a GPAI provider" gates the provider duties only.
+        # Art. 54 binds the authorised representative for ANOTHER (third-country) provider's model. Founder 2026-10-09:
+        # "this project is not a GPAI model" hides Art. 54 too unless the answers say this organisation IS such a
+        # representative; "not a GPAI provider" alone hides it only when they say it is not one (same rule as the
+        # dashboard's applicability engine).
         if 51 <= self._article_number <= 55:
             art51 = ctx.get_article_answers("art51") or {}
-            if scope.get("is_gpai_provider") is False or art51.get("is_gpai_model") is False:
+            not_gpai_model = art51.get("is_gpai_model") is False
+            not_gpai_provider = scope.get("is_gpai_provider") is False
+            if self._article_number == 54:
+                representative = scope.get("is_authorised_representative")
+                if not_gpai_model and representative is not True:
+                    return self._not_applicable_result(
+                        project_path, lang, obl_prefix,
+                        legal_basis="Art. 3(63)",
+                        reason=(
+                            "The scope answers state that this project is not a general-purpose AI model within "
+                            "Article 3(63) and do not state that this organisation is the authorised representative "
+                            "of a third-country provider of one (Article 54)."
+                        ),
+                    )
+                if not_gpai_provider and representative is False:
+                    return self._not_applicable_result(
+                        project_path, lang, obl_prefix,
+                        legal_basis="Art. 54",
+                        reason=(
+                            "The scope answers state that this organisation does not provide a general-purpose AI "
+                            "model and is not the authorised representative of a third-country provider of one "
+                            "(Article 54)."
+                        ),
+                    )
+            elif not_gpai_model:
+                return self._not_applicable_result(
+                    project_path, lang, obl_prefix,
+                    legal_basis="Art. 3(63)",
+                    reason="The scope answers state that this project is not a general-purpose AI model within Article 3(63).",
+                )
+            elif not_gpai_provider:
                 return self._not_applicable_result(
                     project_path, lang, obl_prefix,
                     legal_basis="Art. 3(63)",
                     reason=(
-                        "Chapter V (Art. 51-55) sets obligations for providers of general-purpose AI models "
-                        "(Art. 3(63)). The scope answers state that this project does not provide one "
-                        "(_scope.is_gpai_provider or art51.is_gpai_model is false)."
+                        "The scope answers state that this organisation is not the provider of a general-purpose "
+                        "AI model within Article 3(63); this article sets out provider duties or the "
+                        "classification of the provider's model."
                     ),
                 )
 
-        if scope.get("is_open_source") is True:
+        # ── Art. 2(12): Open-source exemption ──
+        if self._open_source_carve_out_applies(ctx, scope):
             if self._article_number not in self._OPEN_SOURCE_APPLICABLE:
                 license_name = scope.get("open_source_license", "unknown")
                 return self._not_applicable_result(
                     project_path, lang, obl_prefix,
                     legal_basis="Art. 2(12)",
-                    reason=(
-                        f"This is an open-source AI component (license: {license_name}). "
-                        f"Art. 2(12) exempts providers of free and open-source AI "
-                        f"components from Title III obligations (Art. 6-15), UNLESS the "
-                        f"system is used for prohibited practices (Art. 5) or has "
-                        f"transparency obligations (Art. 50). Art. {self._article_number} "
-                        f"is a Title III obligation and does not apply to this open-source "
-                        f"component. Note: this exemption does NOT apply if the open-source "
-                        f"component is incorporated into a high-risk AI system by a deployer "
-                        f"— in that case, the deployer's obligations under Art. 25-26 apply."
-                    ),
+                    reason=f"Licence: {license_name}. The scope answers state that {self._OPEN_SOURCE_REASON}.",
                 )
 
         return None  # All scope checks passed — proceed with scan
+
+    def _open_source_carve_out_applies(self, ctx, scope: dict) -> bool:
+        """Art. 2(12) applies to an is_open_source=true answer only when no other answer says the system is high-risk,
+        engages in an Art. 5 practice, or falls under Art. 50 — then the exclusion itself does not apply (o3 Prompt D
+        R10: the "yes" is an attestation; contradicting answers are detected)."""
+        if scope.get("is_open_source") is not True:
+            return False
+        risk = (ctx.risk_classification or scope.get("risk_classification") or "").lower().strip()
+        if risk and risk not in self._NOT_HIGH_RISK_VALUES and ("high" in risk or "prohibit" in risk):
+            return False
+        if "limited" in risk:  # limited-risk = Art. 50 transparency obligations
+            return False
+        art5 = ctx.get_article_answers("art5") or {}
+        if any(v is True for k, v in art5.items() if k.startswith("has_")):
+            return False
+        art50 = ctx.get_article_answers("art50") or {}
+        if any(art50.get(k) is True for k in (
+            "is_chatbot_or_interactive_ai", "is_generating_synthetic_content", "is_emotion_recognition_system",
+            "is_biometric_categorization_system", "is_deep_fake_system",
+        )):
+            return False
+        art6 = ctx.get_article_answers("art6") or {}
+        if art6.get("is_high_risk") is True or art6.get("annex_iii_categories") or art6.get("annex_i_product_type"):
+            return False
+        return True
 
     def _not_applicable_result(
         self, project_path: str, language: str, obl_prefix: str,

@@ -136,7 +136,8 @@ class TestScopeGateResearch:
 
 
 class TestScopeGateOpenSource:
-    """Art. 2(12): open source exempts Title III but NOT Art.5/50."""
+    """Art. 2(12): an open-source AI system that is not high-risk and does not fall under Art. 5 or 50 is outside the
+    Regulation; a high-risk one is not excluded at all (legal review 2026-10-08)."""
 
     @pytest.mark.parametrize("article_dir", [
         "art09-risk-management",
@@ -151,7 +152,7 @@ class TestScopeGateOpenSource:
         ctx = _make_ctx(scope={
             "is_open_source": True,
             "open_source_license": "Apache-2.0",
-        })
+        }, risk="minimal-risk")
         mod = _load_module(article_dir)
         BaseArticleModule.set_context(ctx)
         BaseArticleModule.set_config(None)
@@ -162,10 +163,30 @@ class TestScopeGateOpenSource:
         assert "Art. 2(12)" in result.findings[0].description
 
     @pytest.mark.parametrize("article_dir", [
+        "art09-risk-management",
+        "art12-record-keeping",
+        "art15-accuracy-robustness",
+    ])
+    def test_open_source_high_risk_system_is_not_excluded(self, article_dir, tmp_path):
+        # Art. 2(12) does not apply to a system placed on the market or put into service as a high-risk AI system.
+        ctx = _make_ctx(scope={
+            "is_open_source": True,
+            "open_source_license": "Apache-2.0",
+        }, risk="likely high-risk")
+        mod = _load_module(article_dir)
+        BaseArticleModule.set_context(ctx)
+        BaseArticleModule.set_config(None)
+        result = mod.scan(str(tmp_path))
+        BaseArticleModule.set_context(None)
+
+        assert result.overall_level != ComplianceLevel.NOT_APPLICABLE
+
+    @pytest.mark.parametrize("article_dir", [
         "art05-prohibited-practices",
         "art50-transparency-obligations",
     ])
-    def test_open_source_does_not_exempt_art5_art50(self, article_dir, tmp_path):
+    def test_open_source_high_risk_system_keeps_art5_art50(self, article_dir, tmp_path):
+        # Default risk class "likely high-risk": the Art. 2(12) exclusion does not apply, so Art. 5 / 50 are scanned.
         ctx = _make_ctx(scope={
             "is_open_source": True,
             "open_source_license": "MIT",
@@ -176,7 +197,6 @@ class TestScopeGateOpenSource:
         result = mod.scan(str(tmp_path))
         BaseArticleModule.set_context(None)
 
-        # Art.5 and Art.50 should NOT be NOT_APPLICABLE for open source
         assert result.overall_level != ComplianceLevel.NOT_APPLICABLE
 
 
@@ -217,16 +237,17 @@ class TestScopeGatePartialScope:
     """Partial _scope (only some fields) → only check what's provided."""
 
     def test_partial_scope_only_checks_provided(self, tmp_path):
-        # Only is_open_source=true, nothing else
-        ctx = _make_ctx(scope={"is_open_source": True, "open_source_license": "GPL-3.0"})
+        # Only is_open_source=true, nothing else in _scope (risk class not high-risk)
+        ctx = _make_ctx(scope={"is_open_source": True, "open_source_license": "GPL-3.0"}, risk="minimal-risk")
         mod = _load_module("art09-risk-management")
         BaseArticleModule.set_context(ctx)
         BaseArticleModule.set_config(None)
         result = mod.scan(str(tmp_path))
         BaseArticleModule.set_context(None)
 
-        # Should be NOT_APPLICABLE (open source + Title III article)
+        # NOT_APPLICABLE through the Art. 2(12) scope gate
         assert result.overall_level == ComplianceLevel.NOT_APPLICABLE
+        assert "[Art. 2(12)]" in result.findings[0].description
 
     def test_partial_scope_no_exemption_for_unset(self, tmp_path):
         # Only user_role set, nothing else → should proceed

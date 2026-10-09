@@ -1,6 +1,6 @@
 {
   "name": "Open-source biometric library (MIT)",
-  "description": "Like deepface: face recognition, emotion analysis, real-time streaming. Art.2(12) exempts Title III but Art.5/50 still apply.",
+  "description": "Like deepface: face recognition, emotion analysis, real-time streaming, released under MIT. Art. 2(12) does not exclude it: it is likely high-risk and its answers report Art. 5 practices, so every article is assessed on its answers.",
   "project_context": {
     "primary_language": "Python",
     "risk_classification": "likely high-risk",
@@ -313,175 +313,180 @@
   "expected": {
     "art4": {
       "overall": "unable_to_determine",
-      "legal_basis": "Art. 4 applies to ALL AI systems including open-source (Art. 4 is NOT a Title III obligation); has_ai_literacy_measures=null so unable to determine"
+      "legal_basis": "Art. 2(12) does not apply: the system is likely high-risk (Annex III biometric identification) and its answers report Art. 5 practices, so the open-source exclusion is unavailable; Art. 4 applies, has_ai_literacy_measures=null so unable to determine"
     },
     "art5": {
       "overall": "non_compliant",
-      "legal_basis": "Art. 5(1)(d),(h): real-time biometric surveillance and prohibited emotion recognition detected \u2014 Art. 5 applies to ALL AI systems regardless of open-source status per Art. 2(12)"
+      "legal_basis": "Art. 5(1)(d),(h): real-time biometric surveillance and prohibited emotion recognition detected; Art. 2(12) does not apply: the system is likely high-risk (Annex III biometric identification) and its answers report Art. 5 practices, so the open-source exclusion is unavailable"
     },
     "art6": {
-      "overall": "not_applicable",
-      "reason_contains": "Art. 2(12)",
-      "legal_basis": "Art. 2(12): open-source AI components exempt from Title III (Art. 6-15), unless deploying a prohibited practice under Art. 5 or transparency obligation under Art. 50"
+      "overall": "non_compliant",
+      "legal_basis": "Art. 2(12) does not apply: the system is likely high-risk (Annex III biometric identification) and its answers report Art. 5 practices, so the open-source exclusion is unavailable; Art. 6 is scanned on the archetype's answers (non_compliant)"
     },
     "art9": {
-      "overall": "not_applicable",
-      "reason_contains": "open-source",
-      "legal_basis": "Art. 2(12): open-source AI exempt from Art. 9 risk management requirements under Title III exemption"
+      "overall": "non_compliant",
+      "legal_basis": "Art. 2(12) does not apply: the system is likely high-risk (Annex III biometric identification) and its answers report Art. 5 practices, so the open-source exclusion is unavailable; Art. 9 is scanned on the archetype's answers (non_compliant)"
     },
     "art10": {
-      "overall": "not_applicable",
-      "reason_contains": "Art. 2(12)",
-      "legal_basis": "Art. 2(12): open-source AI exempt from Art. 10 data governance requirements under Title III exemption"
+      "overall": "non_compliant",
+      "legal_basis": "Art. 2(12) does not apply: the system is likely high-risk (Annex III biometric identification) and its answers report Art. 5 practices, so the open-source exclusion is unavailable; Art. 10 is scanned on the archetype's answers (non_compliant)"
     },
     "art11": {
-      "overall": "not_applicable",
-      "reason_contains": "Art. 2(12)",
-      "legal_basis": "Art. 2(12): open-source AI exempt from Art. 11 technical documentation requirements under Title III exemption"
+      "overall": "partial",
+      "legal_basis": "Art. 2(12) does not apply: the system is likely high-risk (Annex III biometric identification) and its answers report Art. 5 practices, so the open-source exclusion is unavailable; Art. 11 is scanned on the archetype's answers (partial)"
     },
     "art12": {
-      "overall": "not_applicable",
-      "reason_contains": "Art. 2(12)",
-      "legal_basis": "Art. 2(12): open-source AI exempt from Art. 12 record-keeping requirements under Title III exemption"
+      "overall": "non_compliant",
+      "legal_basis": "Art. 2(12) does not apply: the system is likely high-risk (Annex III biometric identification) and its answers report Art. 5 practices, so the open-source exclusion is unavailable; Art. 12 is scanned on the archetype's answers (non_compliant)"
     },
     "art13": {
-      "overall": "not_applicable",
-      "reason_contains": "Art. 2(12)",
-      "legal_basis": "Art. 2(12): open-source AI exempt from Art. 13 transparency requirements under Title III exemption"
+      "overall": "non_compliant",
+      "legal_basis": "Art. 2(12) does not apply: the system is likely high-risk (Annex III biometric identification) and its answers report Art. 5 practices, so the open-source exclusion is unavailable; Art. 13 is scanned on the archetype's answers (non_compliant)"
     },
     "art14": {
-      "overall": "not_applicable",
-      "reason_contains": "Art. 2(12)",
-      "legal_basis": "Art. 2(12): open-source AI exempt from Art. 14 human oversight requirements under Title III exemption"
+      "overall": "non_compliant",
+      "legal_basis": "Art. 2(12) does not apply: the system is likely high-risk (Annex III biometric identification) and its answers report Art. 5 practices, so the open-source exclusion is unavailable; Art. 14 is scanned on the archetype's answers (non_compliant)"
     },
     "art15": {
-      "overall": "not_applicable",
-      "reason_contains": "Art. 2(12)",
-      "legal_basis": "Art. 2(12): open-source AI exempt from Art. 15 accuracy/robustness requirements under Title III exemption"
+      "overall": "non_compliant",
+      "legal_basis": "Art. 2(12) does not apply: the system is likely high-risk (Annex III biometric identification) and its answers report Art. 5 practices, so the open-source exclusion is unavailable; Art. 15 is scanned on the archetype's answers (non_compliant)"
     },
     "art50": {
       "overall": "non_compliant",
       "must_have_obligations": [
         "ART50-OBL-3"
       ],
-      "legal_basis": "Art. 50(3): emotion recognition and biometric categorization system detected but no disclosure to exposed persons \u2014 Art. 50 applies regardless of open-source status per Art. 2(12)"
+      "legal_basis": "Art. 50(3): emotion recognition and biometric categorization system detected but no disclosure to exposed persons; Art. 2(12) does not apply: the system is likely high-risk (Annex III biometric identification) and its answers report Art. 5 practices, so the open-source exclusion is unavailable"
     },
     "art17": {
-      "overall": "not_applicable",
-      "reason_contains": "Art. 2(12)",
-      "legal_basis": "Art. 2(12): open-source AI exempt from Art. 17 quality management requirements under Title III exemption"
+      "overall": "non_compliant",
+      "legal_basis": "Art. 2(12) does not apply: the system is likely high-risk (Annex III biometric identification) and its answers report Art. 5 practices, so the open-source exclusion is unavailable; Art. 17 is scanned on the archetype's answers (non_compliant)"
     },
     "art26": {
-      "overall": "not_applicable",
-      "legal_basis": "Art. 26: open-source system \u2014 scope gate excludes from deployer obligations"
+      "overall": "unable_to_determine",
+      "legal_basis": "Art. 2(12) does not apply: the system is likely high-risk (Annex III biometric identification) and its answers report Art. 5 practices, so the open-source exclusion is unavailable; Art. 26 is scanned on the archetype's answers (unable_to_determine)"
     },
     "art43": {
-      "overall": "not_applicable"
+      "overall": "unable_to_determine",
+      "legal_basis": "Art. 2(12) does not apply: the system is likely high-risk (Annex III biometric identification) and its answers report Art. 5 practices, so the open-source exclusion is unavailable; Art. 43 is scanned on the archetype's answers (unable_to_determine)"
     },
     "art47": {
-      "overall": "not_applicable"
+      "overall": "unable_to_determine",
+      "legal_basis": "Art. 2(12) does not apply: the system is likely high-risk (Annex III biometric identification) and its answers report Art. 5 practices, so the open-source exclusion is unavailable; Art. 47 is scanned on the archetype's answers (unable_to_determine)"
     },
     "art49": {
-      "overall": "not_applicable"
+      "overall": "unable_to_determine",
+      "legal_basis": "Art. 2(12) does not apply: the system is likely high-risk (Annex III biometric identification) and its answers report Art. 5 practices, so the open-source exclusion is unavailable; Art. 49 is scanned on the archetype's answers (unable_to_determine)"
     },
     "art51": {
       "overall": "unable_to_determine",
-      "legal_basis": "Art. 51 (GPAI classification) applies to open-source systems; all answers null so unable to determine"
+      "legal_basis": "Art. 51 (GPAI classification) is assessed by its own GPAI gates, not by Art. 2(12); all answers null so unable to determine"
     },
     "art53": {
       "overall": "unable_to_determine",
-      "legal_basis": "Art. 53 (GPAI provider obligations) applies to open-source systems; all answers null so unable to determine"
+      "legal_basis": "Art. 53 (GPAI provider obligations) is assessed by its own GPAI gates, not by Art. 2(12); all answers null so unable to determine"
     },
     "art54": {
       "overall": "unable_to_determine",
-      "legal_basis": "Art. 54 (GPAI authorised representatives) applies to open-source systems; all answers null so unable to determine"
+      "legal_basis": "Art. 54 (GPAI authorised representatives) is assessed by its own GPAI gates, not by Art. 2(12); all answers null so unable to determine"
     },
     "art55": {
       "overall": "unable_to_determine",
-      "legal_basis": "Art. 55 (GPAI systemic risk) applies to open-source systems; all answers null so unable to determine"
+      "legal_basis": "Art. 55 (GPAI systemic risk) is assessed by its own GPAI gates, not by Art. 2(12); all answers null so unable to determine"
     },
     "art27": {
-      "overall": "not_applicable"
+      "overall": "unable_to_determine",
+      "legal_basis": "Art. 2(12) does not apply: the system is likely high-risk (Annex III biometric identification) and its answers report Art. 5 practices, so the open-source exclusion is unavailable; Art. 27 is scanned on the archetype's answers (unable_to_determine)"
     },
     "art72": {
-      "overall": "not_applicable"
+      "overall": "unable_to_determine",
+      "legal_basis": "Art. 2(12) does not apply: the system is likely high-risk (Annex III biometric identification) and its answers report Art. 5 practices, so the open-source exclusion is unavailable; Art. 72 is scanned on the archetype's answers (unable_to_determine)"
     },
     "art73": {
-      "overall": "not_applicable"
+      "overall": "unable_to_determine",
+      "legal_basis": "Art. 2(12) does not apply: the system is likely high-risk (Annex III biometric identification) and its answers report Art. 5 practices, so the open-source exclusion is unavailable; Art. 73 is scanned on the archetype's answers (unable_to_determine)"
     },
     "art86": {
-      "overall": "not_applicable"
+      "overall": "unable_to_determine",
+      "legal_basis": "Art. 2(12) does not apply: the system is likely high-risk (Annex III biometric identification) and its answers report Art. 5 practices, so the open-source exclusion is unavailable; Art. 86 is scanned on the archetype's answers (unable_to_determine)"
     },
     "art16": {
-      "overall": "not_applicable",
-      "legal_basis": "Art. 2(12): open-source AI exempt from Art. 16 provider obligations under Title III exemption"
+      "overall": "unable_to_determine",
+      "legal_basis": "Art. 2(12) does not apply: the system is likely high-risk (Annex III biometric identification) and its answers report Art. 5 practices, so the open-source exclusion is unavailable; Art. 16 is scanned on the archetype's answers (unable_to_determine)"
     },
     "art18": {
-      "overall": "not_applicable",
-      "legal_basis": "Art. 2(12): open-source AI exempt from Art. 18 documentation keeping requirements under Title III exemption"
+      "overall": "unable_to_determine",
+      "legal_basis": "Art. 2(12) does not apply: the system is likely high-risk (Annex III biometric identification) and its answers report Art. 5 practices, so the open-source exclusion is unavailable; Art. 18 is scanned on the archetype's answers (unable_to_determine)"
     },
     "art19": {
-      "overall": "not_applicable",
-      "legal_basis": "Art. 2(12): open-source AI exempt from Art. 19 automatically generated logs requirements under Title III exemption"
+      "overall": "unable_to_determine",
+      "legal_basis": "Art. 2(12) does not apply: the system is likely high-risk (Annex III biometric identification) and its answers report Art. 5 practices, so the open-source exclusion is unavailable; Art. 19 is scanned on the archetype's answers (unable_to_determine)"
     },
     "art20": {
-      "overall": "not_applicable",
-      "legal_basis": "Art. 2(12): open-source AI exempt from Art. 20 corrective actions requirements under Title III exemption"
+      "overall": "unable_to_determine",
+      "legal_basis": "Art. 2(12) does not apply: the system is likely high-risk (Annex III biometric identification) and its answers report Art. 5 practices, so the open-source exclusion is unavailable; Art. 20 is scanned on the archetype's answers (unable_to_determine)"
     },
     "art21": {
-      "overall": "not_applicable",
-      "legal_basis": "Art. 2(12): open-source AI exempt from Art. 21 cooperation with authorities requirements under Title III exemption"
+      "overall": "unable_to_determine",
+      "legal_basis": "Art. 2(12) does not apply: the system is likely high-risk (Annex III biometric identification) and its answers report Art. 5 practices, so the open-source exclusion is unavailable; Art. 21 is scanned on the archetype's answers (unable_to_determine)"
     },
     "art22": {
-      "overall": "not_applicable",
-      "reason_contains": "Art. 2(12)",
-      "legal_basis": "Art. 2(12): open-source AI exempt from Art. 22 authorised representative requirements under Title III exemption"
+      "overall": "unable_to_determine",
+      "legal_basis": "Art. 2(12) does not apply: the system is likely high-risk (Annex III biometric identification) and its answers report Art. 5 practices, so the open-source exclusion is unavailable; Art. 22 is scanned on the archetype's answers (unable_to_determine)"
     },
     "art24": {
-      "overall": "not_applicable",
-      "legal_basis": "Art. 2(12): open-source AI exempt from Art. 24 distributor obligations under Title III exemption"
+      "overall": "unable_to_determine",
+      "legal_basis": "Art. 2(12) does not apply: the system is likely high-risk (Annex III biometric identification) and its answers report Art. 5 practices, so the open-source exclusion is unavailable; Art. 24 is scanned on the archetype's answers (unable_to_determine)"
     },
     "art25": {
-      "overall": "not_applicable",
-      "legal_basis": "Art. 2(12): open-source AI components exempt from Title III obligations including Art. 25 responsibilities along the AI value chain"
+      "overall": "unable_to_determine",
+      "legal_basis": "Art. 2(12) does not apply: the system is likely high-risk (Annex III biometric identification) and its answers report Art. 5 practices, so the open-source exclusion is unavailable; Art. 25 is scanned on the archetype's answers (unable_to_determine)"
     },
     "art8": {
-      "overall": "not_applicable",
-      "reason_contains": "Art. 2(12)",
-      "legal_basis": "Art. 2(12): open-source AI exempt from Art. 8 compliance requirements under Title III exemption"
+      "overall": "unable_to_determine",
+      "legal_basis": "Art. 2(12) does not apply: the system is likely high-risk (Annex III biometric identification) and its answers report Art. 5 practices, so the open-source exclusion is unavailable; Art. 8 is scanned on the archetype's answers (unable_to_determine)"
     },
     "art23": {
-      "overall": "not_applicable",
-      "legal_basis": "Art. 2(12): open-source AI exempt from Art. 23 importer obligations under Title III exemption"
+      "overall": "unable_to_determine",
+      "legal_basis": "Art. 2(12) does not apply: the system is likely high-risk (Annex III biometric identification) and its answers report Art. 5 practices, so the open-source exclusion is unavailable; Art. 23 is scanned on the archetype's answers (unable_to_determine)"
     },
     "art41": {
-      "overall": "not_applicable"
+      "overall": "unable_to_determine",
+      "legal_basis": "Art. 2(12) does not apply: the system is likely high-risk (Annex III biometric identification) and its answers report Art. 5 practices, so the open-source exclusion is unavailable; Art. 41 is scanned on the archetype's answers (unable_to_determine)"
     },
     "art60": {
-      "overall": "not_applicable"
+      "overall": "unable_to_determine",
+      "legal_basis": "Art. 2(12) does not apply: the system is likely high-risk (Annex III biometric identification) and its answers report Art. 5 practices, so the open-source exclusion is unavailable; Art. 60 is scanned on the archetype's answers (unable_to_determine)"
     },
     "art61": {
-      "overall": "not_applicable"
+      "overall": "unable_to_determine",
+      "legal_basis": "Art. 2(12) does not apply: the system is likely high-risk (Annex III biometric identification) and its answers report Art. 5 practices, so the open-source exclusion is unavailable; Art. 61 is scanned on the archetype's answers (unable_to_determine)"
     },
     "art71": {
-      "overall": "not_applicable"
+      "overall": "unable_to_determine",
+      "legal_basis": "Art. 2(12) does not apply: the system is likely high-risk (Annex III biometric identification) and its answers report Art. 5 practices, so the open-source exclusion is unavailable; Art. 71 is scanned on the archetype's answers (unable_to_determine)"
     },
     "art80": {
-      "overall": "not_applicable"
+      "overall": "unable_to_determine",
+      "legal_basis": "Art. 2(12) does not apply: the system is likely high-risk (Annex III biometric identification) and its answers report Art. 5 practices, so the open-source exclusion is unavailable; Art. 80 is scanned on the archetype's answers (unable_to_determine)"
     },
     "art82": {
-      "overall": "not_applicable"
+      "overall": "unable_to_determine",
+      "legal_basis": "Art. 2(12) does not apply: the system is likely high-risk (Annex III biometric identification) and its answers report Art. 5 practices, so the open-source exclusion is unavailable; Art. 82 is scanned on the archetype's answers (unable_to_determine)"
     },
     "art91": {
-      "overall": "not_applicable"
+      "overall": "unable_to_determine",
+      "legal_basis": "Art. 2(12) does not apply: the system is likely high-risk (Annex III biometric identification) and its answers report Art. 5 practices, so the open-source exclusion is unavailable; Art. 91 is scanned on the archetype's answers (unable_to_determine)"
     },
     "art92": {
       "note": "Evaluation cooperation readiness not determined",
-      "overall": "not_applicable"
+      "overall": "unable_to_determine",
+      "legal_basis": "Art. 2(12) does not apply: the system is likely high-risk (Annex III biometric identification) and its answers report Art. 5 practices, so the open-source exclusion is unavailable; Art. 92 is scanned on the archetype's answers (unable_to_determine)"
     },
     "art111": {
-      "overall": "not_applicable",
-      "note": "No transitional provision context provided"
+      "overall": "unable_to_determine",
+      "note": "No transitional provision context provided",
+      "legal_basis": "Art. 2(12) does not apply: the system is likely high-risk (Annex III biometric identification) and its answers report Art. 5 practices, so the open-source exclusion is unavailable; Art. 111 is scanned on the archetype's answers (unable_to_determine)"
     }
   }
 }

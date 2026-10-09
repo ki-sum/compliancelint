@@ -102,9 +102,19 @@ class TestMutationOpenSource:
         answers = _base_answers()
         answers["_scope"]["is_open_source"] = True
         answers["_scope"]["open_source_license"] = "MIT"
-        ctx = _make_ctx(answers)
+        ctx = _make_ctx(answers, risk="minimal-risk")
         result = _scan("art09-risk-management", ctx, tmp_path)
         assert result.overall_level == ComplianceLevel.NOT_APPLICABLE
+        assert "[Art. 2(12)]" in result.findings[0].description
+
+    def test_open_source_true_high_risk_scans_art9(self, tmp_path):
+        # Art. 2(12) does not apply to a high-risk AI system — flipping the risk class flips the outcome.
+        answers = _base_answers()
+        answers["_scope"]["is_open_source"] = True
+        answers["_scope"]["open_source_license"] = "MIT"
+        ctx = _make_ctx(answers)  # default risk: "likely high-risk"
+        result = _scan("art09-risk-management", ctx, tmp_path)
+        assert result.overall_level != ComplianceLevel.NOT_APPLICABLE
 
     def test_open_source_false_scans_art9(self, tmp_path):
         answers = _base_answers()
@@ -113,7 +123,7 @@ class TestMutationOpenSource:
         result = _scan("art09-risk-management", ctx, tmp_path)
         assert result.overall_level != ComplianceLevel.NOT_APPLICABLE
 
-    def test_open_source_does_not_exempt_art5(self, tmp_path):
+    def test_open_source_high_risk_does_not_exempt_art5(self, tmp_path):
         answers = _base_answers()
         answers["_scope"]["is_open_source"] = True
         answers["_scope"]["open_source_license"] = "MIT"
