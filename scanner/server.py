@@ -427,7 +427,8 @@ def _fetch_saas_scan_settings(config, project_path: str) -> dict | None:
     })
 
     try:
-        with urllib.request.urlopen(req, timeout=5) as resp:
+        # 15 s: a cold server took longer than the former 5 s (acceptance round 2, 2026-10-09).
+        with urllib.request.urlopen(req, timeout=15) as resp:
             if resp.status == 200:
                 return json.loads(resp.read().decode("utf-8"))
     except (urllib.error.URLError, urllib.error.HTTPError, OSError, json.JSONDecodeError) as e:
@@ -436,14 +437,26 @@ def _fetch_saas_scan_settings(config, project_path: str) -> dict | None:
     return None
 
 
-def _apply_saas_scan_settings(ctx, config, project_path: str, tool: str) -> None:
+# Acceptance round 2 (2026-10-09): a connected scan whose dashboard settings could not be fetched used to fall back
+# silently to the unscoped scan — the AI and the user did not learn that the Profiling Wizard answers were not applied.
+_DASHBOARD_SETTINGS_UNAVAILABLE = (
+    "Your dashboard settings (Profiling Wizard answers, roles, applicable obligations) could not be loaded, so this "
+    "scan used only the answers in compliance_answers. Tell the user, then run the scan again; if it keeps happening, "
+    "check the connection to the dashboard."
+)
+
+
+def _apply_saas_scan_settings(ctx, config, project_path: str, tool: str) -> str:
     """Dashboard settings (roles / risk / applicability / wizard answers) onto the scan context when connected —
-    cl_scan_all and, since acceptance run E (2026-10-08), cl_scan, which ignored them."""
+    cl_scan_all and, since acceptance run E (2026-10-08), cl_scan, which ignored them.
+
+    Returns "applied", "unavailable" (connected, but the settings could not be fetched) or "not_connected"."""
     if not config.saas_api_key:
-        return
+        return "not_connected"
     saas_settings = _fetch_saas_scan_settings(config, project_path)
     if not saas_settings:
-        return
+        logger.warning("%s — dashboard settings unavailable; scanning without them", tool)
+        return "unavailable"
     scope = ctx.compliance_answers.get("_scope", {})
     _apply_saas_settings_to_scope(scope, saas_settings)
     ctx.compliance_answers["_scope"] = scope
@@ -463,6 +476,7 @@ def _apply_saas_scan_settings(ctx, config, project_path: str, tool: str) -> None
         "%s — SaaS settings applied: roles=%s, risk=%s",
         tool, saas_settings.get("roles"), saas_settings.get("riskClassification"),
     )
+    return "applied"
 
 
 def _apply_saas_settings_to_scope(scope: dict, saas_settings: dict) -> dict:
@@ -686,6 +700,25 @@ _WIZARD_TO_SCANNER_FIELDS: dict = {
 }
 
 
+def _overall_verdict(levels: list, failed_articles: list) -> str:
+    """Worst-case summary of the per-article levels. Nothing assessed (every article not_applicable) is
+    "not_applicable"; compliant with some not_applicable and nothing undecided is "compliant" (acceptance round 2,
+    2026-10-09 — both fell to "unable_to_determine")."""
+    if "non_compliant" in levels:
+        return "non_compliant"
+    if failed_articles:
+        # Permanent AI-call failure on at least one article → partial coverage, never green-with-gaps.
+        return "partial"
+    if "partial" in levels:
+        return "partial"
+    assessed = [lv for lv in levels if lv != "not_applicable"]
+    if not assessed:
+        return "not_applicable"
+    if all(lv == "compliant" for lv in assessed):
+        return "compliant"
+    return "unable_to_determine"
+
+
 def _apply_approach_b_post_process(findings: list) -> list:
     """§AT.19 Phase 2d (2026-05-13) — Approach (b) post-process.
 
@@ -729,7 +762,13 @@ def _apply_approach_b_post_process(findings: list) -> list:
             continue
         auto = row.get("automation_assessment", {}) or {}
         level = auto.get("level", "")
-        if level != "partial":
+        # Manual obligations too (acceptance round 2, 2026-10-09): modules such as Art. 82 map the AI's answer to
+        # COMPLIANT / NON_COMPLIANT, so a manual duty read NON_COMPLIANT before any human answered.
+        if level not in ("partial", "manual"):
+            continue
+        # A manual obligation is reset only when a module mapped the AI's answer to a verdict; the gap finding
+        # (already UNABLE_TO_DETERMINE + Human Gates hint) stays as emitted.
+        if level == "manual" and f.get("level") not in ("compliant", "non_compliant"):
             continue
         # §AT.19 root cause fix (2026-05-14) — preserve NOT_APPLICABLE
         # emitted by scanner modules. NA is a deterministic
@@ -752,6 +791,14 @@ def _apply_approach_b_post_process(findings: list) -> list:
         if f.get("level") == "non_compliant" and row.get("deontic_type") == "prohibition":
             detection = f"AI detection: {f.get('description', '')} "
         f["level"] = "unable_to_determine"
+        if level == "manual":
+            f["description"] = (
+                f"[COVERAGE GAP — manual] {row.get('source', oid)}: {detection}"
+                f"This obligation requires human judgment. {auto.get('human_judgment_needed') or ''}"
+            ).strip()
+            f["human_gate_hint"] = HG_HINT.replace("{obl_id}", oid)
+            f["confidence"] = "low"
+            continue
         f["description"] = (
             f"[HYBRID — needs Human Gates attestation] {row.get('source', oid)}: "
             f"{detection}"
@@ -1707,7 +1754,7 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
 
     # ── SaaS Source of Truth: fetch role/risk settings if connected ──
     config = ProjectConfig.load(project_path)
-    _apply_saas_scan_settings(ctx, config, project_path, "cl_scan_all")
+    dashboard_settings = _apply_saas_scan_settings(ctx, config, project_path, "cl_scan_all")
 
     # ── Validation Gate: coerce + validate compliance_answers ──
     from core.validation_gate import run_gate
@@ -2031,20 +2078,7 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
         if isinstance(v, dict) and "error" in v
     )
 
-    # Determine worst-case overall
-    if "non_compliant" in overall_levels:
-        overall = "non_compliant"
-    elif failed_articles:
-        # Permanent AI-call failure on at least one article → partial
-        # coverage. Force "partial" even if every successful article
-        # was COMPLIANT, so dashboard never shows green-with-gaps.
-        overall = "partial"
-    elif "partial" in overall_levels:
-        overall = "partial"
-    elif all(l == "compliant" for l in overall_levels):
-        overall = "compliant"
-    else:
-        overall = "unable_to_determine"
+    overall = _overall_verdict(overall_levels, failed_articles)
 
     report = {
         "report_type": "compliance_scan_summary",
@@ -2059,6 +2093,9 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
             "skip_articles": config.skip_articles,
         } if config.has_config else None,
         "context_warnings": [w.__dict__ for w in ctx_warnings] if ctx_warnings else [],
+        # "applied" / "unavailable" / "not_connected" (acceptance round 2, 2026-10-09).
+        "dashboard_settings": dashboard_settings,
+        **({"dashboard_settings_warning": _DASHBOARD_SETTINGS_UNAVAILABLE} if dashboard_settings == "unavailable" else {}),
         "validation_gate": {
             "coerce_fixes": len(gate.coerce_log) if gate.coerce_log else 0,
             "coerce_details": gate.coerce_log[:10] if gate.coerce_log else [],

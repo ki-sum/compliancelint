@@ -229,7 +229,9 @@ _ART5_1A = (
 # What each answer field means — returned by cl_analyze_project as
 # compliance_answers_field_descriptions (self-audit B2, 2026-10-02). "true" for an
 # Art. 5 field means the prohibited practice IS present (a violation signal).
-_SCOPE_RISK_FIELDS = ("risk_classification", "risk_classification_confidence", "risk_reasoning")
+_SCOPE_RISK_FIELDS = ("risk_classification", "risk_classification_confidence", "risk_reasoning",
+                      # Text slot read by the Art. 2(12) reason (acceptance round 2, 2026-10-09).
+                      "open_source_license")
 
 _FIELD_DESCRIPTIONS: dict = {
     "_scope": {
@@ -250,6 +252,10 @@ _FIELD_DESCRIPTIONS: dict = {
             "— the Art. 12(3) logging and Art. 14(5) separate-verification duties apply only to these. false for "
             "biometric verification whose sole purpose is to confirm that a specific person is who they claim to be, "
             "and for every other system; null if you cannot determine it from the project."
+        ),
+        "open_source_license": (
+            "Text: the SPDX identifier of the licence the system is released under (e.g. \"MIT\", \"Apache-2.0\"); "
+            "empty if it is not released under a free and open-source licence."
         ),
         "is_open_source": (
             "true only if the system is released under a free and open-source licence AND it is not high-risk "

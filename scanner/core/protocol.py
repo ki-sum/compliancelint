@@ -779,11 +779,13 @@ class BaseArticleModule:
         # ── Art. 2(12): Open-source exemption ──
         if self._open_source_carve_out_applies(ctx, scope):
             if self._article_number not in self._OPEN_SOURCE_APPLICABLE:
-                license_name = scope.get("open_source_license", "unknown")
+                license_name = (scope.get("open_source_license") or "").strip()
+                # The licence only when the answers name it (it used to read "Licence: unknown").
+                licence = f"Licence: {license_name}. " if license_name else ""
                 return self._not_applicable_result(
                     project_path, lang, obl_prefix,
                     legal_basis="Art. 2(12)",
-                    reason=f"Licence: {license_name}. The scope answers state that {self._OPEN_SOURCE_REASON}.",
+                    reason=f"{licence}The scope answers state that {self._OPEN_SOURCE_REASON}.",
                 )
 
         return None  # All scope checks passed — proceed with scan
