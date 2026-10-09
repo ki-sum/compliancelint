@@ -173,7 +173,7 @@
       "deontic_type": "exception",
       "modality": "shall not",
       "addressee": "provider_and_deployer",
-      "scope_limitation": "Only applies to law enforcement, migration, border control or asylum systems where national/Union law deems dual verification disproportionate",
+      "scope_limitation": "Only relevant for high-risk AI systems referred to in point 1(a) of Annex III (the Art. 14(5) separate-verification requirement it is an exception to); it applies to such systems used for law enforcement, migration, border control or asylum where Union or national law considers the requirement disproportionate",
       "context_skip_field": "is_biometric_system",
       "context_skip_value": false,
       "note": "Exemption from ART14-OBL-5 dual verification requirement. Applies when: (1) system is used for law enforcement, migration, border control, or asylum, AND (2) Union or national law considers dual verification disproportionate. NOT a general exemption.",

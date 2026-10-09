@@ -141,6 +141,15 @@ class Art80Module(BaseArticleModule):
         }
 
         # ── Obligation Engine: enrich findings + identify gaps ──
+        # Art. 80(1) concerns "an AI system classified by the provider as non-high-risk pursuant to Article 6(3)"
+        # (acceptance round 2, 2026-10-09). An explicit "no Art. 6(3) claim" makes the article not applicable.
+        if self._answers_flat(ctx).get("claims_art6_3_exception") is False:
+            findings = self._set_not_applicable(
+                findings, ("ART80-OBL-4", "ART80-OBL-5", "ART80-OBL-7"),
+                "Not applicable: Article 80 concerns AI systems that the provider classified as non-high-risk "
+                "pursuant to Article 6(3); the answers state that no such classification is made.",
+            )
+
         obligations = self._load_obligations()
         if obligations:
             engine = ObligationEngine(obligations)

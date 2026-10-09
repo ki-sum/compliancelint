@@ -104,7 +104,9 @@ _BOOL_FIELDS: dict = {
               "has_ai_disclosure_to_users", "has_content_watermarking",
               "is_emotion_recognition_system", "is_biometric_categorization_system",
               "has_emotion_biometric_disclosure", "is_deep_fake_system",
-              "has_deep_fake_disclosure"],
+              "has_deep_fake_disclosure",
+              # Art. 50(4) second subparagraph (acceptance round 2, 2026-10-09)
+              "publishes_public_interest_text"],
     "art20": ["has_corrective_action_procedure", "has_supply_chain_notification",
               "has_risk_investigation_procedure"],
     "art72": ["has_pmm_system", "has_active_data_collection", "has_pmm_plan"],
@@ -381,6 +383,15 @@ with open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
     for _art, _descs in json.load(_f).items():
         if not _art.startswith("_"):
             _FIELD_DESCRIPTIONS.setdefault(_art, {}).update(_descs)
+
+
+# Art. 50(4) second subparagraph had no answer field, so ART50-OBL-4b — and with it Art. 50(5) — could never be
+# settled, and the Art. 2(12) contradiction check missed that Art. 50 case (acceptance round 2, 2026-10-09).
+_FIELD_DESCRIPTIONS.setdefault("art50", {})["publishes_public_interest_text"] = (
+    "true if the system generates or manipulates text that is published with the purpose of informing the public on "
+    "matters of public interest (Art. 50(4), second subparagraph); false if it does not; null if you cannot determine "
+    "it from the project."
+)
 
 
 def _fill_application_date_placeholders() -> None:

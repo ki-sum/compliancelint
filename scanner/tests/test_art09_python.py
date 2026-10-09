@@ -395,8 +395,10 @@ class TestArt09Obl9Conditional:
             ComplianceLevel.NOT_APPLICABLE,
         )
 
-    def test_affects_children_false_gives_not_applicable(self, art09_module, tmp_path):
-        """affects_children=False → OBL-9 NOT_APPLICABLE."""
+    def test_affects_children_false_still_applies(self, art09_module, tmp_path):
+        """Art. 9(9) — "shall give consideration to whether … minors … and, as appropriate, other vulnerable groups" —
+        is a duty of every high-risk provider; affects_children=False no longer makes it NOT_APPLICABLE (acceptance
+        round 2, 2026-10-09)."""
         ctx = _ctx_with("art9", {
             "has_risk_docs": True, "has_risk_code_patterns": True,
             "has_testing_infrastructure": True, "has_defined_metrics": True,
@@ -406,7 +408,7 @@ class TestArt09Obl9Conditional:
         result = art09_module.scan(str(tmp_path))
         obl = _find(result, "ART09-OBL-9")
         assert len(obl) > 0
-        assert obl[0].level == ComplianceLevel.NOT_APPLICABLE
+        assert obl[0].level != ComplianceLevel.NOT_APPLICABLE
 
     def test_affects_children_true_gives_utd(self, art09_module, tmp_path):
         """affects_children=True → OBL-9 UNABLE_TO_DETERMINE (manual assessment)."""

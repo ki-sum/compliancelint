@@ -80,8 +80,9 @@ class TestArt47Obl2:
         assert obl[0].level == ComplianceLevel.PARTIAL
 
     def test_false_gives_non_compliant(self, art47_module, tmp_path):
-        """has_annex_v_content=False → ART47-OBL-2 NON_COMPLIANT."""
-        BaseArticleModule.set_context(_full_false_ctx())
+        """A declaration exists (47(1) true) but lacks the Annex V content → ART47-OBL-2 NON_COMPLIANT. Without a
+        declaration 47(2) cannot be assessed (test_acceptance_r2_legal_scope.py, 2026-10-09)."""
+        BaseArticleModule.set_context(_ctx_with("art47", {"has_doc_declaration": True, "has_annex_v_content": False}))
         result = art47_module.scan(str(tmp_path))
         obl = _find(result, "ART47-OBL-2")
         assert len(obl) > 0

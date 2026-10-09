@@ -99,9 +99,11 @@ class Art47Module(BaseArticleModule):
 
         # ── ART47-OBL-2: Annex V content and translation ──
         # DoC must state Section 2 compliance, contain Annex V info, and be translated
+        # Art. 47(2) is the content of the declaration: without a declaration (47(1) answered false) it cannot be
+        # assessed, so it is not reported non-compliant as well (acceptance round 2, 2026-10-09).
         findings.append(self._finding_from_answer(
             obligation_id="ART47-OBL-2",
-            answer=has_annex_v_content,
+            answer=None if has_doc_declaration is False else has_annex_v_content,
             true_description=(
                 "DoC appears to contain Annex V elements. "
                 "Verify it states compliance with Section 2 requirements "
@@ -114,6 +116,9 @@ class Art47Module(BaseArticleModule):
                 "languages understood by relevant national competent authorities."
             ),
             none_description=(
+                "No EU declaration of conformity exists yet (Art. 47(1)), so its content under Art. 47(2) "
+                "cannot be assessed; draw up the declaration first."
+                if has_doc_declaration is False else
                 "AI could not determine whether the DoC contains Annex V information. "
                 "Art. 47(2) requires Annex V content and appropriate translations."
             ),

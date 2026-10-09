@@ -544,8 +544,9 @@ class TestClScanArticle9:
                 f"{obl_id} not in findings. Found: {sorted(finding_ids)}"
             )
 
-    def test_affects_children_false_skips_obl9(self, project_dir):
-        """affects_children=False → OBL-9 NOT_APPLICABLE."""
+    def test_affects_children_false_keeps_obl9(self, project_dir):
+        """Art. 9(9) applies to every high-risk provider — affects_children=False no longer skips OBL-9 (acceptance
+        round 2, 2026-10-09)."""
         ctx = ProjectContext.from_json(json.dumps({
             "art9": {
                 "has_risk_docs": True,
@@ -559,7 +560,7 @@ class TestClScanArticle9:
         result = json.loads(result_json)
         obl9 = [f for f in result["findings"] if f["obligation_id"] == "ART09-OBL-9"]
         assert len(obl9) > 0
-        assert obl9[0]["level"] == "not_applicable"
+        assert obl9[0]["level"] != "not_applicable"
 
     def test_no_context_returns_error(self, project_dir):
         """Missing project_context returns error."""

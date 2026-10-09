@@ -172,6 +172,16 @@ class Art43Module(BaseArticleModule):
         }
 
         # ── Obligation Engine: enrich findings + identify gaps ──
+        # Art. 43(1) concerns "high-risk AI systems listed in point 1 of Annex III"; points 2 to 8 follow Art. 43(2)
+        # (acceptance round 2, 2026-10-09). The point comes from art6.annex_iii_categories ("1(a)", "5(b)" …).
+        categories = [str(c).strip() for c in (ctx.get_article_answers("art6") or {}).get("annex_iii_categories") or []]
+        if is_annex_i_product is not True and categories and not any(c.startswith("1") for c in categories):
+            findings = self._set_not_applicable(
+                findings, ("ART43-OBL-1",),
+                "Not applicable: Article 43(1) concerns high-risk AI systems listed in point 1 of Annex III; the "
+                f"answers place the system in Annex III point(s) {', '.join(categories)}, which follow Article 43(2).",
+            )
+
         obligations = self._load_obligations()
         if obligations:
             engine = ObligationEngine(obligations)

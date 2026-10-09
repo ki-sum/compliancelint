@@ -244,6 +244,8 @@ class TestValidateAnswers:
                 "is_deep_fake_system": False,
                 "has_deep_fake_disclosure": None,
                 "deep_fake_evidence": [],
+                # Art. 50(4) second subparagraph field (acceptance round 2, 2026-10-09)
+                "publishes_public_interest_text": False,
             }
         }
         errors, missing = validate_answers(answers)

@@ -808,6 +808,7 @@ class BaseArticleModule:
             return False
         art50 = ctx.get_article_answers("art50") or {}
         if any(art50.get(k) is True for k in (
+            "publishes_public_interest_text",
             "is_chatbot_or_interactive_ai", "is_generating_synthetic_content", "is_emotion_recognition_system",
             "is_biometric_categorization_system", "is_deep_fake_system",
         )):
@@ -1164,6 +1165,34 @@ class BaseArticleModule:
         return result
 
     # ── AI-answer → Finding mapping helper ──
+
+    @staticmethod
+    def _answers_flat(ctx) -> dict:
+        """Every article's answers in one dict (last wins) — how the obligation engine reads context fields."""
+        flat: dict = {}
+        for article_answers in ((ctx.compliance_answers or {}).values() if ctx else ()):
+            if isinstance(article_answers, dict):
+                flat.update(article_answers)
+        return flat
+
+    @staticmethod
+    def _set_not_applicable(findings: list, obligation_ids, reason: str) -> list:
+        """Replace (or add) the findings of these obligations with NOT_APPLICABLE + reason — for scope conditions the
+        answers settle (acceptance round 2, 2026-10-09). Call before the obligation engine so it adds no gap finding."""
+        ids = set(obligation_ids)
+        kept = [f for f in findings if getattr(f, "obligation_id", None) not in ids]
+        for oid in sorted(ids):
+            kept.append(Finding(
+                obligation_id=oid,
+                file_path="project-wide",
+                line_number=None,
+                level=ComplianceLevel.NOT_APPLICABLE,
+                confidence=Confidence.MEDIUM,
+                description=reason,
+                gap_type=GapType.PROCESS,
+                is_informational=True,
+            ))
+        return kept
 
     def _finding_from_answer(
         self,

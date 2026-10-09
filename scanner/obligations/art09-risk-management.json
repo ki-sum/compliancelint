@@ -440,9 +440,6 @@
       "deontic_type": "obligation",
       "modality": "shall",
       "addressee": "provider",
-      "scope_limitation": "Only applies when the AI system is intended to be used by or may affect children or vulnerable groups",
-      "context_skip_field": "affects_children",
-      "context_skip_value": false,
       "decomposed_atoms": [
         {
           "atom": "consider_child_impact",

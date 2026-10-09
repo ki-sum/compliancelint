@@ -61,6 +61,7 @@ class Art50Module(BaseArticleModule):
         has_emotion_biometric_disclosure = answers.get("has_emotion_biometric_disclosure")
         emotion_biometric_evidence = answers.get("emotion_biometric_evidence", [])
         is_deep_fake_system = answers.get("is_deep_fake_system")
+        publishes_public_interest_text = answers.get("publishes_public_interest_text")
         has_deep_fake_disclosure = answers.get("has_deep_fake_disclosure")
         deep_fake_evidence = answers.get("deep_fake_evidence", [])
 
@@ -93,7 +94,8 @@ class Art50Module(BaseArticleModule):
                     false_description=(
                         "System is a chatbot/interactive AI but no AI disclosure to users "
                         "was found. Art. 50(1) requires informing users they are interacting "
-                        "with an AI system prior to their first interaction."
+                        "with an AI system, at the latest at the time of the first interaction or exposure "
+                        "(Art. 50(5))."
                     ),
                     evidence=disclosure_evidence,
                     gap_type=GapType.CODE,
@@ -139,7 +141,8 @@ class Art50Module(BaseArticleModule):
                 false_description=(
                     "System generates synthetic content but no content marking "
                     "was found. Art. 50(2) requires marking output as artificially "
-                    "generated in machine-readable format (C2PA recommended)."
+                    "generated in a machine-readable format (for images, audio and video e.g. C2PA content "
+                    "credentials; for text, metadata or watermarking suited to text)."
                 ),
                 gap_type=GapType.CODE,
             ))
@@ -250,7 +253,7 @@ class Art50Module(BaseArticleModule):
                 confidence=Confidence.MEDIUM,
                 description=(
                     "Not applicable: system does not generate or manipulate deep fake content. "
-                    "Art. 50(4) does not apply."
+                    "The first subparagraph of Art. 50(4) (deep fakes) does not apply."
                 ),
                 gap_type=GapType.PROCESS,
             ))
@@ -283,12 +286,32 @@ class Art50Module(BaseArticleModule):
         }
 
         # ── Obligation Engine: enrich findings + identify gaps ──
+        # Art. 50(4) second subparagraph (text published to inform the public on matters of public interest) — settled
+        # by its own answer; true / unanswered stays with the obligation engine (acceptance round 2, 2026-10-09).
+        if publishes_public_interest_text is False:
+            findings = self._set_not_applicable(
+                findings, ("ART50-OBL-4b",),
+                "Not applicable: the answers state that the system does not generate or manipulate text published "
+                "with the purpose of informing the public on matters of public interest (Art. 50(4), second "
+                "subparagraph).",
+            )
+
         obligations = self._load_obligations()
         if obligations:
             engine = ObligationEngine(obligations)
             findings = [engine.enrich_finding(f) for f in findings]
             gap_findings = engine.gap_findings(findings, ctx.compliance_answers if ctx else None)
             findings.extend(gap_findings)
+            # Art. 50(5) governs "the information referred to in paragraphs 1 to 4": not applicable when none of
+            # them applies (acceptance round 2, 2026-10-09).
+            paras = ("ART50-OBL-1", "ART50-OBL-2", "ART50-OBL-3", "ART50-OBL-4", "ART50-OBL-4b")
+            levels = {f.obligation_id: f.level for f in findings if getattr(f, "obligation_id", None) in paras}
+            if len(levels) == len(paras) and all(lv == ComplianceLevel.NOT_APPLICABLE for lv in levels.values()):
+                findings = self._set_not_applicable(
+                    findings, ("ART50-OBL-5",),
+                    "Not applicable: Article 50(5) governs how the information referred to in paragraphs 1 to 4 is "
+                    "provided; none of paragraphs 1 to 4 applies to this system.",
+                )
             details["obligation_coverage"] = {
                 "total_obligations": len(engine.obligations),
                 "covered_by_scan": len(engine.obligations) - len(gap_findings),
@@ -397,8 +420,8 @@ class Art50Module(BaseArticleModule):
                 details=(
                     "Art. 50(1) requires informing users they are interacting with AI. "
                     "Add a clear, persistent disclosure at the start of every conversation. "
-                    "Example: 'You are interacting with an AI assistant.' Must be shown "
-                    "'prior to their first interaction' per Art. 50(1)."
+                    "Example: 'You are interacting with an AI assistant.' It must be given at the latest at "
+                    "the time of the first interaction or exposure (Art. 50(5))."
                 ),
                 effort="1-2 hours",
             ))
