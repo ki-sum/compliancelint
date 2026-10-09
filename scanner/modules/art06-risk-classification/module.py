@@ -220,19 +220,15 @@ class Art06Module(BaseArticleModule):
 
         # ── Obligation Engine: enrich findings + identify gaps ──
         # Acceptance round 2 (2026-10-09): Art. 6(4) applies to "a provider who considers that an AI system
-        # referred to in Annex III is not high-risk"; Art. 6(1) concerns Annex I products.
+        # referred to in Annex III is not high-risk". ART06-CLS-1 has no such gate: is_annex_i_product answers the
+        # Section A question only, which rules out neither a Section B product nor the safety-component side of
+        # Art. 6(1)(a) (o3 Prompt G item C2).
         flat = self._answers_flat(ctx)
         if flat.get("claims_art6_3_exception") is False:
             findings = self._set_not_applicable(
                 findings, ("ART06-OBL-4",),
                 "Not applicable: Article 6(4) applies to a provider who considers that an AI system referred to in "
                 "Annex III is not high-risk; the answers state that the Article 6(3) derogation is not relied on.",
-            )
-        if flat.get("is_annex_i_product") is False and not answers.get("annex_i_product_type"):
-            findings = self._set_not_applicable(
-                findings, ("ART06-CLS-1",),
-                "Not applicable: the answers state that the AI system is not a safety component of, or itself, a "
-                "product covered by the Union harmonisation legislation listed in Annex I (Article 6(1)).",
             )
 
         obligations = self._load_obligations()

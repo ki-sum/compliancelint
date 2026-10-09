@@ -4,8 +4,11 @@
 - Art. 80(1) concerns "an AI system classified by the provider as non-high-risk pursuant to Article 6(3)" — not
   applicable when the provider does not claim the Art. 6(3) derogation.
 - Art. 6(4): "A provider who considers that an AI system referred to in Annex III is not high-risk" — same condition.
-- Art. 6(1) concerns Annex I products — not applicable when the answers say the system is not one.
-- Art. 43(1) concerns "high-risk AI systems listed in point 1 of Annex III"; points 2 to 8 follow Art. 43(2).
+- Art. 6(1)(a) covers an AI system that is itself an Annex I product or intended to be used as a safety component of
+  one, in Section A or Section B. The scanner's is_annex_i_product answer covers Section A only, so it cannot make
+  ART06-CLS-1 not applicable (o3 Prompt G item C2, 2026-10-09: the earlier gate was rejected).
+- Art. 43(1) concerns "high-risk AI systems listed in point 1 of Annex III" (o3 Prompt G item C3: the reason names
+  the points, not Art. 43(2), which also depends on the Art. 43(3) product route).
 - Art. 47(2) is the content of the declaration — it cannot be non-compliant before a declaration exists (47(1)).
 - Art. 50(5): "The information referred to in paragraphs 1 to 4" — not applicable when none of 50(1)-(4) applies; the
   information is given "at the latest at the time of the first interaction or exposure"; Art. 50(4) first
@@ -74,12 +77,19 @@ def test_art6_4_not_applicable_without_an_art6_3_claim(tmp_path):
     f = _scan("art06-risk-classification",
               {"art49": {"claims_art6_3_exception": False}, "art6": {"annex_iii_categories": ["5(b)"], "has_risk_classification_doc": None}}, tmp_path)
     assert f["ART06-OBL-4"].level == NA
+    assert f["ART06-OBL-4"].description == (
+        "Not applicable: Article 6(4) applies to a provider who considers that an AI system referred to in Annex III "
+        "is not high-risk; the answers state that the Article 6(3) derogation is not relied on.")
 
 
-def test_art6_1_not_applicable_for_a_non_annex_i_system(tmp_path):
+def test_art6_1_not_made_not_applicable_by_a_section_a_answer(tmp_path):
+    # is_annex_i_product = the Section A question; a Section B product (machinery, motor vehicles …) or the
+    # safety-component side is not ruled out by it, nor by the absence of an AI-detected product type.
     f = _scan("art06-risk-classification",
               {"art11": {"is_annex_i_product": False}, "art6": {"annex_iii_categories": ["5(b)"], "annex_i_product_type": None}}, tmp_path)
-    assert f["ART06-CLS-1"].level == NA
+    assert f["ART06-CLS-1"].level != NA
+    src = open(os.path.join(SCANNER_ROOT, "modules", "art06-risk-classification", "module.py"), encoding="utf-8").read()
+    assert "not a safety component of, or itself, a" not in src
 
 
 @pytest.mark.parametrize("categories,applicable", [(["5(b)"], False), (["4(a)", "5(b)"], False), (["1(a)"], True)])
@@ -87,6 +97,17 @@ def test_art43_1_only_for_annex_iii_point_1(categories, applicable, tmp_path):
     f = _scan("art43-conformity-assessment",
               {"art6": {"annex_iii_categories": categories}, "art43": {"is_annex_i_product": False}}, tmp_path)
     assert (f["ART43-OBL-1"].level != NA) is applicable
+    if not applicable:
+        assert f["ART43-OBL-1"].description == (
+            "Not applicable: Article 43(1) concerns high-risk AI systems listed in point 1 of Annex III; the answers "
+            f"place the system in Annex III point(s) {', '.join(categories)}, not point 1.")
+
+
+def test_art43_1_point_reason_with_an_unknown_annex_i_answer(tmp_path):
+    # The decisive fact is that no category is point 1; an unanswered Section A question does not block it.
+    f = _scan("art43-conformity-assessment", {"art6": {"annex_iii_categories": ["5(b)"]}}, tmp_path)
+    assert f["ART43-OBL-1"].level == NA
+    assert f["ART43-OBL-1"].description.endswith("point(s) 5(b), not point 1.")
 
 
 def test_art47_2_not_non_compliant_without_a_declaration(tmp_path):
@@ -134,6 +155,14 @@ def test_art50_texts(tmp_path):
     assert "Art. 50(4) does not apply." not in src
     assert "first subparagraph" in src
     assert "(C2PA recommended)" not in src
+
+
+def test_art50_2_marking_text_is_technology_neutral(tmp_path):
+    f = _scan("art50-transparency-obligations", {"art50": {
+        "is_generating_synthetic_content": True, "has_content_watermarking": False}}, tmp_path, risk="limited-risk")
+    assert f["ART50-OBL-2"].description == (
+        "System generates synthetic content but no content marking was found. Art. 50(2) requires outputs to be "
+        "marked in a machine-readable format and detectable as artificially generated or manipulated.")
 
 
 def test_art9_9_has_no_children_condition():
