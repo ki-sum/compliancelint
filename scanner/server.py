@@ -20,7 +20,7 @@ from datetime import datetime, timezone
 
 from mcp.server.fastmcp import FastMCP
 
-CL_VERSION = "1.2.0"  # ComplianceLint version — displayed in UI, PDF, and scan metadata
+CL_VERSION = "1.2.1"  # ComplianceLint version — displayed in UI, PDF, and scan metadata
 
 logger = logging.getLogger("compliancelint")
 logging.basicConfig(level=logging.INFO, format="%(name)s %(levelname)s: %(message)s",
@@ -4238,6 +4238,12 @@ async def cl_connect(
                 reg_data = json.loads(reg_result.stdout.strip())
                 if reg_data.get("dashboard_url"):
                     repo_dashboard_url = reg_data["dashboard_url"]
+                # 1.2.1: keep the repo id, so the first scan can read the dashboard settings (Profiling Wizard
+                # answers, roles). Only cl_sync stored it — a scan before the first sync reported them
+                # "unavailable" although the message below invites the user to fill the wizard first.
+                if isinstance(reg_data.get("repo_id"), str) and reg_data["repo_id"]:
+                    from core.pending_evidence import write_cached_repo_id
+                    write_cached_repo_id(project_path, reg_data["repo_id"])
                 slog.info(
                     "cl_connect: pre-registered repo (was_new=%s, repo_id=%s)",
                     reg_data.get("was_new"),

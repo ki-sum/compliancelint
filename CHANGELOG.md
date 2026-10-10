@@ -4,6 +4,15 @@ All notable changes to ComplianceLint will be documented in this file.
 
 This project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.2.1] — 2026-10-10
+
+### Fixed — the first scan of a new project reads the dashboard settings
+- `cl_connect` now stores the dashboard's repo id (`.compliancelint/local/metadata.json`) when it registers the
+  project. Before, only `cl_sync` stored it, so a scan run before the first sync could not read the dashboard
+  settings (Profiling Wizard answers, roles, applicable obligations) and reported `dashboard_settings:
+  "unavailable"` with a warning to re-run the scan — although `cl_connect` invites the user to fill the wizard
+  before the first scan.
+
 ## [1.2.0] — 2026-10-10
 
 ### Changed — Art. 111(1) and 111(4) records
