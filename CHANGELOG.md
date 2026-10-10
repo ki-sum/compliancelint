@@ -4,7 +4,7 @@ All notable changes to ComplianceLint will be documented in this file.
 
 This project adheres to [Semantic Versioning](https://semver.org/).
 
-## [1.2.0] — unreleased
+## [1.2.0] — 2026-10-10
 
 ### Changed — Art. 111(1) and 111(4) records
 - **ART111-OBL-1** (Art. 111(1), AI systems that are components of the Annex X large-scale IT
