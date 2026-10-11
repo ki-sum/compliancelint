@@ -12,6 +12,7 @@ asserting.
 """
 import json
 import os
+import re
 import sys
 
 SCANNER_ROOT = os.path.join(os.path.dirname(__file__), "..")
@@ -57,7 +58,8 @@ def test_cl_version_tools_count_matches_registered_decorators():
     server_path = os.path.join(SCANNER_ROOT, "server.py")
     with open(server_path, "r", encoding="utf-8") as f:
         source = f.read()
-    decorator_count = source.count("@mcp.tool()")
+    # `@mcp.tool()` and `@mcp.tool(**options)` (1.2.2: tools that declare their result-size limit).
+    decorator_count = len(re.findall(r"^@mcp\.tool\(", source, flags=re.MULTILINE))
     parsed = _parse_cl_version()
     reported = parsed["tools"]
     assert reported == decorator_count, (

@@ -4,6 +4,27 @@ All notable changes to ComplianceLint will be documented in this file.
 
 This project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.2.2] — 2026-10-11
+
+### Changed — `cl_scan_all` and `cl_action_plan` responses: readable by the AI client in one piece
+- `cl_scan_all` and `cl_action_plan` for all articles no longer carry the verbatim text of every related Recital
+  (`related_recitals_by_article`). That text was about 254,000 characters — 78 % of a full scan response (325,000)
+  and of a full action plan (329,000) — which is more than an AI client keeps in the conversation: Claude Code
+  wrote the result to a file and handed the assistant the file path, so the assistant did not see the scan summary
+  or the actions directly. Both now list the Recital numbers per article (`related_recital_numbers_by_article`).
+  The text is returned, as before, by `cl_explain(article=N)`, by `cl_scan` for selected articles and by
+  `cl_action_plan(article=N)`. A full scan response is now about 60,000 characters, a full action plan about 65,000.
+- `cl_analyze_project`, `cl_scan_all` and `cl_action_plan` declare their result-size limit to Claude Code
+  (`_meta["anthropic/maxResultSizeChars"]`, 200,000), so these responses stay in the conversation (the default
+  threshold is 50,000 characters). With an mcp SDK too old to carry tool metadata the tools work as before.
+
+### Added — `cl_scan_all` totals that say what they count
+- New `totals` block: articles by the AI's assessment, findings (one per obligation) by the AI's assessment, and
+  findings as `cl_sync` records them on the dashboard. A scan could be reported in the terminal as "15 articles
+  non-compliant" and shown on the dashboard as "Non-Compliant 2 of 145 findings": the first counts articles, the
+  second counts findings after the sync rule that holds the AI's verdict on a human-judgment obligation as "needs
+  review" until a person confirms it in Human Gates. The block states the unit of each count and that rule.
+
 ## [1.2.1] — 2026-10-10
 
 ### Fixed — the first scan of a new project reads the dashboard settings

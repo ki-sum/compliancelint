@@ -20,7 +20,7 @@ from datetime import datetime, timezone
 
 from mcp.server.fastmcp import FastMCP
 
-CL_VERSION = "1.2.1"  # ComplianceLint version — displayed in UI, PDF, and scan metadata
+CL_VERSION = "1.2.2"  # ComplianceLint version — displayed in UI, PDF, and scan metadata
 
 logger = logging.getLogger("compliancelint")
 logging.basicConfig(level=logging.INFO, format="%(name)s %(levelname)s: %(message)s",
@@ -55,6 +55,23 @@ except Exception:  # noqa: BLE001
     pass
 
 mcp = FastMCP("compliancelint")
+
+# Claude Code keeps a tool result in the conversation only up to 50,000 characters (25,000 tokens); a larger one is
+# written to a file and the assistant gets the file path instead of the content. A tool may declare its own limit in
+# `_meta["anthropic/maxResultSizeChars"]` (ceiling 500,000). Three tools return more than 50,000 characters on a
+# real project, and the assistant has to read all of it: cl_analyze_project (the answers template, about 57,000),
+# cl_scan_all (the summary of every article, about 60,000) and cl_action_plan for all articles (about 65,000).
+_LARGE_RESULT_MAX_CHARS = 200_000
+
+
+def _result_limit_options(max_chars: int) -> dict:
+    """Keyword arguments for `@mcp.tool(...)` that declare the tool's result-size limit, where the installed mcp
+    SDK can carry tool `_meta` (older 1.x releases cannot — the tool is then registered without it)."""
+    import inspect
+
+    if "meta" in inspect.signature(mcp.tool).parameters:
+        return {"meta": {"anthropic/maxResultSizeChars": max_chars}}
+    return {}
 
 # ── Module Registry ──
 
@@ -191,7 +208,7 @@ def _read_ai_provider(project_path: str) -> str:
 
 # ── MCP Tools ──
 
-@mcp.tool()
+@mcp.tool(**_result_limit_options(_LARGE_RESULT_MAX_CHARS))
 def cl_analyze_project(project_path: str) -> str:
     """Analyze a project's structure and sample source code for compliance scanning.
 
@@ -717,6 +734,50 @@ def _overall_verdict(levels: list, failed_articles: list) -> str:
     if all(lv == "compliant" for lv in assessed):
         return "compliant"
     return "unable_to_determine"
+
+
+_SCAN_LEVELS = ("non_compliant", "partial", "unable_to_determine", "not_applicable", "compliant")
+_FINDINGS_UNIT = "findings (one per obligation)"
+_SCAN_TOTALS_EXPLANATION = (
+    "Three counts of the same scan — say which one you quote. "
+    "articles_by_ai_assessment counts ARTICLES by their overall result. The two findings rows count individual "
+    "obligations (one finding per obligation). findings_by_ai_assessment is the AI's own assessment in this scan. "
+    "findings_as_recorded_on_dashboard is what cl_sync records: a verdict detected from the code is recorded as it "
+    "is; for an obligation that needs human judgment the AI's verdict is a hypothesis, and the dashboard holds the "
+    "finding as 'needs review' until a person confirms it in Human Gates or attaches evidence. The dashboard's "
+    "Non-Compliant and Compliant numbers are this third count, limited to the obligations of the configured role "
+    "and updated by Human Gates answers and evidence."
+)
+
+
+def _scan_totals(overall_by_article: dict, findings_by_article: dict) -> dict:
+    """Totals of a cl_scan_all run, each with its unit. A real scan (2026-10-10) was reported in the terminal as
+    "15 articles non-compliant" and shown on the dashboard as "Non-Compliant 2 of 145 findings": the first counts
+    articles by the AI's assessment (34 findings), the second counts findings after cl_sync's post-process, which
+    holds the AI's verdict on a human-judgment obligation as "needs review". Nothing in the response said so.
+
+    overall_by_article: {article number: overall level}. findings_by_article: {article number: [{obligation_id,
+    level, ...}]} — not modified."""
+    def by_level(levels):
+        return {level: sum(1 for lv in levels if lv == level) for level in _SCAN_LEVELS}
+
+    overall_levels = list(overall_by_article.values())
+    ai_levels = [f.get("level") for findings in findings_by_article.values() for f in findings]
+
+    recorded = {"non_compliant": 0, "needs_review": 0, "not_applicable": 0, "compliant": 0}
+    for findings in findings_by_article.values():
+        # Same rewrite cl_sync applies before uploading; on copies.
+        for f in _apply_approach_b_post_process([dict(f) for f in findings]):
+            level = f.get("level")
+            # The dashboard records "partial" (and anything it does not know) as needs review.
+            recorded[level if level in ("non_compliant", "not_applicable", "compliant") else "needs_review"] += 1
+
+    return {
+        "explanation": _SCAN_TOTALS_EXPLANATION,
+        "articles_by_ai_assessment": {"unit": "articles", "total": len(overall_levels), **by_level(overall_levels)},
+        "findings_by_ai_assessment": {"unit": _FINDINGS_UNIT, "total": len(ai_levels), **by_level(ai_levels)},
+        "findings_as_recorded_on_dashboard": {"unit": _FINDINGS_UNIT, "total": sum(recorded.values()), **recorded},
+    }
 
 
 def _apply_approach_b_post_process(findings: list) -> list:
@@ -1694,12 +1755,15 @@ def _build_ai_classification_guidance(
     }
 
 
-@mcp.tool()
+@mcp.tool(**_result_limit_options(_LARGE_RESULT_MAX_CHARS))
 def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str = "", regulation: str = "eu-ai-act") -> str:
     """Scan a project for ALL available compliance checks in a regulation.
 
     Returns a SUMMARY report — one row per article with overall status and
     top findings. For detailed findings, use cl_scan(regulation=..., articles="N").
+
+    The `totals` block counts the same scan three ways (articles by AI assessment, findings by AI
+    assessment, findings as recorded on the dashboard) — name the unit when you report a number.
 
     For best results, call cl_analyze_project() first, then pass your
     understanding as project_context. This enables context-aware scanning
@@ -1889,6 +1953,9 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
     _saas_obls = _scope_now.get("_applicable_obligations_from_saas")
     saas_obligations = set(_saas_obls) if isinstance(_saas_obls, list) and _saas_obls else None
 
+    # {article number: [{obligation_id, level, description}]} of every finding, for the totals.
+    findings_for_totals: dict[int, list[dict]] = {}
+
     def _scan_one(art_num: int, mod) -> dict:
         """Run a single article scan and return a compact summary dict."""
         try:
@@ -1978,6 +2045,15 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
                 if "[COVERAGE GAP" not in (f.description or "")
             ]
 
+            findings_for_totals[art_num] = [
+                {
+                    "obligation_id": f.obligation_id,
+                    "level": f.level.value if hasattr(f.level, 'value') else str(f.level),
+                    "description": f.description or "",
+                }
+                for f in result.findings
+            ]
+
             return {
                 "overall": result.overall_level.value,
                 "finding_count": len(result.findings),
@@ -1992,6 +2068,7 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
     results = {}
     articles_scanned = []
     overall_levels = []
+    overall_by_article: dict[int, str] = {}
 
     # ── Phased execution order ──
     # Phase 1: Art.4 (AI literacy) + Art.5 (prohibitions) — universal, no prerequisites
@@ -2020,12 +2097,12 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
                     "overall": "unable_to_determine",
                 }
 
-    # §AG.2 (2026-05-04 evening) — Recital interpretive layer keyed
-    # by article number. Same pattern as cl_action_plan / cl_scan
-    # (single + multi). AI consumers iterating over results[] gain
-    # the matching Recitals via a sibling top-level dict.
+    # Recital interpretive layer: the NUMBERS of the Recitals related to each scanned article. The single-article
+    # tools (cl_explain, cl_scan and cl_action_plan for one article) return the verbatim text; here it was 78 % of the
+    # response (253,852 of 324,637 characters on a full scan, 2026-10-10) and pushed it past what an AI client keeps
+    # in the conversation, so the assistant no longer saw the scan summary itself (founder decision 2026-10-11).
     from core.obligation_lookup import recitals_for_article as _recitals_for_article
-    related_recitals_by_article: dict[str, list[dict]] = {}
+    related_recital_numbers_by_article: dict[str, list[int]] = {}
 
     for phase in _PHASE_ORDER:
         for art_num in phase:
@@ -2040,10 +2117,11 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
             status = summary.get("overall", "error")
             articles_scanned.append(f"Art. {art_num} ({title}): {status}")
             overall_levels.append(summary.get("overall", "unable_to_determine"))
+            overall_by_article[art_num] = summary.get("overall", "unable_to_determine")
 
             recs = _recitals_for_article(art_num)
             if recs:
-                related_recitals_by_article[str(art_num)] = recs
+                related_recital_numbers_by_article[str(art_num)] = [r.get("number") for r in recs]
 
             # Note: Art.6 scan checks documentation quality, not risk level.
             # Risk classification comes from AI-provided ctx.risk_classification.
@@ -2121,8 +2199,12 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
         # dashboard can flag partial-coverage scans visibly instead
         # of treating them as clean runs with mystery dips.
         "failed_articles": failed_articles,
+        "totals": _scan_totals(overall_by_article, findings_for_totals),
         "results": results,
-        "related_recitals_by_article": related_recitals_by_article,
+        "related_recital_numbers_by_article": related_recital_numbers_by_article,
+        "related_recitals_note": (
+            "Recital numbers only. For the verbatim Recital text related to an article, call cl_explain(article=N)."
+        ),
         "next_steps": (
             "IMPORTANT: Do not stop here. Your job is to help the user reach full compliance.\n\n"
             "1. REVIEW the findings above. For each NC or NEEDS_REVIEW article:\n"
@@ -2517,7 +2599,7 @@ def _fetch_effective_status_from_saas(project_path: str) -> dict[str, str]:
         return {}
 
 
-@mcp.tool()
+@mcp.tool(**_result_limit_options(_LARGE_RESULT_MAX_CHARS))
 def cl_action_plan(project_path: str, regulation: str = "eu-ai-act", article: int = 0) -> str:
     """Generate a human action plan for compliance.
 
@@ -2716,11 +2798,24 @@ def cl_action_plan(project_path: str, regulation: str = "eu-ai-act", article: in
         # were downgraded. Empty / zero values when api_key missing or
         # SaaS unreachable; AI should fall back to raw scanner verdicts.
         "dashboard_overlay_summary": overlay_summary,
-        # §AD.5b — Recital interpretive layer keyed by article number.
-        # Empty dict when no covered article has mapped Recitals OR when
-        # recitals.json is unavailable. Per Kisum decision 2026-05-04:
-        # full Recital text inline (not links).
-        "related_recitals_by_article": related_recitals_by_article,
+        # §AD.5b — Recital interpretive layer keyed by article number. Empty dict when no covered article has
+        # mapped Recitals OR when recitals.json is unavailable. A plan for ONE article carries the verbatim Recital
+        # text (decision 2026-05-04). A plan for ALL articles carries the Recital numbers: the text was 254,222 of
+        # 328,871 characters there (2026-10-11) and pushed the plan past what an AI client keeps in the
+        # conversation, so the assistant no longer saw the actions themselves (founder decision 2026-10-11).
+        **(
+            {"related_recitals_by_article": related_recitals_by_article}
+            if article > 0
+            else {
+                "related_recital_numbers_by_article": {
+                    art: [r.get("number") for r in recs] for art, recs in related_recitals_by_article.items()
+                },
+                "related_recitals_note": (
+                    "Recital numbers only. For the verbatim Recital text related to an article, call "
+                    "cl_explain(article=N) or cl_action_plan(article=N)."
+                ),
+            }
+        ),
         # Layer 2 (2026-08-10) — EU-authoritative interpretive materials
         # keyed by article number. Pilot: 304 atoms on Art 50 from EC
         # Guidelines C(2026) 5054 final. Each atom carries byte-verbatim
@@ -2731,10 +2826,16 @@ def cl_action_plan(project_path: str, regulation: str = "eu-ai-act", article: in
         "disclaimer": (
             "This action plan is based on ComplianceLint compliance checklist and best practices. "
             "Official CEN-CENELEC standards (expected Q4 2026) may modify these requirements. "
-            "Verbatim EU AI Act Recital text in `related_recitals_by_article` is drawn from "
-            "the official Regulation (EU) 2024/1689 PDF (via pdfplumber) — use as ground "
-            "truth when interpreting the Articles. "
-            "Layer-2 EU-authoritative interpretive materials in "
+            + (
+                "Verbatim EU AI Act Recital text in `related_recitals_by_article` is drawn from "
+                "the official Regulation (EU) 2024/1689 PDF (via pdfplumber) — use as ground "
+                "truth when interpreting the Articles. "
+                if article > 0
+                else "`related_recital_numbers_by_article` lists the EU AI Act Recitals related to each article; "
+                "fetch the verbatim text (official Regulation (EU) 2024/1689 PDF, via pdfplumber) with "
+                "cl_explain(article=N) and use it as ground truth when interpreting the Articles. "
+            )
+            + "Layer-2 EU-authoritative interpretive materials in "
             "`interpretive_materials_by_article[]` are SUMMARY tier "
             "(v1.1.6) — doc metadata + per-obligation atom counts; "
             "fetch verbatim atoms via cl_explain(obligation_id=..., "
