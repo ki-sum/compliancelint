@@ -4,7 +4,7 @@ All notable changes to ComplianceLint will be documented in this file.
 
 This project adheres to [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [1.2.3] — 2026-10-11
 
 ### Fixed
 - The validation gate no longer reports an obligation's context field as an unknown field of its article. With
