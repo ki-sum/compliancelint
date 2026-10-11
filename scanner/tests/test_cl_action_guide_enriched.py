@@ -116,7 +116,16 @@ def _mock_classification_fetch():
     rationale / what_to_scan / confidence / human_judgment_needed
     would fail with empty strings (degraded mode = those fields stay
     stripped from public JSON post-§AA Step 1)."""
-    obligation_lookup.reset_cache()
+    # server.py imports the lookup as `core.obligation_lookup` (sys.path = scanner/); this file imports it as
+    # `scanner.core.obligation_lookup`. Python holds them as two module objects, each with its own index cache.
+    # Only the second was reset here, so when an earlier test in the same process had already built the
+    # server-side index (without classifications), cl_action_guide kept answering from it and
+    # test_action_guide_returns_human_judgment_needed failed — alone it passed. Both are reset, before and after
+    # (after: the fixture-enriched index must not leak into later tests either).
+    import core.obligation_lookup as server_side_lookup
+
+    for lookup in (obligation_lookup, server_side_lookup):
+        lookup.reset_cache()
     classification_client.reset_degraded_notice_flag()
     with patch.object(
         classification_client,
@@ -124,7 +133,8 @@ def _mock_classification_fetch():
         side_effect=_load_classifications_fixture,
     ):
         yield
-    obligation_lookup.reset_cache()
+    for lookup in (obligation_lookup, server_side_lookup):
+        lookup.reset_cache()
 
 
 def _strip_text_footer(s: str) -> str:
