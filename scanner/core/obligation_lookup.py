@@ -252,6 +252,32 @@ def _unique_ids() -> frozenset:
     return _UNIQUE_IDS
 
 
+_CONTEXT_FIELDS: Optional[dict] = None
+
+
+def context_fields_for_article(article_key: str) -> frozenset:
+    """The `context_skip_field` names of an article's obligations — answer fields the obligation engine reads to
+    decide applicability (e.g. "art49" → claims_art6_3_exception, is_public_authority). Some are not in the answers
+    template: the dashboard's Profiling Wizard answer is written into the article's answers by the scanner itself.
+    `article_key` as in compliance_answers ("art4", "art49"). From the JSON files only."""
+    global _CONTEXT_FIELDS
+    if _CONTEXT_FIELDS is None:
+        fields: dict[str, set] = {}
+        for path in glob.glob(os.path.join(_obligations_dir(), "art*.json")):
+            m = re.match(r"art0*(\d+[a-z]?)-", os.path.basename(path))
+            if not m:
+                continue
+            try:
+                with open(path, encoding="utf-8") as f:
+                    obligations = json.load(f).get("obligations", [])
+            except (OSError, json.JSONDecodeError):
+                continue
+            names = {o.get("context_skip_field") for o in obligations if o.get("context_skip_field")}
+            fields.setdefault(f"art{m.group(1)}", set()).update(names)
+        _CONTEXT_FIELDS = {k: frozenset(v) for k, v in fields.items()}
+    return _CONTEXT_FIELDS.get(article_key, frozenset())
+
+
 def unique_obligation_count() -> int:
     """Number of unique obligation IDs — the count used in user-facing text (self-audit A13).
     Three IDs appear in two obligation files, so JSON rows outnumber obligations."""

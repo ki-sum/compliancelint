@@ -4,6 +4,21 @@ All notable changes to ComplianceLint will be documented in this file.
 
 This project adheres to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+- The validation gate no longer reports an obligation's context field as an unknown field of its article. With
+  dashboard settings applied, every scan told the AI client that its answers had format issues because of
+  `art49.claims_art6_3_exception` — a field the scanner writes itself from the Profiling Wizard answer (the same
+  applied to `art52.is_gpai_with_systemic_risk`). Scan results were not affected.
+- The update notice (`cl_version`, `cl_check_updates`) appears only when PyPI has a newer version than the installed
+  one; it used to appear whenever the two differed.
+
+### Changed
+- `COMPLIANCELINT_HOME` now moves the scanner's whole per-user directory (`~/.compliancelint`), the per-project
+  log directories included; it already moved the telemetry config. The test suite sets it to a temporary directory,
+  so running the tests no longer leaves a log directory per test project in the developer's home.
+
 ## [1.2.2] — 2026-10-11
 
 ### Changed — `cl_scan_all` and `cl_action_plan` responses: readable by the AI client in one piece

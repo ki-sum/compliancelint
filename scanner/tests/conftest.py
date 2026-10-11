@@ -4,12 +4,23 @@ New architecture: tests inject mock ComplianceAnswers into ProjectContext.
 The scanner does NO detection — it only maps AI answers to obligation findings.
 All tests use tmp_path (pytest builtin) instead of fixture files.
 """
+import atexit
 import os
+import shutil
 import sys
+import tempfile
 import pytest
 
 SCANNER_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, SCANNER_ROOT)
+
+# The scanner's per-user directory (~/.compliancelint: one log directory per scanned project) for the whole test
+# session, subprocesses included: a temporary directory. Every test project used to leave a directory in the real
+# home — 216,816 of them on the development machine by 2026-10-11. An explicit COMPLIANCELINT_HOME still wins.
+if not os.environ.get("COMPLIANCELINT_HOME"):
+    _TEST_USER_HOME = tempfile.mkdtemp(prefix="compliancelint-test-home-")
+    os.environ["COMPLIANCELINT_HOME"] = os.path.join(_TEST_USER_HOME, ".compliancelint")
+    atexit.register(shutil.rmtree, _TEST_USER_HOME, ignore_errors=True)
 
 
 # Default COMPLIANCELINT_AUDIT_TOOLS to the in-repo audit-tools dir when

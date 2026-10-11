@@ -36,6 +36,17 @@ _BASELINES_DIR = "baselines"
 _REPORTS_DIR = "reports"
 
 
+def user_dir() -> Path:
+    """`~/.compliancelint/` — per-user data outside any project (the scanner logs, one directory per project).
+
+    `COMPLIANCELINT_HOME` replaces the whole directory. The test suite points it at a temporary directory: every
+    test project used to leave a log directory in the real home (216,816 of them by 2026-10-11).
+    core/telemetry.py reads its config file from the same place.
+    """
+    override = os.environ.get("COMPLIANCELINT_HOME")
+    return Path(override) if override else Path.home() / _ROOT_DIR
+
+
 def root_dir(project_path: str) -> Path:
     """`<project>/.compliancelint/` — the top-level compliance dir."""
     return Path(project_path) / _ROOT_DIR

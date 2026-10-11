@@ -195,11 +195,19 @@ def test_scanner_log_lives_outside_project_tree(tmp_path):
         "expected at least one RotatingFileHandler attached to the project logger"
     )
 
-    home_resolved = Path.home().resolve()
+    # The per-user directory: ~/.compliancelint by default (pinned in test_user_dir.py); the test session moves it
+    # to a temporary directory with COMPLIANCELINT_HOME, so tests leave nothing in the real home.
+    from core.paths import user_dir
+
+    user_resolved = user_dir().resolve()
+    project_resolved = tmp_path.resolve()
     for h in file_handlers:
         bf = Path(h.baseFilename).resolve()
-        assert str(bf).startswith(str(home_resolved)), (
-            f"log file at {bf} is not under home {home_resolved}"
+        assert user_resolved in bf.parents, (
+            f"log file at {bf} is not under the per-user directory {user_resolved}"
+        )
+        assert project_resolved not in bf.parents, (
+            f"log file at {bf} is inside the project tree {project_resolved}"
         )
         assert ".compliancelint" in bf.parts, (
             f"log file {bf} must live under a .compliancelint directory"

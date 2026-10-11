@@ -5346,8 +5346,23 @@ def _run_broken_link_check(project_path: str, saas_url: str, api_key: str,
     return summary.to_dict()
 
 
+def _release_tuple(version: str) -> tuple:
+    """(1, 2, 3) from "1.2.3", "1.2.3.dev1" or "1.2.3rc1" — the numeric release part, for comparing versions."""
+    import re
+
+    parts = []
+    for piece in version.split("."):
+        m = re.match(r"[0-9]+", piece)
+        if not m:
+            break
+        parts.append(int(m.group()))
+        if m.group() != piece:
+            break
+    return tuple(parts)
+
+
 def _check_latest_version() -> dict:
-    """Check PyPI for the latest ComplianceLint version. Returns update info or empty dict."""
+    """Check PyPI for a ComplianceLint version newer than the installed one. Returns update info or empty dict."""
     try:
         import urllib.request
         req = urllib.request.Request(
@@ -5357,7 +5372,9 @@ def _check_latest_version() -> dict:
         with urllib.request.urlopen(req, timeout=3) as resp:
             data = json.loads(resp.read())
             latest = data.get("info", {}).get("version", "")
-            if latest and latest != CL_VERSION:
+            # Newer, not merely different: a build ahead of PyPI (or a mirror still serving the previous
+            # release) is not told to "upgrade" to an older version.
+            if latest and _release_tuple(latest) > _release_tuple(CL_VERSION):
                 return {
                     "update_available": True,
                     "current_version": CL_VERSION,

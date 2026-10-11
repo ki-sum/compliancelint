@@ -90,7 +90,11 @@ def _project_hash(project_path: str) -> str:
 
 
 def _expected_home_log_dir(project_path: str) -> Path:
-    return Path.home() / ".compliancelint" / "logs" / _project_hash(project_path)
+    # The scanner's per-user directory: ~/.compliancelint by default; the test session moves it to a temporary
+    # directory with COMPLIANCELINT_HOME (conftest.py), which the MCP subprocess inherits.
+    from core.paths import user_dir
+
+    return user_dir() / "logs" / _project_hash(project_path)
 
 
 def _build_synthetic_context(client: McpStdioClient, project_path: Path) -> str:

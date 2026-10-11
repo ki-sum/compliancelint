@@ -20,6 +20,7 @@ import difflib
 from typing import Any
 
 from core.context import _AUX_FIELDS, _BOOL_FIELDS, _LIST_FIELDS, _NUMBER_FIELDS, _parse_number
+from core.obligation_lookup import context_fields_for_article
 
 
 # ── Article scope classification ──
@@ -425,10 +426,13 @@ def _coerce_article_fields(article_key: str, fields: dict) -> tuple[dict, list[d
 
     # Unknown field names are kept as sent and logged — never renamed (template-gap T5, founder 2026-10-04).
     # The former fuzzy rename (difflib, cutoff 0.7) turned near-miss names into another obligation's answer
-    # (self-audit A1: has_risk_code → has_risk_docs). Every key a module reads is in the template, so an
-    # unknown key is a mistake the AI should fix; the module never reads it.
+    # (self-audit A1: has_risk_code → has_risk_docs). A key that is neither in the template nor a context field of
+    # one of the article's obligations is a mistake the AI should fix; nothing reads it. The context fields count:
+    # the obligation engine reads them, and the scanner writes some itself from the dashboard's wizard answers
+    # (art49.claims_art6_3_exception was reported back to the AI as its own format error, 2026-10-10).
     known_fields = (set(_BOOL_FIELDS.get(article_key, [])) | set(_LIST_FIELDS.get(article_key, []))
-                    | set(_NUMBER_FIELDS.get(article_key, [])) | set(_AUX_FIELDS.get(article_key, [])))
+                    | set(_NUMBER_FIELDS.get(article_key, [])) | set(_AUX_FIELDS.get(article_key, []))
+                    | context_fields_for_article(article_key))
     for uf in sorted(set(result.keys()) - known_fields):
         log.append({
             "action": "unknown_field",

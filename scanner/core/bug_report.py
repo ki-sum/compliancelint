@@ -30,7 +30,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterable
 
-LOG_DIR_ROOT = Path.home() / ".compliancelint" / "logs"
+from core.paths import user_dir
+
+# Set to read the logs from another place; None = the per-user directory (core.paths.user_dir()).
+LOG_DIR_ROOT: Path | None = None
 DEFAULT_TAIL_LINES = 200
 DEFAULT_BUNDLE_DIR = Path.home()
 BUNDLE_FILE_PREFIX = "compliancelint-bugreport"
@@ -58,12 +61,18 @@ def _tail_file(path: Path, lines: int) -> list[str]:
     return [_scrub_line(ln.rstrip("\n")) for ln in buf[-lines:]]
 
 
+def log_dir_root() -> Path:
+    """Where the per-project log directories live: ~/.compliancelint/logs/ unless COMPLIANCELINT_HOME moves it."""
+    return LOG_DIR_ROOT if LOG_DIR_ROOT is not None else user_dir() / "logs"
+
+
 def _list_log_dirs() -> list[Path]:
     """Return all per-project log dirs under ~/.compliancelint/logs/."""
-    if not LOG_DIR_ROOT.is_dir():
+    root = log_dir_root()
+    if not root.is_dir():
         return []
     return sorted(
-        (p for p in LOG_DIR_ROOT.iterdir() if p.is_dir()),
+        (p for p in root.iterdir() if p.is_dir()),
         key=lambda p: p.stat().st_mtime,
         reverse=True,
     )
@@ -153,7 +162,7 @@ def build_bundle(
     if not log_dirs:
         sections.append(
             "## Logs\n\n"
-            f"No scanner logs were found at `{LOG_DIR_ROOT}`. "
+            f"No scanner logs were found at `{log_dir_root()}`. "
             "This is expected if you have not run a scan yet, or if the logs "
             "have been deleted by `cl_delete`.\n"
         )

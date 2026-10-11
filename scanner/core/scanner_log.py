@@ -23,6 +23,8 @@ import os
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
+from core.paths import user_dir
+
 _loggers: dict[str, logging.Logger] = {}
 
 
@@ -42,7 +44,7 @@ def _resolve_log_dir(project_path: str) -> Path:
 
     Lives outside the project tree so rmtree on the project is safe.
     """
-    return Path.home() / ".compliancelint" / "logs" / _project_hash(project_path)
+    return user_dir() / "logs" / _project_hash(project_path)
 
 
 def get_scanner_logger(project_path: str = "") -> logging.Logger:
