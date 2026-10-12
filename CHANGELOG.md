@@ -4,6 +4,30 @@ All notable changes to ComplianceLint will be documented in this file.
 
 This project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.3.0] — 2026-10-12
+
+### Added — Article 48 (CE marking)
+- New scanned article, the 45th module: 7 obligation records (255 obligations in 46 articles, Art. 4a included).
+  Art. 48(1) general principles of Article 30 of Regulation (EC) No 765/2008, 48(2) digital CE marking for systems
+  provided digitally, 48(3) affixing, 48(4) the notified body's identification number in three records (after the
+  CE marking, who affixes it, in promotional material), 48(5) other Union law that also provides for the CE
+  marking. Source quotes are verbatim from the consolidated text of the Regulation.
+- Eleven answer fields for `art48`: seven results and four conditions (`is_provided_digitally`,
+  `has_notified_body_assessment`, `is_subject_to_other_ce_marking_law`, `has_ce_marking_promotional_material`).
+  A condition answered false makes its record not applicable; an unanswered condition leaves it undetermined.
+  Article 48 is assessed for providers of high-risk AI systems, like the other provider duties of Chapter III.
+- The answer template asks the AI client for `art49.claims_art6_3_exception` and
+  `art52.is_gpai_with_systemic_risk` as well; until now only dashboard settings could supply them.
+
+### Changed
+- Article 55 follows the systemic-risk answer in full: without systemic risk the paragraph 2 records
+  (`ART55-PERM-2`, `ART55-OBL-2`) are not applicable, like the paragraph 1 records. The dashboard's systemic-risk
+  answer is applied to `art55.has_systemic_risk` too.
+
+### Fixed
+- A condition field present with the value null — the shape of the answer template — was read as an answer and
+  reported as "[APPLICABLE] … (field=None)". It is unanswered: the record stays undetermined.
+
 ## [1.2.3] — 2026-10-11
 
 ### Fixed
