@@ -167,6 +167,15 @@
         "has_doc_declaration": null,
         "has_annex_v_content": null
       },
+      "art48": {
+        "has_ce_marking": null,
+        "has_digital_ce_marking": null,
+        "has_notified_body_number": null,
+        "has_notified_body_number_in_promotion": null,
+        "is_provided_digitally": null,
+        "has_notified_body_assessment": null,
+        "is_subject_to_other_ce_marking_law": null
+      },
       "art49": {
         "has_eu_database_registration": null
       },
@@ -397,6 +406,9 @@
       "overall": "not_applicable"
     },
     "art47": {
+      "overall": "not_applicable"
+    },
+    "art48": {
       "overall": "not_applicable"
     },
     "art49": {

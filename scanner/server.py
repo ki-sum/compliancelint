@@ -707,6 +707,8 @@ _WIZARD_TO_SCANNER_FIELDS: dict = {
         # Also pinned at article level for 4 ART52 obligations that
         # cascade their NA on this field via context_skip_field.
         ("art52", "is_gpai_with_systemic_risk"),
+        # Art. 55 applies to models with systemic risk only; its module reads this field.
+        ("art55", "has_systemic_risk"),
     ],
     "claimsArt63Exception": [
         ("_scope", "claims_art6_3_exception"),
@@ -2074,12 +2076,12 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
     # Phase 1: Art.4 (AI literacy) + Art.5 (prohibitions) — universal, no prerequisites
     # Phase 2: Art.6 (risk classification) — determines Art.9-15+ applicability
     # Phase 3: Art.50 (transparency) + Art.51-55 (GPAI) — no high-risk prerequisite
-    # Phase 4: Art.9-15, 17-19, 26, 27, 43, 47, 49, 72, 73, 86 — high-risk obligations
+    # Phase 4: Art.9-15, 17-19, 26, 27, 43, 47, 48, 49, 72, 73, 86 — high-risk obligations
     _PHASE_ORDER = [
         (4, 5),        # Phase 1: universal obligations (all AI systems)
         (6,),          # Phase 2: risk classification
         (50, 51, 52, 53, 54, 55),  # Phase 3: general transparency + GPAI
-        (8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 41, 43, 47, 49, 60, 61, 71, 72, 73, 80, 82, 86, 91, 92, 111),  # Phase 4: high-risk + authority powers + transitional
+        (8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 41, 43, 47, 48, 49, 60, 61, 71, 72, 73, 80, 82, 86, 91, 92, 111),  # Phase 4: high-risk + authority powers + transitional
     ]
 
     def _run_article(art_num, mod):

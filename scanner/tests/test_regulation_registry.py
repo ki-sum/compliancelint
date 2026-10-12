@@ -116,11 +116,11 @@ class TestArticleSortKey:
 class TestRealObligations:
     """Tests that run against the actual scanner/obligations/ directory."""
 
-    def test_discovers_all_45_articles(self):
+    def test_discovers_all_46_articles(self):
         reload()  # Force fresh scan
         articles = get_articles("eu-ai-act")
-        # 44 scanned articles + Art 4a (permissions only, inserted by Reg (EU) 2026/1744)
-        assert len(articles) == 45, f"Expected 45 articles, got {len(articles)}: {articles}"
+        # 45 scanned articles + Art 4a (permissions only, inserted by Reg (EU) 2026/1744)
+        assert len(articles) == 46, f"Expected 46 articles, got {len(articles)}: {articles}"
         assert "art4a" in articles and "art10" in articles
 
     def test_articles_sorted_numerically(self):
@@ -158,4 +158,4 @@ class TestRealObligations:
         a = get_articles("eu-ai-act")
         a.clear()
         b = get_articles("eu-ai-act")
-        assert len(b) == 45 and "art4a" in b
+        assert len(b) == 46 and "art4a" in b

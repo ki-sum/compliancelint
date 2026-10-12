@@ -2389,6 +2389,110 @@ class TestClScanArticle47:
         assert result["overall_level"] == "not_applicable"
 
 
+class TestClScanArticle48:
+    """Test cl_scan for Article 48 (CE marking) end-to-end."""
+
+    def test_full_context_partial(self, project_dir):
+        ctx = ProjectContext.from_json(json.dumps({
+            "art48": {"has_ce_marking": True,
+                      "is_provided_digitally": True, "has_digital_ce_marking": True,
+                      "has_notified_body_assessment": True, "has_notified_body_number": True,
+                      "has_notified_body_number_in_promotion": True,
+                      "is_subject_to_other_ce_marking_law": True}
+        }))
+        result_json = _scan_single_article(48, project_dir, context=ctx)
+        result = json.loads(result_json)
+        assert "error" not in result
+        assert result["overall_level"] == "partial"
+
+    def test_shorthand_context_works(self, project_dir):
+        ctx = ProjectContext.from_json(json.dumps({
+            "art48": {"has_ce_marking": True,
+                      "has_notified_body_assessment": True, "has_notified_body_number": False}
+        }))
+        result_json = _scan_single_article(48, project_dir, context=ctx)
+        result = json.loads(result_json)
+        assert "error" not in result
+        obl3 = [f for f in result["findings"] if f["obligation_id"] == "ART48-OBL-3"]
+        assert obl3[0]["level"] == "partial"
+        obl4a = [f for f in result["findings"] if f["obligation_id"] == "ART48-OBL-4a"]
+        assert obl4a[0]["level"] == "non_compliant"
+
+    def test_no_context_returns_error(self, project_dir):
+        result_json = _scan_single_article(48, project_dir, context=None)
+        result = json.loads(result_json)
+        assert "error" in result
+
+    def test_invalid_directory_returns_error(self):
+        ctx = ProjectContext.from_json('{"art48": {"has_ce_marking": true}}')
+        result_json = _scan_single_article(48, "C:/nonexistent_cl_test_path_12345", context=ctx)
+        result = json.loads(result_json)
+        assert "error" in result
+
+    def test_all_false_non_compliant(self, project_dir):
+        ctx = ProjectContext.from_json(json.dumps({
+            "art48": {"has_ce_marking": False}
+        }))
+        result_json = _scan_single_article(48, project_dir, context=ctx)
+        result = json.loads(result_json)
+        assert result["overall_level"] == "non_compliant"
+
+    def test_no_notified_body_is_not_applicable_for_paragraph_4(self, project_dir):
+        ctx = ProjectContext.from_json(json.dumps({
+            "art48": {"has_ce_marking": True,
+                      "has_notified_body_assessment": False, "has_notified_body_number": False,
+                      "has_notified_body_number_in_promotion": False}
+        }))
+        result_json = _scan_single_article(48, project_dir, context=ctx)
+        result = json.loads(result_json)
+        assert result["overall_level"] == "partial"
+        levels = {f["obligation_id"]: f["level"] for f in result["findings"]}
+        for obl_id in ["ART48-OBL-4a", "ART48-OBL-4b", "ART48-OBL-4c"]:
+            assert levels[obl_id] == "not_applicable", obl_id
+
+    def test_compliance_summary_present(self, project_dir):
+        ctx = ProjectContext.from_json(json.dumps({
+            "ai_model": "claude-opus-4-6",
+            "art48": {"has_ce_marking": True}
+        }))
+        result_json = _scan_single_article(48, project_dir, context=ctx)
+        result = json.loads(result_json)
+        summary = result.get("compliance_summary", {})
+        assert "article" in summary
+        assert "overall" in summary
+        assert "terminology" in summary
+        assert summary["compliance_checklist_version"] == "CL-IS-ART48-v0.1"
+
+    def test_assessed_by_from_context(self, project_dir):
+        ctx = ProjectContext.from_json(json.dumps({
+            "ai_model": "claude-opus-4-6",
+            "art48": {"has_ce_marking": False}
+        }))
+        result_json = _scan_single_article(48, project_dir, context=ctx)
+        result = json.loads(result_json)
+        assert result.get("compliance_summary", {}).get("assessed_by") == "claude-opus-4-6"
+
+    def test_all_obligations_in_findings(self, project_dir):
+        ctx = ProjectContext.from_json(json.dumps({
+            "art48": {"has_ce_marking": False}
+        }))
+        result_json = _scan_single_article(48, project_dir, context=ctx)
+        result = json.loads(result_json)
+        finding_ids = {f["obligation_id"] for f in result.get("findings", [])}
+        for obl_id in ["ART48-OBL-1", "ART48-OBL-2", "ART48-OBL-3", "ART48-OBL-4a", "ART48-OBL-4b",
+                       "ART48-OBL-4c", "ART48-OBL-5"]:
+            assert obl_id in finding_ids, f"{obl_id} not in findings. Found: {sorted(finding_ids)}"
+
+    def test_scope_gate_open_source(self, project_dir):
+        ctx = ProjectContext.from_json(json.dumps({
+            "_scope": {"is_open_source": True, "open_source_license": "MIT"},
+            "art48": {"has_ce_marking": True}
+        }))
+        result_json = _scan_single_article(48, project_dir, context=ctx)
+        result = json.loads(result_json)
+        assert result["overall_level"] == "not_applicable"
+
+
 class TestClScanArticle49:
     """Test cl_scan_article_49 MCP tool function end-to-end."""
 

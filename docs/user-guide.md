@@ -33,7 +33,7 @@ Requirements:
 - Before each article, tell me which files you are reading
 - Describe what you found in natural language
 - After each article, give me a brief summary (compliant/partial/non-compliant)
-- After all 44 articles, sync the results to my ComplianceLint dashboard
+- After all 45 articles, sync the results to my ComplianceLint dashboard
 ```
 
 **Why this works**: the AI reads files using Read/Grep tools (visible to you),
@@ -65,19 +65,19 @@ trail regulators expect.
 ## What You'll See in Step-by-Step Mode
 
 ```
-▶ Art. 5 — Prohibited Practices (1/44)
+▶ Art. 5 — Prohibited Practices (1/45)
   📖 Reading: app/api/chat/route.ts
   📖 Reading: components/chat.tsx
   💬 "Found no emotional manipulation patterns. No social scoring features..."
   ⚙️ [scanner tool runs — ~5 seconds]
   ✅ Result: COMPLIANT — No prohibited practices detected
 
-▶ Art. 6 — Risk Classification (2/44)
+▶ Art. 6 — Risk Classification (2/45)
   💬 "This is a general-purpose chatbot. Not in Annex III high-risk categories..."
   ⚙️ [scanner tool runs — ~5 seconds]
   ✅ Result: COMPLIANT — Low-risk classification confirmed
 
-... (continues for all 44 articles)
+... (continues for all 45 articles)
 
 📋 [scanner uploads results to ComplianceLint dashboard for PDF export]
 ```

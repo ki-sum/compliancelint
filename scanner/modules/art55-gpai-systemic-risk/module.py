@@ -89,9 +89,11 @@ class Art55Module(BaseArticleModule):
         has_cybersecurity_protection = answers.get("has_cybersecurity_protection")
         cybersecurity_evidence = answers.get("cybersecurity_evidence", [])
 
-        # Scope gate: Art. 55 only applies to GPAI with systemic risk
+        # Scope gate: Art. 55 only applies to GPAI with systemic risk — every record of the article, paragraph 2
+        # included (a means of compliance for the same group of providers).
         if has_systemic_risk is False:
-            for obl_id in ["ART55-OBL-1a", "ART55-OBL-1b", "ART55-OBL-1c", "ART55-OBL-1d"]:
+            for obl_id in ["ART55-OBL-1a", "ART55-OBL-1b", "ART55-OBL-1c", "ART55-OBL-1d",
+                           "ART55-PERM-2", "ART55-OBL-2"]:
                 findings.append(Finding(
                     obligation_id=obl_id,
                     file_path="project-wide",

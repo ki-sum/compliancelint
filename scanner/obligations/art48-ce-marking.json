@@ -1,0 +1,233 @@
+{
+  "_metadata": {
+    "article": 48,
+    "title": "CE marking",
+    "prerequisites": [
+      {
+        "type": "risk_classification",
+        "required_level": "high-risk",
+        "source_article": 6,
+        "context_field": "risk_classification",
+        "skip_when": "not high-risk with medium/high confidence"
+      }
+    ],
+    "decomposition_date": "2026-10-12",
+    "primary_official_source": {
+      "name": "EUR-Lex -- Official Journal of the European Union",
+      "eli_uri": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng",
+      "celex": "32024R1689",
+      "oj_citation": "OJ L 2024/1689, 12.7.2024",
+      "consolidated_celex": "02024R1689-20260727"
+    },
+    "pdf_pages": [
+      81
+    ],
+    "consolidated_pdf_pages": [
+      57,
+      58
+    ],
+    "related_standards": {
+      "published": [
+        "Regulation (EC) No 765/2008, Article 30 -- general principles of the CE marking"
+      ],
+      "upcoming": []
+    }
+  },
+  "obligations": [
+    {
+      "id": "ART48-OBL-1",
+      "source": "Art. 48(1)",
+      "source_quote": "The CE marking shall be subject to the general principles set out in Article 30 of Regulation (EC) No 765/2008.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "addressee_note": "Art. 48 names no addressee; Art. 16(h) makes affixing the CE marking in accordance with Art. 48 an obligation of the provider of the high-risk AI system",
+      "decomposed_atoms": [
+        {
+          "atom": "ce_marking_general_principles",
+          "description": "The CE marking follows the general principles of Article 30 of Regulation (EC) No 765/2008",
+          "requirement": "The CE marking SHALL be subject to the general principles set out in Article 30 of Regulation (EC) No 765/2008"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual"
+      },
+      "cross_references": [
+        "Regulation (EC) No 765/2008 Art. 30",
+        "Art. 16(h)"
+      ]
+    },
+    {
+      "id": "ART48-OBL-2",
+      "source": "Art. 48(2)",
+      "source_quote": "For high-risk AI systems provided digitally, a digital CE marking shall be used, only if it can easily be accessed via the interface from which that system is accessed or via an easily accessible machine-readable code or other electronic means.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "addressee_note": "Art. 48 names no addressee; Art. 16(h) makes affixing the CE marking in accordance with Art. 48 an obligation of the provider of the high-risk AI system",
+      "scope_limitation": "Only applies to high-risk AI systems provided digitally",
+      "context_skip_field": "is_provided_digitally",
+      "context_skip_value": false,
+      "decomposed_atoms": [
+        {
+          "atom": "digital_ce_marking_used",
+          "description": "A digital CE marking is used for a high-risk AI system provided digitally",
+          "requirement": "For high-risk AI systems provided digitally, a digital CE marking SHALL be used"
+        },
+        {
+          "atom": "digital_ce_marking_easily_accessible",
+          "description": "The digital CE marking can easily be accessed via the interface from which the system is accessed or via an easily accessible machine-readable code or other electronic means",
+          "requirement": "A digital CE marking SHALL be used only if it can easily be accessed via the interface from which the system is accessed or via an easily accessible machine-readable code or other electronic means"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial"
+      },
+      "cross_references": [
+        "Art. 16(h)"
+      ]
+    },
+    {
+      "id": "ART48-OBL-3",
+      "source": "Art. 48(3)",
+      "source_quote": "The CE marking shall be affixed visibly, legibly and indelibly for high-risk AI systems. Where that is not possible or not warranted on account of the nature of the high-risk AI system, it shall be affixed to the packaging or to the accompanying documentation, as appropriate.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "addressee_note": "Art. 48 names no addressee; Art. 16(h) makes affixing the CE marking in accordance with Art. 48 an obligation of the provider of the high-risk AI system",
+      "decomposed_atoms": [
+        {
+          "atom": "ce_marking_visible_legible_indelible",
+          "description": "The CE marking is affixed visibly, legibly and indelibly for the high-risk AI system",
+          "requirement": "The CE marking SHALL be affixed visibly, legibly and indelibly for high-risk AI systems"
+        },
+        {
+          "atom": "ce_marking_on_packaging_or_documentation",
+          "description": "Where affixing to the system is not possible or not warranted on account of its nature, the CE marking is affixed to the packaging or to the accompanying documentation",
+          "requirement": "Where that is not possible or not warranted on account of the nature of the high-risk AI system, the CE marking SHALL be affixed to the packaging or to the accompanying documentation, as appropriate"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial"
+      },
+      "cross_references": [
+        "Art. 16(h)"
+      ]
+    },
+    {
+      "id": "ART48-OBL-4a",
+      "source": "Art. 48(4)",
+      "source_quote": "Where applicable, the CE marking shall be followed by the identification number of the notified body responsible for the conformity assessment procedures set out in Article 43.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "addressee_note": "Art. 48 names no addressee; Art. 16(h) makes affixing the CE marking in accordance with Art. 48 an obligation of the provider of the high-risk AI system",
+      "scope_limitation": "Only applies where a notified body is responsible for the conformity assessment procedure set out in Article 43 (\"Where applicable\")",
+      "context_skip_field": "has_notified_body_assessment",
+      "context_skip_value": false,
+      "decomposed_atoms": [
+        {
+          "atom": "ce_marking_followed_by_notified_body_number",
+          "description": "The CE marking is followed by the identification number of the notified body responsible for the Article 43 conformity assessment procedures",
+          "requirement": "Where applicable, the CE marking SHALL be followed by the identification number of the notified body responsible for the conformity assessment procedures set out in Article 43"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial"
+      },
+      "cross_references": [
+        "Art. 43",
+        "Art. 16(h)"
+      ]
+    },
+    {
+      "id": "ART48-OBL-4b",
+      "source": "Art. 48(4)",
+      "source_quote": "The identification number of the notified body shall be affixed by the body itself or, under its instructions, by the provider or by the provider’s authorised representative.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "addressee_note": "Art. 48(4), second sentence, names the notified body itself or, under its instructions, the provider or the provider's authorised representative as the party affixing the number. Recorded for the provider, who is responsible for the CE marking under Art. 16(h)",
+      "scope_limitation": "Only applies where a notified body is responsible for the conformity assessment procedure set out in Article 43 (\"Where applicable\")",
+      "context_skip_field": "has_notified_body_assessment",
+      "context_skip_value": false,
+      "decomposed_atoms": [
+        {
+          "atom": "notified_body_number_affixed_by_authorised_actor",
+          "description": "The identification number is affixed by the notified body itself or, under its instructions, by the provider or by the provider's authorised representative",
+          "requirement": "The identification number of the notified body SHALL be affixed by the body itself or, under its instructions, by the provider or by the provider's authorised representative"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual"
+      },
+      "cross_references": [
+        "Art. 43",
+        "Art. 16(h)"
+      ]
+    },
+    {
+      "id": "ART48-OBL-4c",
+      "source": "Art. 48(4)",
+      "source_quote": "The identification number shall also be indicated in any promotional material which mentions that the high-risk AI system fulfils the requirements for CE marking.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "addressee_note": "Art. 48 names no addressee; Art. 16(h) makes affixing the CE marking in accordance with Art. 48 an obligation of the provider of the high-risk AI system",
+      "scope_limitation": "Only applies where a notified body is responsible for the conformity assessment procedure set out in Article 43 (\"Where applicable\")",
+      "context_skip_field": "has_notified_body_assessment",
+      "context_skip_value": false,
+      "decomposed_atoms": [
+        {
+          "atom": "notified_body_number_in_promotional_material",
+          "description": "Promotional material which mentions that the high-risk AI system fulfils the requirements for CE marking also indicates the identification number of the notified body",
+          "requirement": "The identification number SHALL also be indicated in any promotional material which mentions that the high-risk AI system fulfils the requirements for CE marking"
+        }
+      ],
+      "automation_assessment": {
+        "level": "partial"
+      },
+      "cross_references": [
+        "Art. 43",
+        "Art. 16(h)"
+      ]
+    },
+    {
+      "id": "ART48-OBL-5",
+      "source": "Art. 48(5)",
+      "source_quote": "Where high-risk AI systems are subject to other Union law which also provides for the affixing of the CE marking, the CE marking shall indicate that the high-risk AI system also fulfil the requirements of that other law.",
+      "deontic_type": "obligation",
+      "modality": "shall",
+      "addressee": "provider",
+      "addressee_note": "Art. 48 names no addressee; Art. 16(h) makes affixing the CE marking in accordance with Art. 48 an obligation of the provider of the high-risk AI system",
+      "scope_limitation": "Only applies where the high-risk AI system is subject to other Union law which also provides for the affixing of the CE marking",
+      "context_skip_field": "is_subject_to_other_ce_marking_law",
+      "context_skip_value": false,
+      "decomposed_atoms": [
+        {
+          "atom": "ce_marking_covers_other_union_law",
+          "description": "Where other Union law also provides for the affixing of the CE marking, the CE marking indicates that the high-risk AI system also fulfils the requirements of that other law",
+          "requirement": "Where high-risk AI systems are subject to other Union law which also provides for the affixing of the CE marking, the CE marking SHALL indicate that the high-risk AI system also fulfils the requirements of that other law"
+        }
+      ],
+      "automation_assessment": {
+        "level": "manual"
+      },
+      "cross_references": [
+        "Art. 16(h)"
+      ]
+    }
+  ],
+  "summary": {
+    "total_obligations": 7,
+    "obligation_count": 7,
+    "addressee_breakdown": {
+      "provider": 7
+    },
+    "automation_breakdown": {
+      "full": 0,
+      "partial": 4,
+      "manual": 3
+    }
+  }
+}

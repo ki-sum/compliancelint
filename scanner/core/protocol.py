@@ -618,7 +618,7 @@ class BaseArticleModule:
         return ctx
 
     # Articles that apply only to HIGH-RISK AI systems (Chapter III, Section 2)
-    _HIGH_RISK_ONLY_ARTICLES = frozenset({8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 25, 26, 27, 41, 43, 47, 49, 60, 61, 71, 72, 73, 86})
+    _HIGH_RISK_ONLY_ARTICLES = frozenset({8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 25, 26, 27, 41, 43, 47, 48, 49, 60, 61, 71, 72, 73, 86})
 
     # Art. 2(12): a free and open-source AI system that is not placed on the market or put into service as a high-risk
     # AI system and does not fall under Art. 5 or 50 is outside the Regulation. Chapter V (Art. 51-55) concerns

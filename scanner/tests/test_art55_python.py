@@ -286,3 +286,42 @@ class TestArt55Structural:
             assert findings[0].level == ComplianceLevel.NOT_APPLICABLE, (
                 f"{obl_id} should be NA without systemic risk, got {findings[0].level}"
             )
+
+
+# ── Art. 55(2): the records follow the systemic-risk answer too ──
+
+class TestArt55Paragraph2FollowsSystemicRisk:
+    """Art. 55's introductory clause limits the whole article to providers of general-purpose AI models with
+    systemic risk; paragraph 2 is a means of compliance for that same group. Without systemic risk every record of
+    the article is not applicable, with it open nothing is concluded (consensus review 2026-10-12, item I5)."""
+
+    def test_no_systemic_risk_paragraph_2_records_are_not_applicable(self, art55_module, tmp_path):
+        BaseArticleModule.set_context(_no_systemic_risk_ctx())
+        result = art55_module.scan(str(tmp_path))
+        for obl_id in ["ART55-OBL-2", "ART55-PERM-2"]:
+            findings = _find(result, obl_id)
+            assert len(findings) == 1, f"{obl_id}: expected one finding, got {len(findings)}"
+            assert findings[0].level == ComplianceLevel.NOT_APPLICABLE, (
+                f"{obl_id} should be NA without systemic risk, got {findings[0].level}"
+            )
+
+    def test_no_systemic_risk_every_record_of_the_article_is_not_applicable(self, art55_module, tmp_path):
+        BaseArticleModule.set_context(_no_systemic_risk_ctx())
+        result = art55_module.scan(str(tmp_path))
+        by_id = {f.obligation_id: f.level for f in result.findings if f.obligation_id.startswith("ART55-")}
+        assert set(by_id) == {
+            "ART55-OBL-1a", "ART55-OBL-1b", "ART55-OBL-1c", "ART55-OBL-1d", "ART55-PERM-2", "ART55-OBL-2",
+        }
+        assert set(by_id.values()) == {ComplianceLevel.NOT_APPLICABLE}
+
+    def test_systemic_risk_unknown_paragraph_2_is_not_concluded(self, art55_module, tmp_path):
+        BaseArticleModule.set_context(_empty_ctx())
+        result = art55_module.scan(str(tmp_path))
+        for finding in _find(result, "ART55-OBL-2"):
+            assert finding.level != ComplianceLevel.NOT_APPLICABLE
+
+    def test_with_systemic_risk_paragraph_2_is_not_marked_not_applicable(self, art55_module, tmp_path):
+        BaseArticleModule.set_context(_systemic_risk_all_true_ctx())
+        result = art55_module.scan(str(tmp_path))
+        for finding in _find(result, "ART55-OBL-2"):
+            assert finding.level != ComplianceLevel.NOT_APPLICABLE

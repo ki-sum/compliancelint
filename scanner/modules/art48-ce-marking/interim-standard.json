@@ -1,0 +1,82 @@
+{
+  "_metadata": {
+    "standard_id": "CL-IS-ART48-v0.1",
+    "title": "ComplianceLint Interim Standard for EU AI Act Article 48: CE marking",
+    "version": "0.1.0",
+    "date": "2026-10-12",
+    "status": "draft",
+    "disclaimer": "This is an interim standard developed by ComplianceLint. It is not an official EU, ISO or CEN-CENELEC standard.",
+    "basis": [
+      "EU AI Act Article 48 (official text)",
+      "EU AI Act Article 16(h) -- provider obligation to affix the CE marking in accordance with Article 48",
+      "EU AI Act Article 43 -- conformity assessment procedures"
+    ],
+    "awaiting_standard": "Art. 48 refers to the general principles of the CE marking in Article 30 of Regulation (EC) No 765/2008; it names no harmonised standard."
+  },
+  "requirements": [
+    {
+      "id": "IS-ART48-R01",
+      "obligation_ref": "ART48-OBL-3",
+      "title": "CE Marking Affixed",
+      "requirement": "The CE marking MUST be affixed visibly, legibly and indelibly for the high-risk AI system or, where that is not possible or not warranted on account of the nature of the system, to the packaging or to the accompanying documentation.",
+      "rationale": "Art. 48(3) sets how and where the CE marking is affixed.",
+      "acceptable_locations": [
+        "The high-risk AI system itself",
+        "The packaging, where affixing to the system is not possible or not warranted on account of its nature",
+        "The accompanying documentation, where affixing to the system is not possible or not warranted on account of its nature"
+      ]
+    },
+    {
+      "id": "IS-ART48-R02",
+      "obligation_ref": "ART48-OBL-2",
+      "title": "Digital CE Marking for Systems Provided Digitally",
+      "requirement": "For a high-risk AI system provided digitally, a digital CE marking MUST be used and MUST be easily accessible via the interface from which the system is accessed or via an easily accessible machine-readable code or other electronic means.",
+      "rationale": "Art. 48(2) sets the form of the CE marking for systems provided digitally.",
+      "applies_when": "The high-risk AI system is provided digitally."
+    },
+    {
+      "id": "IS-ART48-R03",
+      "obligation_ref": "ART48-OBL-4a",
+      "title": "Notified Body Identification Number",
+      "requirement": "Where a notified body is responsible for the conformity assessment procedure set out in Article 43, the CE marking MUST be followed by the identification number of that notified body.",
+      "rationale": "Art. 48(4), first sentence.",
+      "applies_when": "A notified body is responsible for the conformity assessment procedure set out in Article 43."
+    },
+    {
+      "id": "IS-ART48-R04",
+      "obligation_ref": "ART48-OBL-4b",
+      "title": "Who Affixes the Identification Number",
+      "requirement": "The identification number of the notified body MUST be affixed by the body itself or, under its instructions, by the provider or by the provider's authorised representative.",
+      "rationale": "Art. 48(4), second sentence.",
+      "applies_when": "A notified body is responsible for the conformity assessment procedure set out in Article 43."
+    },
+    {
+      "id": "IS-ART48-R05",
+      "obligation_ref": "ART48-OBL-4c",
+      "title": "Identification Number in Promotional Material",
+      "requirement": "Any promotional material which mentions that the high-risk AI system fulfils the requirements for CE marking MUST also indicate the identification number of the notified body.",
+      "rationale": "Art. 48(4), third sentence.",
+      "applies_when": "A notified body is responsible for the conformity assessment procedure set out in Article 43."
+    },
+    {
+      "id": "IS-ART48-R06",
+      "obligation_ref": "ART48-OBL-1",
+      "title": "General Principles of the CE Marking",
+      "requirement": "The CE marking MUST follow the general principles set out in Article 30 of Regulation (EC) No 765/2008.",
+      "rationale": "Art. 48(1) makes the CE marking subject to those principles. Human review against that Regulation is required."
+    },
+    {
+      "id": "IS-ART48-R07",
+      "obligation_ref": "ART48-OBL-5",
+      "title": "CE Marking Under Other Union Law",
+      "requirement": "Where the high-risk AI system is subject to other Union law which also provides for the affixing of the CE marking, the CE marking MUST indicate that the system also fulfils the requirements of that other law.",
+      "rationale": "Art. 48(5). Human review of the other applicable Union law is required.",
+      "applies_when": "The high-risk AI system is subject to other Union law which also provides for the affixing of the CE marking."
+    }
+  ],
+  "scoring": {
+    "compliant": "R01 met, and R02 to R07 met where they apply, confirmed by human review",
+    "partial": "A CE marking is present but one or more applicable requirements are not confirmed",
+    "non_compliant": "No CE marking, or an applicable requirement is not met"
+  }
+}

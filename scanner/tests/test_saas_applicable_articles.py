@@ -243,7 +243,7 @@ class TestComputeApplicableUsesSaasList:
         assert "art4" in skipped
         assert "saas" in skipped["art4"].lower()
 
-    def test_saas_list_none_falls_back_to_all_44(self):
+    def test_saas_list_none_falls_back_to_all_45(self):
         # Free tier: null from SaaS = explicit "see everything".
         # MUST NOT be treated as empty set.
         scope = {
@@ -254,12 +254,12 @@ class TestComputeApplicableUsesSaasList:
             "_applicable_articles_from_saas": None,
         }
         applicable, _ = compute_applicable_articles(scope)
-        # Number is exact: ComplianceLint covers exactly 44 articles.
-        assert len(applicable) == 44
+        # Number is exact: ComplianceLint covers exactly 45 articles.
+        assert len(applicable) == 45
 
-    def test_saas_list_empty_treated_as_all_44_not_zero(self):
+    def test_saas_list_empty_treated_as_all_45_not_zero(self):
         # Defensive: even if SaaS sends `[]` (which it shouldn't),
-        # scanner falls back to all-44 rather than scanning nothing.
+        # scanner falls back to all-45 rather than scanning nothing.
         # Empty-set scan would mean "0 obligations checked, 0 violations
         # reported" — silently incorrect for the customer.
         scope = {
@@ -270,4 +270,4 @@ class TestComputeApplicableUsesSaasList:
             "_applicable_articles_from_saas": [],
         }
         applicable, _ = compute_applicable_articles(scope)
-        assert len(applicable) == 44
+        assert len(applicable) == 45

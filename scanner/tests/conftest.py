@@ -13,6 +13,12 @@ import pytest
 
 SCANNER_ROOT = os.path.join(os.path.dirname(__file__), "..")
 sys.path.insert(0, SCANNER_ROOT)
+# Tests that import the package by name (`from scanner.core ...`) must get this checkout, not a released
+# compliancelint installed in site-packages. With a non-editable install, test_regulation_registry.py and
+# test_obligation_lookup_classification_merge.py counted the obligation files of the installed release and
+# kept passing after an article was added to the checkout (found 2026-10-12 with Art. 48). CI installs the
+# checkout editable, so nothing changes there.
+sys.path.insert(1, os.path.abspath(os.path.join(SCANNER_ROOT, "..")))
 
 # The scanner's per-user directory (~/.compliancelint: one log directory per scanned project) for the whole test
 # session, subprocesses included: a temporary directory. Every test project used to leave a directory in the real
@@ -92,6 +98,7 @@ def minimal_ai_context():
             "art26": {"has_deployment_documentation": None, "has_human_oversight_assignment": None, "has_operational_monitoring": None, "has_log_retention": None, "retention_days": None, "retention_evidence": "", "has_affected_persons_notification": None},
             "art43": {"has_internal_control_assessment": None, "has_change_management_procedures": None},
             "art47": {"has_doc_declaration": None, "has_annex_v_content": None},
+            "art48": {"has_ce_marking": None, "has_digital_ce_marking": None, "has_notified_body_number": None, "has_notified_body_number_in_promotion": None, "is_provided_digitally": None, "has_notified_body_assessment": None, "is_subject_to_other_ce_marking_law": None},
             "art49": {"has_eu_database_registration": None},
             "art50": {"is_chatbot_or_interactive_ai": None, "is_generating_synthetic_content": None, "has_ai_disclosure_to_users": None, "disclosure_evidence": [], "has_content_watermarking": None, "is_emotion_recognition_system": None, "is_biometric_categorization_system": None, "has_emotion_biometric_disclosure": None, "emotion_biometric_evidence": [], "is_deep_fake_system": None, "has_deep_fake_disclosure": None, "deep_fake_evidence": []},
             "art51": {"is_gpai_model": None, "has_high_impact_capabilities": None, "training_compute_exceeds_threshold": None, "training_compute_flops": None, "has_commission_designation": None, "has_systemic_risk_assessment": None, "reasoning": ""},
@@ -168,6 +175,7 @@ def _ctx_with(article_key: str, answers: dict):
         "art26": {"has_deployment_documentation": None, "has_human_oversight_assignment": None, "has_operational_monitoring": None, "has_log_retention": None, "retention_days": None, "retention_evidence": "", "has_affected_persons_notification": None},
         "art43": {"has_internal_control_assessment": None, "has_change_management_procedures": None},
         "art47": {"has_doc_declaration": None, "has_annex_v_content": None},
+        "art48": {"has_ce_marking": None, "has_digital_ce_marking": None, "has_notified_body_number": None, "has_notified_body_number_in_promotion": None, "is_provided_digitally": None, "has_notified_body_assessment": None, "is_subject_to_other_ce_marking_law": None},
         "art49": {"has_eu_database_registration": None},
         "art50": {"is_chatbot_or_interactive_ai": None, "is_generating_synthetic_content": None, "has_ai_disclosure_to_users": None, "disclosure_evidence": [], "has_content_watermarking": None, "is_emotion_recognition_system": None, "is_biometric_categorization_system": None, "has_emotion_biometric_disclosure": None, "emotion_biometric_evidence": [], "is_deep_fake_system": None, "has_deep_fake_disclosure": None, "deep_fake_evidence": []},
         "art51": {"is_gpai_model": None, "has_high_impact_capabilities": None, "training_compute_exceeds_threshold": None, "training_compute_flops": None, "has_commission_designation": None, "has_systemic_risk_assessment": None, "reasoning": ""},
@@ -274,6 +282,10 @@ def art43_module():
 @pytest.fixture
 def art47_module():
     return _load_module("art47-declaration-of-conformity")
+
+@pytest.fixture
+def art48_module():
+    return _load_module("art48-ce-marking")
 
 @pytest.fixture
 def art49_module():

@@ -41,6 +41,7 @@ ARTICLE_MODULE_MAP = {
     "art86": "art86-right-to-explanation",
     "art43": "art43-conformity-assessment",
     "art47": "art47-declaration-of-conformity",
+    "art48": "art48-ce-marking",
     "art49": "art49-registration",
     "art50": "art50-transparency-obligations",
     "art51": "art51-gpai-classification",

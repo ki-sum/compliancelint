@@ -46,6 +46,7 @@ ARTICLE_MODULES = [
     (41, "art41-common-specifications",  "art41-common-specifications.json"),
     (43, "art43-conformity-assessment",  "art43-conformity-assessment.json"),
     (47, "art47-declaration-of-conformity","art47-declaration-of-conformity.json"),
+    (48, "art48-ce-marking",             "art48-ce-marking.json"),
     (49, "art49-registration",           "art49-registration.json"),
     (50, "art50-transparency-obligations","art50-transparency-obligations.json"),
     (51, "art51-gpai-classification",    "art51-gpai-classification.json"),
@@ -158,6 +159,12 @@ def _all_false_answers():
                   "has_change_management_procedures": False},
         "art47": {"has_doc_declaration": False,
                   "has_annex_v_content": False},
+        # the three condition fields stay True (the paragraphs apply); every answer is False
+        "art48": {"has_ce_marking": False,
+                  "is_provided_digitally": True, "has_digital_ce_marking": False,
+                  "has_notified_body_assessment": True, "has_notified_body_number": False,
+                  "has_notified_body_number_in_promotion": False,
+                  "is_subject_to_other_ce_marking_law": True},
         "art49": {"has_eu_database_registration": False},
         # is_gpai_model stays True (like art54.is_third_country_provider / art55.has_systemic_risk below): false
         # makes Chapter V NOT_APPLICABLE (_scope_gate, acceptance run A2 2026-10-07) and no obligation would be mapped.
@@ -307,6 +314,11 @@ def _all_true_answers():
                   "has_change_management_procedures": True},
         "art47": {"has_doc_declaration": True,
                   "has_annex_v_content": True},
+        "art48": {"has_ce_marking": True,
+                  "is_provided_digitally": True, "has_digital_ce_marking": True,
+                  "has_notified_body_assessment": True, "has_notified_body_number": True,
+                  "has_notified_body_number_in_promotion": True,
+                  "is_subject_to_other_ce_marking_law": True},
         "art49": {"has_eu_database_registration": True},
         "art51": {"is_gpai_model": True,
                   "has_high_impact_capabilities": True,

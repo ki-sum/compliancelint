@@ -139,6 +139,15 @@
         "has_doc_declaration": null,
         "has_annex_v_content": null
       },
+      "art48": {
+        "has_ce_marking": null,
+        "has_digital_ce_marking": null,
+        "has_notified_body_number": null,
+        "has_notified_body_number_in_promotion": null,
+        "is_provided_digitally": null,
+        "has_notified_body_assessment": null,
+        "is_subject_to_other_ce_marking_law": null
+      },
       "art49": {
         "has_eu_database_registration": null
       },
@@ -360,6 +369,10 @@
     "art47": {
       "overall": "not_applicable",
       "legal_basis": "Art. 47 applies only to high-risk AI systems; risk_classification='not high-risk' with medium confidence"
+    },
+    "art48": {
+      "overall": "not_applicable",
+      "legal_basis": "Art. 48 applies only to high-risk AI systems; risk_classification='not high-risk' with medium confidence"
     },
     "art49": {
       "overall": "not_applicable",

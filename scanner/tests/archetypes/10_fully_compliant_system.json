@@ -189,6 +189,15 @@
         "has_doc_declaration": true,
         "has_annex_v_content": true
       },
+      "art48": {
+        "has_ce_marking": true,
+        "has_digital_ce_marking": true,
+        "has_notified_body_number": null,
+        "has_notified_body_number_in_promotion": null,
+        "is_provided_digitally": true,
+        "has_notified_body_assessment": false,
+        "is_subject_to_other_ce_marking_law": false
+      },
       "art49": {
         "has_eu_database_registration": true
       },
@@ -415,6 +424,10 @@
     },
     "art47": {
       "overall": "partial"
+    },
+    "art48": {
+      "overall": "partial",
+      "legal_basis": "Art. 48(2)-(3): CE marking affixed, digital CE marking accessible; Art. 48(4) and (5) do not apply (internal control, no other Union law providing for the CE marking)"
     },
     "art49": {
       "overall": "partial"

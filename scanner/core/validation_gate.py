@@ -27,7 +27,7 @@ from core.obligation_lookup import context_fields_for_article
 # These MUST match BaseArticleModule._HIGH_RISK_ONLY_ARTICLES in protocol.py.
 # Future: read from module metadata to avoid duplication.
 # When adding a new regulation, add its scope sets here (e.g. _GDPR_CONTROLLER_ONLY).
-_HIGH_RISK_ONLY = frozenset({8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 25, 26, 27, 41, 43, 47, 49, 60, 61, 71, 72, 73, 86})
+_HIGH_RISK_ONLY = frozenset({8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 25, 26, 27, 41, 43, 47, 48, 49, 60, 61, 71, 72, 73, 86})
 
 # GPAI model provider obligations (Art. 51-55)
 _GPAI_ONLY = frozenset({51, 52, 53, 54, 55})

@@ -3,7 +3,7 @@
 [![License](https://img.shields.io/badge/License-BSL_1.1-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.10+-green.svg)](https://www.python.org/)
 [![MCP](https://img.shields.io/badge/MCP-Compatible-purple.svg)](https://modelcontextprotocol.io/)
-[![EU AI Act](https://img.shields.io/badge/EU_AI_Act-248_obligations-emerald.svg)](https://compliancelint.dev)
+[![EU AI Act](https://img.shields.io/badge/EU_AI_Act-255_obligations-emerald.svg)](https://compliancelint.dev)
 
 **Compliance in your IDE. Not in a meeting.**
 
@@ -155,7 +155,7 @@ Track compliance over time at **[compliancelint.dev](https://compliancelint.dev)
   - **Compliance All-in-One Pack ZIP** (Business+) — audit-grade snapshot bundling all of the above plus an embedded offline HTML viewer that mirrors the live dashboard
 - **Attestation** — record human review decisions with evidence directly in the dashboard, or ask your AI to submit evidence via natural-language conversation
 - **Evidence stays in your repo** — upload files from the dashboard; bytes commit to `.compliancelint/evidence/` in your git repo. We relay transiently, never hold your files.
-- **Profiling Wizard** — guided 3-section interview about your AI system + organisational role + Art. 2 scope carve-outs (territorial, military, research, open-source); filters the 248-obligation matrix down to the ones that actually apply to you
+- **Profiling Wizard** — guided 3-section interview about your AI system + organisational role + Art. 2 scope carve-outs (territorial, military, research, open-source); filters the 255-obligation matrix down to the ones that actually apply to you
 - **Human Gates** — guided questionnaires for obligations that need human judgment (FRIA, Art. 14 human oversight, Art. 26(7) worker notifications); each answer saved as attestation evidence with full audit trail
 - **Penalty Exposure** — live € estimate per non-compliant finding using Art. 99 caps (€35M or 7% turnover for Art. 5 prohibitions; €15M or 3% for high-risk violations); applies the Art. 99(6) SME min-fine formula for microenterprise / small / medium organisations
 - **Role-based filtering** — Provider / Product Manufacturer / Deployer / Importer / Distributor / Authorised Representative; combined with Art. 2 carve-outs auto-narrows the obligation set so you don't see noise from articles that don't apply
@@ -186,7 +186,7 @@ The user can stop any MCP tool call at any time by pressing Stop in their IDE.
 
 | | Other tools | ComplianceLint |
 |-|------------|----------------|
-| **Method** | Check if `RISK_MANAGEMENT.md` exists | AI reads entire codebase, checks against 248 decomposed legal obligations |
+| **Method** | Check if `RISK_MANAGEMENT.md` exists | AI reads entire codebase, checks against 255 decomposed legal obligations |
 | **Citations** | "You need logging" | `Art. 12(1): "High-risk AI systems shall technically allow for the automatic recording of events..."` |
 | **False positives** | Keyword matching → many | AI understands context → near zero |
 | **Privacy** | Cloud upload | **Code stays local** — source never leaves your machine; only compliance verdicts sync to your dashboard |
@@ -200,7 +200,7 @@ You can ask any AI to review your code. But here's the difference:
 
 | | AI chat (Claude, ChatGPT, etc.) | ComplianceLint |
 |-|--------------------------------|----------------|
-| **Legal structure** | "You probably need logging" — vague, based on general knowledge | 248 specific obligations decomposed from actual EU AI Act articles |
+| **Legal structure** | "You probably need logging" — vague, based on general knowledge | 255 specific obligations decomposed from actual EU AI Act articles |
 | **Consistency** | Ask twice, get two different answers | Deterministic engine — same code, same result, every time |
 | **Completeness** | AI decides what to check (and what to skip) | Every obligation is checked — nothing is missed |
 | **Citations** | May hallucinate article numbers | Every finding traced to verbatim EUR-Lex source text |
@@ -214,7 +214,7 @@ You can ask any AI to review your code. But here's the difference:
 
 ## Coverage
 
-**EU AI Act** (Regulation (EU) 2024/1689, as amended by Regulation (EU) 2026/1744) — 45 articles, 248 obligations:
+**EU AI Act** (Regulation (EU) 2024/1689, as amended by Regulation (EU) 2026/1744) — 46 articles, 255 obligations:
 
 | Article | Topic | Obligations |
 |---------|-------|:-----------:|
@@ -245,6 +245,7 @@ You can ask any AI to review your code. But here's the difference:
 | Art. 41 | Common specifications | 1 |
 | Art. 43 | Conformity assessment | 4 |
 | Art. 47 | EU declaration of conformity | 4 |
+| Art. 48 | CE marking | 7 |
 | Art. 49 | Registration | 3 |
 | Art. 50 | Transparency obligations | 10 |
 | Art. 51 | GPAI classification (systemic risk) | 3 |
@@ -266,9 +267,9 @@ You can ask any AI to review your code. But here's the difference:
 
 All obligations verified against EUR-Lex source text.
 
-**Why 45 of the Act's articles?** The EU AI Act, as amended by Regulation (EU) 2026/1744, contains Articles 1-113 plus six inserted articles (Art. 4a, 60a, 75a-75d), for 119 articles in the consolidated text. ComplianceLint currently covers 45 selected articles with operator-facing compliance requirements, permissions or related procedures. This is a product-scope selection, not an exhaustive statement that only those 45 articles can create operator obligations or permissions.
+**Why 46 of the Act's articles?** The EU AI Act, as amended by Regulation (EU) 2026/1744, contains Articles 1-113 plus six inserted articles (Art. 4a, 60a, 75a-75d), for 119 articles in the consolidated text. ComplianceLint currently covers 46 selected articles with operator-facing compliance requirements, permissions or related procedures. This is a product-scope selection, not an exhaustive statement that only those 46 articles can create operator obligations or permissions.
 
-Not all 45 articles apply to every project. The applicable obligations depend on your role (provider, product manufacturer, deployer, importer, distributor, authorised representative) and risk classification. Configure your role in the [dashboard](https://compliancelint.dev) for accurate scoring.
+Not all 46 articles apply to every project. The applicable obligations depend on your role (provider, product manufacturer, deployer, importer, distributor, authorised representative) and risk classification. Configure your role in the [dashboard](https://compliancelint.dev) for accurate scoring.
 
 ---
 
@@ -382,7 +383,7 @@ The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard
 | Projects | 1 | 2 | 10 | Unlimited | Unlimited |
 | Scan history | 7 days | Unlimited | Unlimited | Unlimited | Unlimited |
 | PDF reports | Watermarked | Clean | Clean | Clean | Clean |
-| All 248 obligations visible (worst-case) | ✓ | ✓ | ✓ | ✓ | ✓ |
+| All 255 obligations visible (worst-case) | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Penalty display (worst-case Art. 99 caps) | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Team members | Unlimited | Unlimited | Unlimited | Unlimited | Unlimited |
 | **Scope narrowing** — see only obligations applicable to your AI system (typically saves ~70% review time) | — | ✓ | ✓ | ✓ | ✓ |
@@ -418,15 +419,15 @@ The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard
 
 ### Shipped
 
-- [x] **MCP Server** with full EU AI Act tool surface — 45 articles, 248 obligations
+- [x] **MCP Server** with full EU AI Act tool surface — 46 articles, 255 obligations
 - [x] **SaaS Dashboard** with Compliance Journey tracking
 - [x] **Audit-ready PDFs** — Compliance Journey, Declaration of Conformity (Art. 47), Technical Documentation (Art. 11), per-article evidence packs, and the Compliance All-in-One Pack ZIP
 - [x] **`npx compliancelint init`** — one-line setup for Claude Code, Cursor, Windsurf, Claude Desktop, ChatGPT (zero-config auto-discovery via [SEP-2127](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2127))
 - [x] **Role-based obligation filtering** — Provider, Product Manufacturer, Deployer, Importer, Distributor, Authorised Representative
-- [x] **Profiling Wizard** — guided questions about your AI system + organisational role; filters the 248-obligation matrix down to what actually applies to you
+- [x] **Profiling Wizard** — guided questions about your AI system + organisational role; filters the 255-obligation matrix down to what actually applies to you
 - [x] **Human Gates** — guided questionnaires for obligations that need human judgment (FRIA, Art. 14 oversight, Art. 26(7) worker notifications)
 - [x] **Evidence trail** — attestations, rebuttals, acknowledgements, deferrals with full audit history
-- [x] **EU AI Act browser** at [`/dashboard/regulations/eu-ai-act`](https://compliancelint.dev/dashboard/regulations/eu-ai-act) — full text of 45 articles + 13 annexes + searchable across 248 obligations (free after sign-up, no credit card)
+- [x] **EU AI Act browser** at [`/dashboard/regulations/eu-ai-act`](https://compliancelint.dev/dashboard/regulations/eu-ai-act) — full text of 46 articles + 13 annexes + searchable across 255 obligations (free after sign-up, no credit card)
 - [x] **Tamper-evident audit trail** — deterministic state hashing, evidence health sweeps, cross-OS CI tested (Ubuntu, macOS, Windows × Python 3.10–3.13)
 
 ### Up next
@@ -445,7 +446,7 @@ The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard
 
 | Metric | Value |
 |--------|-------|
-| Legal obligations covered | 248 (from 45 EU AI Act articles) |
+| Legal obligations covered | 255 (from 46 EU AI Act articles) |
 | Test coverage | Unit + integration + e2e (scanner pytest, dashboard Vitest, Playwright) |
 | Archetype test fixtures | Biometric systems to CRUD apps |
 | Test pass rate | 100% |

@@ -124,18 +124,17 @@ def test_degraded_notice_emitted_once_when_first_article_fetch_fails(capsys):
     assert captured.err.count("Offline mode") == 1
 
 
-def test_loaded_oid_count_includes_all_247_obligations():
-    """Sanity: post-merge, the index should still have 247 OIDs (the
+def test_loaded_oid_count_includes_all_255_obligations():
+    """Sanity: post-merge, the index should still have 255 OIDs (the
     merge doesn't add or drop entries, just enriches them)."""
     with patch.object(
         classification_client, "fetch_classifications", return_value=None
     ):
         count = obligation_lookup.loaded_oid_count()
-    # 247 unique OIDs across 44 articles. Some OIDs are
+    # 255 unique OIDs across 46 articles (45 with a module + Art. 4a). Some OIDs are
     # cross-referenced into multiple files but de-duped at index
     # insertion (first-write-wins on legitimate cross-refs).
-    assert count >= 244, f"expected >=244 OIDs, got {count}"
-    assert count <= 250, f"expected <=250 OIDs, got {count}"
+    assert count == 255, f"expected 255 OIDs, got {count}"
 
 
 # ── §Z Z.2 follow-up (2026-05-02) — _classification_unavailable flag ──

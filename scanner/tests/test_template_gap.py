@@ -199,3 +199,18 @@ def test_a_former_alias_no_longer_answers_another_obligation(art15_module, tmp_p
     BaseArticleModule.set_context(_ctx_with("art15", {}))
     without = {(f.obligation_id, f.level.value) for f in art15_module.scan(str(tmp_path)).findings}
     assert with_alias == without
+
+
+def test_the_two_applicability_answers_of_art49_and_art52_are_in_the_template():
+    """ART49-OBL-2 depends on `claims_art6_3_exception`, the four conditional Art. 52 records on
+    `is_gpai_with_systemic_risk`. Only the dashboard's settings could supply them; without a dashboard the AI was
+    never asked and those records could not be decided. The template asks for them now, with a description."""
+    from core.context import _build_answers_template, _FIELD_DESCRIPTIONS
+
+    template = _build_answers_template()
+    assert "claims_art6_3_exception" in template["art49"]
+    assert template["art49"]["claims_art6_3_exception"] is None
+    assert "is_gpai_with_systemic_risk" in template["art52"]
+    assert template["art52"]["is_gpai_with_systemic_risk"] is None
+    assert "Art. 6(3)" in _FIELD_DESCRIPTIONS["art49"]["claims_art6_3_exception"]
+    assert "Art. 51(1)" in _FIELD_DESCRIPTIONS["art52"]["is_gpai_with_systemic_risk"]

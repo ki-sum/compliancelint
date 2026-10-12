@@ -306,3 +306,24 @@ class TestWizardOverridesIdempotent:
         first = {k: dict(v) for k, v in compliance_answers.items()}
         _apply_wizard_overrides_to_answers(compliance_answers, wizard)
         assert compliance_answers == first
+
+
+class TestSystemicRiskAnswerReachesArt55:
+    """The dashboard's systemic-risk answer also decides Art. 55 (its module reads art55.has_systemic_risk): without
+    the pin the AI's own answer decided whether the Art. 55 records were scanned (consensus review 2026-10-12, I5)."""
+
+    def test_no_systemic_risk_pins_art55(self):
+        compliance_answers = {"art55": {"has_systemic_risk": True, "has_model_evaluation": True}}
+        _apply_wizard_overrides_to_answers(compliance_answers, {"isGpaiWithSystemicRisk": False})
+        assert compliance_answers["art55"]["has_systemic_risk"] is False
+        assert compliance_answers["art55"]["has_model_evaluation"] is True  # evidence answers are left alone
+
+    def test_systemic_risk_pins_art55(self):
+        compliance_answers = {}
+        _apply_wizard_overrides_to_answers(compliance_answers, {"isGpaiWithSystemicRisk": True})
+        assert compliance_answers["art55"]["has_systemic_risk"] is True
+
+    def test_unanswered_leaves_the_ai_answer(self):
+        compliance_answers = {"art55": {"has_systemic_risk": True}}
+        _apply_wizard_overrides_to_answers(compliance_answers, {"isGpaiWithSystemicRisk": None})
+        assert compliance_answers["art55"]["has_systemic_risk"] is True

@@ -465,7 +465,9 @@ class ObligationEngine:
             if obl.scope_limitation is not None:
                 # If context_skip_field is set and context has a definitive answer,
                 # auto-determine NOT_APPLICABLE instead of asking the user
-                if obl.context_skip_field and obl.context_skip_field in answers_flat:
+                # The answers template lists every field with the value null: present-but-null means the condition
+                # was not answered, and nothing is concluded from it (falls through to CONDITIONAL below).
+                if obl.context_skip_field and answers_flat.get(obl.context_skip_field) is not None:
                     field_value = answers_flat[obl.context_skip_field]
                     if field_value is obl.context_skip_value or field_value == obl.context_skip_value:
                         findings.append(Finding(

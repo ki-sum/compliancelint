@@ -95,7 +95,7 @@ def test_large_response_tools_declare_a_result_limit_claude_code_accepts(tool_na
 
 def test_full_scan_response_fits_the_declared_limit_with_room_to_spare(tmp_path):
     raw, report = _scan(tmp_path)
-    assert report["total_modules"] >= 44
+    assert report["total_modules"] >= 45
     # A full scan with a verdict on every obligation: half the declared limit at most.
     assert len(raw) <= _declared_limit() // 2, len(raw)
 

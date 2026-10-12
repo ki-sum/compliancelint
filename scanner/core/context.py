@@ -45,6 +45,7 @@ _LIST_FIELDS: dict = {
     "art21": [],
     "art43": [],
     "art47": [],
+    "art48": [],
     "art50": ["disclosure_evidence", "emotion_biometric_evidence", "deep_fake_evidence"],
     "art4":  ["literacy_evidence"],
     "art16": [],
@@ -100,6 +101,11 @@ _BOOL_FIELDS: dict = {
     "art19": ["has_log_retention", "has_retention_config"],
     "art43": ["has_internal_control_assessment", "has_change_management_procedures"],
     "art47": ["has_doc_declaration", "has_annex_v_content"],
+    # Art. 48 (CE marking): three condition fields (is_provided_digitally, has_notified_body_assessment,
+    # is_subject_to_other_ce_marking_law) decide whether Art. 48(2), (4) and (5) apply at all.
+    "art48": ["has_ce_marking", "has_digital_ce_marking", "has_notified_body_number",
+              "has_notified_body_number_in_promotion", "is_provided_digitally",
+              "has_notified_body_assessment", "is_subject_to_other_ce_marking_law"],
     "art50": ["is_chatbot_or_interactive_ai", "is_generating_synthetic_content",
               "has_ai_disclosure_to_users", "has_content_watermarking",
               "is_emotion_recognition_system", "is_biometric_categorization_system",
@@ -352,7 +358,11 @@ _TEMPLATE_GAP_FIELDS: dict = {
         "art22": ["has_mandate_authority_contact"],
         "art25": ["has_third_party_written_agreement", "has_open_source_exception"],
         "art26": ["has_log_retention", "has_affected_persons_notification"],
+        # Applicability answers of ART49-OBL-2 and of the conditional Art. 52 records. Until 2026-10-12 only the
+        # dashboard's settings supplied them, so without a dashboard those records could not be decided.
+        "art49": ["claims_art6_3_exception"],
         "art51": ["has_systemic_risk_assessment", "has_commission_designation"],
+        "art52": ["is_gpai_with_systemic_risk"],
         "art53": ["has_copyright_policy", "has_training_data_summary", "training_data_summary_public",
                   "is_open_source_gpai", "has_systemic_risk"],
         "art54": ["is_open_source_gpai", "has_systemic_risk"],

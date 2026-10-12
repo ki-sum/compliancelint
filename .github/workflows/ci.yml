@@ -60,7 +60,7 @@ jobs:
               spec.loader.exec_module(mod)
               inst = mod.create_module()
               loaded += 1
-          assert loaded == 44, f'Expected 44 modules, got {loaded}'
+          assert loaded == 45, f'Expected 45 modules, got {loaded}'
           print(f'{loaded} modules loaded successfully')
           "
 
