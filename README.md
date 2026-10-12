@@ -11,11 +11,13 @@ From EU AI Act code to audit-ready evidence — in one workflow, inside the tool
 
 Scan, attest, and document EU AI Act compliance without leaving your IDE. The scanner catches code-verifiable violations; Human Gates capture human attestations (with AI-assisted evidence collection along the way) — all with audit trail. Your code never leaves your machine.
 
-> **EU AI Act enforcement timeline**:
-> - **2025-02-02** — Art. 5 prohibited practices + Art. 99 penalty regime in force
-> - **2025-08-02** — Art. 51-55 GPAI obligations in force
-> - **2026-08-02** *(original)* — Art. 6-27 high-risk obligations were due to become enforceable
-> - **2026-05-07** — Council + Parliament reached political agreement on the Digital Omnibus delaying high-risk obligations to **2027-12-02** (standalone Annex III systems) and **2028-08-02** (embedded in Annex I products). Provisional pending formal adoption; if not adopted before 2026-08-02, the original timeline applies. GenAI watermarking for pre-Aug-2026 models delayed to 2026-12-02.
+> **EU AI Act application dates** (Regulation (EU) 2024/1689 as amended by Regulation (EU) 2026/1744, consolidated text of 2026-07-27):
+> - **2025-02-02** — Chapters I and II apply, except Art. 5(1), first subparagraph, points (ba) and (bb), and Art. 5(1a) and (1b), which apply from 2026-12-02
+> - **2025-08-02** — Chapter III Section 4, Chapters V, VII and XII and Art. 78 apply (except Art. 101)
+> - **2026-08-02** — General application date: all provisions not listed under another date apply
+> - **2026-12-02** — Art. 5(1), first subparagraph, points (ba) and (bb) and Art. 5(1a) and (1b) apply; Providers of AI systems generating synthetic audio, image, video or text content placed on the market before 2 August 2026 must comply with Art. 50(2)
+> - **2027-12-02** — Chapter III Sections 1-3 (except Art. 6(5)) apply to Annex III high-risk AI systems
+> - **2028-08-02** — Chapter III Sections 1-3 (except Art. 6(5)) apply to Annex I high-risk AI systems
 >
 > Track current status in-app: [compliancelint.dev/dashboard/regulations/eu-ai-act](https://compliancelint.dev/dashboard/regulations/eu-ai-act).
 
@@ -23,7 +25,7 @@ Scan, attest, and document EU AI Act compliance without leaving your IDE. The sc
 
 ### See it in action
 
-Try the live demo at **[compliancelint.dev/demo](https://compliancelint.dev/demo)** — pre-loaded with three AI systems (limited-risk chatbot, high-risk finance, high-risk medical) so you can browse a real scan, attestation flow, and Compliance Journey trend without setting up a project of your own.
+Try the live demo at **[compliancelint.dev/demo](https://compliancelint.dev/demo)** — pre-loaded with three AI systems (a chatbot that is not high-risk but has an Article 50 transparency trigger, a high-risk finance system, a high-risk medical system) so you can browse a real scan, attestation flow, and Compliance Journey trend without setting up a project of your own.
 
 ### Dashboard
 
@@ -155,7 +157,7 @@ Track compliance over time at **[compliancelint.dev](https://compliancelint.dev)
   - **Compliance All-in-One Pack ZIP** (Business+) — audit-grade snapshot bundling all of the above plus an embedded offline HTML viewer that mirrors the live dashboard
 - **Attestation** — record human review decisions with evidence directly in the dashboard, or ask your AI to submit evidence via natural-language conversation
 - **Evidence stays in your repo** — upload files from the dashboard; bytes commit to `.compliancelint/evidence/` in your git repo. We relay transiently, never hold your files.
-- **Profiling Wizard** — guided 3-section interview about your AI system + organisational role + Art. 2 scope carve-outs (territorial, military, research, open-source); filters the 255-obligation matrix down to the ones that actually apply to you
+- **Profiling Wizard** — role-first questions that follow the EU's official AI Act Compliance Checker: what is assessed, your role(s), scope (Art. 2), prohibited practices (Art. 5), high-risk classification (Annex I, Annex III, Art. 6(3)), transparency (Art. 50), general-purpose AI model. The risk class is concluded from your answers; filters the 255-obligation matrix down to the ones that actually apply to you
 - **Human Gates** — guided questionnaires for obligations that need human judgment (FRIA, Art. 14 human oversight, Art. 26(7) worker notifications); each answer saved as attestation evidence with full audit trail
 - **Penalty Exposure** — live € estimate per non-compliant finding using Art. 99 caps (€35M or 7% turnover for Art. 5 prohibitions; €15M or 3% for high-risk violations); applies the Art. 99(6) SME min-fine formula for microenterprise / small / medium organisations
 - **Role-based filtering** — Provider / Product Manufacturer / Deployer / Importer / Distributor / Authorised Representative; combined with Art. 2 carve-outs auto-narrows the obligation set so you don't see noise from articles that don't apply
@@ -220,7 +222,7 @@ You can ask any AI to review your code. But here's the difference:
 |---------|-------|:-----------:|
 | Art. 4 | AI literacy | 1 |
 | Art. 4a | Special categories of personal data for bias detection (permissions only) | 2 |
-| Art. 5 | Prohibited AI practices | 8 |
+| Art. 5 | Prohibited AI practices | 10 |
 | Art. 6 | Risk classification | 8 |
 | Art. 8 | Compliance with requirements | 2 |
 | Art. 9 | Risk management system | 19 |
@@ -263,13 +265,13 @@ You can ask any AI to review your code. But here's the difference:
 | Art. 86 | Right to explanation | 3 |
 | Art. 91 | Documentation duty | 1 |
 | Art. 92 | Cooperation with evaluations | 1 |
-| Art. 111 | Transitional provisions | 3 |
+| Art. 111 | Transitional provisions | 4 |
 
-All obligations verified against EUR-Lex source text.
+All obligations verified against EUR-Lex source text. The table has 258 rows for 255 obligations: three records (`ART19-OBL-1b`, `ART19-OBL-2`, `ART26-OBL-6`) are listed under two articles.
 
 **Why 46 of the Act's articles?** The EU AI Act, as amended by Regulation (EU) 2026/1744, contains Articles 1-113 plus six inserted articles (Art. 4a, 60a, 75a-75d), for 119 articles in the consolidated text. ComplianceLint currently covers 46 selected articles with operator-facing compliance requirements, permissions or related procedures. This is a product-scope selection, not an exhaustive statement that only those 46 articles can create operator obligations or permissions.
 
-Not all 46 articles apply to every project. The applicable obligations depend on your role (provider, product manufacturer, deployer, importer, distributor, authorised representative) and risk classification. Configure your role in the [dashboard](https://compliancelint.dev) for accurate scoring.
+Not all 46 articles apply to every project. The applicable obligations depend on the role(s) you state (provider, product manufacturer, deployer, importer, distributor, authorised representative) and on the risk class concluded from your Profiling Wizard answers. Run the Profiling Wizard in the [dashboard](https://compliancelint.dev) for accurate scoring.
 
 ---
 
@@ -387,10 +389,10 @@ The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard
 | Penalty display (worst-case Art. 99 caps) | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Team members | Unlimited | Unlimited | Unlimited | Unlimited | Unlimited |
 | **Scope narrowing** — see only obligations applicable to your AI system (typically saves ~70% review time) | — | ✓ | ✓ | ✓ | ✓ |
-| **Risk classification picker** (Art. 5 / 6 / 50) | — | ✓ | ✓ | ✓ | ✓ |
+| **Risk class concluded from your Profiling Wizard answers** (Art. 5 / 6 / 50) | — | ✓ | ✓ | ✓ | ✓ |
 | **SME relief** (Art. 11 simplified tech-doc per Recommendation 2003/361/EC) | — | ✓ | ✓ | ✓ | ✓ |
 | **Per-obligation questionnaires** (anchor AI answers to verbatim legal text) | — | ✓ | ✓ | ✓ | ✓ |
-| **Art. 2 carve-outs** (territorial / military / research / open-source — entire-Act exemption flags) | — | ✓ | ✓ | ✓ | ✓ |
+| **Art. 2 carve-outs** (territorial / military / research / open-source) | — | ✓ | ✓ | ✓ | ✓ |
 | Penalty configuration (precise — based on your headcount + turnover + balance sheet) | — | ✓ | ✓ | ✓ | ✓ |
 | Evidence — `text` declarations + `git_path` pointers (captured: content saved in DB or git) | — | ✓ | ✓ | ✓ | ✓ |
 | Evidence — `url_reference` (external pointer — content not captured, may link-rot) | — | ✓ | ✓ | ✓ | ✓ |

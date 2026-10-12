@@ -291,10 +291,12 @@ def cl_analyze_project(project_path: str) -> str:
       ║     solely because of the operator role. The offline        ║
       ║     scanner displays null as "unable to determine", which   ║
       ║     is a tool limitation, not a legal finding. On a paid    ║
-      ║     dashboard plan, the Profiling Wizard can exclude        ║
-      ║     deployer duties based on deployer answers. Provider     ║
-      ║     duties are not excluded solely on the basis of          ║
-      ║     provider role.                                          ║
+      ║     dashboard plan, the duties that the Profiling Wizard    ║
+      ║     answers exclude are reported as not applicable:         ║
+      ║     deployer duties based on the deployer answers, and      ║
+      ║     provider duties where the answers do not establish that ║
+      ║     the organisation is the provider, including under       ║
+      ║     Article 25.                                             ║
       ╚═══════════════════════════════════════════════════════════════╝
 
       ╔═══════════════════════════════════════════════════════════════╗
@@ -356,7 +358,7 @@ def cl_analyze_project(project_path: str) -> str:
 
     # v1.1.1 onboarding hint — when project has no api_key configured,
     # tell the AI to recommend cl_connect FIRST. Without cl_connect the
-    # scanner has no wizard_answers and falls back to scanning all 247
+    # scanner has no wizard_answers and falls back to scanning all
     # obligations, producing a noisy unable_to_determine-heavy report
     # that wastes the user's first impression. This is by design (Free
     # tier "see everything" legal safety) but a fresh user has no way
@@ -373,12 +375,15 @@ def cl_analyze_project(project_path: str) -> str:
             ),
             "what_to_tell_user": (
                 "Before I scan, you have two options:\n"
-                "  (1) RECOMMENDED — connect this project to the free "
-                "ComplianceLint dashboard at compliancelint.dev. You'll "
-                "answer a quick 30-second wizard about your role "
-                "(Provider / Deployer / Importer / etc.) and risk class. "
-                "The scanner will then check only the EU AI Act obligations "
-                "that actually apply to you — clean, focused report.\n"
+                "  (1) RECOMMENDED — connect this project to the "
+                "ComplianceLint dashboard at compliancelint.dev (a free "
+                "account is enough to connect). On a Starter plan or higher "
+                "you can then run the Profiling Wizard there: you state "
+                "your role(s) (Provider / Deployer / Importer / etc.) and "
+                "answer questions about scope and use, and the risk class is "
+                "concluded from your answers. The scan then reports the EU "
+                "AI Act obligations that do not apply to you as not "
+                "applicable — a focused report.\n"
                 "  (2) Skip connecting — I'll scan immediately against all "
                 f"{unique_obligation_count()} obligations. Most won't apply and will return 'unable "
                 "to determine'. Legally safe, but noisy.\n"
@@ -386,8 +391,10 @@ def cl_analyze_project(project_path: str) -> str:
             ),
             "if_user_picks_connect": (
                 "Call cl_connect() — it will return a one-time auth URL. "
-                "Give it to the user, wait for them to finish the wizard "
-                "in their browser, then proceed to cl_scan_all."
+                "Give it to the user, wait for them to finish signing in "
+                "in their browser (the Profiling Wizard, where their plan "
+                "includes it, is run in the dashboard), then proceed to "
+                "cl_scan_all."
             ),
             "if_user_picks_skip": (
                 "Proceed directly to cl_scan_all. Filter the noisy "
@@ -2274,14 +2281,17 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
     if not scope.get('_saas_settings_active'):
         meta_extras['role_configuration_hint'] = (
             f'This scan checked all {unique_obligation_count()} obligations across all roles. '
-            'For accurate scoring, configure your role and risk '
-            'classification at compliancelint.dev/dashboard -> '
-            '[repo] -> Settings. With settings configured: only '
-            'applicable articles scanned (faster, more accurate); '
-            'compliance score reflects your actual obligations; Human '
-            'Gates show only your required actions. After syncing '
-            '(cl_sync), review your AI-detected risk classification '
-            'in Settings to confirm.'
+            'To narrow it, run the Profiling Wizard at '
+            'compliancelint.dev/dashboard -> [repo] -> Settings -> Run '
+            'Wizard (Starter plan or higher): you state your role(s) and '
+            'answer questions about scope and use, and the risk class is '
+            'concluded from your answers. With the wizard answers applied: '
+            'obligations that do not apply to your stated role(s) and your '
+            'system are reported as not applicable; the compliance score '
+            'reflects the remaining obligations; Human Gates show only your '
+            'required actions. After syncing (cl_sync), the dashboard shows '
+            'a notice when the AI scan and your wizard answers lead to '
+            'different risk classes.'
         )
     if config.saas_api_key and config.auto_sync:
         try:

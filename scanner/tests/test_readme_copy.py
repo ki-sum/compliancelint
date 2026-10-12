@@ -1,0 +1,128 @@
+"""Facts stated in the README files follow the data (2026-10-12).
+
+Three statements had gone stale because they were typed in:
+  - the application dates still described Regulation (EU) 2026/1744 as a provisional political agreement and put
+    Art. 99 under 2025-02-02 (Chapter XII applies from 2025-08-02);
+  - the coverage table listed 8 obligations for Art. 5 (10 since Art. 5(1)(ba)/(bb)) and 3 for Art. 111 (4);
+  - scanner/README.md said "14 tools".
+The dates come from scanner/data/application_dates.json, the table from the obligation files, the tool count from
+the @mcp.tool functions in server.py.
+"""
+import glob
+import json
+import os
+import re
+
+import pytest
+
+SCANNER_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+REPO_ROOT = os.path.dirname(SCANNER_ROOT)
+
+
+def _read(rel: str) -> str:
+    with open(os.path.join(REPO_ROOT, rel), encoding="utf-8") as f:
+        return f.read()
+
+
+# ── Application dates ──
+
+README_DATES = ("2025-02-02", "2025-08-02", "2026-08-02", "2026-12-02", "2027-12-02", "2028-08-02")
+
+
+def _milestones() -> dict[str, list[str]]:
+    with open(os.path.join(SCANNER_ROOT, "data", "application_dates.json"), encoding="utf-8") as f:
+        by_date: dict[str, list[str]] = {}
+        for m in json.load(f)["milestones"]:
+            by_date.setdefault(m["date"], []).append(m["event"])
+    return by_date
+
+
+def _readme_dates_block() -> str:
+    text = _read("README.md")
+    start = text.index("> **EU AI Act application dates**")
+    end = text.index("> Track current status in-app", start)
+    return text[start:end]
+
+
+def test_readme_names_the_amending_regulation_in_the_dates_heading():
+    heading = _readme_dates_block().splitlines()[0]
+    assert "Regulation (EU) 2024/1689 as amended by Regulation (EU) 2026/1744" in heading
+    assert "consolidated text of 2026-07-27" in heading
+
+
+@pytest.mark.parametrize("day", README_DATES)
+def test_readme_application_date_states_what_application_dates_json_states(day):
+    lines = [ln for ln in _readme_dates_block().splitlines() if ln.startswith(f"> - **{day}** — ")]
+    assert len(lines) == 1, f"expected one README line for {day}, found {len(lines)}"
+    stated = lines[0][len(f"> - **{day}** — "):].strip()
+    assert stated == "; ".join(_milestones()[day])
+
+
+def test_readme_dates_block_lists_no_other_date_line():
+    days = re.findall(r"^> - \*\*(\d{4}-\d{2}-\d{2})\*\*", _readme_dates_block(), flags=re.MULTILINE)
+    assert tuple(days) == README_DATES
+
+
+def test_readme_does_not_call_the_amending_regulation_pending():
+    text = _read("README.md")
+    for stale in ("political agreement", "Provisional pending formal adoption", "the original timeline applies",
+                  "Art. 99 penalty regime in force"):
+        assert stale not in text, stale
+
+
+# ── Coverage table ──
+
+def _rows_per_article() -> dict[str, int]:
+    """Obligation records per obligation file, keyed like the README table ("5", "4a", "111")."""
+    out: dict[str, int] = {}
+    for p in glob.glob(os.path.join(SCANNER_ROOT, "obligations", "art*.json")):
+        key = re.match(r"art0*(\d+[a-z]?)-", os.path.basename(p)).group(1)
+        with open(p, encoding="utf-8") as f:
+            out[key] = len(json.load(f)["obligations"])
+    return out
+
+
+def _readme_table() -> dict[str, int]:
+    return {
+        m.group(1): int(m.group(2))
+        for m in re.finditer(r"^\| Art\. (\d+[a-z]?) \| [^|]+ \| (\d+) \|$", _read("README.md"), flags=re.MULTILINE)
+    }
+
+
+def test_readme_coverage_table_has_a_row_for_every_obligation_file():
+    assert set(_readme_table()) == set(_rows_per_article())
+
+
+@pytest.mark.parametrize("article", sorted(_rows_per_article(), key=lambda k: (int(re.match(r"\d+", k).group()), k)))
+def test_readme_coverage_table_count_is_the_number_of_records_in_the_file(article):
+    assert _readme_table().get(article) == _rows_per_article()[article]
+
+
+def test_readme_explains_why_the_table_sums_to_more_than_the_obligation_count():
+    rows = sum(_rows_per_article().values())
+    unique = len({o["id"] for p in glob.glob(os.path.join(SCANNER_ROOT, "obligations", "art*.json"))
+                  for o in json.load(open(p, encoding="utf-8"))["obligations"]})
+    assert rows > unique
+    assert sum(_readme_table().values()) == rows
+    assert f"The table has {rows} rows for {unique} obligations" in _read("README.md")
+
+
+# ── Tool count ──
+
+@pytest.mark.parametrize("rel", ["README.md", "scanner/README.md", "bin/README.md", "docs/user-guide.md"])
+def test_docs_state_no_tool_count_other_than_the_registered_tools(rel):
+    with open(os.path.join(SCANNER_ROOT, "server.py"), encoding="utf-8") as f:
+        registered = len(re.findall(r"^@mcp\.tool\(", f.read(), flags=re.MULTILINE))
+    stated = {int(n) for n in re.findall(r"\b(\d+) (?:MCP )?tools\b", _read(rel))}
+    assert stated <= {registered}, f"{rel} states {sorted(stated)} tools; server.py registers {registered}"
+
+
+# ── Scan progress in the user guide ──
+
+def test_user_guide_counts_scanned_articles_as_the_scan_modules():
+    modules = len([d for d in os.listdir(os.path.join(SCANNER_ROOT, "modules")) if re.match(r"art\d+[a-z]?-", d)])
+    guide = _read("docs/user-guide.md")
+    stated = {int(n) for n in re.findall(r"\b(\d{2}) scanned articles\b", guide)} | {
+        int(n) for n in re.findall(r"\(\d+/(\d{2})\)", guide)}
+    assert stated == {modules}
+    assert "Low-risk classification" not in guide

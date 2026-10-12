@@ -210,14 +210,32 @@ _USER_FACING_TEMPLATE = (
 )
 
 
+# What the user is shown for each stored risk_classification value. The Regulation has prohibited practices
+# (Art. 5), high-risk AI systems (Art. 6) and transparency obligations for certain AI systems (Art. 50); it has no
+# "limited-risk" or "minimal-risk" class. Those two names are stored values only. The ComplianceLint dashboard shows
+# the same four labels.
+RISK_DISPLAY_LABELS = {
+    "prohibited": "Prohibited practice (Art. 5)",
+    "high-risk": "High-risk",
+    "limited-risk": "Not high-risk — Article 50 transparency trigger identified",
+    "minimal-risk": "Not high-risk — no Article 50 transparency trigger identified",
+}
+
+
 _INSTRUCTIONS = (
-    "Read the detected_indicators above. Classify this AI system using "
-    "EU AI Act categories: prohibited (Art 5), high-risk (Art 6 + Annex "
-    "III), limited-risk (Art 50 transparency), or minimal-risk. "
+    "Read the detected_indicators above. Estimate the risk_classification "
+    "value of this AI system: 'prohibited' (an Art. 5 practice), 'high-risk' "
+    "(Art. 6 with Annex I or Annex III), 'limited-risk' (only the Art. 50 "
+    "transparency obligations) or 'minimal-risk' (none of these). These four "
+    "are the stored values; 'limited-risk' and 'minimal-risk' are not classes "
+    "of the Regulation, so show the user the label of the value, not the "
+    "value: "
+    + "; ".join(f"'{value}' -> \"{label}\"" for value, label in RISK_DISPLAY_LABELS.items())
+    + ". "
     "Biometric libraries trigger Annex III §1 review if used in publicly-"
     "accessible spaces. Render the user_facing_summary_template, fill the "
-    "{stack}/{risk}/{confidence}/{scope} placeholders, and ask the user "
-    "y/n BEFORE calling cl_scan_all."
+    "{stack}/{risk}/{confidence}/{scope} placeholders ({risk} with the "
+    "label), and ask the user y/n BEFORE calling cl_scan_all."
 )
 
 

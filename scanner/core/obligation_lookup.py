@@ -8,7 +8,7 @@ guidance. Customers got less from our paid tool than from ChatGPT.
 This module is the ANTI-HALLUCINATION layer: every field returned
 comes verbatim from a committed obligation JSON. Zero AI inference.
 
-Cache strategy: load all 44 article JSONs lazily on first call and
+Cache strategy: load all article JSONs lazily on first call and
 hold a flat {OID: row} index in memory. Reload only on process
 restart. The JSONs are committed to the repo (44 × ~10-50 KB each =
 ~1 MB total), so memory footprint is trivial.

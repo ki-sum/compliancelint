@@ -154,7 +154,7 @@ def fetch_classifications(article_number: int) -> Optional[dict]:
 
 # One-time CLI notice flag — set on first degraded-mode detection per
 # process so we don't spam the user with the same warning N times when
-# build_index loads 44 articles.
+# build_index loads every article file.
 _DEGRADED_NOTICE_SHOWN = False
 
 

@@ -8,12 +8,12 @@ Open-source, MCP-native compliance engine that decomposes EU AI Act requirements
 core/             — Protocol definitions, ObligationEngine, persistence layer
 modules/          — Per-article scanning modules (45 modules; Art. 4a has permissions only, no module)
 obligations/      — Legal obligation definitions (255 obligations, 46 articles incl. Art. 4a)
-server.py         — MCP Server entry point (14 tools)
+server.py         — MCP Server entry point (the cl_* tools)
 ```
 
 ## Status
 
-- [x] MCP Server with 14 tools
+- [x] MCP Server with the cl_* tools listed in the repository README
 - [x] 45 article modules (Art. 4–6, 8–27, 41, 43, 47–55, 60, 61, 71–73, 80, 82, 86, 91, 92, 111)
 - [x] 255 legal obligations — verified against EUR-Lex source text on all 46 articles
 - [x] Persistence layer (`.compliancelint/` per-project scan state)

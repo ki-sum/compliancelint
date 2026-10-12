@@ -404,9 +404,10 @@ ${bold("Next steps:")}
   1. Restart your AI IDE (Claude Code, Cursor, Windsurf)
   2. ${yellow("Recommended first:")} Ask your AI:
      ${cyan('"Connect this project to my ComplianceLint dashboard"')}
-     ${dim("This is free \u2014 links the project to compliancelint.dev,")}
-     ${dim("you answer a 30-second wizard about your role + risk,")}
-     ${dim("the scanner then narrows to obligations that apply to you.")}
+     ${dim("Connecting is free \u2014 it links the project to compliancelint.dev.")}
+     ${dim("On a Starter plan or higher, the Profiling Wizard then asks your")}
+     ${dim("role(s), the scope and the use of the system and concludes the risk class;")}
+     ${dim("the scan reports obligations that do not apply to you as not applicable.")}
   3. Then ask your AI:
      ${cyan('"Scan this project for EU AI Act compliance"')}
      ${dim("If you skip step 2, the scanner runs all 255 obligations and")}
