@@ -46,8 +46,8 @@
       "id": "IS-ART48-R04",
       "obligation_ref": "ART48-OBL-4b",
       "title": "Who Affixes the Identification Number",
-      "requirement": "The identification number of the notified body MUST be affixed by the body itself or, under its instructions, by the provider or by the provider's authorised representative.",
-      "rationale": "Art. 48(4), second sentence.",
+      "requirement": "The identification number of the notified body MUST be affixed by a permitted performer: the notified body itself, or, under the notified body's instructions, the provider or the provider's authorised representative.",
+      "rationale": "Art. 48(4), second sentence. The provider is responsible via Article 16(h); it does not have to affix the number itself.",
       "applies_when": "A notified body is responsible for the conformity assessment procedure set out in Article 43."
     },
     {
@@ -56,7 +56,7 @@
       "title": "Identification Number in Promotional Material",
       "requirement": "Any promotional material which mentions that the high-risk AI system fulfils the requirements for CE marking MUST also indicate the identification number of the notified body.",
       "rationale": "Art. 48(4), third sentence.",
-      "applies_when": "A notified body is responsible for the conformity assessment procedure set out in Article 43."
+      "applies_when": "A notified body is responsible for the conformity assessment procedure set out in Article 43 and promotional material exists which mentions that the high-risk AI system fulfils the requirements for CE marking."
     },
     {
       "id": "IS-ART48-R06",

@@ -2394,11 +2394,14 @@ class TestClScanArticle48:
 
     def test_full_context_partial(self, project_dir):
         ctx = ProjectContext.from_json(json.dumps({
-            "art48": {"has_ce_marking": True,
+            "art48": {"has_ce_marking": True, "follows_general_ce_marking_principles": True,
                       "is_provided_digitally": True, "has_digital_ce_marking": True,
                       "has_notified_body_assessment": True, "has_notified_body_number": True,
+                      "notified_body_number_affixed_by_permitted_actor": True,
+                      "has_ce_marking_promotional_material": True,
                       "has_notified_body_number_in_promotion": True,
-                      "is_subject_to_other_ce_marking_law": True}
+                      "is_subject_to_other_ce_marking_law": True,
+                      "ce_marking_indicates_other_union_law_compliance": True}
         }))
         result_json = _scan_single_article(48, project_dir, context=ctx)
         result = json.loads(result_json)

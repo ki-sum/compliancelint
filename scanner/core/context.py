@@ -101,11 +101,15 @@ _BOOL_FIELDS: dict = {
     "art19": ["has_log_retention", "has_retention_config"],
     "art43": ["has_internal_control_assessment", "has_change_management_procedures"],
     "art47": ["has_doc_declaration", "has_annex_v_content"],
-    # Art. 48 (CE marking): three condition fields (is_provided_digitally, has_notified_body_assessment,
-    # is_subject_to_other_ce_marking_law) decide whether Art. 48(2), (4) and (5) apply at all.
+    # Art. 48 (CE marking): seven result fields (one per record) and four condition fields
+    # (is_provided_digitally, has_notified_body_assessment, is_subject_to_other_ce_marking_law,
+    # has_ce_marking_promotional_material) that decide whether Art. 48(2), (4) and (5) apply at all.
     "art48": ["has_ce_marking", "has_digital_ce_marking", "has_notified_body_number",
-              "has_notified_body_number_in_promotion", "is_provided_digitally",
-              "has_notified_body_assessment", "is_subject_to_other_ce_marking_law"],
+              "has_notified_body_number_in_promotion", "follows_general_ce_marking_principles",
+              "notified_body_number_affixed_by_permitted_actor",
+              "ce_marking_indicates_other_union_law_compliance", "is_provided_digitally",
+              "has_notified_body_assessment", "is_subject_to_other_ce_marking_law",
+              "has_ce_marking_promotional_material"],
     "art50": ["is_chatbot_or_interactive_ai", "is_generating_synthetic_content",
               "has_ai_disclosure_to_users", "has_content_watermarking",
               "is_emotion_recognition_system", "is_biometric_categorization_system",

@@ -3,19 +3,26 @@
 Tests verify the obligation mapper logic: AI answers → Finding.
 The scanner does no detection; the AI provides compliance_answers.
 
-Obligation mapping:
-  (manual, always UTD)                    → ART48-OBL-1  (Art. 48(1))
-  has_digital_ce_marking                  → ART48-OBL-2  (Art. 48(2); condition: is_provided_digitally)
-  has_ce_marking                          → ART48-OBL-3  (Art. 48(3))
-  has_notified_body_number                → ART48-OBL-4a (Art. 48(4), first sentence;
-                                                          condition: has_notified_body_assessment)
-  (manual, always UTD when it applies)    → ART48-OBL-4b (Art. 48(4), second sentence; same condition)
-  has_notified_body_number_in_promotion   → ART48-OBL-4c (Art. 48(4), third sentence; same condition)
-  (manual, always UTD when it applies)    → ART48-OBL-5  (Art. 48(5); condition: is_subject_to_other_ce_marking_law)
+Obligation mapping (result field → record; condition field(s)):
+  follows_general_ce_marking_principles            → ART48-OBL-1  (Art. 48(1))
+  has_digital_ce_marking                           → ART48-OBL-2  (Art. 48(2); is_provided_digitally)
+  has_ce_marking                                   → ART48-OBL-3  (Art. 48(3))
+  has_notified_body_number                         → ART48-OBL-4a (Art. 48(4), first sentence;
+                                                                   has_notified_body_assessment)
+  notified_body_number_affixed_by_permitted_actor  → ART48-OBL-4b (Art. 48(4), second sentence;
+                                                                   has_notified_body_assessment)
+  has_notified_body_number_in_promotion            → ART48-OBL-4c (Art. 48(4), third sentence;
+                                                                   has_notified_body_assessment AND
+                                                                   has_ce_marking_promotional_material)
+  ce_marking_indicates_other_union_law_compliance  → ART48-OBL-5  (Art. 48(5); is_subject_to_other_ce_marking_law)
 
-A conditional record is assessed from its answer only when its condition is answered true: with the condition
-false it is NOT_APPLICABLE, with the condition unanswered (key absent, or null as in the answers template) it
-stays UNABLE_TO_DETERMINE whatever the answer says.
+A result answer maps true → PARTIAL (a person still confirms it), false → NON_COMPLIANT, null → UNABLE_TO_DETERMINE.
+A conditional record is assessed from its answer only when every condition is answered true: with a condition
+false it is NOT_APPLICABLE, with a condition unanswered (key absent, or null as in the answers template) it stays
+UNABLE_TO_DETERMINE whatever the answer says.
+
+The result fields of ART48-OBL-1, -4b and -5 and the promotional-material condition were added by the legal review
+of 2026-10-12 (item J16).
 """
 import json
 
@@ -28,25 +35,37 @@ from conftest import _ctx_with
 
 ALL_IDS = ["ART48-OBL-1", "ART48-OBL-2", "ART48-OBL-3", "ART48-OBL-4a", "ART48-OBL-4b", "ART48-OBL-4c",
            "ART48-OBL-5"]
+# Automation level manual: the finding always carries the Human Gates hint.
 MANUAL_IDS = ["ART48-OBL-1", "ART48-OBL-4b", "ART48-OBL-5"]
 ANSWER_FIELDS = ["has_ce_marking", "has_digital_ce_marking", "has_notified_body_number",
-                 "has_notified_body_number_in_promotion"]
-CONDITION_FIELDS = ["is_provided_digitally", "has_notified_body_assessment", "is_subject_to_other_ce_marking_law"]
+                 "has_notified_body_number_in_promotion", "follows_general_ce_marking_principles",
+                 "notified_body_number_affixed_by_permitted_actor",
+                 "ce_marking_indicates_other_union_law_compliance"]
+CONDITION_FIELDS = ["is_provided_digitally", "has_notified_body_assessment", "is_subject_to_other_ce_marking_law",
+                    "has_ce_marking_promotional_material"]
 
-# (obligation, condition field, answer field, words the finding uses when the condition is open)
-CONDITIONAL_ANSWERED = [
+# (obligation, result field) of the records without a condition
+UNCONDITIONAL = [
+    ("ART48-OBL-1", "follows_general_ce_marking_principles"),
+    ("ART48-OBL-3", "has_ce_marking"),
+]
+# (obligation, condition field, result field, words the finding uses when the condition is open)
+ONE_CONDITION = [
     ("ART48-OBL-2", "is_provided_digitally", "has_digital_ce_marking", "is provided digitally"),
     ("ART48-OBL-4a", "has_notified_body_assessment", "has_notified_body_number", "whether a notified body"),
-    ("ART48-OBL-4c", "has_notified_body_assessment", "has_notified_body_number_in_promotion",
+    ("ART48-OBL-4b", "has_notified_body_assessment", "notified_body_number_affixed_by_permitted_actor",
      "whether a notified body"),
-]
-# (obligation, condition field, words the finding uses when the condition is open)
-CONDITIONAL_MANUAL = [
-    ("ART48-OBL-4b", "has_notified_body_assessment", "whether a notified body"),
-    ("ART48-OBL-5", "is_subject_to_other_ce_marking_law", "is subject to other Union law"),
+    ("ART48-OBL-5", "is_subject_to_other_ce_marking_law", "ce_marking_indicates_other_union_law_compliance",
+     "is subject to other Union law"),
 ]
 # The condition is unanswered: the key is absent, or present with null (the shape of the answers template).
 UNANSWERED = [pytest.param(False, id="key-absent"), pytest.param(True, id="key-null")]
+
+PERMITTED_PERFORMER = ("the notified body itself, or, under the notified body's instructions, the provider or the "
+                       "provider's authorised representative")
+NB = "has_notified_body_assessment"
+PROMO = "has_ce_marking_promotional_material"
+IN_PROMO = "has_notified_body_number_in_promotion"
 
 
 def _full_true_ctx():
@@ -83,64 +102,53 @@ def _with_open_condition(condition, as_null, answers):
     return {**answers, condition: None} if as_null else answers
 
 
-# ── ART48-OBL-1: general principles of Article 30 of Regulation (EC) No 765/2008 (manual, always UTD) ──
+# ── ART48-OBL-1 / ART48-OBL-3: records without a condition ──
 
-class TestArt48Obl1:
+@pytest.mark.parametrize("obl_id,answer", UNCONDITIONAL)
+class TestArt48Unconditional:
 
-    def test_always_utd(self, art48_module, tmp_path):
-        """ART48-OBL-1 is UNABLE_TO_DETERMINE when every answer is True (manual obligation)."""
-        BaseArticleModule.set_context(_full_true_ctx())
-        result = art48_module.scan(str(tmp_path))
-        obl = _find(result, "ART48-OBL-1")
-        assert len(obl) == 1
-        assert obl[0].level == ComplianceLevel.UNABLE_TO_DETERMINE
-
-    def test_utd_even_when_all_false(self, art48_module, tmp_path):
-        """ART48-OBL-1 stays UNABLE_TO_DETERMINE when every answer is False."""
-        BaseArticleModule.set_context(_full_false_ctx())
-        result = art48_module.scan(str(tmp_path))
-        obl = _find(result, "ART48-OBL-1")
-        assert len(obl) == 1
-        assert obl[0].level == ComplianceLevel.UNABLE_TO_DETERMINE
-
-    def test_names_the_regulation_and_points_to_human_gates(self, art48_module, tmp_path):
-        BaseArticleModule.set_context(_empty_ctx())
-        result = art48_module.scan(str(tmp_path))
-        obl = _find(result, "ART48-OBL-1")[0]
-        assert "Article 30 of Regulation (EC) No 765/2008" in obl.description
-        assert "compliancelint.dev" in obl.human_gate_hint
-
-
-# ── ART48-OBL-3: affixed visibly, legibly and indelibly (has_ce_marking) ──
-
-class TestArt48Obl3:
-
-    def test_true_gives_partial(self, art48_module, tmp_path):
-        """has_ce_marking=True → ART48-OBL-3 PARTIAL."""
-        result = _scan(art48_module, tmp_path, {"has_ce_marking": True})
-        obl = _find(result, "ART48-OBL-3")
+    def test_true_gives_partial(self, art48_module, tmp_path, obl_id, answer):
+        """Answer True → PARTIAL (evidence found, a person confirms)."""
+        result = _scan(art48_module, tmp_path, {answer: True})
+        obl = _find(result, obl_id)
         assert len(obl) == 1
         assert obl[0].level == ComplianceLevel.PARTIAL
 
-    def test_false_gives_non_compliant(self, art48_module, tmp_path):
-        """has_ce_marking=False → ART48-OBL-3 NON_COMPLIANT."""
-        result = _scan(art48_module, tmp_path, {"has_ce_marking": False})
-        obl = _find(result, "ART48-OBL-3")
+    def test_false_gives_non_compliant(self, art48_module, tmp_path, obl_id, answer):
+        """Answer False → NON_COMPLIANT."""
+        result = _scan(art48_module, tmp_path, {answer: False})
+        obl = _find(result, obl_id)
         assert len(obl) == 1
         assert obl[0].level == ComplianceLevel.NON_COMPLIANT
 
-    def test_none_gives_utd(self, art48_module, tmp_path):
-        """has_ce_marking=None → ART48-OBL-3 UNABLE_TO_DETERMINE."""
-        result = _scan(art48_module, tmp_path, {})
-        obl = _find(result, "ART48-OBL-3")
+    @pytest.mark.parametrize("as_null", UNANSWERED)
+    def test_none_gives_utd(self, art48_module, tmp_path, obl_id, answer, as_null):
+        """Answer None → UNABLE_TO_DETERMINE."""
+        result = _scan(art48_module, tmp_path, {answer: None} if as_null else {})
+        obl = _find(result, obl_id)
         assert len(obl) == 1
         assert obl[0].level == ComplianceLevel.UNABLE_TO_DETERMINE
 
 
-# ── ART48-OBL-2 / 4a / 4c: conditional records a boolean answer decides ──
+class TestArt48Obl1:
 
-@pytest.mark.parametrize("obl_id,condition,answer,open_words", CONDITIONAL_ANSWERED)
-class TestArt48ConditionalAnswered:
+    def test_names_the_regulation_in_every_state(self, art48_module, tmp_path):
+        for value in (True, False, None):
+            result = _scan(art48_module, tmp_path, {"follows_general_ce_marking_principles": value})
+            assert "Article 30 of Regulation (EC) No 765/2008" in _find(result, "ART48-OBL-1")[0].description, value
+
+    def test_is_not_decided_by_the_other_answers(self, art48_module, tmp_path):
+        """Art. 48(1) has its own answer: the CE marking being affixed says nothing about the general principles."""
+        result = _scan(art48_module, tmp_path, {"has_ce_marking": True})
+        assert _find(result, "ART48-OBL-1")[0].level == ComplianceLevel.UNABLE_TO_DETERMINE
+        result = _scan(art48_module, tmp_path, {"has_ce_marking": False})
+        assert _find(result, "ART48-OBL-1")[0].level == ComplianceLevel.UNABLE_TO_DETERMINE
+
+
+# ── ART48-OBL-2 / 4a / 4b / 5: one condition ──
+
+@pytest.mark.parametrize("obl_id,condition,answer,open_words", ONE_CONDITION)
+class TestArt48OneCondition:
 
     def test_condition_true_answer_true_gives_partial(self, art48_module, tmp_path, obl_id, condition, answer,
                                                       open_words):
@@ -156,18 +164,20 @@ class TestArt48ConditionalAnswered:
         assert len(obl) == 1
         assert obl[0].level == ComplianceLevel.NON_COMPLIANT
 
+    @pytest.mark.parametrize("as_null", UNANSWERED)
     def test_condition_true_answer_none_gives_utd(self, art48_module, tmp_path, obl_id, condition, answer,
-                                                  open_words):
-        result = _scan(art48_module, tmp_path, {condition: True})
+                                                  open_words, as_null):
+        result = _scan(art48_module, tmp_path, {condition: True, **({answer: None} if as_null else {})})
         obl = _find(result, obl_id)
         assert len(obl) == 1
         assert obl[0].level == ComplianceLevel.UNABLE_TO_DETERMINE
         assert open_words not in obl[0].description
 
+    @pytest.mark.parametrize("answer_value", [True, False, None])
     def test_condition_false_gives_not_applicable(self, art48_module, tmp_path, obl_id, condition, answer,
-                                                  open_words):
-        """The condition does not apply → NOT_APPLICABLE, also when the answer is False."""
-        result = _scan(art48_module, tmp_path, {condition: False, answer: False})
+                                                  open_words, answer_value):
+        """The condition does not apply → NOT_APPLICABLE whatever the answer says: the condition wins."""
+        result = _scan(art48_module, tmp_path, {condition: False, answer: answer_value})
         obl = _find(result, obl_id)
         assert len(obl) == 1
         assert obl[0].level == ComplianceLevel.NOT_APPLICABLE
@@ -193,55 +203,138 @@ class TestArt48ConditionalAnswered:
         assert open_words in obl[0].description
 
 
-# ── ART48-OBL-4b / 5: conditional records that need human judgment ──
+# ── ART48-OBL-4b: who affixes the number ──
 
-@pytest.mark.parametrize("obl_id,condition,open_words", CONDITIONAL_MANUAL)
-class TestArt48ConditionalManual:
+class TestArt48Obl4bPermittedPerformer:
+    """Art. 48(4), second sentence: the provider is responsible (Art. 16(h)) but need not affix the number itself."""
 
-    def test_condition_false_gives_not_applicable(self, art48_module, tmp_path, obl_id, condition, open_words):
-        result = _scan(art48_module, tmp_path, {condition: False})
-        obl = _find(result, obl_id)
-        assert len(obl) == 1
-        assert obl[0].level == ComplianceLevel.NOT_APPLICABLE
+    @pytest.mark.parametrize("value", [True, False, None])
+    def test_finding_names_the_permitted_performers(self, art48_module, tmp_path, value):
+        result = _scan(art48_module, tmp_path, {NB: True, "notified_body_number_affixed_by_permitted_actor": value})
+        assert PERMITTED_PERFORMER in _find(result, "ART48-OBL-4b")[0].description
 
-    def test_condition_true_gives_utd_for_human_review(self, art48_module, tmp_path, obl_id, condition,
-                                                       open_words):
-        result = _scan(art48_module, tmp_path, {condition: True})
-        obl = _find(result, obl_id)
-        assert len(obl) == 1
-        assert obl[0].level == ComplianceLevel.UNABLE_TO_DETERMINE
-        assert "requires human review" in obl[0].description
-        assert "AI could not determine" not in obl[0].description
-        assert "compliancelint.dev" in obl[0].human_gate_hint
+    def test_record_names_the_permitted_performers(self, art48_module):
+        record = next(o for o in art48_module._load_obligations()["obligations"] if o["id"] == "ART48-OBL-4b")
+        assert record["addressee"] == "provider"
+        assert "provider via Article 16(h)" in record["addressee_note"]
+        assert PERMITTED_PERFORMER in record["addressee_note"]
+        assert any(PERMITTED_PERFORMER in atom["description"] for atom in record["decomposed_atoms"])
+
+    def test_interim_standard_names_the_permitted_performers(self, art48_module):
+        requirement = next(r for r in art48_module.compliance_checklist()["requirements"]
+                           if r["obligation_ref"] == "ART48-OBL-4b")
+        assert PERMITTED_PERFORMER in requirement["requirement"]
+
+
+# ── ART48-OBL-4c: two conditions (a notified body is involved AND such promotional material exists) ──
+
+class TestArt48Obl4cPromotionalMaterial:
+
+    def _level(self, module, tmp_path, answers):
+        obl = _find(_scan(module, tmp_path, answers), "ART48-OBL-4c")
+        assert len(obl) == 1, f"{len(obl)} findings for {answers}"
+        return obl[0]
+
+    def test_both_conditions_true_answer_true_gives_partial(self, art48_module, tmp_path):
+        f = self._level(art48_module, tmp_path, {NB: True, PROMO: True, IN_PROMO: True})
+        assert f.level == ComplianceLevel.PARTIAL
+
+    def test_both_conditions_true_answer_false_gives_non_compliant(self, art48_module, tmp_path):
+        f = self._level(art48_module, tmp_path, {NB: True, PROMO: True, IN_PROMO: False})
+        assert f.level == ComplianceLevel.NON_COMPLIANT
 
     @pytest.mark.parametrize("as_null", UNANSWERED)
-    def test_condition_unanswered_gives_utd_naming_the_open_condition(self, art48_module, tmp_path, obl_id,
-                                                                      condition, open_words, as_null):
-        result = _scan(art48_module, tmp_path, _with_open_condition(condition, as_null, {}))
-        obl = _find(result, obl_id)
-        assert len(obl) == 1
-        assert obl[0].level == ComplianceLevel.UNABLE_TO_DETERMINE
-        assert open_words in obl[0].description
+    def test_both_conditions_true_answer_none_gives_utd(self, art48_module, tmp_path, as_null):
+        f = self._level(art48_module, tmp_path, {NB: True, PROMO: True, **({IN_PROMO: None} if as_null else {})})
+        assert f.level == ComplianceLevel.UNABLE_TO_DETERMINE
+        assert "whether a notified body" not in f.description
+        assert "whether the project contains promotional material" not in f.description
 
-    def test_never_non_compliant_from_answers(self, art48_module, tmp_path, obl_id, condition, open_words):
-        BaseArticleModule.set_context(_full_false_ctx())
-        result = art48_module.scan(str(tmp_path))
-        assert _find(result, obl_id)[0].level == ComplianceLevel.UNABLE_TO_DETERMINE
+    @pytest.mark.parametrize("notified_body", [True, None])
+    @pytest.mark.parametrize("answer_value", [True, False, None])
+    def test_no_such_promotional_material_gives_not_applicable(self, art48_module, tmp_path, notified_body,
+                                                               answer_value):
+        """has_ce_marking_promotional_material false → NOT_APPLICABLE, whatever the answer and also while the
+        notified-body condition is still open (one condition that is not met is enough)."""
+        f = self._level(art48_module, tmp_path, {NB: notified_body, PROMO: False, IN_PROMO: answer_value})
+        assert f.level == ComplianceLevel.NOT_APPLICABLE
+        assert "promotional material" in f.description
+
+    @pytest.mark.parametrize("promo", [True, False, None])
+    @pytest.mark.parametrize("answer_value", [True, False, None])
+    def test_no_notified_body_gives_not_applicable(self, art48_module, tmp_path, promo, answer_value):
+        """has_notified_body_assessment false → NOT_APPLICABLE, whatever the other condition and the answer."""
+        f = self._level(art48_module, tmp_path, {NB: False, PROMO: promo, IN_PROMO: answer_value})
+        assert f.level == ComplianceLevel.NOT_APPLICABLE
+
+    @pytest.mark.parametrize("as_null", UNANSWERED)
+    @pytest.mark.parametrize("answer_value", [True, False])
+    def test_promotional_material_unanswered_stays_utd(self, art48_module, tmp_path, as_null, answer_value):
+        """Whether such promotional material exists is open: the answer does not decide the record."""
+        answers = _with_open_condition(PROMO, as_null, {NB: True, IN_PROMO: answer_value})
+        f = self._level(art48_module, tmp_path, answers)
+        assert f.level == ComplianceLevel.UNABLE_TO_DETERMINE
+        assert "whether the project contains promotional material" in f.description
+        assert "whether a notified body" not in f.description
+
+    @pytest.mark.parametrize("as_null", UNANSWERED)
+    @pytest.mark.parametrize("answer_value", [True, False])
+    def test_notified_body_unanswered_stays_utd(self, art48_module, tmp_path, as_null, answer_value):
+        answers = _with_open_condition(NB, as_null, {PROMO: True, IN_PROMO: answer_value})
+        f = self._level(art48_module, tmp_path, answers)
+        assert f.level == ComplianceLevel.UNABLE_TO_DETERMINE
+        assert "whether a notified body" in f.description
+        assert "whether the project contains promotional material" not in f.description
+
+    @pytest.mark.parametrize("answer_value", [True, False, None])
+    def test_both_conditions_unanswered_stays_utd_and_names_both(self, art48_module, tmp_path, answer_value):
+        f = self._level(art48_module, tmp_path, {NB: None, PROMO: None, IN_PROMO: answer_value})
+        assert f.level == ComplianceLevel.UNABLE_TO_DETERMINE
+        assert "whether a notified body" in f.description
+        assert "whether the project contains promotional material" in f.description
+
+    def test_record_scope_names_both_conditions(self, art48_module):
+        record = next(o for o in art48_module._load_obligations()["obligations"] if o["id"] == "ART48-OBL-4c")
+        assert record["context_skip_field"] == NB
+        assert "notified body" in record["scope_limitation"]
+        assert "promotional material" in record["scope_limitation"]
 
 
-# ── The three paragraph 4 records share one condition ──
+# ── The three paragraph 4 records share the notified-body condition ──
 
 class TestArt48NotifiedBodyCondition:
 
     def test_no_notified_body_makes_all_of_paragraph_4_not_applicable(self, art48_module, tmp_path):
         result = _scan(art48_module, tmp_path, {
-            "has_ce_marking": True, "has_notified_body_assessment": False,
-            "has_notified_body_number": False, "has_notified_body_number_in_promotion": False,
+            "has_ce_marking": True, NB: False,
+            "has_notified_body_number": False, "notified_body_number_affixed_by_permitted_actor": False,
+            PROMO: True, IN_PROMO: False,
         })
         for obl_id in ("ART48-OBL-4a", "ART48-OBL-4b", "ART48-OBL-4c"):
             assert _find(result, obl_id)[0].level == ComplianceLevel.NOT_APPLICABLE, obl_id
         assert not [f for f in result.findings if f.level == ComplianceLevel.NON_COMPLIANT]
         assert result.overall_level == ComplianceLevel.PARTIAL
+
+
+# ── Manual records keep the Human Gates hint ──
+
+class TestArt48ManualRecords:
+
+    @pytest.mark.parametrize("ctx_factory", [_full_true_ctx, _full_false_ctx, _empty_ctx, _template_ctx],
+                             ids=["all-true", "all-false", "keys-absent", "template-nulls"])
+    def test_manual_records_point_to_human_gates(self, art48_module, tmp_path, ctx_factory):
+        """A person confirms a manual record in every state in which it may apply."""
+        BaseArticleModule.set_context(ctx_factory())
+        result = art48_module.scan(str(tmp_path))
+        for obl_id in MANUAL_IDS:
+            assert "compliancelint.dev" in (_find(result, obl_id)[0].human_gate_hint or ""), obl_id
+
+    def test_answered_true_is_partial_not_compliant(self, art48_module, tmp_path):
+        """An AI answer alone never makes a manual record COMPLIANT."""
+        BaseArticleModule.set_context(_full_true_ctx())
+        result = art48_module.scan(str(tmp_path))
+        for obl_id in MANUAL_IDS:
+            assert _find(result, obl_id)[0].level == ComplianceLevel.PARTIAL, obl_id
 
 
 # ── Structural tests ──
@@ -320,9 +413,11 @@ class TestArt48Structural:
             assert "None" not in findings[0].description, obl_id
         assert result.overall_level == ComplianceLevel.UNABLE_TO_DETERMINE
 
-    def test_description_has_no_legal_citation_prefix(self, art48_module, tmp_path):
+    @pytest.mark.parametrize("ctx_factory", [_full_true_ctx, _full_false_ctx, _empty_ctx, _template_ctx],
+                             ids=["all-true", "all-false", "keys-absent", "template-nulls"])
+    def test_description_has_no_legal_citation_prefix(self, art48_module, tmp_path, ctx_factory):
         """Finding descriptions must not start with legal citation prefix like [Art. 48(1)]."""
-        BaseArticleModule.set_context(_full_true_ctx())
+        BaseArticleModule.set_context(ctx_factory())
         result = art48_module.scan(str(tmp_path))
         for f in result.findings:
             assert not f.description.startswith("[Art."), (
@@ -333,21 +428,20 @@ class TestArt48Structural:
             )
 
     def test_all_true_no_non_compliant(self, art48_module, tmp_path):
-        """All-true answers → the four answered records PARTIAL, the three manual ones UTD, overall PARTIAL."""
+        """All-true answers with every condition applying → all seven records PARTIAL, overall PARTIAL."""
         BaseArticleModule.set_context(_full_true_ctx())
         result = art48_module.scan(str(tmp_path))
         levels = {f.obligation_id: f.level for f in result.findings}
         for obl_id in ALL_IDS:
-            expected = ComplianceLevel.UNABLE_TO_DETERMINE if obl_id in MANUAL_IDS else ComplianceLevel.PARTIAL
-            assert levels[obl_id] == expected, obl_id
+            assert levels[obl_id] == ComplianceLevel.PARTIAL, obl_id
         assert result.overall_level == ComplianceLevel.PARTIAL
 
     def test_all_false_has_non_compliant(self, art48_module, tmp_path):
-        """All-false answers with every condition applying → the four answered records are NON_COMPLIANT."""
+        """All-false answers with every condition applying → all seven records are NON_COMPLIANT."""
         BaseArticleModule.set_context(_full_false_ctx())
         result = art48_module.scan(str(tmp_path))
         non_compliant = sorted(f.obligation_id for f in result.findings if f.level == ComplianceLevel.NON_COMPLIANT)
-        assert non_compliant == ["ART48-OBL-2", "ART48-OBL-3", "ART48-OBL-4a", "ART48-OBL-4c"]
+        assert non_compliant == sorted(ALL_IDS)
         assert result.overall_level == ComplianceLevel.NON_COMPLIANT
 
     @pytest.mark.parametrize("ctx_factory", [_full_true_ctx, _full_false_ctx, _empty_ctx, _template_ctx],
@@ -359,21 +453,28 @@ class TestArt48Structural:
         found = sorted(f.obligation_id for f in result.findings if f.obligation_id.startswith("ART48-OBL-"))
         assert found == sorted(ALL_IDS)
 
-    def test_every_condition_false_leaves_three_records_assessed(self, art48_module, tmp_path):
-        """Nothing conditional applies: Art. 48(1) and (3) remain, the other five are NOT_APPLICABLE."""
-        result = _scan(art48_module, tmp_path, {**{f: False for f in CONDITION_FIELDS}, "has_ce_marking": True})
-        levels = {f.obligation_id: f.level for f in result.findings}
-        assert levels["ART48-OBL-1"] == ComplianceLevel.UNABLE_TO_DETERMINE
+    def test_every_condition_false_leaves_two_records_assessed(self, art48_module, tmp_path):
+        """Nothing conditional applies: Art. 48(1) and (3) remain, the other five are NOT_APPLICABLE — also when
+        their answers are False (the condition wins)."""
+        result = _scan(art48_module, tmp_path, {**{f: False for f in CONDITION_FIELDS},
+                                                **{f: False for f in ANSWER_FIELDS},
+                                                "has_ce_marking": True,
+                                                "follows_general_ce_marking_principles": True})
+        levels = {f.obligation_id: f.level for f in result.findings if f.obligation_id.startswith("ART48-OBL-")}
+        assert levels["ART48-OBL-1"] == ComplianceLevel.PARTIAL
         assert levels["ART48-OBL-3"] == ComplianceLevel.PARTIAL
         for obl_id in ("ART48-OBL-2", "ART48-OBL-4a", "ART48-OBL-4b", "ART48-OBL-4c", "ART48-OBL-5"):
             assert levels[obl_id] == ComplianceLevel.NOT_APPLICABLE, obl_id
+        assert len(levels) == 7
+        assert result.overall_level == ComplianceLevel.PARTIAL
 
     def test_findings_carry_the_verbatim_source_quote(self, art48_module, tmp_path):
         quotes = {o["id"]: o["source_quote"] for o in art48_module._load_obligations()["obligations"]}
-        BaseArticleModule.set_context(_full_true_ctx())
-        result = art48_module.scan(str(tmp_path))
-        for obl_id in ALL_IDS:
-            assert _find(result, obl_id)[0].source_quote == quotes[obl_id], obl_id
+        for ctx in (_full_true_ctx(), _ctx_with("art48", {NB: True, PROMO: False})):
+            BaseArticleModule.set_context(ctx)
+            result = art48_module.scan(str(tmp_path))
+            for obl_id in ALL_IDS:
+                assert _find(result, obl_id)[0].source_quote == quotes[obl_id], obl_id
 
     def test_not_high_risk_system_is_not_applicable(self, art48_module, tmp_path):
         """Art. 48 concerns high-risk AI systems only."""
@@ -393,25 +494,65 @@ class TestArt48Structural:
 
 # ── Answers template ──
 
+# Descriptions accepted unchanged by the review: (field, paragraph the text cites).
+ACCEPTED_DESCRIPTIONS = [
+    ("has_ce_marking", "Art. 48(3)"), ("has_digital_ce_marking", "Art. 48(2)"),
+    ("is_provided_digitally", "Art. 48(2)"), ("has_notified_body_assessment", "Art. 48(4)"),
+    ("has_notified_body_number", "Art. 48(4)"), ("is_subject_to_other_ce_marking_law", "Art. 48(5)"),
+]
+# Descriptions worded by the review: (field, a passage of the reviewed text, how it words the null case).
+REVIEWED_DESCRIPTIONS = [
+    ("has_ce_marking_promotional_material",
+     "false if the project establishes that no such promotional material exists",
+     "null if this cannot be determined"),
+    ("has_notified_body_number_in_promotion",
+     "false if at least one such item omits it",
+     "null if compliance cannot be determined"),
+    ("follows_general_ce_marking_principles",
+     "the general principles in Article 30 of Regulation (EC) No 765/2008; false if the evidence establishes a breach",
+     "null if this cannot be determined"),
+    ("notified_body_number_affixed_by_permitted_actor",
+     "false if the evidence establishes that it was affixed outside those permitted cases",
+     "null if this cannot be determined"),
+    ("ce_marking_indicates_other_union_law_compliance",
+     "also fulfils the requirements of that other law; false if it does not",
+     "null if this cannot be determined"),
+]
+
+
 class TestArt48AnswersTemplate:
 
     def test_template_has_exactly_the_art48_fields(self):
         assert _build_answers_template()["art48"] == {f: None for f in ANSWER_FIELDS + CONDITION_FIELDS}
+        assert len(ANSWER_FIELDS + CONDITION_FIELDS) == 11
 
     def test_fields_are_boolean(self):
         assert sorted(_BOOL_FIELDS["art48"]) == sorted(ANSWER_FIELDS + CONDITION_FIELDS)
 
-    @pytest.mark.parametrize("field,paragraph", [
-        ("has_ce_marking", "Art. 48(3)"), ("has_digital_ce_marking", "Art. 48(2)"),
-        ("is_provided_digitally", "Art. 48(2)"), ("has_notified_body_assessment", "Art. 48(4)"),
-        ("has_notified_body_number", "Art. 48(4)"), ("has_notified_body_number_in_promotion", "Art. 48(4)"),
-        ("is_subject_to_other_ce_marking_law", "Art. 48(5)"),
-    ])
-    def test_every_field_has_a_description_citing_its_paragraph(self, field, paragraph):
+    def test_every_field_has_a_description(self):
+        assert sorted(_FIELD_DESCRIPTIONS["art48"]) == sorted(ANSWER_FIELDS + CONDITION_FIELDS)
+        described = [f for f, _ in ACCEPTED_DESCRIPTIONS] + [f for f, _, _ in REVIEWED_DESCRIPTIONS]
+        assert sorted(described) == sorted(ANSWER_FIELDS + CONDITION_FIELDS)
+
+    @pytest.mark.parametrize("field,paragraph", ACCEPTED_DESCRIPTIONS)
+    def test_accepted_description_cites_its_paragraph(self, field, paragraph):
         text = _FIELD_DESCRIPTIONS["art48"][field]
         assert text.startswith("true if ")
         assert paragraph in text
         assert "null if you cannot determine it from the project" in text
+
+    @pytest.mark.parametrize("field,passage,null_wording", REVIEWED_DESCRIPTIONS)
+    def test_reviewed_description_keeps_the_reviewed_wording(self, field, passage, null_wording):
+        text = _FIELD_DESCRIPTIONS["art48"][field]
+        assert text.startswith("true if")
+        assert passage in text
+        assert text.endswith(null_wording)
+
+    def test_no_promotional_material_is_not_a_reason_for_a_null_result(self):
+        """The absence of such promotional material is answered by has_ce_marking_promotional_material (the record
+        is then not applicable); it no longer makes the result field null."""
+        assert "no such promotional material" not in _FIELD_DESCRIPTIONS["art48"][IN_PROMO]
+        assert "no such promotional material" in _FIELD_DESCRIPTIONS["art48"][PROMO]
 
     def test_validation_gate_accepts_the_filled_template(self):
         """Booleans for every Art. 48 field pass the gate unchanged: no rename, no error."""
@@ -423,6 +564,14 @@ class TestArt48AnswersTemplate:
         assert not [entry for entry in log if "art48" in str(entry)]
         errors, _missing = validate_answers(out)
         assert errors.get("art48", []) == []
+
+    def test_data_file_states_the_review_and_has_nothing_pending(self):
+        import os
+        path = os.path.join(os.path.dirname(__file__), "..", "data", "answer_field_descriptions.json")
+        with open(path, encoding="utf-8") as f:
+            meta = json.load(f)["_metadata"]
+        assert "pending_verification" not in meta
+        assert "2026-10-12" in meta["verification"]
 
 
 # ── explain() and action_plan() ──
@@ -436,26 +585,39 @@ class TestArt48ExplainAndActionPlan:
         assert "Art. 43" in e.related_articles and "Art. 47" in e.related_articles
 
     def test_action_plan_all_false(self, art48_module, tmp_path):
+        """Every condition applies and every answer is False: one action per record."""
         BaseArticleModule.set_context(_full_false_ctx())
         plan = art48_module.action_plan(art48_module.scan(str(tmp_path)))
         assert [a.article for a in plan.actions] == [
-            "Art. 48(3)", "Art. 48(2)", "Art. 48(4)", "Art. 48(4)", "Art. 48(1)",
+            "Art. 48(3)", "Art. 48(2)", "Art. 48(4)", "Art. 48(4)", "Art. 48(4)", "Art. 48(5)", "Art. 48(1)",
         ]
         assert plan.actions[0].priority == "CRITICAL"
+        assert plan.actions[-1].priority == "HIGH"
 
     def test_action_plan_skips_conditional_actions_when_the_condition_is_not_met(self, art48_module, tmp_path):
         result = _scan(art48_module, tmp_path, {
             "has_ce_marking": True, "is_provided_digitally": False, "has_digital_ce_marking": False,
-            "has_notified_body_assessment": False, "has_notified_body_number": False,
-            "has_notified_body_number_in_promotion": False,
+            NB: False, "has_notified_body_number": False, "notified_body_number_affixed_by_permitted_actor": False,
+            PROMO: True, IN_PROMO: False,
+            "is_subject_to_other_ce_marking_law": False, "ce_marking_indicates_other_union_law_compliance": False,
         })
         plan = art48_module.action_plan(result)
         assert [a.article for a in plan.actions] == ["Art. 48(1)"]
+        assert plan.actions[0].priority == "MEDIUM"
 
     def test_action_plan_skips_conditional_actions_when_the_condition_is_open(self, art48_module, tmp_path):
         result = _scan(art48_module, tmp_path, {
             "has_ce_marking": True, "has_digital_ce_marking": False, "has_notified_body_number": False,
-            "has_notified_body_number_in_promotion": False,
+            "notified_body_number_affixed_by_permitted_actor": False, IN_PROMO: False,
+            "ce_marking_indicates_other_union_law_compliance": False,
+        })
+        plan = art48_module.action_plan(result)
+        assert [a.article for a in plan.actions] == ["Art. 48(1)"]
+
+    def test_action_plan_skips_the_promotional_action_without_such_material(self, art48_module, tmp_path):
+        result = _scan(art48_module, tmp_path, {
+            "has_ce_marking": True, NB: True, "has_notified_body_number": True,
+            "notified_body_number_affixed_by_permitted_actor": True, PROMO: False, IN_PROMO: False,
         })
         plan = art48_module.action_plan(result)
         assert [a.article for a in plan.actions] == ["Art. 48(1)"]

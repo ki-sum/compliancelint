@@ -148,9 +148,13 @@
         "has_digital_ce_marking": null,
         "has_notified_body_number": null,
         "has_notified_body_number_in_promotion": null,
+        "follows_general_ce_marking_principles": null,
+        "notified_body_number_affixed_by_permitted_actor": null,
+        "ce_marking_indicates_other_union_law_compliance": null,
         "is_provided_digitally": null,
         "has_notified_body_assessment": null,
-        "is_subject_to_other_ce_marking_law": null
+        "is_subject_to_other_ce_marking_law": null,
+        "has_ce_marking_promotional_material": null
       },
       "art49": {
         "has_eu_database_registration": null

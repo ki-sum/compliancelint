@@ -212,5 +212,6 @@ def test_the_two_applicability_answers_of_art49_and_art52_are_in_the_template():
     assert template["art49"]["claims_art6_3_exception"] is None
     assert "is_gpai_with_systemic_risk" in template["art52"]
     assert template["art52"]["is_gpai_with_systemic_risk"] is None
-    assert "Art. 6(3)" in _FIELD_DESCRIPTIONS["art49"]["claims_art6_3_exception"]
-    assert "Art. 51(1)" in _FIELD_DESCRIPTIONS["art52"]["is_gpai_with_systemic_risk"]
+    # Wording of the legal review of 2026-10-12 (item J17), which writes "Article".
+    assert "Article 6(3)" in _FIELD_DESCRIPTIONS["art49"]["claims_art6_3_exception"]
+    assert "Article 51(1)" in _FIELD_DESCRIPTIONS["art52"]["is_gpai_with_systemic_risk"]

@@ -172,9 +172,13 @@
         "has_digital_ce_marking": null,
         "has_notified_body_number": true,
         "has_notified_body_number_in_promotion": true,
+        "follows_general_ce_marking_principles": null,
+        "notified_body_number_affixed_by_permitted_actor": true,
+        "ce_marking_indicates_other_union_law_compliance": true,
         "is_provided_digitally": false,
         "has_notified_body_assessment": true,
-        "is_subject_to_other_ce_marking_law": true
+        "is_subject_to_other_ce_marking_law": true,
+        "has_ce_marking_promotional_material": true
       },
       "art49": {
         "has_eu_database_registration": true
@@ -402,7 +406,7 @@
     },
     "art48": {
       "overall": "partial",
-      "legal_basis": "Art. 48(3)-(4): CE marking affixed and followed by the notified body number; Art. 48(2) does not apply (the AI is embedded in the device, not provided digitally)"
+      "legal_basis": "Art. 48(3)-(5): CE marking affixed, followed by the notified body number (affixed by a permitted performer, shown in promotional material) and covering the other Union law; Art. 48(2) does not apply (the AI is embedded in the device, not provided digitally); Art. 48(1) is unanswered"
     },
     "art49": {
       "overall": "partial"

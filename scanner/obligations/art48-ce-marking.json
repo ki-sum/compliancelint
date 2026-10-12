@@ -147,14 +147,14 @@
       "deontic_type": "obligation",
       "modality": "shall",
       "addressee": "provider",
-      "addressee_note": "Art. 48(4), second sentence, names the notified body itself or, under its instructions, the provider or the provider's authorised representative as the party affixing the number. Recorded for the provider, who is responsible for the CE marking under Art. 16(h)",
+      "addressee_note": "addressee/responsibility: provider via Article 16(h); permitted performer under Article 48(4): the notified body itself, or, under the notified body's instructions, the provider or the provider's authorised representative",
       "scope_limitation": "Only applies where a notified body is responsible for the conformity assessment procedure set out in Article 43 (\"Where applicable\")",
       "context_skip_field": "has_notified_body_assessment",
       "context_skip_value": false,
       "decomposed_atoms": [
         {
           "atom": "notified_body_number_affixed_by_authorised_actor",
-          "description": "The identification number is affixed by the notified body itself or, under its instructions, by the provider or by the provider's authorised representative",
+          "description": "The identification number is affixed by a permitted performer: the notified body itself, or, under the notified body's instructions, the provider or the provider's authorised representative",
           "requirement": "The identification number of the notified body SHALL be affixed by the body itself or, under its instructions, by the provider or by the provider's authorised representative"
         }
       ],
@@ -174,7 +174,7 @@
       "modality": "shall",
       "addressee": "provider",
       "addressee_note": "Art. 48 names no addressee; Art. 16(h) makes affixing the CE marking in accordance with Art. 48 an obligation of the provider of the high-risk AI system",
-      "scope_limitation": "Only applies where a notified body is responsible for the conformity assessment procedure set out in Article 43 (\"Where applicable\")",
+      "scope_limitation": "Only applies where a notified body is responsible for the conformity assessment procedure set out in Article 43 (\"Where applicable\") and promotional material exists which mentions that the high-risk AI system fulfils the requirements for CE marking",
       "context_skip_field": "has_notified_body_assessment",
       "context_skip_value": false,
       "decomposed_atoms": [
