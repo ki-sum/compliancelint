@@ -9,7 +9,7 @@
 
 From EU AI Act code to audit-ready evidence — in one workflow, inside the tools you already use.
 
-Scan, attest, and document EU AI Act compliance without leaving your IDE. The scanner catches code-verifiable violations; Human Gates capture human attestations (with AI-assisted evidence collection along the way) — all with audit trail. Your code never leaves your machine.
+Scan, attest, and document EU AI Act compliance without leaving your IDE. The scanner catches code-verifiable violations; Human Gates capture human attestations (with AI-assisted evidence collection along the way) — all with audit trail. ComplianceLint never receives your code.
 
 > **EU AI Act application dates** (Regulation (EU) 2024/1689 as amended by Regulation (EU) 2026/1744, consolidated text of 2026-07-27):
 > - **2025-02-02** — Chapters I and II apply, except Art. 5(1), first subparagraph, points (ba) and (bb), and Art. 5(1a) and (1b), which apply from 2026-12-02
@@ -85,7 +85,7 @@ Opens browser, links your scanner to [compliancelint.dev](https://compliancelint
 
 > "Sync my compliance results."
 
-Uploads findings to your dashboard. Code never leaves your machine — only compliance findings, evidence submissions, remediation progress, and attestation records are synced. This builds an auditable compliance trail that demonstrates your ongoing compliance efforts to regulators and legal counsel.
+Uploads findings to your dashboard. ComplianceLint never receives your code: your source files are not uploaded — only compliance findings with their evidence notes, evidence submissions, remediation progress, and attestation records are synced. This builds an auditable compliance trail that demonstrates your ongoing compliance efforts to regulators and legal counsel.
 
 ---
 
@@ -191,7 +191,7 @@ The user can stop any MCP tool call at any time by pressing Stop in their IDE.
 | **Method** | Check if `RISK_MANAGEMENT.md` exists | AI reads entire codebase, checks against 255 decomposed legal obligations |
 | **Citations** | "You need logging" | `Art. 12(1): "High-risk AI systems shall technically allow for the automatic recording of events..."` |
 | **False positives** | Keyword matching → many | AI understands context → near zero |
-| **Privacy** | Cloud upload | **Code stays local** — source never leaves your machine; only compliance verdicts sync to your dashboard |
+| **Privacy** | Cloud upload | **ComplianceLint never receives your code** — it is read by the AI assistant you already use; only findings and their evidence notes sync to your dashboard |
 | **Cost** | Separate subscription | **Free + source-available (BSL 1.1)** — uses your existing AI IDE |
 
 ---
@@ -388,7 +388,7 @@ The scanner is **free and source-available** ([BSL 1.1](LICENSE)). The dashboard
 | All 255 obligations visible (worst-case) | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Penalty display (worst-case Art. 99 caps) | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Team members | Unlimited | Unlimited | Unlimited | Unlimited | Unlimited |
-| **Scope narrowing** — see only obligations applicable to your AI system (typically saves ~70% review time) | — | ✓ | ✓ | ✓ | ✓ |
+| **Scope narrowing** — see only obligations applicable to your AI system | — | ✓ | ✓ | ✓ | ✓ |
 | **Risk class concluded from your Profiling Wizard answers** (Art. 5 / 6 / 50) | — | ✓ | ✓ | ✓ | ✓ |
 | **SME relief** (Art. 11 simplified tech-doc per Recommendation 2003/361/EC) | — | ✓ | ✓ | ✓ | ✓ |
 | **Per-obligation questionnaires** (anchor AI answers to verbatim legal text) | — | ✓ | ✓ | ✓ | ✓ |

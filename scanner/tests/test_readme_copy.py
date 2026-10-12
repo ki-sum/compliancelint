@@ -126,3 +126,37 @@ def test_user_guide_counts_scanned_articles_as_the_scan_modules():
         int(n) for n in re.findall(r"\(\d+/(\d{2})\)", guide)}
     assert stated == {modules}
     assert "Low-risk classification" not in guide
+
+
+# ── Claims about where the code goes, review time saved, and the licence (founder decisions 2026-10-12) ──
+# An audit of the demo videos found "your code never leaves your machine" too broad: the code is read by the AI
+# assistant the developer already uses, which may be a cloud service. What ComplianceLint can state is its own part.
+# "~70 % review time" had no measurement behind it. package.json declared Apache-2.0 for a BSL 1.1 project.
+
+USER_VISIBLE_TEXT_FILES = ("README.md", "scanner/server.py", "scanner/core/upgrade_hint.py", "bin/init.js",
+                           "docs/user-guide.md", "scanner/README.md")
+
+
+@pytest.mark.parametrize("rel", USER_VISIBLE_TEXT_FILES)
+def test_no_claim_that_code_never_leaves_the_machine(rel):
+    text = _read(rel)
+    for claim in ("never leaves your machine", "never leaves the machine", "never leaves the developer's machine",
+                  "Code stays local", "stays on your machine"):
+        assert claim not in text, f"{rel}: {claim!r}"
+
+
+def test_readme_states_what_compliancelint_receives():
+    readme = _read("README.md")
+    assert "ComplianceLint never receives your code" in readme
+
+
+@pytest.mark.parametrize("rel", USER_VISIBLE_TEXT_FILES)
+def test_no_unmeasured_review_time_figure(rel):
+    assert "70%" not in _read(rel), rel
+
+
+def test_npm_package_declares_the_project_licence():
+    licence_file = _read("LICENSE")
+    assert licence_file.lstrip().startswith("Business Source License 1.1")
+    assert json.loads(_read("package.json"))["license"] == "BUSL-1.1"  # SPDX identifier of the Business Source License 1.1
+    assert 'license = {text = "BSL-1.1"}' in _read("pyproject.toml")

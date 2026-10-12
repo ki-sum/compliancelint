@@ -2,7 +2,7 @@
 ComplianceLint — EU AI Act Compliance MCP Server
 
 Provides tools for scanning projects against EU AI Act requirements.
-Runs locally — code never leaves the developer's machine.
+Runs locally — ComplianceLint never receives the developer's code.
 
 Architecture:
   - Modules are auto-discovered from the modules/ directory
@@ -1113,7 +1113,7 @@ def _build_post_scan_hint(project_path: str, nc_count: int = 0, score_pct: int =
         return (
             "\n\n--- Compliance Tracking ---\n"
             "Run cl_connect() to create your free dashboard.\n"
-            "Then cl_sync() to save results. Your code never leaves your machine.\n"
+            "Then cl_sync() to save results. ComplianceLint never receives your code.\n"
             "Track compliance progress over time and generate audit-ready PDF reports."
         )
 
@@ -4392,7 +4392,7 @@ def cl_sync(project_path: str, regulation: str = "") -> str:
     Reads the latest scan state from .compliancelint/local/state.json and uploads
     it to the dashboard. Requires a prior cl_connect to set up API key.
 
-    Only findings JSON is sent — source code never leaves the machine.
+    Only the findings JSON is sent (findings with their evidence notes) — source files are never uploaded.
 
     Args:
         project_path: Absolute path to the project directory.

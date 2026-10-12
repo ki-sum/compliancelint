@@ -49,7 +49,7 @@ TOOL_HINTS: Final[dict[str, dict]] = {
         "free_message": (
             f"You're seeing all {unique_obligation_count()} obligations across {article_count()} articles. "
             "Connect to Starter+ to narrow scope to your specific AI "
-            "system (saves ~70% review time) and unlock per-obligation "
+            "system and unlock per-obligation "
             "questionnaires that prevent AI hallucination."
         ),
         "missing_features": [

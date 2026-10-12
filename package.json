@@ -17,7 +17,7 @@
     "legal"
   ],
   "author": "ki-sum",
-  "license": "Apache-2.0",
+  "license": "BUSL-1.1",
   "repository": {
     "type": "git",
     "url": "https://github.com/ki-sum/compliancelint"
