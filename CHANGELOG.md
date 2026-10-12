@@ -4,6 +4,32 @@ All notable changes to ComplianceLint will be documented in this file.
 
 This project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.3.1] — 2026-10-12
+
+### Changed — texts follow the legal review and the role-first Profiling Wizard
+- Article 48 (CE marking): finding sentences, notes, action-plan explanations and the article explanation in the
+  wording of the legal review. Evidence found in a project is described as indicating that the CE marking may
+  comply with the general principles of Article 30 of Regulation (EC) No 765/2008; the duties of Art. 48(4) keep
+  their "where applicable" condition; the notes state what Article 16(h) and Article 48(4) each say.
+- Scanner notice, rule 5: with dashboard settings, provider duties are reported as not applicable where the
+  Profiling Wizard answers establish neither provider status under Article 3(3) nor deemed-provider status under
+  Article 25(1) or (3); Article 25(2) is assessed separately.
+- Setup and connection texts no longer describe the Profiling Wizard as a 30-second step of the free plan: it is
+  part of the Starter plan and higher, it asks for your role(s), the scope and the use of the system, and the risk
+  class is concluded from the answers.
+- The AI client is told which label to show for each stored risk value: "Prohibited practice (Art. 5)",
+  "High-risk", "Not high-risk — Article 50 transparency trigger identified", "Not high-risk — no Article 50
+  transparency trigger identified". "Limited risk" and "minimal risk" are not classes of the Regulation.
+- "Your code never leaves your machine" is replaced by what this project can state: ComplianceLint never receives
+  your code. Source files are not uploaded; findings with their evidence notes are.
+- The upgrade hint no longer quotes a review-time saving.
+
+### Fixed
+- `package.json` declared the licence as Apache-2.0. The project is under the Business Source License 1.1
+  (SPDX `BUSL-1.1`), as `LICENSE` and `pyproject.toml` state.
+- README: application dates follow Article 113 as amended by Regulation (EU) 2026/1744 (the block still described
+  the amendment as a pending agreement); obligation counts for Article 5 (10) and Article 111 (4) in the table.
+
 ## [1.3.0] — 2026-10-12
 
 ### Added — Article 48 (CE marking)
