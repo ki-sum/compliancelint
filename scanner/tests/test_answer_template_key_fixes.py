@@ -75,18 +75,24 @@ def test_null_vs_false_guidance_for_duties_that_do_not_concern_the_organisation(
     # Third review (2026-10-09, F1): the null shown as "unable to determine" is a tool limitation, not a legal finding.
     # 2026-10-12: "provider" is an answer in the role-first Profiling Wizard — the last sentence no longer says that
     # provider duties are never excluded on the basis of the provider role; it says what the dashboard excludes.
+    # Legal review of 2026-10-12 (item M8) — verbatim: Article 25(2) can bind the initial provider, so it is named
+    # separately from the provider duties that the Profiling Wizard excludes.
     final = (
         "5. A duty addressed solely to another operator does not apply to this organisation in that capacity. Never "
-        "answer false solely because the operator role does not apply (false means the measure is missing). If a "
-        "_scope field covers the role (is_importer, is_distributor, is_gpai_provider, is_authorised_representative), "
-        "set it to false. Deployer and provider duties have no offline role field: answer null when the duty is "
-        "inapplicable solely because of the operator role. The offline scanner displays null as \"unable to "
-        "determine\", which is a tool limitation, not a legal finding. On a paid dashboard plan, the duties that the "
-        "Profiling Wizard answers exclude are reported as not applicable: deployer duties based on the deployer "
-        "answers, and provider duties where the answers do not establish that the organisation is the provider, "
-        "including under Article 25."
+        "answer false solely because the operator role does not apply (false means the required measure is "
+        "missing). If a _scope field covers the role (is_importer, is_distributor, is_gpai_provider, "
+        "is_authorised_representative), set it to false. Deployer and ordinary provider duties have no offline role "
+        "field: answer null when the duty is inapplicable solely because of the operator role. The offline scanner "
+        "displays null as \"unable to determine\", which is a tool limitation, not a legal finding. On a paid "
+        "dashboard plan, duties excluded by the Profiling Wizard are reported as not applicable: deployer duties "
+        "where the answers do not establish deployer status; and ordinary provider duties where the answers "
+        "establish neither provider status under Article 3(3) nor deemed-provider status under Article 25(1) or (3). "
+        "Article 25(2) must be assessed separately because it can bind the initial provider after an Article 25(1) "
+        "circumstance occurs, even though that initial provider is no longer considered the provider of the specific "
+        "system."
     )
     assert final in src
+    assert "including under Article 25." not in src
 
 
 def test_risk_classification_example_uses_the_canonical_values():

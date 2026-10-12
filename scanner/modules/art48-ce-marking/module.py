@@ -145,14 +145,13 @@ class Art48Module(BaseArticleModule):
             obligation_id="ART48-OBL-1",
             answer=follows_general_ce_marking_principles,
             true_description=(
-                "The evidence in the project indicates that the CE marking is subject to the general "
-                "principles set out in Article 30 of Regulation (EC) No 765/2008. Confirm this in "
-                "Human Gates."
+                "Project evidence indicates that the CE marking may comply with the general principles "
+                "set out in Article 30 of Regulation (EC) No 765/2008. Confirm this in Human Gates."
             ),
             false_description=(
-                "The evidence in the project establishes a breach of the general principles set out in "
-                "Article 30 of Regulation (EC) No 765/2008, to which Art. 48(1) makes the CE marking "
-                "subject."
+                "Project evidence indicates that the CE marking does not follow the general principles "
+                "set out in Article 30 of Regulation (EC) No 765/2008, to which Article 48(1) makes the "
+                "CE marking subject."
             ),
             none_description=(
                 "Whether the CE marking follows the general principles set out in Article 30 of "
@@ -271,8 +270,11 @@ class Art48Module(BaseArticleModule):
                 ),
                 gap_type=GapType.PROCESS,
             ), remediation=(
-                "Record who affixed the identification number of the notified body. The provider is "
-                "responsible via Article 16(h); the number may be affixed by " + _PERMITTED_PERFORMER + "."
+                "Record who affixed the identification number of the notified body. Article 16(h) "
+                "requires the provider to affix the CE marking in accordance with Article 48; "
+                "Article 48(4) allows the notified body's identification number to be affixed by the "
+                "notified body itself or, under its instructions, by the provider or by the provider's "
+                "authorised representative."
             )))
 
             # ART48-OBL-4c has a second condition: promotional material which mentions that the system
@@ -304,9 +306,10 @@ class Art48Module(BaseArticleModule):
                     answer=(has_notified_body_number_in_promotion
                             if notified_body and promotional_material else None),
                     true_description=(
-                        "Promotional material that mentions CE conformity indicates an identification "
-                        "number of a notified body. Verify that all promotional material which mentions "
-                        "that the system fulfils the requirements for CE marking indicates the number."
+                        "Promotional material that mentions that the high-risk AI system fulfils the "
+                        "requirements for CE marking indicates the identification number of the notified "
+                        "body responsible for the conformity assessment procedures set out in Article 43. "
+                        "Verify that all such promotional material indicates that number."
                     ),
                     false_description=(
                         "Promotional material mentions that the system fulfils the requirements for CE "
@@ -353,9 +356,9 @@ class Art48Module(BaseArticleModule):
                 ),
                 gap_type=GapType.PROCESS,
             ), remediation=(
-                "Identify the other Union law that provides for the affixing of the CE marking and "
-                "confirm that the high-risk AI system fulfils its requirements before the CE "
-                "marking is affixed."
+                "Identify the other Union law that also provides for the affixing of the CE marking "
+                "and confirm whether the high-risk AI system fulfils the requirements of that other "
+                "law."
             )))
 
         details = {
@@ -406,9 +409,15 @@ class Art48Module(BaseArticleModule):
             article_number=48,
             article_title="CE marking",
             one_sentence=(
-                "The CE marking of a high-risk AI system must be affixed visibly, legibly and "
-                "indelibly, in digital form for systems provided digitally, and be followed by the "
-                "notified body's identification number where a notified body is involved."
+                "The CE marking of a high-risk AI system is subject to the general principles set out "
+                "in Article 30 of Regulation (EC) No 765/2008; for a system provided digitally, a "
+                "digital CE marking shall be used only if it can easily be accessed via the interface "
+                "from which the system is accessed or via an easily accessible machine-readable code "
+                "or other electronic means; the marking shall be affixed visibly, legibly and "
+                "indelibly or, where that is not possible or not warranted on account of the nature of "
+                "the system, to the packaging or accompanying documentation; and, where applicable, it "
+                "shall be followed by the identification number of the notified body responsible for "
+                "the conformity assessment procedures set out in Article 43."
             ),
             official_summary=(
                 "Art. 48 makes the CE marking of high-risk AI systems subject to the general "
@@ -417,14 +426,15 @@ class Art48Module(BaseArticleModule):
                 "via the interface from which the system is accessed or via an easily accessible "
                 "machine-readable code or other electronic means. The CE marking is affixed visibly, "
                 "legibly and indelibly or, where that is not possible or not warranted on account of "
-                "the nature of the system, to the packaging or to the accompanying documentation. "
-                "Where applicable, it is followed by the identification number of the notified body "
-                "responsible for the Art. 43 conformity assessment procedures; that number is affixed "
-                "by the notified body itself or, under its instructions, by the provider or by the "
-                "provider's authorised representative, and is also indicated in promotional material "
-                "which mentions that the system fulfils the requirements for CE marking. Where other "
-                "Union law also provides for the CE marking, the marking indicates that the system "
-                "also fulfils that law."
+                "the nature of the system, to the packaging or to the accompanying documentation, as "
+                "appropriate. Where applicable, it is followed by the identification number of the "
+                "notified body responsible for the Art. 43 conformity assessment procedures; that "
+                "number is affixed by the notified body itself or, under its instructions, by the "
+                "provider or by the provider's authorised representative, and is also indicated in "
+                "promotional material which mentions that the system fulfils the requirements for CE "
+                "marking. Where the high-risk AI system is subject to other Union law which also "
+                "provides for the affixing of the CE marking, the CE marking indicates that the system "
+                "also fulfils the requirements of that other law."
             ),
             related_articles={
                 "Art. 16": "Art. 16(h) makes affixing the CE marking in accordance with Art. 48 a provider obligation",
@@ -513,9 +523,9 @@ class Art48Module(BaseArticleModule):
                     article="Art. 48(4)",
                     action="Add the notified body's identification number after the CE marking",
                     details=(
-                        "Art. 48(4) requires the CE marking to be followed by the identification number "
-                        "of the notified body responsible for the conformity assessment procedure set "
-                        "out in Art. 43."
+                        "Where applicable, Art. 48(4) requires the CE marking to be followed by the "
+                        "identification number of the notified body responsible for the conformity "
+                        "assessment procedures set out in Art. 43."
                     ),
                     effort="1-2 hours",
                     action_type="human_judgment_required",
@@ -526,9 +536,9 @@ class Art48Module(BaseArticleModule):
                     article="Art. 48(4)",
                     action="Have the notified body's identification number affixed by a permitted performer",
                     details=(
-                        "Art. 48(4) lets the identification number be affixed by " + _PERMITTED_PERFORMER
-                        + ". The provider is responsible via Article 16(h) but does not have to affix "
-                        "the number itself."
+                        "Where applicable, Art. 48(4) provides that the identification number is affixed "
+                        "by the notified body itself or, under the notified body's instructions, by the "
+                        "provider or by the provider's authorised representative."
                     ),
                     effort="1-4 hours",
                     action_type="human_judgment_required",
@@ -540,9 +550,9 @@ class Art48Module(BaseArticleModule):
                     article="Art. 48(4)",
                     action="Indicate the notified body's identification number in promotional material",
                     details=(
-                        "Art. 48(4) requires the identification number of the notified body in any "
-                        "promotional material which mentions that the high-risk AI system fulfils the "
-                        "requirements for CE marking."
+                        "Where applicable, Art. 48(4) requires the identification number of the notified "
+                        "body to be indicated in any promotional material which mentions that the "
+                        "high-risk AI system fulfils the requirements for CE marking."
                     ),
                     effort="1-4 hours",
                     action_type="human_judgment_required",

@@ -623,6 +623,105 @@ class TestArt48ExplainAndActionPlan:
         assert [a.article for a in plan.actions] == ["Art. 48(1)"]
 
 
+# ── Sentences worded by the legal review of 2026-10-12 (items L4, L8-L12) — verbatim ──
+
+L4_TRUE = ("Project evidence indicates that the CE marking may comply with the general principles set out in "
+           "Article 30 of Regulation (EC) No 765/2008. Confirm this in Human Gates.")
+L4_FALSE = ("Project evidence indicates that the CE marking does not follow the general principles set out in "
+            "Article 30 of Regulation (EC) No 765/2008, to which Article 48(1) makes the CE marking subject.")
+L4_NONE = ("Whether the CE marking follows the general principles set out in Article 30 of Regulation (EC) No "
+           "765/2008 requires human review. AI could not determine it from the project.")
+L4_NOTE = ("Review the CE marking of the high-risk AI system against the general principles set out in Article 30 "
+           "of Regulation (EC) No 765/2008 and record the result.")
+L8_NOTE = ("Record who affixed the identification number of the notified body. Article 16(h) requires the provider "
+           "to affix the CE marking in accordance with Article 48; Article 48(4) allows the notified body's "
+           "identification number to be affixed by the notified body itself or, under its instructions, by the "
+           "provider or by the provider's authorised representative.")
+L9_TRUE = ("Promotional material that mentions that the high-risk AI system fulfils the requirements for CE marking "
+           "indicates the identification number of the notified body responsible for the conformity assessment "
+           "procedures set out in Article 43. Verify that all such promotional material indicates that number.")
+L10_NOTE = ("Identify the other Union law that also provides for the affixing of the CE marking and confirm whether "
+            "the high-risk AI system fulfils the requirements of that other law.")
+# action → details
+L11_DETAILS = {
+    "Add the notified body's identification number after the CE marking": (
+        "Where applicable, Art. 48(4) requires the CE marking to be followed by the identification number of the "
+        "notified body responsible for the conformity assessment procedures set out in Art. 43."),
+    "Have the notified body's identification number affixed by a permitted performer": (
+        "Where applicable, Art. 48(4) provides that the identification number is affixed by the notified body "
+        "itself or, under the notified body's instructions, by the provider or by the provider's authorised "
+        "representative."),
+    "Indicate the notified body's identification number in promotional material": (
+        "Where applicable, Art. 48(4) requires the identification number of the notified body to be indicated in "
+        "any promotional material which mentions that the high-risk AI system fulfils the requirements for CE "
+        "marking."),
+}
+L12_ONE_SENTENCE = (
+    "The CE marking of a high-risk AI system is subject to the general principles set out in Article 30 of "
+    "Regulation (EC) No 765/2008; for a system provided digitally, a digital CE marking shall be used only if it can "
+    "easily be accessed via the interface from which the system is accessed or via an easily accessible "
+    "machine-readable code or other electronic means; the marking shall be affixed visibly, legibly and indelibly "
+    "or, where that is not possible or not warranted on account of the nature of the system, to the packaging or "
+    "accompanying documentation; and, where applicable, it shall be followed by the identification number of the "
+    "notified body responsible for the conformity assessment procedures set out in Article 43.")
+L12_SUMMARY = (
+    "Art. 48 makes the CE marking of high-risk AI systems subject to the general principles set out in Article 30 "
+    "of Regulation (EC) No 765/2008. For systems provided digitally a digital CE marking is used, only if it can "
+    "easily be accessed via the interface from which the system is accessed or via an easily accessible "
+    "machine-readable code or other electronic means. The CE marking is affixed visibly, legibly and indelibly or, "
+    "where that is not possible or not warranted on account of the nature of the system, to the packaging or to the "
+    "accompanying documentation, as appropriate. Where applicable, it is followed by the identification number of "
+    "the notified body responsible for the Art. 43 conformity assessment procedures; that number is affixed by the "
+    "notified body itself or, under its instructions, by the provider or by the provider's authorised "
+    "representative, and is also indicated in promotional material which mentions that the system fulfils the "
+    "requirements for CE marking. Where the high-risk AI system is subject to other Union law which also provides "
+    "for the affixing of the CE marking, the CE marking indicates that the system also fulfils the requirements of "
+    "that other law.")
+
+
+class TestArt48ReviewedSentences:
+
+    @pytest.mark.parametrize("value,sentence", [(True, L4_TRUE), (False, L4_FALSE), (None, L4_NONE)],
+                             ids=["yes", "no", "not-determined"])
+    def test_l4_general_principles(self, art48_module, tmp_path, value, sentence):
+        f = _find(_scan(art48_module, tmp_path, {"follows_general_ce_marking_principles": value}), "ART48-OBL-1")[0]
+        assert f.description == sentence
+        assert f.remediation == L4_NOTE
+
+    @pytest.mark.parametrize("answers", [
+        {NB: True, "notified_body_number_affixed_by_permitted_actor": True},
+        {NB: True, "notified_body_number_affixed_by_permitted_actor": False},
+        {NB: True},
+        {},
+    ], ids=["yes", "no", "not-determined", "condition-not-determined"])
+    def test_l8_note_is_the_same_wherever_it_is_shown(self, art48_module, tmp_path, answers):
+        assert _find(_scan(art48_module, tmp_path, answers), "ART48-OBL-4b")[0].remediation == L8_NOTE
+
+    def test_l9_promotional_material_names_the_responsible_notified_body(self, art48_module, tmp_path):
+        f = _find(_scan(art48_module, tmp_path, {NB: True, PROMO: True, IN_PROMO: True}), "ART48-OBL-4c")[0]
+        assert f.description == L9_TRUE
+
+    @pytest.mark.parametrize("answers", [
+        {"is_subject_to_other_ce_marking_law": True, "ce_marking_indicates_other_union_law_compliance": True},
+        {"is_subject_to_other_ce_marking_law": True, "ce_marking_indicates_other_union_law_compliance": False},
+        {"is_subject_to_other_ce_marking_law": True},
+        {},
+    ], ids=["yes", "no", "not-determined", "condition-not-determined"])
+    def test_l10_note_is_the_same_wherever_it_is_shown(self, art48_module, tmp_path, answers):
+        assert _find(_scan(art48_module, tmp_path, answers), "ART48-OBL-5")[0].remediation == L10_NOTE
+
+    def test_l11_paragraph_4_actions_keep_where_applicable(self, art48_module, tmp_path):
+        BaseArticleModule.set_context(_full_false_ctx())
+        plan = art48_module.action_plan(art48_module.scan(str(tmp_path)))
+        details = {a.action: a.details for a in plan.actions if a.article == "Art. 48(4)"}
+        assert details == L11_DETAILS
+
+    def test_l12_explanation(self, art48_module):
+        e = art48_module.explain()
+        assert e.one_sentence == L12_ONE_SENTENCE
+        assert e.official_summary == L12_SUMMARY
+
+
 # ── Server: single-article scan and full scan ──
 
 class TestArt48Server:
