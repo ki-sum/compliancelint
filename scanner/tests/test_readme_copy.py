@@ -160,3 +160,10 @@ def test_npm_package_declares_the_project_licence():
     assert licence_file.lstrip().startswith("Business Source License 1.1")
     assert json.loads(_read("package.json"))["license"] == "BUSL-1.1"  # SPDX identifier of the Business Source License 1.1
     assert 'license = {text = "BSL-1.1"}' in _read("pyproject.toml")
+
+
+def test_readme_makes_no_unmeasured_false_positive_claim():
+    # Founder decision 2026-10-13: "near zero" false positives was never measured; the comparison stays qualitative.
+    readme = _read("README.md")
+    assert "near zero" not in readme.lower()
+    assert "| **False positives** | Keyword matching → many | AI understands context → fewer than keyword matching |" in readme

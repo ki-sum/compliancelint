@@ -190,7 +190,7 @@ The user can stop any MCP tool call at any time by pressing Stop in their IDE.
 |-|------------|----------------|
 | **Method** | Check if `RISK_MANAGEMENT.md` exists | AI reads entire codebase, checks against 255 decomposed legal obligations |
 | **Citations** | "You need logging" | `Art. 12(1): "High-risk AI systems shall technically allow for the automatic recording of events..."` |
-| **False positives** | Keyword matching → many | AI understands context → near zero |
+| **False positives** | Keyword matching → many | AI understands context → fewer than keyword matching |
 | **Privacy** | Cloud upload | **ComplianceLint never receives your code** — it is read by the AI assistant you already use; only findings and their evidence notes sync to your dashboard |
 | **Cost** | Separate subscription | **Free + source-available (BSL 1.1)** — uses your existing AI IDE |
 
