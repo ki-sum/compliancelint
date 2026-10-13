@@ -167,3 +167,37 @@ def test_readme_makes_no_unmeasured_false_positive_claim():
     readme = _read("README.md")
     assert "near zero" not in readme.lower()
     assert "| **False positives** | Keyword matching → many | AI understands context → fewer than keyword matching |" in readme
+
+
+# ── What the headline number counts (founder decision 2026-10-13) ──
+# "255 obligations" stays the headline number. The records behind it are obligations and prohibitions plus the
+# provisions that decide whether and how those apply; the README says so once, with numbers counted from the files.
+
+def _record_breakdown() -> dict:
+    seen = {}
+    for path in glob.glob(os.path.join(SCANNER_ROOT, "obligations", "*.json")):
+        with open(path, encoding="utf-8") as f:
+            for o in json.load(f).get("obligations", []):
+                seen[o["id"]] = o
+    records = list(seen.values())
+    obligations = sum(1 for r in records if r["deontic_type"] == "obligation")
+    prohibitions = sum(1 for r in records if r["deontic_type"] == "prohibition")
+    return {
+        "total": len(records),
+        "obligations": obligations,
+        "prohibitions": prohibitions,
+        "related": len(records) - obligations - prohibitions,
+        "upstream": sum(1 for r in records if r["addressee"] in ("commission", "ai_office", "notified_bodies")),
+    }
+
+
+def test_readme_says_what_the_headline_number_counts():
+    b = _record_breakdown()
+    assert b["obligations"] + b["prohibitions"] + b["related"] == b["total"]
+    sentence = (
+        f"The {b['total']} are {b['obligations']} obligations and {b['prohibitions']} prohibitions, plus "
+        f"{b['related']} related provisions that decide whether and how they apply: permissions, exceptions, "
+        f"classification rules and similar clauses. {b['upstream']} of them are addressed to the Commission or to "
+        "notified bodies and never appear as your tasks."
+    )
+    assert sentence in _read("README.md")

@@ -269,6 +269,8 @@ You can ask any AI to review your code. But here's the difference:
 
 All obligations verified against EUR-Lex source text. The table has 258 rows for 255 obligations: three records (`ART19-OBL-1b`, `ART19-OBL-2`, `ART26-OBL-6`) are listed under two articles.
 
+**What the 255 counts.** The 255 are 207 obligations and 12 prohibitions, plus 36 related provisions that decide whether and how they apply: permissions, exceptions, classification rules and similar clauses. 13 of them are addressed to the Commission or to notified bodies and never appear as your tasks.
+
 **Why 46 of the Act's articles?** The EU AI Act, as amended by Regulation (EU) 2026/1744, contains Articles 1-113 plus six inserted articles (Art. 4a, 60a, 75a-75d), for 119 articles in the consolidated text. ComplianceLint currently covers 46 selected articles with operator-facing compliance requirements, permissions or related procedures. This is a product-scope selection, not an exhaustive statement that only those 46 articles can create operator obligations or permissions.
 
 Not all 46 articles apply to every project. The applicable obligations depend on the role(s) you state (provider, product manufacturer, deployer, importer, distributor, authorised representative) and on the risk class concluded from your Profiling Wizard answers. Run the Profiling Wizard in the [dashboard](https://compliancelint.dev) for accurate scoring.
