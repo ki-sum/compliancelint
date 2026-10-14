@@ -16,6 +16,7 @@ import json
 import logging
 import os
 import sys
+import re
 from datetime import datetime, timezone
 
 from mcp.server.fastmcp import FastMCP
@@ -764,6 +765,26 @@ _SCAN_TOTALS_EXPLANATION = (
 )
 
 
+def _one_finding_per_obligation(findings_by_article: dict) -> list:
+    """Every obligation once, as the dashboard stores a scan: a module may also report another article's obligation
+    (the Art. 12 module reports ART19-OBL-1b / -2 and ART26-OBL-6); the finding of the obligation's own article wins,
+    otherwise the first one reported (the dashboard applies the same rule). Findings without an obligation id are
+    all kept. findings_by_article: {article number: [{obligation_id, level, ...}]} — not modified."""
+    chosen: dict = {}
+    others: list = []
+    for article, findings in findings_by_article.items():
+        for f in findings:
+            oid = f.get("obligation_id") or ""
+            m = re.match(r"^ART(\d{1,3})[a-z]?-", oid)
+            if not m:
+                others.append(f)
+                continue
+            own = int(m.group(1)) == int(article)
+            if oid not in chosen or (own and not chosen[oid][0]):
+                chosen[oid] = (own, f)
+    return [f for _, f in chosen.values()] + others
+
+
 def _scan_totals(overall_by_article: dict, findings_by_article: dict) -> dict:
     """Totals of a cl_scan_all run, each with its unit. A real scan (2026-10-10) was reported in the terminal as
     "15 articles non-compliant" and shown on the dashboard as "Non-Compliant 2 of 145 findings": the first counts
@@ -776,10 +797,11 @@ def _scan_totals(overall_by_article: dict, findings_by_article: dict) -> dict:
         return {level: sum(1 for lv in levels if lv == level) for level in _SCAN_LEVELS}
 
     overall_levels = list(overall_by_article.values())
-    ai_levels = [f.get("level") for findings in findings_by_article.values() for f in findings]
+    findings = _one_finding_per_obligation(findings_by_article)
+    ai_levels = [f.get("level") for f in findings]
 
     recorded = {"non_compliant": 0, "needs_review": 0, "not_applicable": 0, "compliant": 0}
-    for findings in findings_by_article.values():
+    if findings:
         # Same rewrite cl_sync applies before uploading; on copies.
         for f in _apply_approach_b_post_process([dict(f) for f in findings]):
             level = f.get("level")

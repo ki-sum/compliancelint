@@ -54,6 +54,23 @@ def _scan(tmp_path):
     return raw, report
 
 
+def _saved_findings_one_per_obligation(tmp_path):
+    """The saved scan state, one finding per obligation id: the one saved under the obligation's own article wins
+    (what the dashboard stores)."""
+    chosen = {}
+    for path in sorted(glob.glob(os.path.join(str(tmp_path), ".compliancelint", "local", "articles", "*.json"))):
+        with open(path, encoding="utf-8") as f:
+            saved = json.load(f)
+        article = int(os.path.basename(path)[3:].split(".")[0].rstrip("abcdefghijklmnopqrstuvwxyz"))
+        for oid, v in (saved.get("findings") or {}).items():
+            if v.get("baselineState") == "absent":
+                continue
+            own = oid.upper().startswith(f"ART{article:02d}-") or oid.upper().startswith(f"ART{article}-")
+            if oid not in chosen or (own and not chosen[oid][0]):
+                chosen[oid] = (own, dict(v, obligation_id=oid))
+    return {oid: f for oid, (_, f) in chosen.items()}
+
+
 def _declared_limit(tool_name="cl_scan_all"):
     tools = asyncio.run(server.mcp.list_tools())
     tool = next(t for t in tools if t.name == tool_name)
@@ -158,7 +175,11 @@ def test_totals_count_articles_and_findings_separately_and_say_so(tmp_path):
 
     findings = totals["findings_by_ai_assessment"]
     assert findings["unit"] == "findings (one per obligation)"
-    assert findings["total"] == sum(r["finding_count"] for r in report["results"].values())
+    # One per obligation (2026-10-14): an obligation that two modules report (Art. 12 reports ART19-OBL-1b / -2)
+    # counts once, as on the dashboard; the per-article finding_count still counts it in each article.
+    oracle = _saved_findings_one_per_obligation(tmp_path)
+    assert findings["total"] == len(oracle)
+    assert findings["total"] < sum(r["finding_count"] for r in report["results"].values()), "scenario has no mirrored obligation"
     assert sum(findings[level] for level in LEVELS) == findings["total"]
 
 
@@ -167,15 +188,12 @@ def test_totals_show_what_the_dashboard_will_record(tmp_path):
     _, report = _scan(tmp_path)
 
     expected = {"non_compliant": 0, "needs_review": 0, "not_applicable": 0, "compliant": 0}
-    ai_non_compliant = 0
-    for path in glob.glob(os.path.join(str(tmp_path), ".compliancelint", "local", "articles", "*.json")):
-        with open(path, encoding="utf-8") as f:
-            saved = json.load(f)
-        findings = [dict(v, obligation_id=k) for k, v in (saved.get("findings") or {}).items() if v.get("baselineState") != "absent"]
-        ai_non_compliant += sum(1 for f in findings if f.get("level") == "non_compliant")
-        for f in server._apply_approach_b_post_process(findings):
-            level = f.get("level")
-            expected[level if level in ("non_compliant", "not_applicable", "compliant") else "needs_review"] += 1
+    # One finding per obligation, the one of the obligation's own article (2026-10-14, as the dashboard stores it).
+    findings = list(_saved_findings_one_per_obligation(tmp_path).values())
+    ai_non_compliant = sum(1 for f in findings if f.get("level") == "non_compliant")
+    for f in server._apply_approach_b_post_process(findings):
+        level = f.get("level")
+        expected[level if level in ("non_compliant", "not_applicable", "compliant") else "needs_review"] += 1
 
     recorded = report["totals"]["findings_as_recorded_on_dashboard"]
     assert {k: recorded[k] for k in expected} == expected
@@ -215,3 +233,41 @@ def test_scan_totals_helper_keeps_automated_verdicts_and_holds_human_judgment_on
     # The caller's findings are not rewritten by the count.
     assert per_article[82][0]["level"] == "non_compliant"
     assert per_article[82][0]["description"] == "No corrective action procedure found."
+
+
+def test_scan_totals_count_an_obligation_reported_by_two_modules_once():
+    """The Art. 12 module also reports ART19-OBL-1b / -2 (log keeping). The dashboard stores one finding per obligation,
+    the one from the obligation's own article; the scan totals counted both
+    and said 177 where the dashboard recorded 175 (demo recording, 2026-10-14)."""
+    per_article = {
+        12: [
+            {"obligation_id": "ART12-OBL-1", "level": "unable_to_determine", "description": "x"},
+            # mirrored from Art. 19 — reported by the Art. 12 module with a different verdict
+            {"obligation_id": "ART19-OBL-1b", "level": "non_compliant", "description": "x"},
+            {"obligation_id": "ART19-OBL-2", "level": "not_applicable", "description": "x"},
+        ],
+        19: [
+            {"obligation_id": "ART19-OBL-1b", "level": "not_applicable", "description": "x"},
+            {"obligation_id": "ART19-OBL-2", "level": "not_applicable", "description": "x"},
+        ],
+    }
+    overall = {12: "non_compliant", 19: "not_applicable"}
+
+    totals = server._scan_totals(overall, per_article)
+
+    # three obligations; ART19-OBL-1b counts with the Art. 19 module's verdict
+    assert totals["findings_by_ai_assessment"]["total"] == 3
+    assert totals["findings_by_ai_assessment"]["non_compliant"] == 0
+    assert totals["findings_by_ai_assessment"]["not_applicable"] == 2
+    assert totals["findings_as_recorded_on_dashboard"]["total"] == 3
+    assert totals["findings_as_recorded_on_dashboard"]["not_applicable"] == 2
+    assert totals["findings_as_recorded_on_dashboard"]["needs_review"] == 1
+    # articles are still counted per module
+    assert totals["articles_by_ai_assessment"]["total"] == 2
+
+
+def test_scan_totals_keep_a_mirrored_obligation_whose_own_module_did_not_report_it():
+    per_article = {12: [{"obligation_id": "ART26-OBL-6", "level": "unable_to_determine", "description": "x"}]}
+    totals = server._scan_totals({12: "unable_to_determine"}, per_article)
+    assert totals["findings_by_ai_assessment"]["total"] == 1
+    assert totals["findings_as_recorded_on_dashboard"]["needs_review"] == 1
