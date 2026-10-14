@@ -9,6 +9,8 @@ on:
 jobs:
   test:
     runs-on: ${{ matrix.os }}
+    # A hanging test used to keep every Python 3.10 / 3.11 job busy until GitHub cancelled it after six hours.
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:

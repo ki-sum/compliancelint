@@ -57,6 +57,19 @@ def tmp_project(tmp_path):
     return str(project)
 
 
+def _register_response():
+    """The answer to the pre-register POST that follows a completed poll (cl_connect, since 1.2.1).
+
+    A side_effect list must end with it: an exhausted list raises StopIteration into an asyncio future, which
+    Python 3.10 / 3.11 never resolve - the test then hangs instead of failing (CI jobs cancelled after six hours).
+    """
+    result = MagicMock()
+    result.returncode = 0
+    result.stdout = "{}"
+    result.stderr = ""
+    return result
+
+
 def _make_poll_response(status, api_key="", email=""):
     if status == "pending":
         data = {"status": "pending"}
@@ -128,10 +141,14 @@ class TestClConnectDeviceFlow:
             _make_poll_response("pending"),
             _make_poll_response("pending"),
             _make_poll_response("complete", api_key="cl_abc123", email="user@example.com"),
+            _register_response(),
         ]
 
         result = json.loads(_run(cl_connect(tmp_project)))
         assert result["status"] == "connected"
+        # three polls, then the pre-register POST - every call the list provides is used, none is missing
+        assert mock_run.call_count == 4
+        assert "POST" in mock_run.call_args_list[3][0][0]
         assert result["email"] == "user@example.com"
 
         mock_browser.assert_called_once()
@@ -201,6 +218,7 @@ class TestClConnectDeviceFlow:
             error_result,
             error_result,
             _make_poll_response("complete", api_key="cl_key", email="a@b.com"),
+            _register_response(),
         ]
         result = json.loads(_run(cl_connect(tmp_project)))
         assert result["status"] == "connected"
@@ -212,6 +230,7 @@ class TestClConnectDeviceFlow:
         mock_run.side_effect = [
             OSError("curl not found"),
             _make_poll_response("complete", api_key="cl_key", email="a@b.com"),
+            _register_response(),
         ]
         result = json.loads(_run(cl_connect(tmp_project)))
         assert result["status"] == "connected"

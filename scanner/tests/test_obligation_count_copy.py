@@ -64,6 +64,10 @@ def test_no_hardcoded_count_in_scanner_messages(rel):
 def test_static_docs_state_the_data_count(rel):
     with open(os.path.join(REPO_ROOT, rel), encoding="utf-8") as f:
         text = f.read()
+    # The README's "What the 255 counts." paragraph names parts of the total ("207 obligations and 12 prohibitions");
+    # test_readme_copy.py counts those parts from the obligation files. Only stated totals are checked here
+    # (2026-10-14: the paragraph was added the day before and broke this check).
+    text = re.sub(r"\*\*What the \d+ counts\.\*\*[^\n]*", "", text)
     # " " in prose, "_" in the README shields.io badge ("EU_AI_Act-248_obligations")
     stated = {int(n) for n in re.findall(r"\b(\d{3})[ _](?:atomic )?obligations\b", text)}
     assert stated <= {_unique()}, f"{rel} states {sorted(stated)}; data has {_unique()}"
