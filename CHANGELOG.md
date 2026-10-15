@@ -4,6 +4,14 @@ All notable changes to ComplianceLint will be documented in this file.
 
 This project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.3.2] — 2026-10-15
+
+### Fixed
+- The totals in the `cl_scan_all` response counted an obligation twice when two article modules report it (the
+  Article 12 module also reports ART19-OBL-1b, ART19-OBL-2 and ART26-OBL-6). They now count one finding per
+  obligation, the one of the obligation's own article, as the dashboard stores it: a scan that said 177 findings now
+  says 175, the number the dashboard records. Article counts are unchanged.
+
 ## [1.3.1] — 2026-10-12
 
 ### Changed — texts follow the legal review and the role-first Profiling Wizard
