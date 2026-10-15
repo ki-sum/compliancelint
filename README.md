@@ -25,6 +25,23 @@ Scan, attest, and document EU AI Act compliance without leaving your IDE. The sc
 
 ### See it in action
 
+[![ComplianceLint overview video (1:37)](https://compliancelint.dev/videos/0-overview.jpg)](https://compliancelint.dev/videos/0-overview.mp4)
+
+**[Watch the overview (1:37)](https://compliancelint.dev/videos/0-overview.mp4)**: one demo project, a credit-scoring API, from setup to the export pack. Each step in its own short video:
+
+| Step | Video |
+|------|-------|
+| 1. Install the scanner in your AI coding assistant | [0:38](https://compliancelint.dev/videos/1-install.mp4) |
+| 2. Connect the project to the dashboard | [0:43](https://compliancelint.dev/videos/2-connect.mp4) |
+| 3. Company profile: the SME size test and the Article 99 fine caps | [0:49](https://compliancelint.dev/videos/3-profile.mp4) |
+| 4. Profiling Wizard: role first, the risk class follows from the answers | [1:34](https://compliancelint.dev/videos/4-wizard.mp4) |
+| 5. Scan and sync: your assistant reads the code, ComplianceLint never receives it | [1:09](https://compliancelint.dev/videos/5-scan.mp4) |
+| 6. Findings and tasks, with the text of the law and the application dates | [1:02](https://compliancelint.dev/videos/6-dashboard.mp4) |
+| 7. Human Gates: what code alone cannot settle needs a person's answer | [0:35](https://compliancelint.dev/videos/7-human-gates.mp4) |
+| 8. Compliance All-in-One Pack: one zip for your legal counsel or auditor | [1:09](https://compliancelint.dev/videos/8-export.mp4) |
+
+All nine on one page: [compliancelint.dev/#demo-videos](https://compliancelint.dev/#demo-videos) · also as a [YouTube playlist](https://www.youtube.com/playlist?list=PLXxAlsu_fRdY).
+
 Try the live demo at **[compliancelint.dev/demo](https://compliancelint.dev/demo)** — pre-loaded with three AI systems (a chatbot that is not high-risk but has an Article 50 transparency trigger, a high-risk finance system, a high-risk medical system) so you can browse a real scan, attestation flow, and Compliance Journey trend without setting up a project of your own.
 
 ### Dashboard
