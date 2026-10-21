@@ -1260,6 +1260,9 @@ def cl_scan(
         _requested = _requested_article_keys(articles)
         if _requested is not None:
             gate.missing_articles = [a for a in gate.missing_articles if a in _requested]
+            gate.invalid_articles = {k: v for k, v in gate.invalid_articles.items() if k in _requested}
+            # all_valid was computed over every article — recompute it for the requested ones
+            gate.all_valid = not gate.missing_articles and not gate.invalid_articles and not gate.scope_errors
         if gate.missing_articles:
             return json.dumps({
                 "status": "needs_analysis_first",

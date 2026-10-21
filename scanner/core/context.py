@@ -46,7 +46,9 @@ _LIST_FIELDS: dict = {
     "art43": [],
     "art47": [],
     "art48": [],
-    "art50": ["disclosure_evidence", "emotion_biometric_evidence", "deep_fake_evidence"],
+    # one list per duty (legal review 2026-10-21): 50(1) notice, 50(2) marking, 50(4) deep fakes, 50(4) public-interest text
+    "art50": ["disclosure_evidence", "marking_evidence", "emotion_biometric_evidence", "deep_fake_evidence",
+              "public_interest_text_evidence"],
     "art4":  ["literacy_evidence"],
     "art16": [],
     "art22": [],

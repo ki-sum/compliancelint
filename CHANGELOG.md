@@ -23,6 +23,13 @@ This project adheres to [Semantic Versioning](https://semver.org/).
   report what the dashboard shows as of the last sync.
 - `cl_scan` for one article (`articles="50"`) asked for the answers of other articles too ("still need to check 4
   more": Art. 4, 5, 6, 111). It now needs the requested articles' answers only; `articles="all"` keeps the full check.
+  The validation result also counts only the requested articles, so a single-article scan is no longer reported as
+  blocked because of answers to articles it did not scan.
+- Article 50: the scanner asked for one `disclosure_evidence` list and quoted it in the Article 50(1) finding, so
+  evidence about the machine-readable marking (50(2)) or the public-interest text (50(4)) appeared under 50(1). The
+  template now has one list per duty — `disclosure_evidence` (50(1)), `marking_evidence` (50(2)),
+  `deep_fake_evidence` (50(4) first subparagraph), `public_interest_text_evidence` (50(4) second subparagraph) — each
+  with its own description, and each finding quotes only its own list.
 
 ### Changed — harmonised standards and the instruments each article waits for (legal review)
 - EN 18286:2026 (quality management system) is the first harmonised standard cited under the AI Act: Commission

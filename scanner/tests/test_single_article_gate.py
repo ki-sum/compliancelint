@@ -37,7 +37,10 @@ def test_single_article_scan_needs_only_its_own_answers(tmp_path):
     (tmp_path / "app.py").write_text("print('hi')")
     out = json.JSONDecoder().raw_decode(server.cl_scan(str(tmp_path), project_context=_ctx({"art50": ART50}),
                                                        articles="50"))[0]
-    assert out.get("status") != "needs_analysis_first", out
+    assert out.get("status") not in ("needs_analysis_first", "blocked_strict"), out
+    # the scan ran: Art. 50 findings come back (the first fix filtered the missing list but the gate's all_valid,
+    # computed before, still blocked: "My answers for 0 articles aren't in the format …")
+    assert any(f.get("obligation_id") == "ART50-OBL-1" for f in out.get("findings", [])), out
 
 
 def test_the_requested_article_still_has_to_be_answered(tmp_path):

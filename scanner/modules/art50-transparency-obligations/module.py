@@ -65,6 +65,9 @@ class Art50Module(BaseArticleModule):
         publishes_public_interest_text = answers.get("publishes_public_interest_text")
         has_deep_fake_disclosure = answers.get("has_deep_fake_disclosure")
         deep_fake_evidence = answers.get("deep_fake_evidence", [])
+        # one list per duty (legal review 2026-10-21): 50(2) marking, 50(4) public-interest text
+        marking_evidence = answers.get("marking_evidence", [])
+        public_interest_text_evidence = answers.get("public_interest_text_evidence", [])
 
         # ── ART50-OBL-1: Human interaction disclosure ──
         # Conditioned on whether the system is a chatbot / interactive AI
@@ -144,6 +147,7 @@ class Art50Module(BaseArticleModule):
                     "was found. Art. 50(2) requires outputs to be marked in a machine-readable "
                     "format and detectable as artificially generated or manipulated."
                 ),
+                evidence=marking_evidence,
                 gap_type=GapType.CODE,
             ))
         elif is_generating_synthetic is False:
@@ -277,6 +281,8 @@ class Art50Module(BaseArticleModule):
             "is_generating_synthetic_content": is_generating_synthetic,
             "has_ai_disclosure_to_users": has_ai_disclosure,
             "disclosure_evidence": disclosure_evidence,
+            "marking_evidence": marking_evidence,
+            "public_interest_text_evidence": public_interest_text_evidence,
             "has_content_watermarking": has_content_watermarking,
             "is_emotion_recognition_system": is_emotion_system,
             "is_biometric_categorization_system": is_biometric_system,
