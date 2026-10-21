@@ -5,14 +5,14 @@
     "version": "0.2.0",
     "date": "2026-10-03",
     "status": "draft",
-    "disclaimer": "This is an interim standard developed by ComplianceLint. It will be superseded by the CEN-CENELEC harmonized standard.",
+    "disclaimer": "This is an interim checklist developed by ComplianceLint. It is not a harmonised standard and does not itself give a presumption of conformity. A harmonised standard or European standardisation deliverable on conformity assessment for AI systems is being developed under Commission Implementing Decision C(2025) 3871, Annex I, point 10. No official date for publication of a harmonised-standard reference, if applicable, has been announced.",
     "basis": [
       "EU AI Act Article 43 (official text)",
       "EU AI Act Annexes VI and VII",
       "ISO/IEC 17065:2012 -- Conformity assessment",
       "ISO/IEC 42001:2023 -- AI management system"
     ],
-    "awaiting_standard": "CEN-CENELEC harmonized standard for Art. 43 (expected Q4 2026)"
+    "awaiting_standard": "A harmonised standard or European standardisation deliverable on conformity assessment for AI systems is being developed under Commission Implementing Decision C(2025) 3871, Annex I, point 10. No official date for publication of a harmonised-standard reference, if applicable, has been announced."
   },
   "requirements": [
     {

@@ -27,6 +27,7 @@ from datetime import datetime, timezone
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from core.application_dates import applicable_from
+from core.harmonised_standards import standard_status
 from core.protocol import (
     BaseArticleModule, ScanResult, Explanation, ActionPlan, ActionItem,
     Finding, ComplianceLevel, Confidence, GapType,
@@ -257,7 +258,7 @@ class Art22Module(BaseArticleModule):
                 "Based on: ISO/IEC 42001:2023 (governance and accountability controls)."
             ),
             enforcement_date=applicable_from(22),
-            waiting_for="CEN-CENELEC harmonized standard for authorised representatives (expected Q4 2026)",
+            waiting_for=standard_status(22),
         )
 
     def action_plan(self, scan_result: ScanResult) -> ActionPlan:
@@ -348,9 +349,8 @@ class Art22Module(BaseArticleModule):
             project_path=scan_result.project_path,
             actions=actions,
             disclaimer=(
-                "Art. 22 is a provider obligation for high-risk AI systems, primarily targeting "
-                "non-EU providers. Based on ComplianceLint compliance checklist. Official CEN-CENELEC "
-                "standards (expected Q4 2026) may modify these requirements."
+                "Art. 22 is a provider obligation for high-risk AI systems, primarily targeting non-EU providers. "
+                "Based on ComplianceLint compliance checklist."
             ),
         )
 

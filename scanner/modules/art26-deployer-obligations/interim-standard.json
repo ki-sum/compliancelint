@@ -5,7 +5,7 @@
     "version": "0.1.0",
     "date": "2026-04-03",
     "status": "draft",
-    "disclaimer": "This is an interim standard developed by ComplianceLint. It will be superseded when CEN-CENELEC publishes the harmonized standard for deployer obligations.",
+    "disclaimer": "This is an interim checklist developed by ComplianceLint. It is not a harmonised standard and does not itself give a presumption of conformity. No harmonised standard is requested specifically for Article 26 in the Commission's standardisation request (Commission Implementing Decision C(2025) 3871). Article 96(1)(a) requires Commission guidelines on the practical application of Article 26.",
     "basis": [
       "EU AI Act Article 26 (official text)",
       "EU AI Act Recitals 91-93 (legislative intent on deployer obligations)",
@@ -13,7 +13,7 @@
       "ISO/IEC 23894:2023 -- AI risk management",
       "GDPR Articles 35, 36 -- Data protection impact assessment"
     ],
-    "awaiting_standard": "CEN-CENELEC harmonized standard for deployer obligations (expected Q4 2026)"
+    "awaiting_standard": "No harmonised standard is requested specifically for Article 26 in the Commission's standardisation request (Commission Implementing Decision C(2025) 3871). Article 96(1)(a) requires Commission guidelines on the practical application of Article 26."
   },
 
   "requirements": [

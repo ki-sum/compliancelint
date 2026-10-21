@@ -52,6 +52,7 @@ from datetime import datetime, timezone
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from core.application_dates import applicable_from
+from core.harmonised_standards import standard_status
 from core.protocol import (
     BaseArticleModule, ScanResult, Explanation, ActionPlan, ActionItem,
     Finding, ComplianceLevel, Confidence, GapType,
@@ -467,7 +468,7 @@ class Art09Module(BaseArticleModule):
                 "Based on: ISO 14971, ISO/IEC 23894:2023, NIST AI RMF."
             ),
             enforcement_date=applicable_from(9),
-            waiting_for="CEN-CENELEC harmonized standard (expected Q4 2026)",
+            waiting_for=standard_status(9),
         )
 
     def action_plan(self, scan_result: ScanResult) -> ActionPlan:

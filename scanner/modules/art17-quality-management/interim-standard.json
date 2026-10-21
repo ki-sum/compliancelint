@@ -5,7 +5,7 @@
     "version": "0.1.0",
     "date": "2026-04-03",
     "status": "draft",
-    "disclaimer": "This is an interim standard developed by ComplianceLint. It will be superseded by the CEN-CENELEC harmonized standard.",
+    "disclaimer": "This is an interim checklist developed by ComplianceLint. It is not a harmonised standard and does not itself give a presumption of conformity. The reference of EN 18286:2026, Artificial intelligence — Quality management system for EU AI Act regulatory purposes, was published in the Official Journal of the European Union on 14 October 2026 by Commission Implementing Decision (EU) 2026/2274. The European Commission states that providers implementing EN 18286:2026 benefit from a presumption of conformity with the Article 17 requirements covered by the standard. The exact coverage is determined by the standard, in particular Annex ZA, which ComplianceLint has not reviewed.",
     "basis": [
       "EU AI Act Article 17 (official text)",
       "ISO 9001:2015 -- Quality management systems",
@@ -13,7 +13,7 @@
       "ISO 13485:2016 -- Medical devices QMS",
       "ISO/IEC 23894:2023 -- AI risk management"
     ],
-    "awaiting_standard": "CEN-CENELEC harmonized standard for Art. 17 (expected Q4 2026)"
+    "awaiting_standard": "A harmonised standard supporting Article 17 is now cited. The reference of EN 18286:2026, Artificial intelligence — Quality management system for EU AI Act regulatory purposes, was published in the Official Journal of the European Union on 14 October 2026 by Commission Implementing Decision (EU) 2026/2274. The European Commission states that providers implementing EN 18286:2026 benefit from a presumption of conformity with the Article 17 requirements covered by the standard. The exact coverage is determined by the standard, in particular Annex ZA, which ComplianceLint has not reviewed."
   },
 
   "requirements": [

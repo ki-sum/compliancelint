@@ -30,6 +30,7 @@ from datetime import datetime, timezone
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from core.application_dates import applicable_from
+from core.harmonised_standards import standard_status
 from core.protocol import (
     BaseArticleModule, ScanResult, Explanation, ActionPlan, ActionItem,
     Finding, ComplianceLevel, Confidence, GapType,
@@ -321,7 +322,7 @@ class Art51Module(BaseArticleModule):
                 "against Annex XIII criteria."
             ),
             enforcement_date=applicable_from(51),
-            waiting_for="CEN-CENELEC harmonized standard for GPAI classification (expected 2027)",
+            waiting_for=standard_status(51),
         )
 
     # ── Action Plan ──
@@ -418,11 +419,9 @@ class Art51Module(BaseArticleModule):
             project_path=scan_result.project_path,
             actions=actions,
             disclaimer=(
-                "GPAI systemic risk classification is primarily a human judgment "
-                "based on model capabilities, training compute, and Commission "
-                "designation. Automated scanning can only flag potential indicators. "
-                "Based on ComplianceLint compliance checklist; official CEN-CENELEC "
-                "standards (expected 2027) may modify these criteria."
+                "GPAI systemic risk classification is primarily a human judgment based on model capabilities, "
+                "training compute, and Commission designation. Automated scanning can only flag potential "
+                "indicators. Based on ComplianceLint compliance checklist."
             ),
         )
 

@@ -5,7 +5,7 @@
     "version": "0.1.0",
     "date": "2026-03-16",
     "status": "draft",
-    "disclaimer": "This is an interim standard developed by ComplianceLint based on available guidance, industry best practices, and the draft ISO/IEC DIS 24970:2025. It is NOT an official standard. It will be superseded when CEN-CENELEC publishes the harmonized standard for Article 12 (expected Q4 2026).",
+    "disclaimer": "This is an interim checklist developed by ComplianceLint. It is not a harmonised standard and does not itself give a presumption of conformity. A harmonised standard on record keeping through logging capabilities by AI systems is being developed by CEN and CENELEC under Commission Implementing Decision C(2025) 3871, Annex I, point 3. No official date for publication of its reference in the Official Journal of the European Union has been announced.",
     "basis": [
       "EU AI Act Article 12 (official text)",
       "EU AI Act Recital 71 (legislative intent)",
@@ -17,7 +17,7 @@
       "practical-ai-act.eu implementation guide",
       "isms.online Article 12 analysis"
     ],
-    "awaiting_standard": "CEN-CENELEC harmonized standard for Art. 12 (expected Q4 2026)"
+    "awaiting_standard": "A harmonised standard on record keeping through logging capabilities by AI systems is being developed by CEN and CENELEC under Commission Implementing Decision C(2025) 3871, Annex I, point 3. No official date for publication of its reference in the Official Journal of the European Union has been announced."
   },
 
   "requirements": [

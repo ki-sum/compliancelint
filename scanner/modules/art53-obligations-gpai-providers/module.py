@@ -38,6 +38,7 @@ from datetime import datetime, timezone
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from core.application_dates import applicable_from
+from core.harmonised_standards import standard_status
 from core.protocol import (
     BaseArticleModule, ScanResult, Explanation, ActionPlan, ActionItem,
     Finding, ComplianceLevel, Confidence, GapType,
@@ -438,7 +439,7 @@ class Art53Module(BaseArticleModule):
                 "always requires human judgment."
             ),
             enforcement_date=applicable_from(53),
-            waiting_for="CEN-CENELEC harmonized standard for GPAI (expected 2027)",
+            waiting_for=standard_status(53),
         )
 
     # ── Action Plan ──
@@ -523,10 +524,8 @@ class Art53Module(BaseArticleModule):
             project_path=scan_result.project_path,
             actions=actions,
             disclaimer=(
-                "GPAI provider obligations require documentation quality assessment "
-                "that exceeds automated scanning capabilities. Based on ComplianceLint "
-                "compliance checklist; official CEN-CENELEC standards (expected 2027) "
-                "and the EU AI Office Code of Practice may modify these requirements."
+                "GPAI provider obligations require documentation quality assessment that exceeds automated scanning "
+                "capabilities. Based on ComplianceLint compliance checklist."
             ),
         )
 

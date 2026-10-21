@@ -20,6 +20,7 @@ from datetime import datetime, timezone
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from core.application_dates import applicable_from
+from core.harmonised_standards import standard_status
 from core.protocol import (
     BaseArticleModule, ScanResult, Explanation, ActionPlan, ActionItem,
     Finding, ComplianceLevel, Confidence, GapType,
@@ -354,7 +355,7 @@ class Art12Module(BaseArticleModule):
                 "Based on: ISO/IEC DIS 24970:2025, ISO 42001, ISO 27001 A.12.4."
             ),
             enforcement_date=applicable_from(12),
-            waiting_for="CEN-CENELEC harmonized standard (expected Q4 2026)",
+            waiting_for=standard_status(12),
         )
 
     def action_plan(self, scan_result: ScanResult) -> ActionPlan:
@@ -465,7 +466,7 @@ class Art12Module(BaseArticleModule):
             article_title="Record-keeping",
             project_path=scan_result.project_path,
             actions=actions,
-            disclaimer="Based on ComplianceLint compliance checklist. Official CEN-CENELEC standards (expected Q4 2026) may modify these requirements.",
+            disclaimer="Based on ComplianceLint compliance checklist.",
         )
 
 

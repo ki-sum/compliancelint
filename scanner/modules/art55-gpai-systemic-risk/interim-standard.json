@@ -5,13 +5,13 @@
     "version": "0.1.0",
     "date": "2026-04-03",
     "status": "draft",
-    "disclaimer": "This is an interim standard developed by ComplianceLint. It will be superseded by the CEN-CENELEC harmonized standard.",
+    "disclaimer": "This is an interim checklist developed by ComplianceLint. It is not a harmonised standard and does not itself give a presumption of conformity. Article 40(2) provides for standardisation requests covering, as applicable, the obligations in Chapter V, Sections 2 and 3; no harmonised standard for Article 55 has been published. Until a harmonised standard is published, Article 55(2) permits providers of general-purpose AI models with systemic risk to rely on codes of practice within the meaning of Article 56. The General-Purpose AI Code of Practice was published on 10 July 2025 and assessed as an adequate voluntary tool by the Commission and the Board on 1 August 2025.",
     "basis": [
       "EU AI Act Article 55 (official text)",
       "NIST AI 600-1 (AI Risk Management Framework: GPAI)",
       "EU AI Office Code of Practice for systemic risk GPAI"
     ],
-    "awaiting_standard": "CEN-CENELEC harmonized standard for Art. 55 (expected Q4 2026)"
+    "awaiting_standard": "Article 40(2) provides for standardisation requests covering, as applicable, the obligations in Chapter V, Sections 2 and 3; no harmonised standard for Article 55 has been published. Until a harmonised standard is published, Article 55(2) permits providers of general-purpose AI models with systemic risk to rely on codes of practice within the meaning of Article 56. The General-Purpose AI Code of Practice was published on 10 July 2025 and assessed as an adequate voluntary tool by the Commission and the Board on 1 August 2025."
   },
   "requirements": [
     {

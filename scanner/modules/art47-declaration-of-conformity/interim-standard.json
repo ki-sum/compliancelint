@@ -5,12 +5,12 @@
     "version": "0.1.0",
     "date": "2026-04-03",
     "status": "draft",
-    "disclaimer": "This is an interim standard developed by ComplianceLint. It will be superseded by the CEN-CENELEC harmonized standard.",
+    "disclaimer": "This is an interim checklist developed by ComplianceLint. It is not a harmonised standard and does not itself give a presumption of conformity. No harmonised standard is requested for Article 47. Article 47(5) empowers the Commission to adopt delegated acts updating the content of the EU declaration of conformity in Annex V in light of technical progress.",
     "basis": [
       "EU AI Act Article 47 (official text)",
       "EU AI Act Annex V -- EU Declaration of Conformity content requirements"
     ],
-    "awaiting_standard": "CEN-CENELEC harmonized standard (expected Q4 2026)"
+    "awaiting_standard": "No harmonised standard is requested for Article 47. Article 47(5) empowers the Commission to adopt delegated acts updating the content of the EU declaration of conformity in Annex V in light of technical progress."
   },
   "requirements": [
     {

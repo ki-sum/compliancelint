@@ -85,8 +85,8 @@ def test_interim_standard_surfaces_superseded_when():
     """When the metadata says when an official standard is expected,
     surface that at the top level so consumers know the lifecycle."""
     payload = _interim(12)
-    # art12 metadata mentions CEN-CENELEC harmonized standard for Art. 12
-    # expected Q4 2026 (via awaiting_standard field). Surface it.
+    # art12 metadata names the harmonised standard on logging being developed
+    # under C(2025) 3871 (awaiting_standard field, legal review 2026-10-21). Surface it.
     assert "superseded_when" in payload, (
         "superseded_when missing — consumers can't tell when this "
         "checklist will be replaced"

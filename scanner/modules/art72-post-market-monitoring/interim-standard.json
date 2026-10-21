@@ -5,7 +5,7 @@
     "version": "0.1.0",
     "date": "2026-04-03",
     "status": "draft",
-    "disclaimer": "This is an interim standard developed by ComplianceLint. It will be superseded when CEN-CENELEC publishes the harmonized standard for post-market monitoring of AI systems.",
+    "disclaimer": "This is an interim checklist developed by ComplianceLint. It is not a harmonised standard and does not itself give a presumption of conformity. No standalone harmonised standard is requested specifically for Article 72. Post-market monitoring processes form part of the quality-management-system work item (Commission Implementing Decision C(2025) 3871, Annex I, point 9), which resulted in EN 18286:2026; they are therefore relevant to EN 18286:2026 through Article 17(1)(h), but this does not create an independent presumption of conformity with Article 72. Article 72(3) requires Commission guidance, including a template, on the post-market monitoring plan by 2 September 2027.",
     "basis": [
       "EU AI Act Article 72 (official text)",
       "EU AI Act Recitals 131-133 (legislative intent on post-market monitoring)",
@@ -13,7 +13,7 @@
       "ISO 9001:2015 -- Quality management systems (post-delivery activities)",
       "EU Decision 768/2008/EC -- New Legislative Framework (market surveillance)"
     ],
-    "awaiting_standard": "CEN-CENELEC harmonized standard for post-market monitoring of AI systems (expected Q4 2026)"
+    "awaiting_standard": "No standalone harmonised standard is requested specifically for Article 72. Post-market monitoring processes form part of the quality-management-system work item (Commission Implementing Decision C(2025) 3871, Annex I, point 9), which resulted in EN 18286:2026; they are therefore relevant to EN 18286:2026 through Article 17(1)(h), but this does not create an independent presumption of conformity with Article 72. Article 72(3) requires Commission guidance, including a template, on the post-market monitoring plan by 2 September 2027."
   },
 
   "requirements": [

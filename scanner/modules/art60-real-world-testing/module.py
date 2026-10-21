@@ -26,6 +26,7 @@ from datetime import datetime, timezone
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from core.application_dates import applicable_from
+from core.harmonised_standards import standard_status
 from core.protocol import (
     BaseArticleModule, ScanResult, Explanation, ActionPlan, ActionItem,
     Finding, ComplianceLevel, Confidence, GapType,
@@ -269,7 +270,7 @@ class Art60Module(BaseArticleModule):
                 "indemnification. Based on: EU AI Act Art. 60, Annex IX."
             ),
             enforcement_date=applicable_from(60),
-            waiting_for="CEN-CENELEC harmonized standard for AI real-world testing (expected Q4 2026)",
+            waiting_for=standard_status(60),
         )
 
     def action_plan(self, scan_result: ScanResult) -> ActionPlan:

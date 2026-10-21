@@ -253,11 +253,9 @@ class Art49Module(BaseArticleModule):
             project_path=scan_result.project_path,
             actions=actions,
             disclaimer=(
-                "EU database registration is a largely process-oriented obligation "
-                "that cannot be fully verified from code. Human expert review is essential "
-                "to verify registration completeness. Based on ComplianceLint compliance "
-                "checklist. Official CEN-CENELEC standards (expected Q4 2026) may modify "
-                "these requirements."
+                "EU database registration is a largely process-oriented obligation that cannot be fully verified "
+                "from code. Human expert review is essential to verify registration completeness. Based on "
+                "ComplianceLint compliance checklist."
             ),
         )
 

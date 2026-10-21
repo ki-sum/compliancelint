@@ -44,6 +44,7 @@ from datetime import datetime, timezone
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from core.application_dates import applicable_from
+from core.harmonised_standards import standard_status
 from core.protocol import (
     BaseArticleModule, ScanResult, Explanation, ActionPlan, ActionItem,
     Finding, ComplianceLevel, Confidence, GapType,
@@ -271,7 +272,7 @@ class Art43Module(BaseArticleModule):
                 "and triggering reassessment. Based on: ISO/IEC 42001:2023, ISO/IEC 17065:2012."
             ),
             enforcement_date=applicable_from(43),
-            waiting_for="CEN-CENELEC harmonized standard for Art. 43 (expected Q4 2026)",
+            waiting_for=standard_status(43),
         )
 
     def action_plan(self, scan_result: ScanResult) -> ActionPlan:
@@ -333,10 +334,9 @@ class Art43Module(BaseArticleModule):
             project_path=scan_result.project_path,
             actions=actions,
             disclaimer=(
-                "Conformity assessment is a largely process-oriented obligation that cannot be "
-                "fully verified from code. Human expert review and potentially notified body "
-                "involvement are essential. Based on ComplianceLint compliance checklist. "
-                "Official CEN-CENELEC standards (expected Q4 2026) may modify these requirements."
+                "Conformity assessment is a largely process-oriented obligation that cannot be fully verified from "
+                "code. Human expert review and potentially notified body involvement are essential. Based on "
+                "ComplianceLint compliance checklist."
             ),
         )
 

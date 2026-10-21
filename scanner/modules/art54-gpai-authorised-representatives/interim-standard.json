@@ -5,12 +5,12 @@
     "version": "0.1.0",
     "date": "2026-04-03",
     "status": "draft",
-    "disclaimer": "This is an interim standard developed by ComplianceLint. It will be superseded by the CEN-CENELEC harmonized standard.",
+    "disclaimer": "This is an interim checklist developed by ComplianceLint. It is not a harmonised standard and does not itself give a presumption of conformity. Article 40(2) provides for standardisation requests covering, as applicable, the obligations in Chapter V, Section 2; no harmonised standard for Article 54 has been published. Article 54 applies directly. The Article 56 code-of-practice mechanism is expressly aimed at the obligations in Articles 53 and 55, not Article 54.",
     "basis": [
       "EU AI Act Article 54 (official text)",
       "EU AI Office guidance on third-country provider obligations"
     ],
-    "awaiting_standard": "CEN-CENELEC harmonized standard for Art. 54 (expected Q4 2026)"
+    "awaiting_standard": "Article 40(2) provides for standardisation requests covering, as applicable, the obligations in Chapter V, Section 2; no harmonised standard for Article 54 has been published. Article 54 applies directly. The Article 56 code-of-practice mechanism is expressly aimed at the obligations in Articles 53 and 55, not Article 54."
   },
   "requirements": [
     {

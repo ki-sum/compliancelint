@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "date": "2026-08-11",
     "status": "draft",
-    "disclaimer": "This is an interim standard developed by ComplianceLint based on available guidance, industry best practices, and existing provenance standards. It is NOT an official standard. It will be superseded when CEN-CENELEC publishes the harmonized standard for Article 50 (expected Q4 2026).",
+    "disclaimer": "This is an interim checklist developed by ComplianceLint. It is not a harmonised standard and does not itself give a presumption of conformity. No harmonised standard is requested for Article 50. The Commission adopted Guidelines on the implementation of the transparency obligations for certain AI systems under Article 50 on 20 July 2026. The Code of Practice on Transparency of AI-generated Content was published on 10 June 2026; the Commission and the Board have confirmed that it is an adequate voluntary tool for the marking and labelling obligations it covers.",
     "basis": [
       "EU AI Act Article 50 (official text)",
       "EU AI Act Recitals 132-134 (legislative intent for transparency)",
@@ -15,7 +15,7 @@
       "ISO/IEC 12792:2024 — Transparency taxonomy of AI systems",
       "NIST AI 100-4 — Reducing Risks Posed by Synthetic Content"
     ],
-    "awaiting_standard": "CEN-CENELEC harmonized standard for Art. 50 (expected Q4 2026)",
+    "awaiting_standard": "No harmonised standard is requested for Article 50. The Commission adopted Guidelines on the implementation of the transparency obligations for certain AI systems under Article 50 on 20 July 2026. The Code of Practice on Transparency of AI-generated Content was published on 10 June 2026; the Commission and the Board have confirmed that it is an adequate voluntary tool for the marking and labelling obligations it covers.",
     "changelog": [
       "v0.2.0 (2026-08-11) — Basis updated: swapped placeholder 'EU AI Office Guidelines (2025)' for the actual EC Commission Guidelines C(2026) 5054 final published 2026-07-20 (Layer 2 pilot). SHA256 anchor included for hallucination-free citation.",
       "v0.1.0 (2026-03-17) — Initial draft."

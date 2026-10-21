@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "date": "2026-10-03",
     "status": "draft",
-    "disclaimer": "This is an interim standard developed by ComplianceLint based on available guidance, industry best practices, and relevant ISO standards. It is NOT an official standard. It will be superseded when CEN-CENELEC publishes guidance for Article 4.",
+    "disclaimer": "This is an interim checklist developed by ComplianceLint. It is not a harmonised standard and does not itself give a presumption of conformity. No harmonised standard is requested for Article 4. The Regulation instead requires the Commission to publish practical examples of how to comply on the single information platform (Article 4(2)) and the Board to adopt recommendations setting out common objectives (Article 4(3)). The Commission has published an AI-literacy Q&A and a living repository of AI-literacy practices.",
     "basis": [
       "EU AI Act Article 4 (official text)",
       "EU AI Act Recital 91 (legislative intent on AI literacy)",
@@ -14,7 +14,7 @@
       "OECD AI Principles -- Human-centred values and fairness",
       "UNESCO Recommendation on the Ethics of AI (2021)"
     ],
-    "awaiting_standard": "AI Office guidance on Art. 4 implementation (no formal harmonized standard expected)"
+    "awaiting_standard": "No harmonised standard is requested for Article 4. The Regulation instead requires the Commission to publish practical examples of how to comply on the single information platform (Article 4(2)) and the Board to adopt recommendations setting out common objectives (Article 4(3)). The Commission has published an AI-literacy Q&A and a living repository of AI-literacy practices."
   },
   "requirements": [
     {

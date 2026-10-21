@@ -233,10 +233,9 @@ class Art71Module(BaseArticleModule):
             project_path=scan_result.project_path,
             actions=actions,
             disclaimer=(
-                "EU database data entry is a largely process-oriented obligation "
-                "that cannot be fully verified from code. Human expert review is essential "
-                "to verify data completeness. Based on ComplianceLint compliance checklist. "
-                "Official CEN-CENELEC standards (expected Q4 2026) may modify these requirements."
+                "EU database data entry is a largely process-oriented obligation that cannot be fully verified from "
+                "code. Human expert review is essential to verify data completeness. Based on ComplianceLint "
+                "compliance checklist."
             ),
         )
 

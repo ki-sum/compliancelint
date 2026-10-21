@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "date": "2026-10-04",
     "status": "draft",
-    "disclaimer": "This is an interim standard developed by ComplianceLint based on available guidance and the official EU AI Act text. It is NOT an official standard. It will be superseded when CEN-CENELEC publishes the harmonized standard for Article 6 (expected Q4 2026).",
+    "disclaimer": "This is an interim checklist developed by ComplianceLint. It is not a harmonised standard and does not itself give a presumption of conformity. No harmonised standard is requested for Article 6 classification. Article 6(5) requires Commission guidelines with practical examples. The Commission published draft guidelines on the classification of high-risk AI systems on 19 May 2026.",
     "basis": [
       "EU AI Act Article 6 (official text)",
       "EU AI Act Annex I (Union harmonisation legislation)",
@@ -14,7 +14,7 @@
       "EU AI Act Article 6(3) exception criteria",
       "European Commission guidelines on high-risk classification (2025)"
     ],
-    "awaiting_standard": "CEN-CENELEC harmonized standard for Art. 6 classification (expected Q4 2026)"
+    "awaiting_standard": "No harmonised standard is requested for Article 6 classification. Article 6(5) requires Commission guidelines with practical examples. The Commission published draft guidelines on the classification of high-risk AI systems on 19 May 2026."
   },
 
   "classification_decision_tree": {

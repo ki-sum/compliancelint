@@ -48,6 +48,7 @@ from datetime import datetime, timezone
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from core.application_dates import applicable_from
+from core.harmonised_standards import standard_status
 from core.protocol import (
     BaseArticleModule, ScanResult, Explanation, ActionPlan, ActionItem,
     Finding, ComplianceLevel, Confidence, GapType,
@@ -398,7 +399,7 @@ class Art17Module(BaseArticleModule):
                 "Based on: ISO 9001:2015, ISO/IEC 42001:2023."
             ),
             enforcement_date=applicable_from(17),
-            waiting_for="CEN-CENELEC harmonized standard (expected Q4 2026)",
+            waiting_for=standard_status(17),
         )
 
     def action_plan(self, scan_result: ScanResult) -> ActionPlan:
@@ -413,8 +414,12 @@ class Art17Module(BaseArticleModule):
                 details=(
                     "Art. 17(1) requires a QMS documented as written policies, procedures, "
                     "and instructions. Create a quality manual or equivalent covering all "
-                    "13 aspects listed in Art. 17(1)(a)-(m). Consider using ISO 9001:2015 "
-                    "or ISO/IEC 42001:2023 as a framework."
+                    "13 aspects listed in Art. 17(1)(a)-(m). The reference of the harmonised "
+                    "standard EN 18286:2026 (quality management system) was published in the "
+                    "Official Journal of the European Union on 14 October 2026; the European "
+                    "Commission states that providers implementing it benefit from a presumption of "
+                    "conformity with the Article 17 requirements covered by the standard. ISO 9001:2015 "
+                    "or ISO/IEC 42001:2023 can also serve as a framework."
                 ),
                 effort="16-40 hours",
                 action_type="human_judgment_required",

@@ -24,6 +24,7 @@ from datetime import datetime, timezone
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from core.application_dates import applicable_from
+from core.harmonised_standards import standard_status
 from core.protocol import (
     BaseArticleModule, ScanResult, Explanation, ActionPlan, ActionItem,
     Finding, ComplianceLevel, Confidence, GapType,
@@ -232,7 +233,7 @@ class Art47Module(BaseArticleModule):
                 "up-to-date. Based on: EU AI Act Annex V, ISO/IEC 17050-1:2004."
             ),
             enforcement_date=applicable_from(47),
-            waiting_for="CEN-CENELEC harmonized standard for Art. 47 (expected Q4 2026)",
+            waiting_for=standard_status(47),
         )
 
     def action_plan(self, scan_result: ScanResult) -> ActionPlan:
@@ -297,11 +298,9 @@ class Art47Module(BaseArticleModule):
             project_path=scan_result.project_path,
             actions=actions,
             disclaimer=(
-                "The EU Declaration of Conformity is a largely document-oriented obligation "
-                "that cannot be fully verified from code. Human expert review is essential "
-                "to verify Annex V completeness and legal adequacy. Based on ComplianceLint "
-                "compliance checklist. Official CEN-CENELEC standards (expected Q4 2026) may "
-                "modify these requirements."
+                "The EU Declaration of Conformity is a largely document-oriented obligation that cannot be fully "
+                "verified from code. Human expert review is essential to verify Annex V completeness and legal "
+                "adequacy. Based on ComplianceLint compliance checklist."
             ),
         )
 

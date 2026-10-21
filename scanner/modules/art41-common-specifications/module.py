@@ -24,6 +24,7 @@ from datetime import datetime, timezone
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from core.application_dates import applicable_from
+from core.harmonised_standards import standard_status
 from core.protocol import (
     BaseArticleModule, ScanResult, Explanation, ActionPlan, ActionItem,
     Finding, ComplianceLevel, Confidence, GapType,
@@ -210,7 +211,7 @@ class Art41Module(BaseArticleModule):
                 "Based on: EU AI Act Art. 41, Recital 124."
             ),
             enforcement_date=applicable_from(41),
-            waiting_for="CEN-CENELEC harmonized standards for AI Act (expected 2026)",
+            waiting_for=standard_status(41),
         )
 
     def action_plan(self, scan_result: ScanResult) -> ActionPlan:
@@ -269,10 +270,9 @@ class Art41Module(BaseArticleModule):
             project_path=scan_result.project_path,
             actions=actions,
             disclaimer=(
-                "Common specifications compliance is largely process-oriented and context-dependent. "
-                "As of the current date, no common specifications have been formally adopted under "
-                "Art. 41. Based on ComplianceLint compliance checklist. Official CEN-CENELEC "
-                "standards (expected Q4 2026) may modify these requirements."
+                "Common specifications compliance is largely process-oriented and context-dependent. As of the "
+                "current date, no common specifications have been formally adopted under Art. 41. Based on "
+                "ComplianceLint compliance checklist."
             ),
         )
 

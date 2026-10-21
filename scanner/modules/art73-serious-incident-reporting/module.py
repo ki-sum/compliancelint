@@ -24,6 +24,7 @@ from datetime import datetime, timezone
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from core.application_dates import applicable_from
+from core.harmonised_standards import standard_status
 from core.protocol import (
     BaseArticleModule, ScanResult, Explanation, ActionPlan, ActionItem,
     Finding, ComplianceLevel, Confidence, GapType,
@@ -264,7 +265,7 @@ class Art73Module(BaseArticleModule):
                 "Based on: ISO/IEC 42001:2023, ISO 9001:2015 (nonconformity and corrective action)."
             ),
             enforcement_date=applicable_from(73),
-            waiting_for="CEN-CENELEC harmonized standard for AI incident reporting (expected Q4 2026)",
+            waiting_for=standard_status(73),
         )
 
     def action_plan(self, scan_result: ScanResult) -> ActionPlan:
@@ -362,10 +363,9 @@ class Art73Module(BaseArticleModule):
             project_path=scan_result.project_path,
             actions=actions,
             disclaimer=(
-                "Art. 73 is a provider obligation for high-risk AI systems. Incident reporting "
-                "requires operational readiness and authority relationships beyond documentation. "
-                "Based on ComplianceLint compliance checklist. Official CEN-CENELEC standards "
-                "(expected Q4 2026) may modify these requirements."
+                "Art. 73 is a provider obligation for high-risk AI systems. Incident reporting requires operational "
+                "readiness and authority relationships beyond documentation. Based on ComplianceLint compliance "
+                "checklist."
             ),
         )
 

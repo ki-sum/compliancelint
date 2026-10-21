@@ -5,7 +5,7 @@
     "version": "0.1.0",
     "date": "2026-04-03",
     "status": "draft",
-    "disclaimer": "This is an interim standard developed by ComplianceLint. It will be superseded when CEN-CENELEC publishes the harmonized standard for AI incident reporting.",
+    "disclaimer": "This is an interim checklist developed by ComplianceLint. It is not a harmonised standard and does not itself give a presumption of conformity. No harmonised standard is requested specifically for Article 73. Article 73(7) requires dedicated Commission guidance on serious-incident reporting; the Commission published draft guidance and a reporting template on 26 September 2025.",
     "basis": [
       "EU AI Act Article 73 (official text)",
       "EU AI Act Recitals 134-136 (legislative intent on incident reporting)",
@@ -13,7 +13,7 @@
       "ISO 9001:2015 -- Quality management systems (nonconformity and corrective action)",
       "EU Decision 768/2008/EC -- New Legislative Framework (market surveillance)"
     ],
-    "awaiting_standard": "CEN-CENELEC harmonized standard for AI incident reporting (expected Q4 2026)"
+    "awaiting_standard": "No harmonised standard is requested specifically for Article 73. Article 73(7) requires dedicated Commission guidance on serious-incident reporting; the Commission published draft guidance and a reporting template on 26 September 2025."
   },
 
   "requirements": [

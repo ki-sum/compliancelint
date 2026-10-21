@@ -5,7 +5,7 @@
     "version": "0.1.0",
     "date": "2026-03-17",
     "status": "draft",
-    "disclaimer": "This is an interim standard developed by ComplianceLint based on available guidance, industry best practices, and relevant ISO standards. It is NOT an official standard. It will be superseded when CEN-CENELEC publishes the harmonized standard for Article 15 (expected Q4 2026).",
+    "disclaimer": "This is an interim checklist developed by ComplianceLint. It is not a harmonised standard and does not itself give a presumption of conformity. Harmonised standards and, where necessary, European standardisation deliverables on accuracy, robustness and cybersecurity specifications for AI systems are being developed under Commission Implementing Decision C(2025) 3871, Annex I, points 6 to 8. No official date for publication of their references in the Official Journal of the European Union has been announced.",
     "basis": [
       "EU AI Act Article 15 (official text)",
       "EU AI Act Recital 74 (legislative intent on accuracy, robustness, cybersecurity)",
@@ -19,7 +19,7 @@
       "NIST AI 100-2 — Adversarial Machine Learning",
       "MITRE ATLAS — Adversarial Threat Landscape for AI Systems"
     ],
-    "awaiting_standard": "CEN-CENELEC harmonized standard for Art. 15 (expected Q4 2026)"
+    "awaiting_standard": "Harmonised standards and, where necessary, European standardisation deliverables on accuracy, robustness and cybersecurity specifications for AI systems are being developed under Commission Implementing Decision C(2025) 3871, Annex I, points 6 to 8. No official date for publication of their references in the Official Journal of the European Union has been announced."
   },
 
   "requirements": [

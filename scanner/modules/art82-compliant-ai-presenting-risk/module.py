@@ -21,6 +21,7 @@ from datetime import datetime, timezone
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from core.application_dates import applicable_from
+from core.harmonised_standards import standard_status
 from core.protocol import (
     BaseArticleModule, ScanResult, Explanation, ActionPlan, ActionItem,
     Finding, ComplianceLevel, Confidence, GapType,
@@ -161,7 +162,7 @@ class Art82Module(BaseArticleModule):
                 "prescribed by the market surveillance authority."
             ),
             enforcement_date=applicable_from(82),
-            waiting_for="CEN-CENELEC harmonized standard (expected Q4 2026)",
+            waiting_for=standard_status(82),
         )
 
     def action_plan(self, scan_result: ScanResult) -> ActionPlan:
@@ -208,11 +209,9 @@ class Art82Module(BaseArticleModule):
             project_path=scan_result.project_path,
             actions=actions,
             disclaimer=(
-                "Art. 82 applies when market surveillance authorities evaluate compliant "
-                "AI systems that nevertheless present a risk. Proactive risk assessment "
-                "and corrective action planning helps ensure timely response. Based on "
-                "ComplianceLint compliance checklist. Official CEN-CENELEC standards "
-                "(expected Q4 2026) may modify these requirements."
+                "Art. 82 applies when market surveillance authorities evaluate compliant AI systems that "
+                "nevertheless present a risk. Proactive risk assessment and corrective action planning helps ensure "
+                "timely response. Based on ComplianceLint compliance checklist."
             ),
         )
 

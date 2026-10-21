@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "date": "2026-10-03",
     "status": "draft",
-    "disclaimer": "This is an interim standard developed by ComplianceLint. It will be superseded when CEN-CENELEC publishes the harmonized standard for fundamental rights impact assessment.",
+    "disclaimer": "This is an interim checklist developed by ComplianceLint. It is not a harmonised standard and does not itself give a presumption of conformity. No harmonised standard is requested specifically for Article 27 in the Commission's standardisation request (Commission Implementing Decision C(2025) 3871). Article 27(5) requires the AI Office to develop a questionnaire template, including through an automated tool, for the fundamental rights impact assessment. The Commission states that guidance with a template is being prepared.",
     "basis": [
       "EU AI Act Article 27 (official text)",
       "EU AI Act Recitals 94-96 (legislative intent on fundamental rights impact assessment)",
@@ -13,7 +13,7 @@
       "ISO/IEC 23894:2023 -- AI risk management",
       "GDPR Article 35 -- Data protection impact assessment"
     ],
-    "awaiting_standard": "CEN-CENELEC harmonized standard for fundamental rights impact assessment (expected Q4 2026)"
+    "awaiting_standard": "No harmonised standard is requested specifically for Article 27 in the Commission's standardisation request (Commission Implementing Decision C(2025) 3871). Article 27(5) requires the AI Office to develop a questionnaire template, including through an automated tool, for the fundamental rights impact assessment. The Commission states that guidance with a template is being prepared."
   },
   "requirements": [
     {

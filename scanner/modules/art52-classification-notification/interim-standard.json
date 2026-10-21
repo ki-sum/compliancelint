@@ -5,12 +5,12 @@
     "version": "0.1.0",
     "date": "2026-04-03",
     "status": "draft",
-    "disclaimer": "This is an interim standard developed by ComplianceLint. It will be superseded by the CEN-CENELEC harmonized standard.",
+    "disclaimer": "This is an interim checklist developed by ComplianceLint. It is not a harmonised standard and does not itself give a presumption of conformity. No harmonised standard is requested for Article 52; Article 52 is in Chapter V, Section 1. Article 52(4) empowers the Commission to adopt delegated acts amending the criteria in Annex XIII.",
     "basis": [
       "EU AI Act Article 52 (official text)",
       "EU AI Office notification procedures"
     ],
-    "awaiting_standard": "CEN-CENELEC harmonized standard for Art. 52 (expected Q4 2026)"
+    "awaiting_standard": "No harmonised standard is requested for Article 52; Article 52 is in Chapter V, Section 1. Article 52(4) empowers the Commission to adopt delegated acts amending the criteria in Annex XIII."
   },
   "requirements": [
     {

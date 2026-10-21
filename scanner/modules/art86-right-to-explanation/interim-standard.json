@@ -5,7 +5,7 @@
     "version": "0.1.0",
     "date": "2026-04-03",
     "status": "draft",
-    "disclaimer": "This is an interim standard developed by ComplianceLint. It will be superseded when CEN-CENELEC publishes the harmonized standard for AI transparency and explainability.",
+    "disclaimer": "This is an interim checklist developed by ComplianceLint. It is not a harmonised standard and does not itself give a presumption of conformity. No harmonised standard is requested for Article 86. The right to obtain a clear and meaningful explanation in the circumstances defined by Article 86 applies directly; the Article does not provide for a standard, code, template or implementing act specific to Article 86.",
     "basis": [
       "EU AI Act Article 86 (official text)",
       "EU AI Act Recitals 171-173 (legislative intent on right to explanation)",
@@ -13,7 +13,7 @@
       "ISO/IEC TR 24028:2020 -- AI trustworthiness (explainability)",
       "GDPR Article 22 -- Automated individual decision-making"
     ],
-    "awaiting_standard": "CEN-CENELEC harmonized standard for AI transparency and explainability (expected Q4 2026)"
+    "awaiting_standard": "No harmonised standard is requested for Article 86. The right to obtain a clear and meaningful explanation in the circumstances defined by Article 86 applies directly; the Article does not provide for a standard, code, template or implementing act specific to Article 86."
   },
 
   "requirements": [

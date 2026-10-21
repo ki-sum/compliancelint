@@ -26,11 +26,10 @@
       "published": [
         "ISO 9001:2015 -- Quality management systems",
         "ISO/IEC 42001:2023 -- AI management system",
-        "ISO 13485:2016 -- Medical devices QMS (for Annex I medical device AI)"
+        "ISO 13485:2016 -- Medical devices QMS (for Annex I medical device AI)",
+        "EN 18286:2026 -- Artificial intelligence -- Quality management system for EU AI Act regulatory purposes (harmonised standard; Commission Implementing Decision (EU) 2026/2274, OJ L 2026/2274, 14.10.2026)"
       ],
-      "upcoming": [
-        "CEN-CENELEC harmonized standard for Art. 17 (expected Q4 2026)"
-      ]
+      "upcoming": []
     },
     "amendments": [
       {

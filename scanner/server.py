@@ -37,6 +37,7 @@ from core.config import ProjectConfig
 from core.evidence import load_evidence, apply_evidence_to_findings
 from core.error_response import dump_error
 from core.obligation_lookup import unique_obligation_count
+from core import harmonised_standards as hs_texts
 from core.upgrade_hint import (
     append_upgrade_hint,
     cache_tier,
@@ -2863,8 +2864,7 @@ def cl_action_plan(project_path: str, regulation: str = "eu-ai-act", article: in
         # has mapped Layer 2 materials.
         "interpretive_materials_by_article": interpretive_materials_by_article,
         "disclaimer": (
-            "This action plan is based on ComplianceLint compliance checklist and best practices. "
-            "Official CEN-CENELEC standards (expected Q4 2026) may modify these requirements. "
+            hs_texts.ACTION_PLAN_DISCLAIMER + " "
             + (
                 "Verbatim EU AI Act Recital text in `related_recitals_by_article` is drawn from "
                 "the official Regulation (EU) 2024/1689 PDF (via pdfplumber) — use as ground "
@@ -2897,7 +2897,7 @@ def cl_check_updates() -> str:
 
     Returns the current status of relevant standards and upcoming deadlines.
     """
-    from core import application_dates
+    from core import application_dates, harmonised_standards
 
     _check_updates_response = json.dumps({
         "last_checked": application_dates._today().isoformat(),
@@ -2906,11 +2906,15 @@ def cl_check_updates() -> str:
         # scanner/data/application_dates.json; status computed against today.
         "upcoming_deadlines": application_dates.milestones_status(),
         "standards_status": [
-            {
-                "standard": "prEN 18286 — AI Quality Management System",
-                "status": "Public Enquiry phase",
-                "expected": "Q4 2026",
-            },
+            # harmonised standards cited in the OJ — core/harmonised_standards.py
+            *(
+                {
+                    "standard": f"{std['reference']} — {std['title']}",
+                    "status": harmonised_standards.update_check_status(std),
+                    "presumption_of_conformity_from": std["presumption_from"],
+                }
+                for std in harmonised_standards.CITED_STANDARDS
+            ),
             {
                 "standard": "ISO/IEC DIS 24970 — AI System Logging",
                 "status": "Draft International Standard",
@@ -2957,6 +2961,10 @@ def cl_interim_standard(article_number: int) -> str:  # Tool name kept for backw
             awaiting = ""
             if isinstance(md, dict):
                 awaiting = str(md.get("awaiting_standard", "") or "")
+            from core.harmonised_standards import STANDARD_STATUS, cited_for_article
+            _cited = cited_for_article(article_number)
+            # legal review 2026-10-21 — the article's text from core/harmonised_standards.py
+            awaiting = STANDARD_STATUS.get(article_number, awaiting)
 
             enriched = {
                 "is_official_standard": False,
@@ -2975,6 +2983,8 @@ def cl_interim_standard(article_number: int) -> str:  # Tool name kept for backw
                     or "An official harmonized standard has not been "
                     "announced for this article yet."
                 ),
+                # Harmonised standards cited in the OJ for this article (empty when none).
+                "official_harmonised_standards": _cited,
                 # §AD.5b — Recital interpretive layer (full verbatim
                 # text). Empty list when no Recitals reference this
                 # article OR when recitals.json is unavailable.

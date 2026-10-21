@@ -32,6 +32,7 @@ from datetime import datetime, timezone
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from core.application_dates import applicable_from
+from core.harmonised_standards import standard_status
 from core.protocol import (
     BaseArticleModule, ScanResult, Explanation, ActionPlan, ActionItem,
     Finding, ComplianceLevel, Confidence, GapType,
@@ -206,7 +207,7 @@ class Art27Module(BaseArticleModule):
                 "obligations. Based on: ISO/IEC 42001:2023, ISO/IEC 23894:2023."
             ),
             enforcement_date=applicable_from(27),
-            waiting_for="CEN-CENELEC harmonized standard for fundamental rights impact assessment (expected Q4 2026)",
+            waiting_for=standard_status(27),
         )
 
     def action_plan(self, scan_result: ScanResult) -> ActionPlan:
@@ -281,11 +282,9 @@ class Art27Module(BaseArticleModule):
             project_path=scan_result.project_path,
             actions=actions,
             disclaimer=(
-                "Art. 27 is a deployer-addressed article. The FRIA is a substantive document "
-                "requiring human judgment about fundamental rights impacts. Automated scanning "
-                "can only detect the presence of documentation, not its adequacy. "
-                "Based on ComplianceLint compliance checklist. Official CEN-CENELEC standards "
-                "(expected Q4 2026) may modify these requirements."
+                "Art. 27 is a deployer-addressed article. The FRIA is a substantive document requiring human "
+                "judgment about fundamental rights impacts. Automated scanning can only detect the presence of "
+                "documentation, not its adequacy. Based on ComplianceLint compliance checklist."
             ),
         )
 

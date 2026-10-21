@@ -28,6 +28,7 @@ from datetime import datetime, timezone
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from core.application_dates import applicable_from
+from core.harmonised_standards import standard_status
 from core.protocol import (
     BaseArticleModule, ScanResult, Explanation, ActionPlan, ActionItem,
     Finding, ComplianceLevel, Confidence, GapType,
@@ -301,7 +302,7 @@ class Art10Module(BaseArticleModule):
                 "Based on: ISO/IEC 5259 series, ISO/IEC TR 24027:2021."
             ),
             enforcement_date=applicable_from(10),
-            waiting_for="CEN-CENELEC harmonized standard (expected Q4 2026)",
+            waiting_for=standard_status(10),
         )
 
     def action_plan(self, scan_result: ScanResult) -> ActionPlan:

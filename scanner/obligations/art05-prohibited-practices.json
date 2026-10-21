@@ -6,14 +6,12 @@
     "decomposition_date": "2026-03-17",
     "related_standards": {
       "published": [
+        "Commission Guidelines on prohibited artificial intelligence practices established by Regulation (EU) 2024/1689 (C(2025) 884 final, 4 February 2025)",
         "European Data Protection Board Guidelines on biometric data processing under GDPR",
         "Fundamental Rights Agency — AI and Fundamental Rights (structural alignment with Art. 5 prohibitions)",
         "ISO/IEC 42001:2023 — AI management system (governance controls relevant to Art. 5 self-assessment)"
       ],
-      "upcoming": [
-        "AI Office guidelines on interpretation of Art. 5 prohibited practices (expected 2026)",
-        "CEN-CENELEC guidance on prohibited practice identification methodologies"
-      ]
+      "upcoming": []
     },
     "primary_official_source": {
       "name": "EUR-Lex — Official Journal of the European Union",

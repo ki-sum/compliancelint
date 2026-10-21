@@ -20,6 +20,7 @@ from datetime import datetime, timezone
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from core.application_dates import applicable_from
+from core.harmonised_standards import standard_status
 from core.protocol import (
     BaseArticleModule, ScanResult, Explanation, ActionPlan, ActionItem,
     Finding, ComplianceLevel, Confidence, GapType,
@@ -403,7 +404,7 @@ class Art50Module(BaseArticleModule):
                 "ISO/IEC 12792:2024, NIST AI 100-4."
             ),
             enforcement_date=applicable_from(50),
-            waiting_for="CEN-CENELEC harmonized standard for Art. 50 (expected Q4 2026)",
+            waiting_for=standard_status(50),
         )
 
     def action_plan(self, scan_result: ScanResult) -> ActionPlan:
@@ -536,9 +537,8 @@ class Art50Module(BaseArticleModule):
             project_path=scan_result.project_path,
             actions=actions,
             disclaimer=(
-                "Based on ComplianceLint compliance checklist. Art. 50 applies broadly to almost all "
-                "AI systems. Official CEN-CENELEC standards (expected Q4 2026) may modify "
-                "these requirements. C2PA is recommended but not yet mandated by harmonized standard."
+                "Based on ComplianceLint compliance checklist. Art. 50 applies broadly to almost all AI systems. "
+                "C2PA is recommended but not yet mandated by harmonized standard."
             ),
         )
 

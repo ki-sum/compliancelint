@@ -21,6 +21,7 @@ from datetime import datetime, timezone
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from core.application_dates import applicable_from
+from core.harmonised_standards import standard_status
 from core.protocol import (
     BaseArticleModule, ScanResult, Explanation, ActionPlan, ActionItem,
     Finding, ComplianceLevel, Confidence, GapType,
@@ -325,7 +326,7 @@ class Art06Module(BaseArticleModule):
                 "the final classification always requires human judgment on intended purpose."
             ),
             enforcement_date=applicable_from(6),
-            waiting_for="CEN-CENELEC harmonized standard for Art. 6 classification (expected Q4 2026)",
+            waiting_for=standard_status(6),
         )
 
     # ── Action Plan ──
@@ -489,8 +490,8 @@ class Art06Module(BaseArticleModule):
                 "the final classification decision. The intended purpose of the AI system, "
                 "not its technical implementation, determines the classification. Legal "
                 "counsel familiar with the EU AI Act is recommended for final classification. "
-                "Based on ComplianceLint compliance checklist; official CEN-CENELEC standards (expected Q4 2026) "
-                "may modify these criteria."
+                "Based on ComplianceLint compliance checklist; the Commission guidelines under "
+                "Art. 6(5) specify the practical implementation of these criteria."
             ),
         )
 

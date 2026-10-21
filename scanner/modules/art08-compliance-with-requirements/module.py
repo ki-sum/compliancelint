@@ -18,6 +18,7 @@ from datetime import datetime, timezone
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from core.application_dates import applicable_from
+from core.harmonised_standards import standard_status
 from core.protocol import (
     BaseArticleModule, ScanResult, Explanation, ActionPlan, ActionItem,
     Finding, ComplianceLevel, Confidence, GapType,
@@ -216,7 +217,7 @@ class Art08Module(BaseArticleModule):
                 "compliance documentation. Based on: EU AI Act Art. 8(1)-(2)."
             ),
             enforcement_date=applicable_from(8),
-            waiting_for="CEN-CENELEC harmonized standard (expected Q4 2026)",
+            waiting_for=standard_status(8),
         )
 
     def action_plan(self, scan_result: ScanResult) -> ActionPlan:
@@ -273,10 +274,8 @@ class Art08Module(BaseArticleModule):
             project_path=scan_result.project_path,
             actions=actions,
             disclaimer=(
-                "Art. 8 is a meta-requirement that aggregates compliance across "
-                "Art. 9-15. Run individual article scans for detailed gap analysis. "
-                "Based on ComplianceLint compliance checklist. Official CEN-CENELEC "
-                "standards (expected Q4 2026) may modify requirements."
+                "Art. 8 is a meta-requirement that aggregates compliance across Art. 9-15. Run individual article "
+                "scans for detailed gap analysis. Based on ComplianceLint compliance checklist."
             ),
         )
 

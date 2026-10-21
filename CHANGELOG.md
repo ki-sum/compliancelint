@@ -4,6 +4,28 @@ All notable changes to ComplianceLint will be documented in this file.
 
 This project adheres to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Changed — harmonised standards and the instruments each article waits for (legal review)
+- EN 18286:2026 (quality management system) is the first harmonised standard cited under the AI Act: Commission
+  Implementing Decision (EU) 2026/2274 published its reference in the Official Journal of the European Union on
+  14 October 2026. `cl_check_updates` reports it as cited, no longer as "prEN 18286 — Public Enquiry phase,
+  expected Q4 2026". Article 17 (`cl_explain`, action plan, obligation file, `cl_interim_standard`) and Article 16
+  name it; the European Commission states that providers implementing it benefit from a presumption of conformity
+  with the Article 17 requirements covered by the standard, whose exact coverage is set out in its Annex ZA.
+  `cl_interim_standard` has a new top-level `official_harmonised_standards` list (empty for articles without one).
+- Every article's "waiting for" text, the interim checklists and the obligation files no longer promise a
+  "CEN-CENELEC harmonized standard (expected Q4 2026)" or "(expected 2027)". They say whether a harmonised standard
+  is being developed under the Commission's standardisation request C(2025) 3871 (Articles 9, 10, 12, 13, 14, 15
+  and 43, no date announced), whether none is requested, and which instrument the Regulation provides instead
+  (for example the Article 6(5) guidelines, the Article 50 guidelines and code of practice, the general-purpose AI
+  code of practice under Article 56, the Article 72(3) guidance due by 2 September 2027).
+- The action-plan disclaimer no longer says that standards "may modify these requirements": a ComplianceLint
+  action plan gives no presumption of conformity, a cited harmonised standard gives it only for the requirements
+  it covers, and harmonised standards do not amend the Regulation.
+- Article 5: the Commission Guidelines on prohibited AI practices (C(2025) 884 final, 4 February 2025) are listed
+  as published, no longer as expected.
+
 ## [1.3.2] — 2026-10-15
 
 ### Fixed

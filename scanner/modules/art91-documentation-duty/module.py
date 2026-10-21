@@ -29,6 +29,7 @@ from datetime import datetime, timezone
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from core.application_dates import applicable_from
+from core.harmonised_standards import standard_status
 from core.protocol import (
     BaseArticleModule, ScanResult, Explanation, ActionPlan, ActionItem,
     Finding, ComplianceLevel, Confidence, GapType,
@@ -199,7 +200,7 @@ class Art91Module(BaseArticleModule):
                 "Commission information requests."
             ),
             enforcement_date=applicable_from(91),
-            waiting_for="CEN-CENELEC harmonized standard for GPAI obligations (expected 2027)",
+            waiting_for=standard_status(91),
         )
 
     # ── Action Plan ──
@@ -248,10 +249,8 @@ class Art91Module(BaseArticleModule):
             project_path=scan_result.project_path,
             actions=actions,
             disclaimer=(
-                "Art. 91 information supply is primarily an organizational/legal matter. "
-                "Automated scanning can only check for documentation readiness indicators. "
-                "Based on ComplianceLint compliance checklist; official CEN-CENELEC "
-                "standards (expected 2027) may modify these requirements."
+                "Art. 91 information supply is primarily an organizational/legal matter. Automated scanning can only "
+                "check for documentation readiness indicators. Based on ComplianceLint compliance checklist."
             ),
         )
 
