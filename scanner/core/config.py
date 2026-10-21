@@ -74,6 +74,11 @@ class ProjectConfig:
                 try:
                     with open(path, 'r', encoding='utf-8') as f:
                         data = json.load(f)
+                    if data.get('saas_api_key'):
+                        # the classification metadata is fetched with the project's key (cl_connect writes it here,
+                        # not to ~/.compliancelint/config.json) — found on the production site, 2026-10-21
+                        from core.classification_client import use_api_key
+                        use_api_key(data['saas_api_key'])
                     return cls(
                         skip_articles=data.get('skip_articles', []),
                         process_managed_externally=data.get('process_managed_externally', {}),

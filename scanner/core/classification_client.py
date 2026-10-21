@@ -13,8 +13,11 @@ caching so re-runs only pay one round-trip per article (304 if file
 unchanged) instead of re-downloading.
 
 Falls back to **degraded mode** (returns None) when:
-    - `~/.compliancelint/config.json` is missing or has no api_key
-      (user hasn't run `cl_connect` yet)
+    - neither `~/.compliancelint/config.json` nor the project being scanned
+      has an api_key (user hasn't run `cl_connect` yet). cl_connect stores
+      the key in the project's `.compliancelintrc`; ProjectConfig.load hands
+      it to this module (use_api_key) — before 2026-10-21 only config.json was
+      read, which nothing writes, so connected scans ran degraded too
     - SaaS endpoint is unreachable (network failure / timeout)
     - Endpoint returns 401 / 5xx
 
@@ -26,9 +29,11 @@ metadata unlocks on free sign-up at compliancelint.dev.
 """
 from __future__ import annotations
 
+import importlib
 import json
 import logging
 import os
+import sys
 import urllib.error
 import urllib.request
 from pathlib import Path
@@ -44,6 +49,9 @@ CONFIG_PATH = Path.home() / ".compliancelint" / "config.json"
 # CLI-driven so a stuck request blocks user-visible work — fail fast.
 HTTP_TIMEOUT_SEC = 10
 
+# The API key of the project being scanned (its .compliancelintrc), set by ProjectConfig.load via use_api_key.
+_project_api_key: Optional[str] = None
+
 
 class ClassificationFetchError(Exception):
     """Raised only by callers that explicitly want to fail-loud rather
@@ -51,23 +59,48 @@ class ClassificationFetchError(Exception):
     returns None (degraded mode signal)."""
 
 
+def use_api_key(key: Optional[str]) -> None:
+    """Use the API key of the project being scanned when ~/.compliancelint/config.json has none.
+
+    The module is imported under two names (`core.…` by the server, `scanner.core.…` by obligation_lookup), each with
+    its own globals — both get the key. When a new key arrives, the obligation indexes (`core.obligation_lookup`,
+    `scanner.core.obligation_lookup`) are dropped once so the next lookup fetches the classification metadata with
+    it; an index built with the same key is kept.
+    """
+    key = key or None
+    changed = False
+    for name in ("core.classification_client", "scanner.core.classification_client"):
+        try:
+            mod = importlib.import_module(name)
+        except ImportError:
+            continue
+        if getattr(mod, "_project_api_key", None) != key:
+            mod._project_api_key = key
+            changed = True
+    if changed and key:
+        for name in ("core.obligation_lookup", "scanner.core.obligation_lookup"):
+            mod = sys.modules.get(name)
+            if mod is not None:
+                mod.reset_cache()
+
+
 def _load_api_key() -> Optional[str]:
-    """Read api_key from ~/.compliancelint/config.json. Returns None on
-    any failure (file missing, JSON parse error, key missing).
+    """Read api_key from ~/.compliancelint/config.json, else the project's key (use_api_key). Returns None when
+    neither exists (file missing, JSON parse error, key missing).
 
     Caller treats None as "user hasn't run cl_connect yet → degraded
     mode". Logs at debug level only — config-missing is the expected
     state for fresh installs and we don't want to spam the CLI."""
     if not CONFIG_PATH.exists():
-        return None
+        return _project_api_key
     try:
         cfg = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as e:
         logger.debug("classification_client: config.json unreadable: %s", e)
-        return None
+        return _project_api_key
     key = cfg.get("api_key")
     if not isinstance(key, str) or not key:
-        return None
+        return _project_api_key
     return key
 
 

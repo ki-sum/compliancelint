@@ -6,6 +6,18 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+- Connected projects were scanned without the detection metadata (detection method, what to scan, confidence,
+  human judgment needed) that the dashboard serves: the scanner read the API key for it only from
+  `~/.compliancelint/config.json`, which nothing writes — `cl_connect` stores the key in the project's
+  `.compliancelintrc`. `cl_analyze_project` then said "No detection hints available … once this project is
+  connected" for a connected project, findings showed an empty "Detection method", and the scanner printed the
+  offline notice. The project's key is now used, and `cl_analyze_project` loads the project settings before it
+  builds the scanning strategy.
+- Right after `cl_connect`, `cl_analyze_project` reported the plan as "unconnected" and suggested connecting: the plan
+  was learned only from the first scan. `cl_connect` now stores the plan the dashboard returns when it registers
+  the project.
+
 ### Changed — harmonised standards and the instruments each article waits for (legal review)
 - EN 18286:2026 (quality management system) is the first harmonised standard cited under the AI Act: Commission
   Implementing Decision (EU) 2026/2274 published its reference in the Official Journal of the European Union on

@@ -923,6 +923,10 @@ def analyze_project_metadata(project_path: str) -> dict:
             ci_configs.append(cp)
 
     # ── 7. Scanning strategy (dynamic from obligation JSONs) ──
+    # The project settings first: loading them hands the project's API key to the classification client, without
+    # which the strategy has no detection hints (found on the production site, 2026-10-21: built before step 9 loaded them).
+    from core.config import ProjectConfig
+    config = ProjectConfig.load(project_path)
     scanning_strategy = _build_scanning_strategy()
 
     # ── 8. Empty compliance_answers template ──
@@ -932,8 +936,6 @@ def analyze_project_metadata(project_path: str) -> dict:
 
     # ── 9. Configuration status check ──
     # Detect missing setup so AI can guide user proactively.
-    from core.config import ProjectConfig
-    config = ProjectConfig.load(project_path)
     setup_warnings = []
     if not config.saas_api_key:
         setup_warnings.append(

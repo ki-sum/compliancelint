@@ -4394,6 +4394,10 @@ async def cl_connect(
                 if isinstance(reg_data.get("repo_id"), str) and reg_data["repo_id"]:
                     from core.pending_evidence import write_cached_repo_id
                     write_cached_repo_id(project_path, reg_data["repo_id"])
+                # The plan, so that the first cl_analyze_project does not say "unconnected" (it was cached only
+                # from the first scan's settings — found on the production site, 2026-10-21).
+                if isinstance(reg_data.get("tier_at_scan"), str) and reg_data["tier_at_scan"]:
+                    cache_tier(project_path, reg_data["tier_at_scan"])
                 slog.info(
                     "cl_connect: pre-registered repo (was_new=%s, repo_id=%s)",
                     reg_data.get("was_new"),
