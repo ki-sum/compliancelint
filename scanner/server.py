@@ -1255,6 +1255,11 @@ def cl_scan(
                 "scope_errors": gate.scope_errors,
                 "fix": "Fill in risk_classification (e.g., 'high-risk' or 'limited-risk') in the _scope section of compliance_answers.",
             })
+        # A single-article scan needs the requested articles' answers only (found on the production site,
+        # 2026-10-21: cl_scan(articles="50") asked for Art. 4, 5, 6 and 111 too); "all" keeps the full check.
+        _requested = _requested_article_keys(articles)
+        if _requested is not None:
+            gate.missing_articles = [a for a in gate.missing_articles if a in _requested]
         if gate.missing_articles:
             return json.dumps({
                 "status": "needs_analysis_first",
@@ -2564,6 +2569,22 @@ def _dashboard_status_for(oids: list[str], saas_status_map: dict[str, str]) -> s
     if all(s == "NOT_APPLICABLE" for s in listed):
         return "NOT_APPLICABLE"
     return None
+
+
+def _requested_article_keys(articles: str) -> set[str] | None:
+    """The article keys ("art50") a cl_scan `articles` argument names; None for "all" or anything unparseable (the
+    full check then applies)."""
+    if not isinstance(articles, str) or articles.strip().lower() == "all":
+        return None
+    try:
+        parsed = json.loads(articles)
+        numbers = parsed if isinstance(parsed, list) else [parsed]
+    except (json.JSONDecodeError, TypeError):
+        numbers = [p for p in articles.split(",") if p.strip()]
+    try:
+        return {f"art{int(str(n).strip())}" for n in numbers}
+    except ValueError:
+        return None
 
 
 def _apply_dashboard_overlay(report: dict, status_map: dict[str, str]) -> None:
