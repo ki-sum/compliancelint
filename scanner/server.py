@@ -2345,6 +2345,10 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
         else:
             report['_meta'] = meta_extras
 
+    # The dashboard's view — Human Gates answers and evidence applied (after the auto-sync above, if any).
+    if dashboard_settings == "applied":
+        _apply_dashboard_overlay(report, _fetch_effective_status_from_saas(project_path))
+
     output = json.dumps(report, indent=2, default=str)
 
     # Phase 5 Task 15 — cross-AI-client paywall hint footer.
@@ -2560,6 +2564,47 @@ def _dashboard_status_for(oids: list[str], saas_status_map: dict[str, str]) -> s
     if all(s == "NOT_APPLICABLE" for s in listed):
         return "NOT_APPLICABLE"
     return None
+
+
+def _apply_dashboard_overlay(report: dict, status_map: dict[str, str]) -> None:
+    """Make a scan report agree with the dashboard once Human Gates answers and evidence are applied (found on the
+    production site, 2026-10-21: after the obligations were confirmed in Human Gates — dashboard Compliant — a rescan
+    still listed them under `pending_evidence` and said overall "partial").
+
+    `status_map` = the dashboard's effective statuses (_fetch_effective_status_from_saas; not-applicable obligations are
+    not listed). Pending items that are COMPLIANT there are dropped; `totals.findings_on_dashboard_now` and
+    `dashboard_overall` report what the dashboard shows now. An empty map (not connected, unreachable) changes nothing.
+    """
+    if not status_map:
+        return
+    pending = report.get("pending_evidence")
+    if isinstance(pending, dict):
+        rows = [r for r in pending.get("obligations") or [] if status_map.get(r.get("obligation_id")) != "COMPLIANT"]
+        if rows:
+            pending["obligations"] = rows
+            pending["count"] = len(rows)
+        else:
+            report.pop("pending_evidence", None)
+    counts = {"compliant": 0, "non_compliant": 0, "needs_review": 0}
+    for status in status_map.values():
+        if status == "COMPLIANT":
+            counts["compliant"] += 1
+        elif status == "NON_COMPLIANT":
+            counts["non_compliant"] += 1
+        else:
+            counts["needs_review"] += 1
+    totals = report.setdefault("totals", {})
+    totals["findings_on_dashboard_now"] = {
+        "unit": "findings (one per obligation, not-applicable ones not listed)", **counts,
+    }
+    if isinstance(totals.get("explanation"), str):
+        totals["explanation"] += (
+            " findings_on_dashboard_now is what the dashboard shows as of the last cl_sync — with the Human Gates answers"
+            " and the evidence applied; quote it (after syncing this scan) when the user asks where the project stands."
+        )
+    report["dashboard_overall"] = (
+        "non_compliant" if counts["non_compliant"] else "needs_review" if counts["needs_review"] else "compliant"
+    )
 
 
 def _fetch_effective_status_from_saas(project_path: str) -> dict[str, str]:

@@ -17,6 +17,10 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 - Right after `cl_connect`, `cl_analyze_project` reported the plan as "unconnected" and suggested connecting: the plan
   was learned only from the first scan. `cl_connect` now stores the plan the dashboard returns when it registers
   the project.
+- After obligations were confirmed in Human Gates (dashboard: Compliant), a rescan still listed them under
+  `pending_evidence` and gave no figure the dashboard shows. `cl_scan_all` now reads the dashboard's current statuses:
+  pending items that are compliant there are dropped, and `totals.findings_on_dashboard_now` with `dashboard_overall`
+  report what the dashboard shows as of the last sync.
 
 ### Changed — harmonised standards and the instruments each article waits for (legal review)
 - EN 18286:2026 (quality management system) is the first harmonised standard cited under the AI Act: Commission
