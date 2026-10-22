@@ -30,6 +30,10 @@ This project adheres to [Semantic Versioning](https://semver.org/).
   template now has one list per duty — `disclosure_evidence` (50(1)), `marking_evidence` (50(2)),
   `deep_fake_evidence` (50(4) first subparagraph), `public_interest_text_evidence` (50(4) second subparagraph) — each
   with its own description, and each finding quotes only its own list.
+- An article whose findings the dashboard's applicability profile makes not applicable is now not applicable as a
+  whole: `cl_scan_all` set those findings to not applicable but kept the article's earlier overall level (Article 111
+  read "unable_to_determine" with all four findings not applicable), and `cl_scan` for one article did not apply the
+  dashboard's obligation list at all.
 
 ### Changed — harmonised standards and the instruments each article waits for (legal review)
 - EN 18286:2026 (quality management system) is the first harmonised standard cited under the AI Act: Commission

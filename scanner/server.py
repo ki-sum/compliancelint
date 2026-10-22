@@ -2030,21 +2030,8 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
                 result = skip_result
             else:
                 result = _scan_with_retry(art_num, mod, project_path)
-            # Obligations the dashboard's applicability engine excludes (applicable_obligations) are not applicable
-            # even when another article's module reports them — e.g. Art 12's module reports ART26-OBL-6 (deployer
-            # log keeping), excluded for a deployer that is not high-risk (§16.1; acceptance run E, 2026-10-08).
             if saas_obligations is not None:
-                from core.protocol import ComplianceLevel as _CL
-                for f in result.findings:
-                    oid = f.obligation_id or ""
-                    if oid.endswith(("-NOT-APPLICABLE", "-SCAN")) or oid in saas_obligations:
-                        continue
-                    if f.level != _CL.NOT_APPLICABLE:
-                        f.level = _CL.NOT_APPLICABLE
-                        f.description = (
-                            "Not applicable per the repo's applicability profile on the ComplianceLint dashboard "
-                            "(Profiling Wizard answers). " + (f.description or "")
-                        ).strip()
+                _apply_dashboard_obligation_list(result, mod, saas_obligations)
             # Inject AI model attribution
             if ctx and getattr(ctx, "ai_model", ""):
                 result.assessed_by = ctx.ai_model
@@ -2588,6 +2575,29 @@ def _requested_article_keys(articles: str) -> set[str] | None:
         return {f"art{int(str(n).strip())}" for n in numbers}
     except ValueError:
         return None
+
+
+def _apply_dashboard_obligation_list(result, mod, applicable: set) -> None:
+    """Obligations the dashboard's applicability engine excludes (applicable_obligations) are not applicable even when
+    an article's module reports them — e.g. Art 12's module reports ART26-OBL-6 (deployer log keeping), excluded for a
+    deployer that is not high-risk (§16.1; acceptance run E, 2026-10-08). The article's overall level is computed again
+    from the findings afterwards: Art. 111 read "unable_to_determine" with all four findings not applicable (found on
+    the production site, 2026-10-22). cl_scan_all and cl_scan both apply it."""
+    from core.protocol import ComplianceLevel as _CL
+    changed = False
+    for f in result.findings:
+        oid = f.obligation_id or ""
+        if oid.endswith(("-NOT-APPLICABLE", "-SCAN")) or oid in applicable:
+            continue
+        if f.level != _CL.NOT_APPLICABLE:
+            f.level = _CL.NOT_APPLICABLE
+            f.description = (
+                "Not applicable per the repo's applicability profile on the ComplianceLint dashboard "
+                "(Profiling Wizard answers). " + (f.description or "")
+            ).strip()
+            changed = True
+    if changed:
+        result.overall_level = mod._compute_overall_level(result.findings)
 
 
 def _apply_dashboard_overlay(report: dict, status_map: dict[str, str]) -> None:
@@ -3940,6 +3950,11 @@ def _scan_single_article(article_number: int, project_path: str, context=None, r
     except Exception as e:
         logger.error("Art. %d — scan ERROR: %s", article_number, e)
         return dump_error(str(e), article=article_number, type=type(e).__name__)
+
+    # The dashboard's obligation list, as in cl_scan_all (2026-10-22: a single-article scan ignored it).
+    _saas_obls = (context.compliance_answers.get("_scope") or {}).get("_applicable_obligations_from_saas")
+    if isinstance(_saas_obls, list) and _saas_obls:
+        _apply_dashboard_obligation_list(result, mod, set(_saas_obls))
 
     # Inject AI model attribution once at the ScanResult level (not per-finding)
     if context and getattr(context, "ai_model", ""):
