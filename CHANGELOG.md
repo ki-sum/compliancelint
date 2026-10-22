@@ -6,6 +6,8 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.3.3] — 2026-10-23
+
 ### Fixed
 - Connected projects were scanned without the detection metadata (detection method, what to scan, confidence,
   human judgment needed) that the dashboard serves: the scanner read the API key for it only from

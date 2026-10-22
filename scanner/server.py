@@ -21,7 +21,7 @@ from datetime import datetime, timezone
 
 from mcp.server.fastmcp import FastMCP
 
-CL_VERSION = "1.3.2"  # ComplianceLint version — displayed in UI, PDF, and scan metadata
+CL_VERSION = "1.3.3"  # ComplianceLint version — displayed in UI, PDF, and scan metadata
 
 logger = logging.getLogger("compliancelint")
 logging.basicConfig(level=logging.INFO, format="%(name)s %(levelname)s: %(message)s",
