@@ -1221,15 +1221,17 @@ class BaseArticleModule:
         if true_level is None:
             true_level = ComplianceLevel.PARTIAL
 
+        # Every evidence item of the answer, for a "no" as well (series-2 recording, 2026-10-25, QA #37 / #36): only the
+        # first three were kept, which cut an open point and its review date from the dashboard and the Pack, and a "no"
+        # dropped what the assistant had recorded.
+        recorded = f" Evidence: {'; '.join(str(e) for e in evidence)}" if evidence else ""
         if answer is True:
             level = true_level
-            desc = true_description
-            if evidence:
-                desc += f" Evidence: {'; '.join(str(e) for e in evidence[:3])}"
+            desc = true_description + recorded
             confidence = Confidence.MEDIUM
         elif answer is False:
             level = ComplianceLevel.NON_COMPLIANT
-            desc = false_description
+            desc = false_description + recorded
             confidence = Confidence.MEDIUM
         else:
             level = ComplianceLevel.UNABLE_TO_DETERMINE
