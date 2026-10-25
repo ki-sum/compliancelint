@@ -1370,6 +1370,13 @@ def cl_scan(
                     single_payload["related_recitals_by_article"] = related_recitals_by_article
                 if interpretive_materials_by_article:
                     single_payload["interpretive_materials_by_article"] = interpretive_materials_by_article
+                # The same totals as cl_scan_all, and the dashboard's current numbers when connected (series-2
+                # recording, 2026-10-25, QA #34: without them the assistant told the user it could not give counts).
+                single_payload["totals"] = _scan_totals(
+                    {article_numbers[0]: single_payload.get("overall_level")},
+                    {article_numbers[0]: [f for f in single_payload.get("findings") or [] if isinstance(f, dict)]},
+                )
+                _apply_dashboard_overlay(single_payload, _fetch_effective_status_from_saas(project_path))
                 # v1.1.6 (2026-08-11) — Per-finding Layer 2 enrichment
                 # replaces the old `interpretive_atoms[:3]` inline dump
                 # (~3.5 KB × 8 findings = 28 KB) with just the count +
@@ -1443,6 +1450,8 @@ def cl_scan(
     # Multiple articles → scan each, persist full results to state,
     # but return compact summaries to stay within MCP response limits.
     results = {}
+    overall_for_totals: dict[int, str] = {}
+    findings_for_totals: dict[int, list] = {}
     for art_num in article_numbers:
         # Full scan + persist to state.json (complete data saved locally)
         result_json = _scan_single_article(art_num, project_path, context=ctx, regulation=regulation)
@@ -1473,12 +1482,15 @@ def cl_scan(
                 "top_findings": top,
                 "note": f"Full findings saved to state. Use cl_scan(articles=\"{art_num}\") for details.",
             }
+            overall_for_totals[art_num] = overall
+            findings_for_totals[art_num] = [f for f in findings if isinstance(f, dict)] if isinstance(findings, list) else []
         except json.JSONDecodeError:
             results[f"article_{art_num}"] = {"error": "Failed to parse scan result"}
 
-    output = json.dumps({
+    several_report = {
         "regulation": regulation,
         "articles_scanned": article_numbers,
+        "totals": _scan_totals(overall_for_totals, findings_for_totals),
         "results": results,
         # §AG.2 — Recital interpretive layer keyed by article number
         # (same shape as cl_action_plan). Empty when no covered article
@@ -1490,7 +1502,9 @@ def cl_scan(
         # cl_explain(obligation_id=..., limit=..., offset=...). Pilot
         # doc: EC Guidelines C(2026) 5054 final (304 Art 50 atoms).
         "interpretive_materials_by_article": interpretive_materials_by_article,
-    }, indent=2, default=str)
+    }
+    _apply_dashboard_overlay(several_report, _fetch_effective_status_from_saas(project_path))
+    output = json.dumps(several_report, indent=2, default=str)
 
     # v1.1.6 (2026-08-11 Bug D fix) — same _meta migration as
     # single-article path above so downstream json.loads() gets a
