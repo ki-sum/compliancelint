@@ -29,6 +29,59 @@ function detectPythonCommand() {
   return "python"; // Best guess
 }
 
+// The scanner runs at the version of this npm package (series-2 take, 2026-10-24: init used an older pip install,
+// 1.3.1, while the package was 1.3.3, without a word).
+const PACKAGE_VERSION = require("../package.json").version;
+
+/** -1 / 0 / 1 for dotted numeric versions ("1.3.10" > "1.3.3"). */
+function compareVersions(a, b) {
+  const pa = String(a).split(".").map((n) => parseInt(n, 10) || 0);
+  const pb = String(b).split(".").map((n) => parseInt(n, 10) || 0);
+  for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+    const d = (pa[i] || 0) - (pb[i] || 0);
+    if (d !== 0) return d < 0 ? -1 : 1;
+  }
+  return 0;
+}
+
+/** The version of the pip-installed scanner, or null. */
+function installedScannerVersion() {
+  try {
+    const out = execSync("pip show compliancelint", { stdio: ["ignore", "pipe", "ignore"], timeout: 5000 }).toString();
+    const m = out.match(/^Version:\s*(\S+)/m);
+    return m ? m[1] : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * An older pip-installed scanner is upgraded to this package's version; when that fails, init says so and how.
+ * Returns a note for the user, or null when nothing was needed.
+ */
+function ensureScannerVersion(installed = installedScannerVersion(), wanted = PACKAGE_VERSION, run = execSync) {
+  if (!installed || compareVersions(installed, wanted) >= 0) return null;
+  const command = `pip install --upgrade compliancelint==${wanted}`;
+  try {
+    console.log(dim(`Updating the ComplianceLint scanner ${installed} -> ${wanted} (${command})...`));
+    run(command, { stdio: "inherit", timeout: 120000 });
+    return `ComplianceLint scanner updated from ${installed} to ${wanted}.`;
+  } catch {
+    const note = `The installed ComplianceLint scanner is ${installed}, older than ${wanted}. Update it with: ${command}`;
+    console.warn(yellow(`Warning: ${note}`));
+    return note;
+  }
+}
+
+/** uvx runs the scanner of this package's version. */
+function uvxConfig(version) {
+  return {
+    command: "uvx",
+    args: ["--from", `compliancelint==${version}`, "compliancelint-server"],
+    method: "uvx",
+  };
+}
+
 /**
  * Detect the best way to run the MCP server on this machine.
  * Priority: uvx > pip-installed > python module
@@ -38,16 +91,13 @@ function detectServerConfig() {
   // Option 1: uvx (best — auto-downloads, no pre-install needed)
   try {
     execSync("uvx --version", { stdio: "ignore" });
-    return {
-      command: "uvx",
-      args: ["compliancelint-server"],
-      method: "uvx",
-    };
+    return uvxConfig(PACKAGE_VERSION);
   } catch {}
 
   // Option 2: pip-installed (compliancelint-server in PATH)
   try {
     execSync("compliancelint-server --help", { stdio: "ignore", timeout: 3000 });
+    ensureScannerVersion();
     return {
       command: "compliancelint-server",
       args: [],
@@ -60,6 +110,7 @@ function detectServerConfig() {
   // even after pip uninstall, causing false positives.
   try {
     execSync("pip show compliancelint", { stdio: "ignore", timeout: 3000 });
+    ensureScannerVersion();
     return {
       command: pythonCmd,
       args: ["-m", "scanner.server"],
@@ -70,7 +121,7 @@ function detectServerConfig() {
   // Default: pip install compliancelint, then find best way to run
   try {
     console.log(`${dim("Installing compliancelint via pip...")}`);
-    execSync("pip install compliancelint", { stdio: "inherit", timeout: 60000 });
+    execSync(`pip install compliancelint==${PACKAGE_VERSION}`, { stdio: "inherit", timeout: 60000 });
 
     // After install, check if compliancelint-server is now on PATH
     try {
@@ -416,4 +467,8 @@ ${bold("Next steps:")}
 
 }
 
-main();
+if (require.main === module) {
+  main();
+}
+
+module.exports = { compareVersions, ensureScannerVersion, uvxConfig, PACKAGE_VERSION };
