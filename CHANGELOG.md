@@ -6,6 +6,39 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.3.4] — 2026-10-25
+
+### Fixed
+- `cl_action_plan` planned every article module, whatever applied to the project: for a limited-risk chatbot (provider
+  and deployer, not high-risk, not a GPAI provider) it listed 78 actions, with GPAI systemic-risk duties as critical
+  and high-risk duties as high. With the dashboard's scan settings it now plans only the applicable articles and keeps
+  an action when one of its obligations applies. Each action lists those obligations (`obligation_ids`) and says where
+  it is answered (`where`): in Human Gates (a person's judgment), in the project (code or documents), or both.
+  `dashboard_applicability` reports what was left out, or that the profile could not be applied. The same chatbot's
+  plan now has 11 actions.
+- `cl_scan` and `cl_scan_all` reported each finding at the level of the scan itself, while a finding with evidence
+  provided is saved, and synced to the dashboard, at a higher level. After "rescan and sync" the assistant could say
+  "partial, with your evidence attached" while the dashboard showed compliant. Each finding now carries the level it is
+  saved with, the scan's own level in `level_in_this_scan` with a note, and the article's overall level and the
+  totals follow the saved levels.
+- A finding quoted only the first three evidence items of its answer, so later items — such as an open point with its
+  owner and review dates — were missing from the dashboard and the Compliance Pack. An answer "no" dropped its
+  evidence entirely. Every evidence item is now quoted, for "yes" and for "no".
+- `cl_scan` returned no `totals`; `cl_scan_all` always did. `cl_scan`, for one article or several, now carries the
+  same `totals` and, when connected, the dashboard's current numbers (`findings_on_dashboard_now`, `dashboard_overall`).
+- `cl_update_finding` with `action="acknowledge"` or `"defer"` dropped the justification: `cl_sync` sent an empty note
+  and the Compliance Pack's defer note stayed empty. The justification is now kept in the finding's history, single
+  and batch, and synced.
+- Article 50(2): the answer `has_content_watermarking` had no description. An assistant answered "no" because
+  generated text carried no watermark, although the generated images kept their provenance metadata and watermark, so
+  the finding said no marking was found while its own evidence listed those measures. The answer is now described
+  (legal review): "true" when a mechanism — embedded metadata, a watermark or another technical method — is identified
+  for at least one output type, which is evidence for review and not compliance; the outputs without marking are
+  listed in `marking_evidence`. The "no" finding and its action now say that no marking mechanism was identified and
+  ask for the evidence to be reviewed.
+- `npx compliancelint init` used an older pip-installed scanner as it was. It now upgrades it to the npm package's
+  version (or warns with the command when the upgrade fails), and the uvx configuration names that version.
+
 ## [1.3.3] — 2026-10-23
 
 ### Fixed
