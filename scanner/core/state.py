@@ -619,10 +619,10 @@ def update_findings_batch(
             }
             finding["status"] = "rebutted"
             history_entry["justification"] = justification
-        elif action == "acknowledge":
-            finding["status"] = "acknowledged"
-        elif action == "defer":
-            finding["status"] = "deferred"
+        elif action in ("acknowledge", "defer"):
+            finding["status"] = "acknowledged" if action == "acknowledge" else "deferred"
+            if justification:
+                history_entry["justification"] = justification
         elif action == "resolve":
             finding["status"] = "resolved"
             if evidence_value:
@@ -727,11 +727,12 @@ def update_finding(
         finding["status"] = "rebutted"
         history_entry["justification"] = justification
 
-    elif action == "acknowledge":
-        finding["status"] = "acknowledged"
-
-    elif action == "defer":
-        finding["status"] = "deferred"
+    elif action in ("acknowledge", "defer"):
+        finding["status"] = "acknowledged" if action == "acknowledge" else "deferred"
+        # The reason (and the owner and dates of a deferred point) belongs in the record; cl_sync sends it as the
+        # response note, which the Compliance Pack prints (series-2 dry run, 2026-10-24, QA #29: it was dropped).
+        if justification:
+            history_entry["justification"] = justification
 
     elif action == "resolve":
         finding["status"] = "resolved"
