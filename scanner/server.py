@@ -2060,6 +2060,23 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
             except Exception as e:
                 logger.warning("Could not save state for Art. %d: %s", art_num, e)
 
+            # Report the levels the findings were saved with — evidence provided upgrades partial / unable to
+            # determine to compliant — and the overall level that follows (QA #38).
+            from core.protocol import ComplianceLevel as _CL
+            saved_levels = _saved_finding_levels(project_path, art_num)
+            scan_levels: dict[str, str] = {}
+            for f in result.findings:
+                s = saved_levels.get(f.obligation_id or "")
+                current = f.level.value if hasattr(f.level, "value") else str(f.level)
+                if s and s.get("level") and s["level"] != current:
+                    try:
+                        f.level = _CL(s["level"])
+                    except ValueError:
+                        continue
+                    scan_levels[f.obligation_id] = current
+            if scan_levels:
+                result.overall_level = mod._compute_overall_level(result.findings)
+
             # Build compact summary — top findings by severity only
             level_order = {"non_compliant": 0, "partial": 1, "unable_to_determine": 2,
                            "not_applicable": 3, "compliant": 4}
@@ -2072,6 +2089,7 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
                     "obligation_id": f.obligation_id,
                     "level": f.level.value if hasattr(f.level, 'value') else str(f.level),
                     "description": (f.description or "")[:200],
+                    **({"level_in_this_scan": scan_levels[f.obligation_id]} if f.obligation_id in scan_levels else {}),
                 }
                 for f in sorted_findings[:5]
                 if "[COVERAGE GAP" not in (f.description or "")
@@ -2628,6 +2646,68 @@ def _apply_dashboard_obligation_list(result, mod, applicable: set) -> None:
             changed = True
     if changed:
         result.overall_level = mod._compute_overall_level(result.findings)
+
+
+def _saved_finding_levels(project_path: str, article_number: int) -> dict[str, dict]:
+    """{obligation_id: {"level", "status"}} as the article's last scan was saved (.compliancelint/local/articles)."""
+    from core.state import _article_path
+    try:
+        with open(_article_path(project_path, article_number), "r", encoding="utf-8") as f:
+            saved = json.load(f)
+    except (OSError, json.JSONDecodeError):
+        return {}
+    return {
+        oid: {"level": f.get("level"), "status": f.get("status")}
+        for oid, f in (saved.get("findings") or {}).items() if isinstance(f, dict)
+    }
+
+
+def _saved_level_note(level: str, status: str | None) -> str:
+    if status == "evidence_provided":
+        return (f"Saved as {level}: evidence was provided for this obligation (cl_update_finding), so the scan's own "
+                "level is upgraded; cl_sync puts this level on the dashboard.")
+    return f"Saved as {level}; cl_sync puts this level on the dashboard."
+
+
+def _overall_from_finding_dicts(findings: list[dict]) -> str:
+    """The article's overall level from its findings, as BaseArticleModule._compute_overall_level computes it."""
+    levels = [f.get("level") for f in findings if isinstance(f, dict) and not f.get("is_informational")]
+    if not levels:
+        return "unable_to_determine"
+    active = [lv for lv in levels if lv != "not_applicable"]
+    if not active:
+        return "not_applicable"
+    if all(lv == "compliant" for lv in active):
+        return "compliant"
+    if "non_compliant" in active:
+        return "non_compliant"
+    if "partial" in active:
+        return "partial"
+    return "unable_to_determine"
+
+
+def _report_saved_levels(data: dict, project_path: str, article_number: int) -> None:
+    """A scan report gives each finding the level its scan was saved with (series-2 recording, 2026-10-25, QA #38):
+    a finding with evidence provided is saved as compliant when the scan finds it partial or unable to determine, and
+    the dashboard shows that level after cl_sync — the scan's own level ("partial") made the assistant contradict
+    the dashboard. The scan's level stays in `level_in_this_scan`; the article's overall level follows."""
+    saved = _saved_finding_levels(project_path, article_number)
+    changed = False
+    for f in data.get("findings") or []:
+        if not isinstance(f, dict):
+            continue
+        s = saved.get(f.get("obligation_id") or "")
+        if not s or not s.get("level") or s["level"] == f.get("level"):
+            continue
+        f["level_in_this_scan"] = f.get("level")
+        f["level"] = s["level"]
+        f["level_note"] = _saved_level_note(s["level"], s.get("status"))
+        changed = True
+    if changed:
+        overall = _overall_from_finding_dicts(data.get("findings") or [])
+        data["overall_level"] = overall
+        if isinstance(data.get("compliance_summary"), dict):
+            data["compliance_summary"]["overall"] = overall
 
 
 def _apply_dashboard_overlay(report: dict, status_map: dict[str, str]) -> None:
@@ -4176,6 +4256,7 @@ def _scan_single_article(article_number: int, project_path: str, context=None, r
         state_path = save_article_result(project_path, article_number, data)
         if state_path:
             data["state_saved"] = state_path
+            _report_saved_levels(data, project_path, article_number)
     except Exception as e:
         import traceback
         logger.warning("Could not save state.json: %s\n%s", e, traceback.format_exc())
