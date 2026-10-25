@@ -2547,6 +2547,36 @@ def _action_obligation_ids(action: dict) -> list[str]:
     return ids
 
 
+_AUTOMATION_LEVELS: dict[str, str] | None = None
+
+
+def _automation_level(oid: str) -> str:
+    """The obligation's automation_assessment.level (full / partial / manual) from scanner/obligations/*.json, or ""."""
+    global _AUTOMATION_LEVELS
+    if _AUTOMATION_LEVELS is None:
+        import glob as _glob
+        levels: dict[str, str] = {}
+        for path in sorted(_glob.glob(os.path.join(os.path.dirname(os.path.abspath(__file__)), "obligations", "*.json"))):
+            with open(path, "r", encoding="utf-8") as f:
+                for obl in json.load(f).get("obligations", []):
+                    levels[obl.get("id", "")] = (obl.get("automation_assessment") or {}).get("level", "")
+        _AUTOMATION_LEVELS = levels
+    return _AUTOMATION_LEVELS.get(oid, "")
+
+
+def _action_where(oids: list[str], questionnaire: set) -> str:
+    """Where an action-plan entry is answered (QA #39): "human_gates" when a person answers every one of its
+    obligations in the dashboard's Human Gates — in the repo's questionnaire and not settled from the code (automation
+    level partial or manual) —, "project" when none is (the code or the project's documents change; Art. 50(1) and
+    50(2) are in the questionnaire for their evidence but checked in the code), "both" when it covers both kinds."""
+    gates = [o in questionnaire and _automation_level(o) != "full" for o in oids]
+    if gates and all(gates):
+        return "human_gates"
+    if any(gates):
+        return "both"
+    return "project"
+
+
 def _dashboard_status_for(oids: list[str], saas_status_map: dict[str, str]) -> str | None:
     """COMPLIANT / NOT_APPLICABLE when every obligation of the action that the dashboard lists has that status;
     None otherwise. Obligations the dashboard does not list (not applicable — omitted — or not in the scan) do not
@@ -2790,7 +2820,28 @@ def cl_action_plan(project_path: str, regulation: str = "eu-ai-act", article: in
     all_actions = []
     articles_covered = []
 
+    # The repo's applicability profile on the dashboard (Profiling Wizard answers), as the scan uses it: the plan covers
+    # what applies to this repo. Series-2 recording, 2026-10-25 (QA #39): for a limited-risk chatbot the plan listed
+    # 78 actions over all 45 article modules — GPAI systemic-risk duties as CRITICAL, high-risk duties as HIGH.
+    plan_settings = _fetch_saas_scan_settings(ProjectConfig.load(project_path), project_path)
+    applicable_obligations: set | None = None
+    human_gate_obligations: set = set()
+    applicable_article_numbers: set | None = None
+    if (isinstance(plan_settings, dict) and isinstance(plan_settings.get("applicable_obligations"), list)
+            and plan_settings["applicable_obligations"]):
+        applicable_obligations = set(plan_settings["applicable_obligations"])
+        questionnaire = plan_settings.get("questionnaire")
+        human_gate_obligations = set(questionnaire) if isinstance(questionnaire, dict) else set()
+        if isinstance(plan_settings.get("applicable_articles"), list):
+            import re as _re_plan
+            applicable_article_numbers = {
+                int(m.group(1)) for a in plan_settings["applicable_articles"]
+                if isinstance(a, str) and (m := _re_plan.match(r"^art(\d+)$", a))
+            }
+
     target_articles = [article] if article > 0 else sorted(_modules.keys())
+    if applicable_article_numbers is not None:
+        target_articles = [a for a in target_articles if a in applicable_article_numbers]
     for art_num in target_articles:
         if art_num not in _modules:
             all_actions.append({
@@ -2851,6 +2902,40 @@ def cl_action_plan(project_path: str, regulation: str = "eu-ai-act", article: in
             action_dict["interpretive_atoms"] = atoms[:3]
             action_dict["interpretive_atoms_total"] = len(atoms)
 
+    # Keep an action only when one of its obligations applies to the repo; name those obligations, and say whether a
+    # person answers it in Human Gates (the repo's questionnaire) or the project has to change (QA #39).
+    if applicable_obligations is not None:
+        kept, not_applicable_refs = [], []
+        for action_dict in action_dicts:
+            oids = _action_obligation_ids(action_dict)
+            relevant = [o for o in oids if o in applicable_obligations]
+            if oids and not relevant:
+                not_applicable_refs.append(str(action_dict.get("article") or ""))
+                continue
+            action_dict["obligation_ids"] = relevant
+            action_dict["where"] = _action_where(relevant, human_gate_obligations)
+            kept.append(action_dict)
+        action_dicts = kept
+        dashboard_applicability = {
+            "applied": True,
+            "actions_not_applicable": {"count": len(not_applicable_refs), "articles": sorted(set(not_applicable_refs))},
+            "note": (
+                "Only the obligations that apply to this repo under its Profiling Wizard answers on the dashboard. "
+                "`where`: human_gates = a person answers it in the dashboard's Human Gates (with evidence where "
+                "required); project = the code or the project's documents have to change; both = it covers "
+                "obligations of both kinds."
+            ),
+        }
+    else:
+        dashboard_applicability = {
+            "applied": False,
+            "note": (
+                "Not limited to what applies to this repo: the project is not connected to the ComplianceLint "
+                "dashboard, or its settings could not be loaded, so every article is planned and many actions may not "
+                "apply. Connect with cl_connect and complete the Profiling Wizard on the dashboard, then ask again."
+            ),
+        }
+
     # §AT.19 Phase 4 (2026-05-13) — Cross-surface overlay. Fetch
     # effective status from SaaS dashboard (Channel B overlay applied)
     # so actions whose obligation_id is COMPLIANT / NOT_APPLICABLE in
@@ -2867,7 +2952,7 @@ def cl_action_plan(project_path: str, regulation: str = "eu-ai-act", article: in
         for action_dict in action_dicts:
             # ActionItems carry an article reference, not an obligation id — map it (acceptance run A6, 2026-10-07:
             # matching on action.obligation_id never marked anything).
-            oids = _action_obligation_ids(action_dict)
+            oids = action_dict.get("obligation_ids") or _action_obligation_ids(action_dict)
             if not oids:
                 continue
             dashboard_status = _dashboard_status_for(oids, saas_status_map)
@@ -2912,6 +2997,14 @@ def cl_action_plan(project_path: str, regulation: str = "eu-ai-act", article: in
         "medium": sum(1 for a in action_dicts if a.get("priority") == "MEDIUM"),
         "low": sum(1 for a in action_dicts if a.get("priority") == "LOW"),
         "actions": action_dicts,
+        "dashboard_applicability": dashboard_applicability,
+        **(
+            {"by_where": {
+                where: sum(1 for a in action_dicts if a.get("where") == where)
+                for where in ("human_gates", "project", "both")
+            }}
+            if applicable_obligations is not None else {}
+        ),
         # §AT.19 Phase 4 (2026-05-13) — overlay diagnostics. Tells the AI
         # client whether dashboard overlay was applied + how many actions
         # were downgraded. Empty / zero values when api_key missing or
