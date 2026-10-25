@@ -142,10 +142,14 @@ class Art50Module(BaseArticleModule):
                 obligation_id="ART50-OBL-2",
                 answer=has_content_watermarking,
                 true_description="Synthetic content marking/watermarking found.",
+                # Wording of the legal review o3 Y (2026-10-25, QA #36): "no" means no mechanism was identified,
+                # not that the evidence proves an infringement.
                 false_description=(
-                    "System generates synthetic content but no content marking "
-                    "was found. Art. 50(2) requires outputs to be marked in a machine-readable "
-                    "format and detectable as artificially generated or manipulated."
+                    "System generates synthetic content, but no machine-readable marking mechanism enabling "
+                    "detection as artificially generated or manipulated was identified for its synthetic outputs. "
+                    "Article 50(2) requires such marking, subject to its applicable exceptions and "
+                    "technical-feasibility qualifications. Review the evidence and confirm whether marking is "
+                    "implemented elsewhere."
                 ),
                 evidence=marking_evidence,
                 gap_type=GapType.CODE,
@@ -451,9 +455,10 @@ class Art50Module(BaseArticleModule):
                 article="Art. 50(2)",
                 action="Implement machine-readable marking for AI-generated content",
                 details=(
-                    "System generates synthetic content but no content marking found. "
-                    "Art. 50(2) requires marking output as artificially generated in "
-                    "machine-readable format. Recommended: C2PA SDK for media, "
+                    "System generates synthetic content, but no machine-readable marking mechanism enabling "
+                    "detection as artificially generated or manipulated was identified for its synthetic outputs. "
+                    "Article 50(2) requires such marking, subject to its applicable exceptions and "
+                    "technical-feasibility qualifications. Recommended: C2PA SDK for media, "
                     "X-AI-Generated header for text, IPTC DigitalSourceType metadata."
                 ),
                 effort="4-8 hours",

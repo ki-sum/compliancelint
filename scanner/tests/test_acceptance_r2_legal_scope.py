@@ -160,9 +160,12 @@ def test_art50_texts(tmp_path):
 def test_art50_2_marking_text_is_technology_neutral(tmp_path):
     f = _scan("art50-transparency-obligations", {"art50": {
         "is_generating_synthetic_content": True, "has_content_watermarking": False}}, tmp_path, risk="limited-risk")
+    # Wording of the legal review o3 Y (2026-10-25, QA #36).
     assert f["ART50-OBL-2"].description == (
-        "System generates synthetic content but no content marking was found. Art. 50(2) requires outputs to be "
-        "marked in a machine-readable format and detectable as artificially generated or manipulated.")
+        "System generates synthetic content, but no machine-readable marking mechanism enabling detection as "
+        "artificially generated or manipulated was identified for its synthetic outputs. Article 50(2) requires such "
+        "marking, subject to its applicable exceptions and technical-feasibility qualifications. Review the evidence "
+        "and confirm whether marking is implemented elsewhere.")
 
 
 def test_art9_9_has_no_children_condition():
