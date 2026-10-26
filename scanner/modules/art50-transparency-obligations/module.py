@@ -597,10 +597,9 @@ class Art50Module(BaseArticleModule):
             article_title="Transparency Obligations for Certain AI Systems",
             project_path=scan_result.project_path,
             actions=actions,
-            disclaimer=(
-                "Based on ComplianceLint compliance checklist. Art. 50 applies broadly to almost all AI systems. "
-                "C2PA is recommended but not yet mandated by harmonized standard."
-            ),
+            # o3 Z (2026-10-26): Art. 50 applies only to the system types it names, and the AI Act prescribes no
+            # marking technology; the two sentences that said otherwise are gone.
+            disclaimer="Based on ComplianceLint compliance checklist.",
         )
 
 

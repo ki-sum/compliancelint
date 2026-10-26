@@ -215,3 +215,16 @@ class TestThePlanUsesTheGivenRoute:
     def test_a_code_checked_obligation_can_be_routed_to_human_gates(self, tmp_path, monkeypatch):
         plan = self._plan(tmp_path, monkeypatch, has_ai_disclosure_to_users=True)
         assert (plan[B[0]]["where"], plan[B[0]]["obligation_ids"]) == ("human_gates", ["ART50-OBL-1"])
+
+
+def test_the_plan_disclaimer_states_no_wrong_scope(tmp_path):
+    mod = _load_module("art50-transparency-obligations")
+    BaseArticleModule.set_context(ProjectContext(
+        primary_language="python", risk_classification="limited-risk", risk_classification_confidence="high",
+        compliance_answers={"_scope": {"is_ai_system": True, "risk_classification": "limited-risk"}, "art50": E1_STATE},
+    ))
+    try:
+        disclaimer = mod.action_plan(mod.scan(str(tmp_path))).disclaimer
+    finally:
+        BaseArticleModule.set_context(None)
+    assert disclaimer == "Based on ComplianceLint compliance checklist."
