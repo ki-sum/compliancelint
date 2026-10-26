@@ -40,7 +40,25 @@ Scan, attest, and document EU AI Act compliance without leaving your IDE. The sc
 | 7. Human Gates: what code alone cannot settle needs a person's answer | [0:35](https://compliancelint.dev/videos/7-human-gates.mp4) |
 | 8. Compliance All-in-One Pack: one zip for your legal counsel or auditor | [1:09](https://compliancelint.dev/videos/8-export.mp4) |
 
-All nine on one page: [compliancelint.dev/#demo-videos](https://compliancelint.dev/#demo-videos) · also as a [YouTube playlist](https://www.youtube.com/playlist?list=PLXxAlsu_fRdY).
+All videos, with their transcripts, on one page: [compliancelint.dev/videos](https://compliancelint.dev/videos) · this series as a [YouTube playlist](https://www.youtube.com/playlist?list=PLXxAlsu_fRdY).
+
+#### Walkthrough: fixing an AI chatbot, from findings to evidence
+
+[![Walkthrough overview video (1:29)](https://compliancelint.dev/videos/fixing-a-chatbot/e0-overview.jpg)](https://compliancelint.dev/videos/fixing-a-chatbot/e0-overview.mp4)
+
+**[Watch the overview (1:29)](https://compliancelint.dev/videos/fixing-a-chatbot/e0-overview.mp4)**: a fictional customer-support chatbot that is not high-risk, taken from its first scan to the Compliance Pack under Article 50 (transparency), Article 4 (AI literacy) and Article 5. One point stays open for review, with its reason and a review date.
+
+| Episode | Video |
+|------|-------|
+| 1. The first scan: three open Article 50 findings, and a to-do list | [3:46](https://compliancelint.dev/videos/fixing-a-chatbot/e1-baseline.mp4) |
+| 2. Article 50(1): tell people they are chatting with an AI | [3:32](https://compliancelint.dev/videos/fixing-a-chatbot/e2-chat-notice.mp4) |
+| 3. AI images: marked, checked and labelled | [2:15](https://compliancelint.dev/videos/fixing-a-chatbot/e3-images.mp4) |
+| 4. AI-generated text: what is marked, and what stays open | [3:05](https://compliancelint.dev/videos/fixing-a-chatbot/e4-text.mp4) |
+| 5. AI-written press releases and the Human Gate | [2:29](https://compliancelint.dev/videos/fixing-a-chatbot/e5-press-releases.mp4) |
+| 6. Article 4 AI literacy and prohibited practices under Article 5 | [2:47](https://compliancelint.dev/videos/fixing-a-chatbot/e6-literacy-safeguards.mp4) |
+| 7. The record: the Compliance Pack and the open Article 50(2) point | [1:58](https://compliancelint.dev/videos/fixing-a-chatbot/e7-final.mp4) |
+
+Also as a [YouTube playlist](https://www.youtube.com/playlist?list=PLAF1jMZOUYEA).
 
 Try the live demo at **[compliancelint.dev/demo](https://compliancelint.dev/demo)** — pre-loaded with three AI systems (a chatbot that is not high-risk but has an Article 50 transparency trigger, a high-risk finance system, a high-risk medical system) so you can browse a real scan, attestation flow, and Compliance Journey trend without setting up a project of your own.
 

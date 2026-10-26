@@ -201,3 +201,22 @@ def test_readme_says_what_the_headline_number_counts():
         "notified bodies and never appear as your tasks."
     )
     assert sentence in _read("README.md")
+
+
+# The demo videos (2026-10-26): every video is on compliancelint.dev/videos; the README keeps the step series and adds
+# the walkthrough series "From findings to evidence" with its seven episodes and its YouTube playlist.
+WALKTHROUGH_EPISODES = ["e1-baseline", "e2-chat-notice", "e3-images", "e4-text", "e5-press-releases",
+                        "e6-literacy-safeguards", "e7-final"]
+
+
+def test_readme_links_all_videos_and_the_walkthrough_series():
+    readme = _read("README.md")
+    assert "(https://compliancelint.dev/videos)" in readme
+    assert "#### Walkthrough: fixing an AI chatbot, from findings to evidence" in readme
+    assert "https://compliancelint.dev/videos/fixing-a-chatbot/e0-overview.mp4" in readme
+    for name in WALKTHROUGH_EPISODES:
+        assert f"(https://compliancelint.dev/videos/fixing-a-chatbot/{name}.mp4)" in readme, name
+    assert "https://www.youtube.com/playlist?list=PLAF1jMZOUYEA" in readme
+    assert "https://www.youtube.com/playlist?list=PLXxAlsu_fRdY" in readme
+    # wording of the legal check of the YouTube texts (2026-10-26)
+    assert "Article 5 safeguards" not in readme
