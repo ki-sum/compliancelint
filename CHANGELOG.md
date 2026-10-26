@@ -6,6 +6,28 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.3.6] — 2026-10-26
+
+### Fixed
+- `cl_action_plan` listed the same duty twice for Articles 4, 5 and 6. Now one action per duty:
+  - Article 4: without AI-literacy measures, only "Take measures ..." (it already names the Article 4(1) factors);
+    "Verify AI literacy measures ..." only when measures were found or the answer is unknown.
+  - Article 5: nothing flagged — one action "Review the system against each Art. 5 prohibition and record the
+    assessment"; something flagged — the action per practice and "Record the Art. 5 assessment". The record names the
+    points with an exception or limitation and no longer calls itself essential for demonstrating compliance.
+  - Article 6: "Confirm non-high-risk classification with manual review" and "Create and maintain classification
+    documentation" are part of "Complete formal Art. 6 risk classification", which states the Article 6(4) duties.
+- The Article 6(3) exception action said a provider claiming the exception must notify the national authority. It now
+  follows Article 6(4): document the assessment before placing on the market or putting into service, register under
+  Article 49(2), and provide the documentation on request; it also states the conditions as "intended to" and that a
+  system referred to in Annex III that performs profiling of natural persons is always high-risk.
+- Article 50(2): the answer field `is_generating_synthetic_content` had no description, so an assistant could count
+  generated source code as synthetic text and get the CRITICAL marking action. It now applies the Commission's
+  non-binding Guidelines C(2026) 5054, paragraph 68 (source code, short labels, machine-to-machine and non-final
+  closed-loop outputs do not count; natural-language answers, documents and images do) and the Article 50(2)
+  exceptions. `has_content_watermarking` and `marking_evidence` now ask, for each marking mechanism, how a person
+  exposed to the output can detect it, or that no means of detection was found, and record unmarked paths.
+
 ## [1.3.5] — 2026-10-26
 
 ### Fixed
