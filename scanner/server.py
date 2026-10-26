@@ -3007,7 +3007,7 @@ def cl_action_plan(project_path: str, regulation: str = "eu-ai-act", article: in
                 not_applicable_refs.append(str(action_dict.get("article") or ""))
                 continue
             action_dict["obligation_ids"] = relevant
-            action_dict["where"] = _action_where(relevant, human_gate_obligations)
+            action_dict["where"] = action_dict.get("where") or _action_where(relevant, human_gate_obligations)
             kept.append(action_dict)
         action_dicts = kept
         dashboard_applicability = {
@@ -3021,6 +3021,9 @@ def cl_action_plan(project_path: str, regulation: str = "eu-ai-act", article: in
             ),
         }
     else:
+        # Without the dashboard there is no Human Gates to route to.
+        for action_dict in action_dicts:
+            action_dict.pop("where", None)
         dashboard_applicability = {
             "applied": False,
             "note": (

@@ -141,7 +141,13 @@ class Art50Module(BaseArticleModule):
             findings.append(self._finding_from_answer(
                 obligation_id="ART50-OBL-2",
                 answer=has_content_watermarking,
-                true_description="Synthetic content marking/watermarking found.",
+                # o3 Z (2026-10-26): "true" is evidence for review, not compliance.
+                true_description=(
+                    "A marking mechanism was identified for at least one synthetic output type. This is evidence for "
+                    "review, not proof of Article 50(2) compliance. Human review must confirm machine-readable marking "
+                    "and a usable detection method for each in-scope output type, and assess any outputs listed as "
+                    "unmarked in marking_evidence."
+                ),
                 # Wording of the legal review o3 Y (2026-10-25, QA #36): "no" means no mechanism was identified,
                 # not that the evidence proves an infringement.
                 false_description=(
@@ -293,6 +299,7 @@ class Art50Module(BaseArticleModule):
             "has_emotion_biometric_disclosure": has_emotion_biometric_disclosure,
             "is_deep_fake_system": is_deep_fake_system,
             "has_deep_fake_disclosure": has_deep_fake_disclosure,
+            "publishes_public_interest_text": publishes_public_interest_text,
         }
 
         # ── Obligation Engine: enrich findings + identify gaps ──
@@ -421,125 +428,168 @@ class Art50Module(BaseArticleModule):
         actions = []
         details = scan_result.details
 
-        # ── Art. 50(1) actions — uses scan() detail keys directly ──
+        # Texts, priorities and routes of the legal review o3 Z (2026-10-26). An action names its obligation; `where`
+        # is the route o3 gave it (cl_action_plan keeps it when the dashboard profile applies).
+
+        # ── Art. 50(1) ──
         if details.get("is_chatbot_or_interactive_ai") and not details.get("has_ai_disclosure_to_users"):
             actions.append(ActionItem(
                 priority="CRITICAL",
                 article="Art. 50(1)",
-                action="Add AI interaction disclosure to chatbot/conversational interface",
+                action="Inform users that they are interacting with an AI system",
                 details=(
-                    "Art. 50(1) requires informing users they are interacting with AI. "
-                    "Add a clear, persistent disclosure at the start of every conversation. "
-                    "Example: 'You are interacting with an AI assistant.' It must be given at the latest at "
-                    "the time of the first interaction or exposure (Art. 50(5))."
+                    "For AI systems intended to interact directly with natural persons, Art. 50(1) requires providers "
+                    "to ensure people are informed that they are interacting with AI, unless this is obvious in "
+                    "context or a statutory exception applies. Give a clear, distinguishable and accessible notice at "
+                    "the start of the first interaction (Art. 50(5)), for example when the chat opens: \u201cYou are "
+                    "chatting with an AI assistant.\u201d Do not rely solely on terms of service. Record any exception "
+                    "relied on."
                 ),
                 effort="1-2 hours",
+                obligation_id="ART50-OBL-1",
+                where="project",
             ))
         elif details.get("is_chatbot_or_interactive_ai") and details.get("has_ai_disclosure_to_users"):
             actions.append(ActionItem(
                 priority="MEDIUM",
                 article="Art. 50(1)",
-                action="Verify AI disclosure is shown at point of interaction",
+                action="Verify that the AI disclosure is shown at the first interaction",
                 details=(
-                    "AI disclosure detected — verify it is displayed to ALL users at "
-                    "the START of interaction, not buried in terms of service."
+                    "An AI-interaction notice was identified, but its presentation has not been verified. Check each "
+                    "relevant user journey to confirm that people receive a clear, distinguishable and accessible "
+                    "notice at the start of their first direct interaction (Art. 50(5)). A notice found only in terms "
+                    "of service is insufficient. Document any applicable exception."
                 ),
                 effort="30 minutes",
                 action_type="human_judgment_required",
+                obligation_id="ART50-OBL-1",
+                where="human_gates",
             ))
 
-        # ── Art. 50(2) actions ──
-        if details.get("is_generating_synthetic_content") and not details.get("has_content_watermarking"):
+        # ── Art. 50(2) — "true" means a mechanism was identified for at least one output type (o3 Y) ──
+        if details.get("is_generating_synthetic_content") and details.get("has_content_watermarking") is True:
+            actions.append(ActionItem(
+                priority="MEDIUM",
+                article="Art. 50(2)",
+                action="Confirm that marking covers every in-scope synthetic output type",
+                details=(
+                    "A marking mechanism was identified for at least one output type; this does not establish "
+                    "compliance. Check each in-scope synthetic audio, image, video and text output and delivery path "
+                    "for machine-readable marking and a usable detection method. Test whether marks survive the "
+                    "project's normal processing, where technically feasible. Record unmarked output types, valid "
+                    "exceptions and technical limits in marking_evidence. A person confirms the assessment in Human "
+                    "Gates."
+                ),
+                effort="2-4 hours",
+                action_type="human_judgment_required",
+                obligation_id="ART50-OBL-2",
+                where="project",
+            ))
+        elif details.get("is_generating_synthetic_content"):
             actions.append(ActionItem(
                 priority="CRITICAL",
                 article="Art. 50(2)",
-                action="Implement machine-readable marking for AI-generated content",
+                action="Mark in-scope AI-generated outputs in a machine-readable format",
                 details=(
-                    "System generates synthetic content, but no machine-readable marking mechanism enabling "
-                    "detection as artificially generated or manipulated was identified for its synthetic outputs. "
-                    "Article 50(2) requires such marking, subject to its applicable exceptions and "
-                    "technical-feasibility qualifications. Recommended: C2PA SDK for media, "
-                    "X-AI-Generated header for text, IPTC DigitalSourceType metadata."
+                    "No marking mechanism was identified for the system's potentially in-scope synthetic outputs. "
+                    "Determine which output types Article 50(2) covers; for each covered audio, image, video or text "
+                    "output, implement machine-readable marking and a corresponding means of detecting AI generation "
+                    "or manipulation. Possible techniques include verifiable provenance metadata (such as C2PA "
+                    "Content Credentials), watermarks, or suitable combinations with detection-supporting "
+                    "fingerprinting or logging. Preserve existing marks where practicable. Record unmarked output "
+                    "types, applicable exceptions and technical limitations; no technique alone guarantees compliance."
                 ),
                 effort="4-8 hours",
+                obligation_id="ART50-OBL-2",
+                where="project",
             ))
 
-        # ── Art. 50(3) actions ──
+        # ── Art. 50(3) ──
+        art50_3_tail = (
+            " of its operation, unless the statutory law-enforcement exception applies. Provide clear, distinguishable "
+            "and accessible information by first exposure (Art. 50(5)). Separately check applicable data-protection "
+            "law (GDPR, Regulation (EU) 2018/1725 or Directive (EU) 2016/680), including any GDPR Arts. 13\u201314 "
+            "notices or Art. 35 impact assessment. Assess any Article 5 prohibition independently."
+        )
         if details.get("is_emotion_recognition_system") and not details.get("has_emotion_biometric_disclosure"):
             actions.append(ActionItem(
                 priority="CRITICAL",
                 article="Art. 50(3)",
-                action="Implement emotion recognition disclosure and GDPR notice",
-                details=(
-                    "Emotion recognition detected. Art. 50(3) requires:\n"
-                    "1. Inform all exposed persons\n"
-                    "2. Explain what personal data is processed\n"
-                    "3. Provide GDPR Art. 13/14 compliant privacy notice\n"
-                    "4. Consider DPIA under GDPR Art. 35"
-                ),
+                action="Inform exposed persons of the emotion recognition system",
+                details=("Art. 50(3) requires deployers to inform natural persons exposed to an emotion recognition "
+                         "system" + art50_3_tail),
                 effort="4-8 hours",
+                obligation_id="ART50-OBL-3",
+                where="project",
             ))
         if details.get("is_biometric_categorization_system") and not details.get("has_emotion_biometric_disclosure"):
             actions.append(ActionItem(
                 priority="CRITICAL",
                 article="Art. 50(3)",
-                action="Implement biometric categorization disclosure and GDPR notice",
-                details=(
-                    "Biometric categorization detected. Art. 50(3) requires:\n"
-                    "1. Inform all exposed persons\n"
-                    "2. Explain what categories are inferred (age, gender, etc.)\n"
-                    "3. Provide GDPR Art. 13/14 compliant privacy notice"
-                ),
+                action="Inform exposed persons of the biometric categorisation system",
+                details=("Art. 50(3) requires deployers to inform natural persons exposed to a biometric "
+                         "categorisation system" + art50_3_tail),
                 effort="4-8 hours",
+                obligation_id="ART50-OBL-3",
+                where="project",
             ))
 
-        # ── Art. 50(4) actions ──
+        # ── Art. 50(4), first subparagraph: deep fakes ──
         if details.get("is_deep_fake_system") and not details.get("has_deep_fake_disclosure"):
             actions.append(ActionItem(
                 priority="CRITICAL",
                 article="Art. 50(4)",
-                action="Implement deep fake disclosure mechanism",
+                action="Disclose that deep fake image, audio or video content is AI-generated or manipulated",
                 details=(
-                    "Deep fake code detected. Art. 50(4) requires:\n"
-                    "1. Disclose that content is AI-generated/manipulated\n"
-                    "2. Implement C2PA manifest\n"
-                    "3. Exception for artistic/satirical content — but still indicate AI origin"
+                    "Where AI-generated or manipulated image, audio or video meets the Art. 3(60) definition of a "
+                    "deep fake, Art. 50(4) requires deployers to disclose its AI origin clearly, distinguishably and "
+                    "accessibly by first exposure (Art. 50(5)), for example with a visible or audible label. For an "
+                    "evidently artistic, creative, satirical, fictional or analogous work, disclosure may be "
+                    "appropriately non-disruptive but is still required. This is separate from Art. 50(2) "
+                    "machine-readable marking. In Human Gates, confirm deep-fake status and any exception, and verify "
+                    "or arrange the actual disclosure."
                 ),
                 effort="4-8 hours",
+                action_type="human_judgment_required",
+                obligation_id="ART50-OBL-4",
+                where="human_gates",
             ))
 
-        # ── Always-applicable actions ──
+        # ── Art. 50(4), second subparagraph: text on matters of public interest (answer yes or unknown) ──
+        if details.get("is_generating_synthetic_content") and details.get("publishes_public_interest_text") is not False:
+            actions.append(ActionItem(
+                priority="HIGH",
+                article="Art. 50(4)",
+                action="Decide how AI-generated text published on matters of public interest is disclosed",
+                details=(
+                    "Check whether AI-generated or manipulated text is published to inform the public on matters of "
+                    "public interest. If so, Art. 50(4) requires deployers to disclose its AI origin clearly, "
+                    "distinguishably and accessibly by first exposure, unless the text received substantive human "
+                    "review or editorial control and a natural or legal person holds editorial responsibility, or a "
+                    "statutory law-enforcement exception applies. Mere proofreading is insufficient. Record evidence "
+                    "of the exception or the actual disclosure in Human Gates."
+                ),
+                effort="1-2 hours",
+                action_type="human_judgment_required",
+                obligation_id="ART50-OBL-4b",
+                where="human_gates",
+            ))
+
+        # ── Always ──
         actions.append(ActionItem(
             priority="MEDIUM",
             article="Art. 50 (general)",
             action="Document Art. 50 applicability assessment",
             details=(
-                "Create a transparency obligations register documenting:\n"
-                "- Which Art. 50 paragraphs apply to your system\n"
-                "- What transparency measures are implemented\n"
-                "- Justification for any 'not applicable' determinations\n"
-                "- Schedule for reviewing transparency measures\n\n"
-                "This documentation supports demonstrating compliance to regulators."
+                "Maintain an internal transparency register recording applicable Art. 50 paragraphs, "
+                "provider/deployer roles, implemented measures, supporting evidence, reasons for exceptions or "
+                "non-applicability, and review dates. Check other applicable transparency duties separately (Art. "
+                "50(6)). This register is recommended compliance evidence, not a separately prescribed Art. 50 "
+                "document."
             ),
             effort="2-4 hours",
             action_type="human_judgment_required",
-        ))
-
-        actions.append(ActionItem(
-            priority="LOW",
-            article="Art. 50(2)",
-            action="Evaluate C2PA integration for future-proofing",
-            details=(
-                "Even if not currently generating synthetic content, consider integrating "
-                "C2PA content credentials proactively. The standard is gaining EU regulatory "
-                "endorsement and will likely become the de facto compliance mechanism.\n\n"
-                "C2PA resources:\n"
-                "- Specification: https://c2pa.org/specifications/\n"
-                "- Python SDK: https://github.com/contentauth/c2pa-python\n"
-                "- Rust SDK: https://github.com/contentauth/c2pa-rs"
-            ),
-            effort="2-4 hours",
-            action_type="human_judgment_required",
+            where="human_gates",
         ))
 
         return ActionPlan(

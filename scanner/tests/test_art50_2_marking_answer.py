@@ -65,7 +65,9 @@ def test_a_no_names_what_was_not_identified_and_keeps_the_evidence(tmp_path):
     assert "no content marking was found" not in finding["description"]
 
 
-def test_the_action_for_missing_marking_uses_the_same_words(tmp_path):
+def test_the_action_for_missing_marking_has_the_reviewed_text(tmp_path):
+    # The action text of review Y was replaced by review Z (2026-10-26, test_art50_action_texts.py).
+    from test_art50_action_texts import C
     mod = _load_module("art50-transparency-obligations")
     ctx = ProjectContext(
         primary_language="python", risk_classification="limited-risk", risk_classification_confidence="high",
@@ -80,7 +82,5 @@ def test_the_action_for_missing_marking_uses_the_same_words(tmp_path):
         BaseArticleModule.set_context(None)
     marking = [a for a in actions if a.article == "Art. 50(2)" and a.priority == "CRITICAL"]
     assert len(marking) == 1
-    assert marking[0].details.startswith(
-        "System generates synthetic content, but no machine-readable marking mechanism enabling detection as "
-        "artificially generated or manipulated was identified for its synthetic outputs.")
+    assert (marking[0].action, marking[0].details) == C
     assert "no content marking found" not in marking[0].details

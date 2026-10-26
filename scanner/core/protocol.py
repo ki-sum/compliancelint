@@ -132,9 +132,18 @@ class ActionItem:
     details: str
     effort: str = ""
     action_type: str = "automated"  # automated | human_judgment_required
+    # The one obligation the action is about, when its article reference would name more (Art. 50(4): deep fakes and
+    # public-interest text), and the route a legal review gave it (where: "project" / "human_gates"), which
+    # cl_action_plan keeps instead of deriving it from the obligation (o3 Z, 2026-10-26). Left out of the dict when empty.
+    obligation_id: str = ""
+    where: str = ""
 
     def to_dict(self):
-        return asdict(self)
+        d = asdict(self)
+        for key in ("obligation_id", "where"):
+            if not d[key]:
+                del d[key]
+        return d
 
 
 @dataclass
