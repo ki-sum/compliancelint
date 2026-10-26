@@ -220,22 +220,22 @@ class Art04Module(BaseArticleModule):
                 effort="8-16 hours",
                 action_type="human_judgment_required",
             ))
-
-        # Always add human judgment items
-        actions.append(ActionItem(
-            priority="MEDIUM",
-            article="Art. 4",
-            action="Verify AI literacy measures take the required factors into account",
-            details=(
-                "Art. 4(1) requires the measures to take into account the technical knowledge, "
-                "experience, education and training of the relevant persons and the context in "
-                "which the AI systems are to be used, and to consider the persons or groups of "
-                "persons on whom the AI systems are to be used. Review whether the measures you "
-                "use, including any training where applicable, reflect those factors."
-            ),
-            effort="2-4 hours",
-            action_type="human_judgment_required",
-        ))
+        else:
+            # With no measures, the action above already names the Art. 4(1) factors: one action, not two
+            actions.append(ActionItem(
+                priority="MEDIUM",
+                article="Art. 4",
+                action="Verify AI literacy measures take the required factors into account",
+                details=(
+                    "Art. 4(1) requires the measures to take into account the technical knowledge, "
+                    "experience, education and training of the relevant persons and the context in "
+                    "which the AI systems are to be used, and to consider the persons or groups of "
+                    "persons on whom the AI systems are to be used. Review whether the measures you "
+                    "use, including any training where applicable, reflect those factors."
+                ),
+                effort="2-4 hours",
+                action_type="human_judgment_required",
+            ))
 
         return ActionPlan(
             article_number=4,

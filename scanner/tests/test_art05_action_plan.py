@@ -60,10 +60,11 @@ def test_ncii_detected_before_application_is_a_preparation_item(art05_module, tm
     assert "2026-12-02" in prep[0].action
 
 
-def test_nothing_detected_gives_review_and_documentation_only(art05_module, tmp_path, monkeypatch):
+def test_nothing_detected_gives_one_review_and_record_action(art05_module, tmp_path, monkeypatch):
+    # 2026-10-26: the review and its record are one action (test_action_plan_no_duplicates.py)
     plan = _plan(art05_module, tmp_path, monkeypatch, date(2027, 1, 1))
-    assert [a.priority for a in plan.actions] == ["MEDIUM", "HIGH"]
-    assert "Art. 5 (all)" == plan.actions[0].article
+    assert [(a.priority, a.article, a.action) for a in plan.actions] == [
+        ("HIGH", "Art. 5 (all)", "Review the system against each Art. 5 prohibition and record the assessment")]
 
 
 def test_disclaimer_states_both_application_dates(art05_module, tmp_path, monkeypatch):

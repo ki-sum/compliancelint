@@ -379,39 +379,37 @@ class Art05Module(BaseArticleModule):
                     action_type="human_judgment_required",
                 ))
 
-        # Nothing flagged: still recommend a proactive human review
+        record = (
+            "(1) whether the system could fall under it; (2) for points (bb), (d), (f), (g) "
+            "and (h), which contain an exception or limitation, whether it applies and why (for point (h), also "
+            "the conditions in Art. 5(2) to (7)); (3) who conducted the review and when. Art. 5 does not require "
+            "this record; it can show how the assessment was made, for example if a market surveillance "
+            "authority asks."
+        )
         if not actions:
+            # Nothing flagged: the human review and its record are one action
             actions.append(ActionItem(
-                priority="MEDIUM",
+                priority="HIGH",
                 article="Art. 5 (all)",
-                action="Conduct proactive Art. 5 compliance review",
+                action="Review the system against each Art. 5 prohibition and record the assessment",
                 details=(
-                    "No prohibited practice was detected on the answers given. "
-                    "However, AI scanning cannot detect all prohibited practices "
-                    "(e.g., deployment context, intent, effect on users). "
-                    "Conduct a human review of the system's purpose and deployment "
-                    "context against all Art. 5 prohibitions."
+                    "No prohibited practice was detected based on the answers given. AI scanning cannot "
+                    "detect every prohibited practice, because some depend on the deployment context, the "
+                    "objective or the effect on persons. Review the system's purpose and deployment context "
+                    "against each prohibition in Art. 5(1), points (a) to (h), and record for each one: " + record
                 ),
                 effort="4-8 hours",
                 action_type="human_judgment_required",
             ))
-
-        # Always recommend documentation
-        actions.append(ActionItem(
-            priority="HIGH",
-            article="Art. 5 (all)",
-            action="Document Art. 5 compliance assessment",
-            details=(
-                "Create a written record of your Art. 5 compliance assessment. "
-                "For each prohibited practice, document: (1) whether the system "
-                "could be classified under that practice; (2) if applicable, which "
-                "exception applies and the justification; (3) who conducted the "
-                "review and when. This documentation is essential for demonstrating "
-                "compliance during market surveillance inspections."
-            ),
-            effort="2-4 hours",
-            action_type="human_judgment_required",
-        ))
+        else:
+            actions.append(ActionItem(
+                priority="HIGH",
+                article="Art. 5 (all)",
+                action="Record the Art. 5 assessment",
+                details="For each prohibition in Art. 5(1), points (a) to (h), record: " + record,
+                effort="2-4 hours",
+                action_type="human_judgment_required",
+            ))
 
         return ActionPlan(
             article_number=5,

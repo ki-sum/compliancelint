@@ -336,7 +336,10 @@ class Art06Module(BaseArticleModule):
         details = scan_result.details
         classification = details.get("classification_result", "")
 
-        # Always: document classification
+        annex_iii_categories = details.get("annex_iii_categories", [])
+        no_indicator = not annex_iii_categories and not details.get("annex_i_product_type")
+
+        # Always: the classification, with its record (one action; no separate documentation item)
         actions.append(ActionItem(
             priority="CRITICAL",
             article="Art. 6",
@@ -348,7 +351,14 @@ class Art06Module(BaseArticleModule):
                 "conformity assessment (taking Art. 6(1a)-(1c) into account)? "
                 "(2) Does it fall under an Annex III category? "
                 "(3) Does the Art. 6(3) exception apply? "
-                "Document the reasoning and conclusion."
+                + ("No high-risk indicators were detected by AI analysis; this does not establish that "
+                   "the system is not high-risk. Check the system's intended purpose against each area "
+                   "and use case listed in Annex III. " if no_indicator else "")
+                + "Record the reasoning and conclusion. If the system is referred to in Annex III and "
+                "you consider it not high-risk under Art. 6(3), Art. 6(4) requires you to document that "
+                "assessment before the system is placed on the market or put into service, to register "
+                "under Art. 49(2), and to provide the documentation on request of national competent "
+                "authorities."
             ),
             effort="2-4 hours",
             action_type="human_judgment_required",
@@ -376,7 +386,6 @@ class Art06Module(BaseArticleModule):
             ))
 
         # If Annex III categories found
-        annex_iii_categories = details.get("annex_iii_categories", [])
         if annex_iii_categories:
             actions.append(ActionItem(
                 priority="CRITICAL",
@@ -392,18 +401,30 @@ class Art06Module(BaseArticleModule):
                 action_type="human_judgment_required",
             ))
 
-            # Art. 6(3) exception evaluation
+            # Art. 6(3) exception evaluation, with the Art. 6(4) duties of a provider who relies on it
             actions.append(ActionItem(
                 priority="HIGH",
-                article="Art. 6(3)",
+                article="Art. 6(3)-(4)",
                 action="Evaluate Art. 6(3) exception applicability",
                 details=(
-                    "If the system IS under Annex III, check whether it qualifies for the "
-                    "Art. 6(3) exception. The system must NOT pose significant risk AND must "
-                    "meet at least one criterion: (a) narrow procedural task, (b) improves "
-                    "prior human activity, (c) detects patterns without replacing judgment, "
-                    "(d) performs preparatory task. If claiming the exception, you MUST document "
-                    "the reasoning and notify the relevant national authority before market placement."
+                    "If the system is referred to in Annex III, check whether the Art. 6(3) derogation "
+                    "applies. It applies only where the system does not pose a significant risk of harm to "
+                    "the health, safety or fundamental rights of natural persons, including by not "
+                    "materially influencing the outcome of decision making, and at least one of the "
+                    "conditions in Art. 6(3), second subparagraph, is fulfilled: the system is intended to "
+                    "(a) perform a narrow procedural task; (b) improve the result of a previously completed "
+                    "human activity; (c) detect decision-making patterns or deviations from prior "
+                    "decision-making patterns, and is not meant to replace or influence the previously "
+                    "completed human assessment without proper human review; or (d) perform a preparatory "
+                    "task to an assessment relevant for the purposes of the use cases listed in Annex III. "
+                    "A system referred to in Annex III that performs profiling of natural persons is always "
+                    "high-risk, even if one of these conditions is fulfilled (Art. 6(3), third "
+                    "subparagraph). A provider who considers that a system referred to in Annex III is not "
+                    "high-risk must document its assessment before the system is placed on the market or "
+                    "put into service, must register itself and the system in the EU database before "
+                    "placing it on the market or putting it into service (Art. 49(2); where applicable, the "
+                    "authorised representative registers), and must provide the documentation of the "
+                    "assessment on request of national competent authorities (Art. 6(4))."
                 ),
                 effort="2-4 hours (may require legal counsel)",
                 action_type="human_judgment_required",
@@ -448,37 +469,6 @@ class Art06Module(BaseArticleModule):
                 effort="2-4 hours research + legal counsel recommended",
                 action_type="human_judgment_required",
             ))
-
-        # If no indicators found
-        if not annex_iii_categories and not details.get("annex_i_product_type"):
-            actions.append(ActionItem(
-                priority="MEDIUM",
-                article="Art. 6",
-                action="Confirm non-high-risk classification with manual review",
-                details=(
-                    "No high-risk indicators were detected by AI analysis, but this "
-                    "does not guarantee the system is not high-risk. Review the intended purpose "
-                    "against all Annex III categories manually. Consider whether the system could "
-                    "be used in a high-risk context even if not designed for one."
-                ),
-                effort="1-2 hours",
-                action_type="human_judgment_required",
-            ))
-
-        # Always: documentation
-        actions.append(ActionItem(
-            priority="MEDIUM",
-            article="Art. 6(3)",
-            action="Create and maintain classification documentation",
-            details=(
-                "Regardless of outcome, document the Art. 6 classification analysis. "
-                "Include: intended purpose description, Annex I/III assessment, Art. 6(3) "
-                "exception analysis (if applicable), conclusion, date, and reviewer. "
-                "This documentation may be required by national supervisory authorities."
-            ),
-            effort="1-2 hours",
-            action_type="human_judgment_required",
-        ))
 
         return ActionPlan(
             article_number=6,
