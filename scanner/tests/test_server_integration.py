@@ -772,19 +772,21 @@ class TestClScanArticle10:
         result = json.loads(result_json)
         assert result["overall_level"] == "non_compliant"
 
-    def test_bias_true_partial(self, project_dir):
+    # Art. 10(2)(f) reads has_bias_examination since 2026-10-26 (test_art10_bias_examination_field.py)
+    def test_bias_examination_true_partial(self, project_dir):
         ctx = ProjectContext.from_json(json.dumps({
-            "art10": {"has_data_governance_doc": True, "has_bias_mitigation": True,
-                      "bias_evidence": ["fairlearn"]}
+            "art10": {"has_data_governance_doc": True, "has_bias_examination": True,
+                      "bias_examination_evidence": ["bias report 2026-10"],
+                      "has_bias_mitigation": True, "bias_evidence": ["fairlearn"]}
         }))
         result_json = _scan_single_article(10, project_dir, context=ctx)
         result = json.loads(result_json)
         obl = [f for f in result["findings"] if f["obligation_id"] == "ART10-OBL-2f"]
         assert obl[0]["level"] == "partial"
 
-    def test_bias_false_non_compliant(self, project_dir):
+    def test_bias_examination_false_non_compliant(self, project_dir):
         ctx = ProjectContext.from_json(json.dumps({
-            "art10": {"has_data_governance_doc": True, "has_bias_mitigation": False}
+            "art10": {"has_data_governance_doc": True, "has_bias_examination": False, "has_bias_mitigation": True}
         }))
         result_json = _scan_single_article(10, project_dir, context=ctx)
         result = json.loads(result_json)

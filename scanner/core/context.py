@@ -32,7 +32,7 @@ _LIST_FIELDS: dict = {
     "art5":  [],
     "art6":  ["annex_iii_categories"],
     "art9":  ["risk_doc_paths", "testing_evidence", "risk_code_evidence", "metrics_evidence"],
-    "art10": ["data_doc_paths", "bias_evidence"],
+    "art10": ["data_doc_paths", "bias_examination_evidence", "bias_evidence"],
     "art11": ["doc_paths", "documented_aspects"],
     "art12": ["logging_evidence"],
     "art13": ["explainability_evidence", "transparency_paths"],
@@ -89,7 +89,7 @@ _BOOL_FIELDS: dict = {
               "has_ncii_generation", "has_csam_generation"],
     "art6":  ["is_high_risk"],
     "art9":  ["has_risk_docs", "has_testing_infrastructure", "has_risk_code_patterns", "has_defined_metrics", "affects_children"],
-    "art10": ["has_data_governance_doc", "has_bias_mitigation", "has_data_lineage", "processes_special_category_data"],
+    "art10": ["has_data_governance_doc", "has_bias_examination", "has_bias_mitigation", "has_data_lineage", "processes_special_category_data"],
     "art11": ["has_technical_docs", "is_annex_i_product"],
     "art12": ["has_logging", "has_retention_config"],
     "art13": ["has_explainability", "has_transparency_info"],
@@ -479,6 +479,8 @@ class ProjectContext:
       "art10": {
         "has_data_governance_doc": true | false | null,
         "data_doc_paths": ["docs/data_sheet.md", ...],
+        "has_bias_examination": true | false | null,
+        "bias_examination_evidence": ["description"],
         "has_bias_mitigation": true | false | null,
         "bias_evidence": ["description"],
         "has_data_lineage": true | false | null

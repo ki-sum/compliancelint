@@ -19,6 +19,8 @@ def _full_true_ctx():
     return _ctx_with("art10", {
         "has_data_governance_doc": True,
         "data_doc_paths": ["docs/data_sheet.md"],
+        "has_bias_examination": True,
+        "bias_examination_evidence": ["bias report 2026-10"],
         "has_bias_mitigation": True,
         "bias_evidence": ["fairlearn"],
         "has_data_lineage": True,
@@ -30,6 +32,8 @@ def _full_false_ctx():
     return _ctx_with("art10", {
         "has_data_governance_doc": False,
         "data_doc_paths": [],
+        "has_bias_examination": False,
+        "bias_examination_evidence": [],
         "has_bias_mitigation": False,
         "bias_evidence": [],
         "has_data_lineage": False,
@@ -104,12 +108,12 @@ class TestArt10Obl2:
         assert obl[0].level == ComplianceLevel.UNABLE_TO_DETERMINE
 
 
-# ── ART10-OBL-2f: Bias examination (has_bias_mitigation) ──
+# ── ART10-OBL-2f: Bias examination (has_bias_examination since 2026-10-26) ──
 
 class TestArt10Obl2f:
 
     def test_has_bias_true_gives_partial(self, art10_module, tmp_path):
-        """has_bias_mitigation=True → ART10-OBL-2f PARTIAL."""
+        """has_bias_examination=True → ART10-OBL-2f PARTIAL."""
         BaseArticleModule.set_context(_full_true_ctx())
         result = art10_module.scan(str(tmp_path))
         obl = _find(result, "ART10-OBL-2f")
@@ -117,7 +121,7 @@ class TestArt10Obl2f:
         assert obl[0].level == ComplianceLevel.PARTIAL
 
     def test_has_bias_false_gives_non_compliant(self, art10_module, tmp_path):
-        """has_bias_mitigation=False → ART10-OBL-2f NON_COMPLIANT."""
+        """has_bias_examination=False → ART10-OBL-2f NON_COMPLIANT."""
         BaseArticleModule.set_context(_full_false_ctx())
         result = art10_module.scan(str(tmp_path))
         obl = _find(result, "ART10-OBL-2f")
@@ -125,7 +129,7 @@ class TestArt10Obl2f:
         assert obl[0].level == ComplianceLevel.NON_COMPLIANT
 
     def test_has_bias_none_gives_utd(self, art10_module, tmp_path):
-        """has_bias_mitigation=None → ART10-OBL-2f UNABLE_TO_DETERMINE."""
+        """has_bias_examination=None → ART10-OBL-2f UNABLE_TO_DETERMINE."""
         BaseArticleModule.set_context(_empty_ctx())
         result = art10_module.scan(str(tmp_path))
         obl = _find(result, "ART10-OBL-2f")

@@ -11,7 +11,7 @@ ctx.get_article_answers("art10"). No regex or keyword scanning is performed here
 Obligation mapping:
   ART10-OBL-1   → has_data_governance_doc (quality criteria)
   ART10-OBL-2   → has_data_governance_doc (governance practices a-e)
-  ART10-OBL-2f  → has_bias_mitigation (bias examination)
+  ART10-OBL-2f  → has_bias_examination (bias examination)
   ART10-OBL-2g  → has_bias_mitigation (bias detection/prevention/mitigation measures)
   ART10-OBL-2h  → UNABLE_TO_DETERMINE always (data gap identification — manual)
   ART10-OBL-3   → UNABLE_TO_DETERMINE always (data quality — manual)
@@ -65,12 +65,16 @@ class Art10Module(BaseArticleModule):
 
         has_data_doc = answers.get("has_data_governance_doc")
         data_doc_paths = answers.get("data_doc_paths") or []
+        # Art. 10(2)(f) and (g) are separate answers (series-3 dry run, 2026-10-26): measures are not an examination.
+        has_examination = answers.get("has_bias_examination")
+        examination_evidence = answers.get("bias_examination_evidence") or []
         has_bias = answers.get("has_bias_mitigation")
         bias_evidence = answers.get("bias_evidence") or []
         has_lineage = answers.get("has_data_lineage")
 
         doc_evidence = data_doc_paths or None
         bias_ev = bias_evidence or None
+        examination_ev = examination_evidence or None
 
         # ── ART10-OBL-1: Data quality criteria ──
         findings.append(self._finding_from_answer(
@@ -114,21 +118,24 @@ class Art10Module(BaseArticleModule):
         # ── ART10-OBL-2f: Bias examination ──
         findings.append(self._finding_from_answer(
             obligation_id="ART10-OBL-2f",
-            answer=has_bias,
+            answer=has_examination,
             true_description=(
-                f"Bias examination evidence found: {', '.join(bias_evidence)}."
-                if bias_evidence
-                else "Bias examination evidence found."
+                (f"Evidence of a bias examination found: {', '.join(examination_evidence)}."
+                 if examination_evidence else "Evidence of a bias examination found.")
+                + " The scan does not assess whether the examination is sufficient."
             ),
             false_description=(
-                "No bias examination detected. Art. 10(2)(f) requires examination "
-                "of possible biases affecting health, safety, fundamental rights, "
-                "or leading to prohibited discrimination."
+                "No examination of the data sets for possible biases was found. For high-risk AI systems, "
+                "Art. 10(2)(f) requires the data sets (only the testing data sets where the system does not use "
+                "techniques involving the training of AI models, Art. 10(6)) to be examined in view of possible "
+                "biases that are likely to affect the health and safety of persons, have a negative impact on "
+                "fundamental rights or lead to discrimination prohibited under Union law, especially where data "
+                "outputs influence inputs for future operations."
             ),
             none_description=(
                 "AI could not determine whether bias examination has been performed."
             ),
-            evidence=bias_ev,
+            evidence=examination_ev,
         ))
 
         # ── ART10-OBL-2g: Bias mitigation measures ──
@@ -136,12 +143,13 @@ class Art10Module(BaseArticleModule):
             obligation_id="ART10-OBL-2g",
             answer=has_bias,
             true_description=(
-                "Bias mitigation measures found. Art. 10(2)(g) requires measures to "
-                "detect, prevent and mitigate biases identified in (f)."
+                "Measures to detect, prevent or mitigate possible biases found. The scan does not assess whether "
+                "they are appropriate to the biases identified under Art. 10(2)(f), as Art. 10(2)(g) requires."
             ),
             false_description=(
-                "No bias mitigation measures detected. Art. 10(2)(g) requires "
-                "appropriate measures to detect, prevent and mitigate possible biases."
+                "No measures to detect, prevent and mitigate possible biases were found. Art. 10(2)(g) requires "
+                "appropriate measures to detect, prevent and mitigate possible biases identified according to "
+                "Art. 10(2)(f)."
             ),
             none_description=(
                 "AI could not determine whether bias mitigation measures exist."
@@ -212,6 +220,8 @@ class Art10Module(BaseArticleModule):
         details = {
             "has_data_governance_doc": has_data_doc,
             "data_doc_paths": data_doc_paths,
+            "has_bias_examination": has_examination,
+            "bias_examination_evidence": examination_evidence,
             "has_bias_mitigation": has_bias,
             "bias_evidence": bias_evidence,
             "has_data_lineage": has_lineage,
@@ -274,9 +284,10 @@ class Art10Module(BaseArticleModule):
                 "Art. 71": "EU database for high-risk AI systems listed in Annex III",
                 "GDPR": "Art. 4a(1) applies in addition to Regulation (EU) 2016/679",
             },
+            # Never retyped (2026-10-26: the old summary said "bias-free"): the pointer only, as Art. 48 does.
             recital=(
-                "Recital 67: Data governance is critical for ensuring AI system quality. "
-                "Training data must be representative and bias-free to the extent possible."
+                "Recital 67 addresses the quality of data sets and data governance for high-risk AI systems. Its "
+                "verbatim text is in the official text of the Regulation."
             ),
             automation_summary={
                 "fully_automatable": [],
@@ -324,16 +335,39 @@ class Art10Module(BaseArticleModule):
                 action_type="human_judgment_required",
             ))
 
+        if details.get("has_bias_examination") is False:
+            actions.append(ActionItem(
+                priority="HIGH",
+                article="Art. 10(2)(f)",
+                action="Examine the data sets for possible biases",
+                details=(
+                    "For a high-risk AI system, Art. 10(2)(f) requires the training, validation and testing data sets "
+                    "(only the testing data sets where the system does not use techniques involving the training of "
+                    "AI models, Art. 10(6)) to be examined in view of possible biases that are likely to affect the "
+                    "health and safety of persons, have a negative impact on fundamental rights or lead to "
+                    "discrimination prohibited under Union law, especially where data outputs influence inputs for "
+                    "future operations. Consider proxies for protected characteristics, not only the characteristics "
+                    "themselves. Record the examination, the data sets examined, the results and any limitations, so "
+                    "they can be shown in the technical documentation (Art. 11, Annex IV). Results on synthetic test "
+                    "data do not by themselves show how the system behaves on real data. Art. 4a(1) sets the "
+                    "conditions under which providers may exceptionally process special categories of personal data "
+                    "for bias detection and correction, in addition to the GDPR."
+                ),
+                effort="4-16 hours",
+                action_type="human_judgment_required",
+            ))
+
         if details.get("has_bias_mitigation") is False:
             actions.append(ActionItem(
                 priority="HIGH",
-                article="Art. 10(2)(f)(g)",
-                action="Implement bias examination and mitigation",
+                article="Art. 10(2)(g)",
+                action="Put measures in place to detect, prevent and mitigate biases",
                 details=(
-                    "Art. 10(2)(f) requires examination of biases affecting health, safety, "
-                    "and fundamental rights. Art. 10(2)(g) requires measures to detect, "
-                    "prevent and mitigate biases. Consider: fairlearn, aif360, or manual "
-                    "demographic analysis of training data."
+                    "Art. 10(2)(g) requires appropriate measures to detect, prevent and mitigate possible biases "
+                    "identified according to Art. 10(2)(f), so the measures should address what the examination "
+                    "found. Examples, depending on the biases found: removing or limiting proxy factors in the "
+                    "inputs, group-outcome tests before releases, monitoring outcomes after launch. Libraries such "
+                    "as fairlearn or aif360 can support the analysis."
                 ),
                 effort="4-16 hours",
             ))
