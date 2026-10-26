@@ -21,12 +21,8 @@ DESCRIPTIONS = {
         "system for the purposes of Article 50(1), for example a notice displayed at or before the first interaction. "
         "Empty list if no such evidence is found."
     ),
-    "marking_evidence": (
-        "List of free-text items identifying where outputs consisting of synthetic audio, image, video or text are "
-        "marked in a machine-readable format and are detectable as artificially generated or manipulated for the "
-        "purposes of Article 50(2). Record the implemented marking mechanism and its code or configuration location "
-        "where available. Empty list if no such evidence is found."
-    ),
+    # review AA (2026-10-26): gaps, negative findings and the means of detection (test_art50_2_scope_and_detection.py)
+    "marking_evidence": None,
     "deep_fake_evidence": (
         "List of free-text items identifying where deployers disclose that image, audio or video content "
         "constituting a deep fake has been artificially generated or manipulated for the purposes of Article 50(4), "
@@ -47,6 +43,11 @@ def _analyze(tmp_path):
     return json.loads(server.cl_analyze_project(str(tmp_path)))
 
 
+def _reviewed():
+    from test_art50_2_scope_and_detection import MARKING_EVIDENCE_DESCRIPTION
+    return {**DESCRIPTIONS, "marking_evidence": MARKING_EVIDENCE_DESCRIPTION}
+
+
 def test_the_template_has_the_four_lists(tmp_path):
     template = _analyze(tmp_path)["compliance_answers_template"]["art50"]
     for name in DESCRIPTIONS:
@@ -55,7 +56,7 @@ def test_the_template_has_the_four_lists(tmp_path):
 
 def test_each_list_has_its_description(tmp_path):
     descs = _analyze(tmp_path)["compliance_answers_field_descriptions"]["art50"]
-    for name, text in DESCRIPTIONS.items():
+    for name, text in _reviewed().items():
         assert descs[name] == text, name
 
 

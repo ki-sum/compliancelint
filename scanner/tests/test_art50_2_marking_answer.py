@@ -20,16 +20,8 @@ from test_art50_evidence_fields import _analyze, _art50_findings  # noqa: E402
 from core.context import ProjectContext  # noqa: E402
 from core.protocol import BaseArticleModule  # noqa: E402
 
-FIELD_DESCRIPTION = (
-    "true if at least one of the system's synthetic audio, image, video or text outputs has an identified mechanism "
-    "intended to mark it in a machine-readable format and enable detection as artificially generated or manipulated, "
-    "including embedded metadata, watermarking or another technical method. This includes cases where only some output "
-    "types or output paths are marked. true indicates evidence requiring human review, not compliance with Article "
-    "50(2). false if no such mechanism is identified for any relevant synthetic output; null if the available project "
-    "evidence is insufficient to determine this. In marking_evidence, identify each mechanism and its code or "
-    "configuration location where available, and explicitly identify any synthetic output types or paths for which "
-    "marking or detectability is absent or cannot be verified."
-)
+# Review AA (2026-10-26) added the means of detection to the evidence; the meaning of "yes" is unchanged.
+from test_art50_2_scope_and_detection import MARKING_DESCRIPTION as FIELD_DESCRIPTION  # noqa: E402
 
 FALSE_DESCRIPTION = (
     "System generates synthetic content, but no machine-readable marking mechanism enabling detection as artificially "
