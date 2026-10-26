@@ -26,6 +26,10 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 - The Article 50(2) finding for a "yes" read "Synthetic content marking/watermarking found.". It now says that a
   marking mechanism was identified for at least one output type, that this is evidence for review and not proof of
   compliance, and what a person has to confirm.
+- `cl_action_plan` listed actions about obligations that the project's own scan finds not applicable, when the
+  dashboard profile lists them: a chatbot that went live after 2 August 2026 got "Monitor transitional compliance
+  deadlines and regulatory guidance" (Article 111) as a project change. Such actions are now left out and counted in
+  `dashboard_applicability.actions_not_applicable`.
 
 ## [1.3.4] — 2026-10-25
 

@@ -2913,6 +2913,9 @@ def cl_action_plan(project_path: str, regulation: str = "eu-ai-act", article: in
 
     all_actions = []
     articles_covered = []
+    # Obligations this project's scan finds not applicable: an action about only those is left out like one the
+    # dashboard profile excludes (e1 to-do list, 2026-10-26: Art. 111(4) is always not applicable in the scan).
+    scan_not_applicable: set = set()
 
     # The repo's applicability profile on the dashboard (Profiling Wizard answers), as the scan uses it: the plan covers
     # what applies to this repo. Series-2 recording, 2026-10-25 (QA #39): for a limited-risk chatbot the plan listed
@@ -2950,6 +2953,10 @@ def cl_action_plan(project_path: str, regulation: str = "eu-ai-act", article: in
         mod = _modules[art_num]
         try:
             scan_result = mod.scan(project_path)
+            from core.protocol import ComplianceLevel as _CL
+            scan_not_applicable.update(
+                f.obligation_id for f in scan_result.findings
+                if getattr(f, "obligation_id", None) and f.level == _CL.NOT_APPLICABLE)
             plan = mod.action_plan(scan_result)
             all_actions.extend(plan.actions)
             articles_covered.append(f"Art. {art_num} ({mod.article_title})")
@@ -3002,7 +3009,7 @@ def cl_action_plan(project_path: str, regulation: str = "eu-ai-act", article: in
         kept, not_applicable_refs = [], []
         for action_dict in action_dicts:
             oids = _action_obligation_ids(action_dict)
-            relevant = [o for o in oids if o in applicable_obligations]
+            relevant = [o for o in oids if o in applicable_obligations and o not in scan_not_applicable]
             if oids and not relevant:
                 not_applicable_refs.append(str(action_dict.get("article") or ""))
                 continue

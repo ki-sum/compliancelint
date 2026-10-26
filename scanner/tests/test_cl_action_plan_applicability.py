@@ -66,6 +66,24 @@ class TestPlanFollowsTheDashboardProfile:
         }
 
 
+class TestPlanFollowsTheScan:
+    """An obligation the dashboard profile lists can still be not applicable in this project's scan: Art. 111(4) (the
+    Art. 50(2) transition for systems placed on the market before 2 August 2026) is always not applicable in the scan,
+    yet the e1 to-do list of the demo chatbot (2026-10-26) listed "Monitor transitional compliance deadlines and
+    regulatory guidance" as a project change. An action whose obligations are all not applicable in the scan is left
+    out and counted with the other not-applicable actions."""
+
+    def test_an_action_on_obligations_the_scan_finds_not_applicable_is_dropped(self, tmp_path, monkeypatch):
+        plan = _plan(tmp_path, monkeypatch, _settings(["art111"], ["ART111-OBL-4"]), article=111)
+        assert not any("Monitor transitional" in a["action"] for a in plan["actions"]), plan["actions"]
+        assert "Art. 111" in plan["dashboard_applicability"]["actions_not_applicable"]["articles"]
+
+    def test_an_obligation_open_in_the_scan_keeps_its_action(self, tmp_path, monkeypatch):
+        # Under the high-risk test context the Art. 12 findings are open, so both Art. 12 actions stay.
+        plan = _plan(tmp_path, monkeypatch, _settings(["art12"], ["ART12-OBL-2a", "ART12-OBL-2c"]), article=12)
+        assert [a["article"] for a in plan["actions"]] == ["Art. 12(2)(a)", "Art. 12(2)(c)"]
+
+
 class TestWhereAnActionIsAnswered:
     """A person answers an obligation in Human Gates when it is in the repo's questionnaire and the scanner cannot
     settle it from the code (automation level partial or manual). Obligations the scanner checks in the code (level
