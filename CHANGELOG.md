@@ -6,6 +6,27 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.3.5] — 2026-10-26
+
+### Fixed
+- Article 50 actions in `cl_action_plan` stated wrong law: the deep fake action said Article 50(4) requires a C2PA
+  manifest and that artistic or satirical content must "still indicate AI origin"; the marking action recommended an
+  `X-AI-Generated` HTTP header for text; and an action "Evaluate C2PA integration for future-proofing" began "Even if
+  not currently generating synthetic content" for systems that do generate content. The texts are rewritten after a
+  legal review, one action per duty, each naming its obligation (`obligation_id`):
+  - Article 50(1): the notice is missing (change the project), or found and to be verified in Human Gates.
+  - Article 50(2): no marking identified — machine-readable marking and a means of detecting it, with examples and
+    no technology prescribed; or marking identified for some outputs — confirm it covers every in-scope output type.
+  - Article 50(3): emotion recognition and biometric categorisation, each with its own text.
+  - Article 50(4): deep fakes, and new: text published on matters of public interest (disclosure or the editorial
+    exception, recorded in Human Gates).
+  - The Article 50 register is recommended evidence, not a document the Article prescribes.
+  The future-proofing action is removed. With the dashboard profile, each action keeps the route the review gave it
+  (`where`).
+- The Article 50(2) finding for a "yes" read "Synthetic content marking/watermarking found.". It now says that a
+  marking mechanism was identified for at least one output type, that this is evidence for review and not proof of
+  compliance, and what a person has to confirm.
+
 ## [1.3.4] — 2026-10-25
 
 ### Fixed
