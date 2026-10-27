@@ -60,6 +60,24 @@ All videos, with their transcripts, on one page: [compliancelint.dev/videos](htt
 
 Also as a [YouTube playlist](https://www.youtube.com/playlist?list=PLAF1jMZOUYEA).
 
+#### Walkthrough: preparing a high-risk recruiting AI
+
+[![Walkthrough overview video (1:12)](https://compliancelint.dev/videos/high-risk-recruiting-ai/e0-overview.jpg)](https://compliancelint.dev/videos/high-risk-recruiting-ai/e0-overview.mp4)
+
+**[Watch the overview (1:12)](https://compliancelint.dev/videos/high-risk-recruiting-ai/e0-overview.mp4)**: a fictional recruiting AI, high-risk under Annex III, point 4(a), and not yet on the market, being prepared for the EU AI Act: an emotion-recognition feature removed, logs and human oversight, bias safeguards, the documents, and a record of what is still open before launch. It ends with a plan, not with a declaration of conformity.
+
+| Episode | Video |
+|------|-------|
+| 1. The first scan: high-risk under Annex III, and no Article 6(3) exemption | [1:16](https://compliancelint.dev/videos/high-risk-recruiting-ai/e1-first-scan.mp4) |
+| 2. Article 5(1)(f): removing emotion recognition from a recruiting AI | [1:41](https://compliancelint.dev/videos/high-risk-recruiting-ai/e2-emotion.mp4) |
+| 3. High-risk classification: the Profiling Wizard and the readiness view | [1:44](https://compliancelint.dev/videos/high-risk-recruiting-ai/e3-wizard.mp4) |
+| 4. Articles 12 and 14: event logs and human oversight | [2:17](https://compliancelint.dev/videos/high-risk-recruiting-ai/e4-oversight-logs.mp4) |
+| 5. Log retention and Article 10 bias safeguards | [3:02](https://compliancelint.dev/videos/high-risk-recruiting-ai/e5-bias.mp4) |
+| 6. Articles 9 and 13: risk management, instructions for use, Human Gates | [2:04](https://compliancelint.dev/videos/high-risk-recruiting-ai/e6-documents.mp4) |
+| 7. The record: what is still open before launch | [1:49](https://compliancelint.dev/videos/high-risk-recruiting-ai/e7-record.mp4) |
+
+Also as a [YouTube playlist](https://www.youtube.com/playlist?list=PLOZMylyRTuMA).
+
 Try the live demo at **[compliancelint.dev/demo](https://compliancelint.dev/demo)** — pre-loaded with three AI systems (a chatbot that is not high-risk but has an Article 50 transparency trigger, a high-risk finance system, a high-risk medical system) so you can browse a real scan, attestation flow, and Compliance Journey trend without setting up a project of your own.
 
 ### Dashboard

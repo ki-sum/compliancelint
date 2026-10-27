@@ -220,3 +220,25 @@ def test_readme_links_all_videos_and_the_walkthrough_series():
     assert "https://www.youtube.com/playlist?list=PLXxAlsu_fRdY" in readme
     # wording of the legal check of the YouTube texts (2026-10-26)
     assert "Article 5 safeguards" not in readme
+
+
+RECRUITING_EPISODES = ["e1-first-scan", "e2-emotion", "e3-wizard", "e4-oversight-logs", "e5-bias", "e6-documents",
+                       "e7-record"]
+
+
+def test_readme_adds_the_high_risk_recruiting_walkthrough():
+    """Series 3 (2026-10-27): a fictional high-risk recruiting AI (Annex III), overview + seven episodes, as on
+    compliancelint.dev/videos; episode titles follow the legal-checked YouTube titles."""
+    readme = _read("README.md")
+    assert "#### Walkthrough: preparing a high-risk recruiting AI" in readme
+    assert "https://compliancelint.dev/videos/high-risk-recruiting-ai/e0-overview.mp4" in readme
+    assert "https://compliancelint.dev/videos/high-risk-recruiting-ai/e0-overview.jpg" in readme
+    for name in RECRUITING_EPISODES:
+        assert f"(https://compliancelint.dev/videos/high-risk-recruiting-ai/{name}.mp4)" in readme, name
+    assert "https://www.youtube.com/playlist?list=PLOZMylyRTuMA" in readme
+    # the legal check of the YouTube texts: no "has to go", no "what is done", no "Article 6(3) does not apply"
+    for wrong in ("has to go", "What is done", "Article 6(3) does not apply"):
+        assert wrong not in readme, wrong
+    # it comes after the chatbot walkthrough, before the live demo
+    assert readme.index("Walkthrough: fixing an AI chatbot") < readme.index(
+        "Walkthrough: preparing a high-risk recruiting AI") < readme.index("Try the live demo")
