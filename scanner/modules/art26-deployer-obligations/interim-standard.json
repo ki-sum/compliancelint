@@ -66,7 +66,7 @@
       "requirement": "The deployer MUST retain automatically generated AI system logs for at least six months.",
       "rationale": "Art. 26(6) mandates minimum 6-month log retention for deployers.",
       "acceptable_implementations": [
-        "Log storage with a configured retention of at least six months: counted in days, at least 184 days",
+        "Log storage with a configured retention of 184 days (at least six months)",
         "Cloud logging service with retention policy",
         "Log archive system with documented retention period",
         "SIEM integration with appropriate retention"

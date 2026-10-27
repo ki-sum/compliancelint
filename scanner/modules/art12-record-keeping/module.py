@@ -27,7 +27,7 @@ from core.protocol import (
 )
 from core.obligation_engine import ObligationEngine
 
-from core.retention import RETENTION_MINIMUM_DAYS, six_months, short_of_six_months
+from core.retention import RETENTION_MINIMUM_DAYS, MINIMUM_IN_DAYS, six_months, short_of_six_months
 
 
 class Art12Module(BaseArticleModule):
@@ -250,7 +250,7 @@ class Art12Module(BaseArticleModule):
                     f"{six_months('Art. 19(1)')}"
                 ),
                 remediation=(
-                    f"Configure log retention for at least {RETENTION_MINIMUM_DAYS} days. "
+                    f"Configure log retention for {MINIMUM_IN_DAYS}. "
                     "Options: logrotate (daily, rotate 184), an AWS CloudWatch Logs retention of 365 days (it offers "
                     "no value between 180 and 365 days), or an equivalent time-based retention."
                 ),
@@ -271,8 +271,7 @@ class Art12Module(BaseArticleModule):
                     f"{('Evidence: ' + retention_evidence) if retention_evidence else ''}"
                 ),
                 remediation=(
-                    f"Verify that the configured period keeps every log for at least six months "
-                    f"({RETENTION_MINIMUM_DAYS} days)."
+                    f"Verify that the configured period reaches {MINIMUM_IN_DAYS}."
                 ),
                 gap_type=GapType.CODE,
             )
@@ -307,8 +306,7 @@ class Art12Module(BaseArticleModule):
                     f"{('Evidence: ' + retention_evidence) if retention_evidence else ''}"
                 ),
                 remediation=(
-                    f"Increase log retention to at least {RETENTION_MINIMUM_DAYS} days "
-                    f"(currently {retention_days} days)."
+                    f"Increase log retention to {MINIMUM_IN_DAYS}; currently {retention_days} days."
                 ),
                 gap_type=GapType.CODE,
             )
@@ -400,7 +398,7 @@ class Art12Module(BaseArticleModule):
             actions.append(ActionItem(
                 priority="HIGH",
                 article="Art. 19(1)",
-                action=f"Configure log retention of at least six months ({RETENTION_MINIMUM_DAYS} days)",
+                action=f"Configure log retention of {MINIMUM_IN_DAYS}",
                 details=(
                     f"{six_months('Art. 19(1)')}\n"
                     "\n"
@@ -409,7 +407,7 @@ class Art12Module(BaseArticleModule):
                     "    # /etc/logrotate.d/ai-system\n"
                     "    /var/log/ai-system/*.log {\n"
                     "        daily\n"
-                    f"        rotate {RETENTION_MINIMUM_DAYS}       # {RETENTION_MINIMUM_DAYS} daily files: six months (Art. 19)\n"
+                    f"        rotate {RETENTION_MINIMUM_DAYS}       # {RETENTION_MINIMUM_DAYS} days (at least six months, Art. 19(1))\n"
                     "        compress\n"
                     "        notifempty\n"
                     "    }\n"
@@ -433,12 +431,11 @@ class Art12Module(BaseArticleModule):
             actions.append(ActionItem(
                 priority="HIGH",
                 article="Art. 19(1)",
-                action=f"Increase log retention from {current_days} days to at least six months "
-                       f"({RETENTION_MINIMUM_DAYS} days)",
+                action=f"Increase log retention from {current_days} days to {MINIMUM_IN_DAYS}",
                 details=(
                     f"{short_of_six_months('Current retention', current_days)} "
                     f"{six_months('Art. 19(1)')} "
-                    f"Update your retention configuration to at least {RETENTION_MINIMUM_DAYS} days."
+                    f"Update your retention configuration to {MINIMUM_IN_DAYS}."
                 ),
                 effort="30 minutes",
             ))

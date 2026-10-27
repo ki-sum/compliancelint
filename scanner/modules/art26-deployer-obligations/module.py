@@ -50,7 +50,7 @@ from core.protocol import (
 )
 from core.obligation_engine import ObligationEngine
 
-from core.retention import RETENTION_MINIMUM_DAYS, six_months, short_of_six_months
+from core.retention import RETENTION_MINIMUM_DAYS, MINIMUM_IN_DAYS, six_months, short_of_six_months
 
 
 class Art26Module(BaseArticleModule):
@@ -260,7 +260,7 @@ class Art26Module(BaseArticleModule):
                     f"{six_months('Art. 26(6)')}"
                 ),
                 remediation=(
-                    f"Configure log retention for at least {RETENTION_MINIMUM_DAYS} days. "
+                    f"Configure log retention for {MINIMUM_IN_DAYS}. "
                     "Options: logrotate, cloud log retention settings, or database archival policy."
                 ),
                 gap_type=GapType.CODE,
@@ -280,8 +280,7 @@ class Art26Module(BaseArticleModule):
                     f"{('Evidence: ' + retention_evidence) if retention_evidence else ''}"
                 ),
                 remediation=(
-                    f"Verify that the configured period keeps every log for at least six months "
-                    f"({RETENTION_MINIMUM_DAYS} days)."
+                    f"Verify that the configured period reaches {MINIMUM_IN_DAYS}."
                 ),
                 gap_type=GapType.CODE,
             )
@@ -316,8 +315,7 @@ class Art26Module(BaseArticleModule):
                     f"{('Evidence: ' + retention_evidence) if retention_evidence else ''}"
                 ),
                 remediation=(
-                    f"Increase log retention to at least {RETENTION_MINIMUM_DAYS} days "
-                    f"(currently {retention_days} days)."
+                    f"Increase log retention to {MINIMUM_IN_DAYS}; currently {retention_days} days."
                 ),
                 gap_type=GapType.CODE,
             )
@@ -376,7 +374,7 @@ class Art26Module(BaseArticleModule):
                 "ComplianceLint Compliance Checklist v0.1 requires: (1) deployment documentation "
                 "referencing provider instructions, (2) documented human oversight assignment with "
                 "competency records, (3) operational monitoring infrastructure, (4) log retention "
-                "of at least six months (184 days), (5) notification mechanism for affected persons. "
+                "of 184 days (at least six months), (5) notification mechanism for affected persons. "
                 "Based on: ISO/IEC 42001:2023, ISO/IEC 23894:2023."
             ),
             enforcement_date=applicable_from(26),
@@ -431,7 +429,7 @@ class Art26Module(BaseArticleModule):
             actions.append(ActionItem(
                 priority="HIGH",
                 article="Art. 26(6)",
-                action=f"Configure log retention of at least six months ({RETENTION_MINIMUM_DAYS} days)",
+                action=f"Configure log retention of {MINIMUM_IN_DAYS}",
                 details=(
                     f"{six_months('Art. 26(6)')} Configure retention via logrotate, "
                     f"cloud log settings, or database archival."
@@ -447,8 +445,7 @@ class Art26Module(BaseArticleModule):
             actions.append(ActionItem(
                 priority="HIGH",
                 article="Art. 26(6)",
-                action=f"Increase log retention from {current_days} days to at least six months "
-                       f"({RETENTION_MINIMUM_DAYS} days)",
+                action=f"Increase log retention from {current_days} days to {MINIMUM_IN_DAYS}",
                 details=(
                     f"{short_of_six_months('Current retention', current_days)} "
                     f"{six_months('Art. 26(6)')}"

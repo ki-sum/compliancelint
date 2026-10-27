@@ -152,3 +152,20 @@ def test_a_period_within_the_minimum_leaves_the_judgement_to_a_person(request, t
     _, result = _scan(request, fixture, ctx_for(365), tmp_path)
     text = [f for f in result.findings if f.obligation_id == obligation_id][0].description
     assert "a person still needs to confirm that the period is appropriate to the intended purpose" in text
+
+
+# Founder 2026-10-27: where a number of days is shown, it reads "184 days (at least six months)".
+MINIMUM_SHOWN = "184 days (at least six months)"
+
+
+@pytest.mark.parametrize("fixture,ctx_for,obligation_id", CASES)
+@pytest.mark.parametrize("days", [None, 30, 182])
+def test_every_day_count_of_the_minimum_reads_184_days_at_least_six_months(request, tmp_path, fixture, ctx_for,
+                                                                            obligation_id, days):
+    module, result = _scan(request, fixture, ctx_for(days), tmp_path)
+    texts = _texts(module, result)
+    shown = [t for t in texts if "184" in t]
+    assert shown, "no text gives the minimum in days"
+    for text in shown:
+        for m in re.finditer(r"184 days", text):
+            assert text[m.start():].startswith(MINIMUM_SHOWN) or "181 to 184 days" in text[max(0, m.start() - 7):m.end()], text
