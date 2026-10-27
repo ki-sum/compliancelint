@@ -15,18 +15,18 @@
   "requirements": [
     {
       "id": "IS-ART47-R01",
-      "obligation_ref": "ART47-OBL-1",
+      "obligation_ref": ["ART47-OBL-1", "ART47-OBL-2", "ART47-OBL-3", "ART47-OBL-4"],
       "title": "EU Declaration of Conformity Document",
-      "requirement": "The provider MUST draw up a written, machine-readable EU Declaration of Conformity for each high-risk AI system.",
-      "rationale": "Art. 47(1) mandates the DoC document.",
+      "requirement": "The provider MUST draw up a written machine readable, physical or electronically signed EU declaration of conformity for each high-risk AI system that identifies the system, states that it meets the requirements set out in Section 2 of Chapter III, contains the information set out in Annex V and is translated into a language that can be easily understood by the national competent authorities of the Member States in which the system is placed on the market or made available (Article 47(1) and (2)). Where the system is subject to other Union harmonisation legislation which also requires an EU declaration of conformity, a single declaration MUST be drawn up in respect of all Union law applicable (Article 47(3)). The provider MUST keep the declaration up-to-date as appropriate (Article 47(4)).",
+      "rationale": "Art. 47(1) requires the provider to draw up 'a written machine readable, physical or electronically signed EU declaration of conformity for each high-risk AI system'; Art. 47(2) requires it to 'contain the information set out in Annex V'.",
       "required_content": [
-        "AI system name and identification",
-        "Provider name and address",
-        "Statement that the DoC is issued under the sole responsibility of the provider",
-        "Reference to conformity assessment procedure used",
-        "Reference to harmonised standards or common specifications applied",
-        "Date of issue",
-        "Signature of authorised person"
+        "AI system name and type and any additional unambiguous reference allowing the identification and traceability of the AI system (Annex V, point 1)",
+        "Name and address of the provider or, where applicable, of their authorised representative (Annex V, point 2)",
+        "Statement that the EU declaration of conformity is issued under the sole responsibility of the provider (Annex V, point 3)",
+        "Statement that the AI system is in conformity with this Regulation and, if applicable, with any other relevant Union law that provides for the issuing of the EU declaration of conformity (Annex V, point 4); where the AI system involves the processing of personal data, a statement that it complies with Regulations (EU) 2016/679 and (EU) 2018/1725 and Directive (EU) 2016/680 (Annex V, point 5)",
+        "References to any relevant harmonised standards used or any other common specification in relation to which conformity is declared (Annex V, point 6)",
+        "Where applicable, the name and identification number of the notified body, a description of the conformity assessment procedure performed, and identification of the certificate issued (Annex V, point 7)",
+        "Place and date of issue of the declaration, the name and function of the person who signed it, an indication for, or on behalf of whom, that person signed, and a signature (Annex V, point 8)"
       ],
       "acceptable_formats": [
         "Machine-readable digital document (JSON, XML, PDF/A with structured data)",
@@ -38,8 +38,8 @@
       "id": "IS-ART47-R02",
       "obligation_ref": "ART47-OBL-1",
       "title": "10-Year Retention",
-      "requirement": "The provider MUST keep the DoC at the disposal of national competent authorities for 10 years.",
-      "rationale": "Art. 47(1) requires 10-year retention after market placement."
+      "requirement": "The provider MUST keep the EU declaration of conformity at the disposal of the national competent authorities for 10 years after the high-risk AI system has been placed on the market or put into service, and MUST submit a copy to the relevant national competent authorities upon request (Article 47(1)).",
+      "rationale": "Art. 47(1) requires the provider to keep the declaration 'at the disposal of the national competent authorities for 10 years after the high-risk AI system has been placed on the market or put into service'."
     }
   ],
   "scoring": {

@@ -19,10 +19,10 @@
   "requirements": [
     {
       "id": "IS-ART17-R01",
-      "obligation_ref": "ART17-OBL-1",
+      "obligation_ref": ["ART17-OBL-1", "ART17-OBL-2", "ART17-PERM-3"],
       "title": "Documented Quality Management System",
-      "requirement": "The provider MUST establish and maintain a documented QMS covering all 13 aspects of Art. 17(1).",
-      "rationale": "Art. 17(1) mandates a systematic, documented QMS.",
+      "requirement": "The provider MUST put in place a quality management system that ensures compliance with the Regulation, documented in a systematic and orderly manner in the form of written policies, procedures and instructions, and including at least the 13 aspects listed in Article 17(1), points (a) to (m). The implementation of those aspects MUST be proportionate to the size of the provider's organisation, in particular if the provider is an SME, including a start-up, or an SMC, while respecting the degree of rigour and the level of protection required to ensure compliance (Article 17(2)). SMEs, including start-ups, that do not have partner enterprises or linked enterprises within the meaning of Recommendation 2003/361/EC MAY comply with certain elements of the quality management system in a simplified manner (Article 63(1)). Providers subject to obligations regarding quality management systems, or an equivalent function, under relevant sectoral Union law MAY include these aspects as part of those systems (Article 17(3)); for providers that are financial institutions, Article 17(4) applies.",
+      "rationale": "Art. 17(1) requires a quality management system 'documented in a systematic and orderly manner in the form of written policies, procedures and instructions'. Art. 17(2), as amended by Regulation (EU) 2026/1744, names SMEs, including start-ups, and SMCs in the proportionality rule.",
       "required_content": [
         "Quality policy statement",
         "Quality manual or equivalent",
@@ -35,8 +35,8 @@
       "id": "IS-ART17-R02",
       "obligation_ref": ["ART17-OBL-1c", "ART17-OBL-1d"],
       "title": "Development QA and Testing",
-      "requirement": "The QMS MUST include development quality assurance and testing procedures.",
-      "rationale": "Art. 17(1)(c)(d) requires QC/QA and testing procedures.",
+      "requirement": "The QMS MUST include techniques, procedures and systematic actions to be used for the development, quality control and quality assurance of the high-risk AI system (Article 17(1)(c)), and examination, test and validation procedures to be carried out before, during and after the development of the system, together with the frequency with which they have to be carried out (Article 17(1)(d)).",
+      "rationale": "Art. 17(1), points (c) and (d), require development, quality control and quality assurance techniques and procedures, and examination, test and validation procedures with the frequency with which they have to be carried out.",
       "acceptable_implementations": [
         "CI/CD pipeline with automated testing stages",
         "Code review processes with documented standards",
@@ -49,8 +49,8 @@
       "id": "IS-ART17-R03",
       "obligation_ref": "ART17-OBL-1f",
       "title": "Data Management Procedures",
-      "requirement": "The QMS MUST include comprehensive data management procedures.",
-      "rationale": "Art. 17(1)(f) requires data management covering the full data lifecycle.",
+      "requirement": "The QMS MUST include systems and procedures for data management covering the operations listed in Article 17(1)(f) that are performed before and for the purpose of the placing on the market or the putting into service of the high-risk AI system.",
+      "rationale": "Art. 17(1)(f) requires 'systems and procedures for data management, including data acquisition, data collection, data analysis, data labelling, data storage, data filtration, data mining, data aggregation, data retention and any other operation regarding the data that is performed before and for the purpose of the placing on the market or the putting into service of high-risk AI systems'. Point (f) does not cover the full data lifecycle.",
       "required_content": [
         "Data acquisition and collection procedures",
         "Data labelling quality controls",
@@ -63,7 +63,7 @@
       "id": "IS-ART17-R04",
       "obligation_ref": "ART17-OBL-1m",
       "title": "Accountability Framework",
-      "requirement": "The QMS MUST include an accountability framework defining roles and responsibilities.",
+      "requirement": "The QMS MUST include an accountability framework setting out the responsibilities of the management and other staff with regard to all the aspects listed in Article 17(1).",
       "rationale": "Art. 17(1)(m) requires clear accountability for all QMS aspects.",
       "acceptable_implementations": [
         "RACI matrix covering all 13 QMS aspects",

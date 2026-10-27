@@ -8,7 +8,7 @@
     "disclaimer": "This is an interim checklist developed by ComplianceLint. It is not a harmonised standard and does not itself give a presumption of conformity. No harmonised standard is requested specifically for Article 27 in the Commission's standardisation request (Commission Implementing Decision C(2025) 3871). Article 27(5) requires the AI Office to develop a questionnaire template, including through an automated tool, for the fundamental rights impact assessment. The Commission states that guidance with a template is being prepared.",
     "basis": [
       "EU AI Act Article 27 (official text)",
-      "EU AI Act Recitals 94-96 (legislative intent on fundamental rights impact assessment)",
+      "EU AI Act Recital 96 (legislative intent on fundamental rights impact assessment)",
       "ISO/IEC 42001:2023 -- AI management system",
       "ISO/IEC 23894:2023 -- AI risk management",
       "GDPR Article 35 -- Data protection impact assessment"
@@ -20,23 +20,23 @@
       "id": "IS-ART27-R01",
       "obligation_ref": "ART27-OBL-1",
       "title": "FRIA Documentation",
-      "requirement": "The deployer MUST perform and document a fundamental rights impact assessment covering all six required elements: (a) description of processes, (b) period/frequency, (c) categories of persons affected, (d) specific risks, (e) human oversight measures, (f) risk materialisation measures.",
-      "rationale": "Art. 27(1) mandates a comprehensive FRIA covering six specific elements for qualifying deployers.",
+      "requirement": "Prior to deploying a high-risk AI system referred to in Article 6(2), other than one intended to be used in the area listed in Annex III, point 2, deployers that are bodies governed by public law or private entities providing public services, and deployers of high-risk AI systems referred to in Annex III, points 5(b) and (c), MUST perform an assessment of the impact on fundamental rights consisting of: (a) a description of the deployer's processes in which the system will be used in line with its intended purpose; (b) a description of the period of time within which, and the frequency with which, the system is intended to be used; (c) the categories of natural persons and groups likely to be affected by its use in the specific context; (d) the specific risks of harm likely to have an impact on those categories, taking into account the information given by the provider pursuant to Article 13; (e) a description of the implementation of human oversight measures, according to the instructions for use; (f) the measures to be taken in the case of the materialisation of those risks, including the arrangements for internal governance and complaint mechanisms (Article 27(1)).",
+      "rationale": "Art. 27(1) requires the deployers it lists to perform, prior to deploying the system, an assessment consisting of the six elements in points (a) to (f). High-risk AI systems intended to be used in the area listed in Annex III, point 2, are excluded. A written record of the assessment is needed in practice for the notification under Art. 27(3).",
       "required_content": [
         "Description of deployer processes using the AI system",
         "Period of time and frequency of intended use",
         "Categories of natural persons and groups likely affected",
-        "Specific risks of harm to identified categories",
-        "Description of human oversight measures implemented",
-        "Measures to be taken when identified risks materialise"
+        "Specific risks of harm to identified categories, taking into account the information given by the provider pursuant to Article 13",
+        "Description of the implementation of human oversight measures, according to the instructions for use",
+        "Measures to be taken when identified risks materialise, including the arrangements for internal governance and complaint mechanisms"
       ]
     },
     {
       "id": "IS-ART27-R02",
       "obligation_ref": "ART27-OBL-2",
       "title": "FRIA Timing and Updates",
-      "requirement": "The deployer MUST complete the FRIA before first use and MUST update it when relevant elements change.",
-      "rationale": "Art. 27(2) requires the assessment before first use and ongoing updates.",
+      "requirement": "The deployer MUST perform the assessment prior to deploying the system; the obligation applies to the first use of the high-risk AI system (Article 27(1) and (2)). In similar cases, the deployer MAY rely on previously conducted fundamental rights impact assessments or existing impact assessments carried out by the provider. If, during the use of the system, the deployer considers that any of the elements listed in Article 27(1) has changed or is no longer up to date, the deployer MUST take the necessary steps to update the information (Article 27(2)).",
+      "rationale": "Art. 27(1) requires the assessment prior to deploying the system and Art. 27(2) applies the obligation to the first use. Art. 27(2) permits reliance on previous or existing assessments in similar cases and requires the information to be updated when any element has changed or is no longer up to date.",
       "acceptable_implementations": [
         "FRIA document with completion date prior to deployment date",
         "Version-controlled FRIA with change log",
@@ -48,8 +48,8 @@
       "id": "IS-ART27-R03",
       "obligation_ref": "ART27-OBL-3",
       "title": "Authority Notification",
-      "requirement": "The deployer MUST notify the relevant market surveillance authority of the FRIA results.",
-      "rationale": "Art. 27(3) requires notification of assessment results to the authority.",
+      "requirement": "Once the assessment has been performed, the deployer MUST notify the market surveillance authority of its results, submitting the filled-out template referred to in Article 27(5) as part of the notification. In the case referred to in Article 46(1), the deployer MAY be exempt from that obligation to notify (Article 27(3)).",
+      "rationale": "Art. 27(3) requires notification of the results to the market surveillance authority, with the filled-out template referred to in Art. 27(5) as part of the notification, subject to the exemption in the case referred to in Art. 46(1).",
       "acceptable_implementations": [
         "Formal submission to national market surveillance authority",
         "Documented notification with receipt confirmation",
@@ -60,7 +60,7 @@
       "id": "IS-ART27-R04",
       "obligation_ref": "ART27-PERM-4",
       "title": "DPIA Reuse (optional)",
-      "requirement": "Where a data protection impact assessment under GDPR Art. 35 or Art. 27 of Directive (EU) 2016/680 already meets any of the Art. 27 obligations, the FRIA MAY include cross-references to the relevant sections of that assessment or include relevant parts of it.",
+      "requirement": "Where a data protection impact assessment under GDPR Art. 35 or Art. 27 of Directive (EU) 2016/680 already meets any of the Art. 27 obligations, the deployer MAY, when conducting the fundamental rights impact assessment, include cross-references to the relevant sections of that assessment or include relevant parts of it in the fundamental rights impact assessment.",
       "rationale": "Art. 27(4), as amended by Regulation (EU) 2026/1744, permits this reuse; it does not replace the FRIA required by Art. 27(1).",
       "acceptable_implementations": [
         "Cross-reference table mapping DPIA sections to the Art. 27 obligations they meet",

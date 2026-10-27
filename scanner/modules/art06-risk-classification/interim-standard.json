@@ -12,7 +12,7 @@
       "EU AI Act Annex III (High-risk AI systems)",
       "EU AI Act Recitals 46-56 (classification intent)",
       "EU AI Act Article 6(3) exception criteria",
-      "European Commission guidelines on high-risk classification (2025)"
+      "Draft Commission guidelines on the classification of high-risk AI systems (published 19 May 2026; Art. 6(5))"
     ],
     "awaiting_standard": "No harmonised standard is requested for Article 6 classification. Article 6(5) requires Commission guidelines with practical examples. The Commission published draft guidelines on the classification of high-risk AI systems on 19 May 2026."
   },
@@ -29,8 +29,8 @@
       "if_no": "NOT HIGH-RISK under Art. 6 — may still be subject to other AI Act provisions (e.g., Art. 50 transparency obligations for certain AI systems)"
     },
     "step_3": {
-      "question": "Does the Art. 6(3) exception apply? The system is NOT high-risk if it does NOT pose a significant risk of harm to health, safety, or fundamental rights AND it meets at least one of: (a) performs a narrow procedural task, (b) improves the result of a previously completed human activity, (c) detects decision-making patterns without replacing human assessment, (d) performs a preparatory task for an assessment listed in Annex III.",
-      "if_yes": "NOT HIGH-RISK (Art. 6(3) exception) — provider must document this reasoning",
+      "question": "Does the Art. 6(3) derogation apply? An AI system referred to in Annex III is not considered high-risk where it 'does not pose a significant risk of harm to the health, safety or fundamental rights of natural persons, including by not materially influencing the outcome of decision making' and at least one of the following conditions is fulfilled: (a) it is intended to perform a narrow procedural task; (b) it is intended to improve the result of a previously completed human activity; (c) it is intended to detect decision-making patterns or deviations from prior decision-making patterns and is not meant to replace or influence the previously completed human assessment, without proper human review; (d) it is intended to perform a preparatory task to an assessment relevant for the purposes of the use cases listed in Annex III. The derogation never applies where the AI system performs profiling of natural persons: such a system 'shall always be considered to be high-risk' (Art. 6(3), third subparagraph).",
+      "if_yes": "NOT HIGH-RISK (Art. 6(3) exception) — the provider MUST document its assessment before the system is placed on the market or put into service, MUST register itself and the system in the EU database (Art. 49(2)) and MUST provide the documentation to national competent authorities upon request (Art. 6(4))",
       "if_no": "HIGH-RISK via Art. 6(2) — subject to the requirements of Chapter III, Section 2 (Arts. 8-15)"
     }
   },
@@ -62,11 +62,11 @@
     {
       "id": "ANNEX-III-1",
       "category": "Biometrics",
-      "description": "AI systems intended for biometric identification, categorisation, or emotion recognition",
+      "description": "Remote biometric identification systems, biometric categorisation according to sensitive or protected attributes or characteristics, and emotion recognition, in so far as their use is permitted under relevant Union or national law (Annex III, point 1)",
       "subcategories": [
-        "Remote biometric identification (real-time and post, in publicly accessible spaces)",
-        "Biometric categorisation by sensitive attributes (race, political opinions, trade union membership, religious beliefs, sex life/orientation)",
-        "Emotion recognition in workplace and education"
+        "Remote biometric identification systems, wherever used; biometric verification the sole purpose of which is to confirm that a specific natural person is the person he or she claims to be is excluded (point 1(a))",
+        "Biometric categorisation according to sensitive or protected attributes or characteristics based on the inference of those attributes or characteristics (point 1(b)); categorising individual natural persons to deduce or infer their race, political opinions, trade union membership, religious or philosophical beliefs, sex life or sexual orientation is prohibited under Art. 5(1)(g), subject to the exceptions stated there",
+        "Emotion recognition systems (point 1(c)); inferring emotions of a natural person in the areas of workplace and education institutions is prohibited under Art. 5(1)(f), except where the system is intended for medical or safety reasons"
       ],
       "keywords": ["face recognition", "facial detection", "biometric", "fingerprint", "iris scan", "voice identification", "gait recognition", "emotion detection", "sentiment analysis face", "categorisation"],
       "libraries": ["deepface", "face_recognition", "dlib", "insightface", "arcface", "opencv face", "mediapipe face", "amazon rekognition", "azure face api"]
@@ -81,7 +81,7 @@
         "Gas supply",
         "Heating supply",
         "Electricity supply",
-        "Digital infrastructure"
+        "Critical digital infrastructure"
       ],
       "keywords": ["traffic control", "water treatment", "power grid", "electricity grid", "gas pipeline", "smart grid", "scada", "industrial control", "energy management", "water supply", "heating system", "digital infrastructure", "network management critical"],
       "libraries": ["pymodbus", "opcua", "scapy scada", "mininet"]
@@ -93,7 +93,7 @@
       "subcategories": [
         "Access or admission decisions",
         "Assignment to institutions or programs",
-        "Assessment of learning outcomes (when used to determine progression)",
+        "Evaluation of learning outcomes, including when those outcomes are used to steer the learning process (point 3(b)); assessment of the appropriate level of education that an individual will receive or will be able to access (point 3(c))",
         "Monitoring and detection of prohibited behaviour during exams (cheating detection)"
       ],
       "keywords": ["student admission", "enrollment decision", "grade prediction", "exam proctoring", "cheating detection", "plagiarism detection ai", "learning assessment", "student scoring", "academic performance prediction", "dropout prediction"],
@@ -105,7 +105,7 @@
       "description": "AI systems used in recruitment, selection, and management of workers",
       "subcategories": [
         "Recruitment and selection (CV screening, interview evaluation)",
-        "Decisions on promotion, termination, task allocation",
+        "Decisions affecting terms of work-related relationships, promotion or termination of work-related contractual relationships; allocation of tasks based on individual behaviour or personal traits or characteristics (point 4(b))",
         "Monitoring and evaluation of worker performance and behaviour"
       ],
       "keywords": ["resume screening", "cv screening", "candidate ranking", "recruitment ai", "hiring algorithm", "employee performance", "worker monitoring", "promotion decision", "termination decision", "workforce management ai", "talent acquisition ai", "applicant tracking"],
@@ -116,26 +116,26 @@
       "category": "Access to essential private services and public services and benefits",
       "description": "AI systems evaluating eligibility for essential services",
       "subcategories": [
-        "Creditworthiness assessment (credit scoring)",
+        "Evaluation of the creditworthiness of natural persons or establishment of their credit score, except AI systems used for the purpose of detecting financial fraud (point 5(b))",
         "Risk assessment and pricing for life/health insurance",
-        "Evaluation of eligibility for public assistance benefits",
-        "Dispatching or priority-setting for emergency services",
-        "Risk assessment for emergency response"
+        "Evaluation, by or on behalf of public authorities, of the eligibility of natural persons for essential public assistance benefits and services, including healthcare services, and granting, reducing, revoking or reclaiming them (point 5(a))",
+        "Evaluation and classification of emergency calls by natural persons; dispatching, or establishing priority in the dispatching of, emergency first response services (point 5(d))",
+        "Emergency healthcare patient triage systems (point 5(d))"
       ],
-      "keywords": ["credit scoring", "credit risk", "loan approval", "insurance risk", "insurance pricing", "underwriting ai", "benefits eligibility", "social scoring", "emergency dispatch", "triage ai", "risk assessment financial", "creditworthiness"],
+      "keywords": ["credit scoring", "credit risk", "loan approval", "insurance risk", "insurance pricing", "underwriting ai", "benefits eligibility", "emergency call classification", "emergency dispatch", "triage ai", "risk assessment financial", "creditworthiness"],
       "libraries": ["scorecardpy", "optbinning", "xgboost credit"]
     },
     {
       "id": "ANNEX-III-6",
       "category": "Law enforcement",
-      "description": "AI systems used by law enforcement authorities",
+      "description": "AI systems intended to be used by or on behalf of law enforcement authorities, or by Union institutions, bodies, offices or agencies in support of law enforcement authorities, in so far as their use is permitted under relevant Union or national law (Annex III, point 6)",
       "subcategories": [
-        "Individual risk assessment (recidivism, reoffending)",
+        "Assessment of the risk of a natural person becoming the victim of criminal offences (point 6(a))",
         "Polygraph and similar tools",
         "Evaluation of reliability of evidence",
-        "Predicting occurrence or reoccurrence of criminal offences (predictive policing)",
+        "Assessment of the risk of a natural person offending or re-offending not solely on the basis of profiling, or assessment of personality traits and characteristics or past criminal behaviour of natural persons or groups (point 6(d)); risk assessments predicting a criminal offence based solely on profiling or on assessing personality traits and characteristics are prohibited under Art. 5(1)(d), which does not apply to AI systems used to support the human assessment of the involvement of a person in a criminal activity, which is already based on objective and verifiable facts directly linked to a criminal activity",
         "Profiling of natural persons in criminal investigations",
-        "Crime analytics on large datasets"
+        "Not in the adopted Annex III: crime analytics on large data sets (a Commission-proposal item); such a system is high-risk only where it falls under one of points 6(a) to 6(e)"
       ],
       "keywords": ["recidivism prediction", "predictive policing", "crime prediction", "evidence evaluation", "polygraph ai", "risk assessment criminal", "offender profiling", "crime analytics", "law enforcement ai", "forensic ai"],
       "libraries": ["compas", "predpol"]
@@ -147,10 +147,10 @@
       "subcategories": [
         "Risk assessment for security, irregular migration, or health risks",
         "Examination of applications for asylum, visa, and residence permits",
-        "Document authenticity verification",
-        "Polygraph or similar tools during examination"
+        "Detecting, recognising or identifying natural persons in the context of migration, asylum or border control management, with the exception of the verification of travel documents (point 7(d))",
+        "Polygraphs or similar tools (point 7(a))"
       ],
-      "keywords": ["border control", "immigration risk", "asylum application", "visa assessment", "document verification", "passport verification", "migration risk", "travel document authenticity"],
+      "keywords": ["border control", "immigration risk", "asylum application", "visa assessment", "border identification", "biometric identification at the border", "migration risk", "migrant identification"],
       "libraries": []
     },
     {
@@ -160,7 +160,7 @@
       "subcategories": [
         "Research and interpretation of facts and law, application of law to facts",
         "Alternative dispute resolution",
-        "Influencing the outcome of elections or referendums (excluding organizational tools)"
+        "Influencing the outcome of an election or referendum or the voting behaviour of natural persons, excluding AI systems to the output of which natural persons are not directly exposed, such as tools used to organise, optimise or structure political campaigns from an administrative or logistical point of view (point 8(b))"
       ],
       "keywords": ["judicial decision", "court decision", "legal prediction", "case outcome prediction", "dispute resolution ai", "sentencing prediction", "election influence", "vote prediction", "legal analytics"],
       "libraries": []
@@ -168,7 +168,7 @@
   ],
 
   "art6_3_exception_criteria": {
-    "description": "An AI system listed in Annex III is NOT high-risk if it does NOT pose a significant risk AND meets at least one of these criteria:",
+    "description": "An AI system referred to in Annex III is NOT high-risk where it does not pose a significant risk of harm to the health, safety or fundamental rights of natural persons, including by not materially influencing the outcome of decision making, AND at least one of these conditions is fulfilled. The derogation never applies where the AI system performs profiling of natural persons (Art. 6(3), third subparagraph):",
     "criteria": [
       {
         "id": "EXC-A",
@@ -183,22 +183,22 @@
       {
         "id": "EXC-C",
         "label": "Pattern detection without replacement",
-        "description": "The system detects decision-making patterns or deviations without replacing or influencing the human assessment (e.g., flagging inconsistencies for human review)"
+        "description": "The system is intended to detect decision-making patterns or deviations from prior decision-making patterns and is not meant to replace or influence the previously completed human assessment, without proper human review (e.g., flagging inconsistencies for human review)"
       },
       {
         "id": "EXC-D",
         "label": "Preparatory task",
-        "description": "The system performs a preparatory task to an assessment relevant to the use cases in Annex III (e.g., data preprocessing before a human makes the actual decision)"
+        "description": "The system performs a preparatory task to an assessment relevant for the purposes of the use cases listed in Annex III (e.g., data preprocessing before a human makes the actual decision)"
       }
     ],
-    "documentation_requirement": "The provider MUST document their reasoning for invoking the Art. 6(3) exception and notify the relevant national authority BEFORE placing the system on the market."
+    "documentation_requirement": "The provider MUST document its assessment before the system is placed on the market or put into service, and MUST provide the documentation of the assessment upon request of national competent authorities (Art. 6(4)). Before placing the system on the market or putting it into service, the provider or, where applicable, the authorised representative MUST register itself and the system in the EU database referred to in Art. 71 (Art. 6(4) and Art. 49(2)). The Regulation requires no notification to a national authority."
   },
 
   "scoring": {
     "high_risk_art6_1": "System is a safety component of, or itself, a product under Annex I legislation and that product is required to undergo a third-party conformity assessment (Art. 6(1), (1a)-(1c)) — HIGH-RISK",
     "high_risk_art6_2": "System falls under Annex III and Art. 6(3) exception does NOT apply — HIGH-RISK",
-    "not_high_risk_exception": "System falls under Annex III but Art. 6(3) exception applies — NOT HIGH-RISK (must document reasoning)",
-    "not_high_risk": "System does not fall under Annex I products or Annex III use cases — NOT HIGH-RISK under Art. 6",
+    "not_high_risk_exception": "System falls under Annex III but Art. 6(3) exception applies — NOT HIGH-RISK (must document the assessment and register under Art. 49(2))",
+    "not_high_risk": "System does not meet both conditions of Art. 6(1) and does not fall under an Annex III use case — NOT HIGH-RISK under Art. 6",
     "unable_to_determine": "Insufficient information to classify — manual review required"
   }
 }

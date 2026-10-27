@@ -8,10 +8,10 @@
     "disclaimer": "This is an interim checklist developed by ComplianceLint. It is not a harmonised standard and does not itself give a presumption of conformity. No harmonised standard is requested specifically for Article 73. Article 73(7) requires dedicated Commission guidance on serious-incident reporting; the Commission published draft guidance and a reporting template on 26 September 2025.",
     "basis": [
       "EU AI Act Article 73 (official text)",
-      "EU AI Act Recitals 134-136 (legislative intent on incident reporting)",
+      "EU AI Act Recital 155 (legislative intent on incident reporting)",
       "ISO/IEC 42001:2023 -- AI management system",
       "ISO 9001:2015 -- Quality management systems (nonconformity and corrective action)",
-      "EU Decision 768/2008/EC -- New Legislative Framework (market surveillance)"
+      "Decision No 768/2008/EC -- common framework for the marketing of products (New Legislative Framework)"
     ],
     "awaiting_standard": "No harmonised standard is requested specifically for Article 73. Article 73(7) requires dedicated Commission guidance on serious-incident reporting; the Commission published draft guidance and a reporting template on 26 September 2025."
   },
@@ -19,10 +19,10 @@
   "requirements": [
     {
       "id": "IS-ART73-R01",
-      "obligation_ref": "ART73-OBL-1",
+      "obligation_ref": ["ART73-OBL-1", "ART17-OBL-1i"],
       "title": "Serious Incident Reporting Procedure",
-      "requirement": "The provider MUST have a documented procedure for reporting serious incidents to the market surveillance authorities of the Member States where the incident occurred.",
-      "rationale": "Art. 73(1) requires reporting of all serious incidents to the relevant authority.",
+      "requirement": "Providers of high-risk AI systems placed on the Union market MUST report any serious incident to the market surveillance authorities of the Member States where that incident occurred (Article 73(1)), and their quality management system MUST include procedures related to that reporting (Article 17(1)(i)). Where providers of high-risk AI systems referred to in Annex III are subject to Union legislative instruments laying down equivalent reporting obligations, and for high-risk AI systems which are safety components of devices, or are themselves devices, covered by Regulations (EU) 2017/745 and (EU) 2017/746, the notification is limited to serious incidents referred to in Article 3, point (49)(c); in the latter case it is made to the national competent authority chosen for that purpose by the Member States where the incident occurred (Article 73(9) and (10)).",
+      "rationale": "Art. 73(1) requires providers to 'report any serious incident to the market surveillance authorities of the Member States where that incident occurred'; Art. 17(1)(i) requires the quality management system to include 'procedures related to the reporting of a serious incident in accordance with Article 73'.",
       "required_content": [
         "Definition of serious incident per the AI Act",
         "Incident detection and classification procedures",
@@ -33,10 +33,10 @@
     },
     {
       "id": "IS-ART73-R02",
-      "obligation_ref": ["ART73-OBL-2", "ART73-OBL-3", "ART73-OBL-4"],
+      "obligation_ref": ["ART73-OBL-2", "ART73-OBL-3", "ART73-OBL-4", "ART73-PER-1"],
       "title": "Reporting Timelines",
-      "requirement": "The provider MUST ensure reporting within the legally mandated timelines: 15 days for general serious incidents, 2 days for widespread infringement, 10 days for incidents involving death.",
-      "rationale": "Art. 73(2)-(4) specify differentiated reporting deadlines based on incident severity.",
+      "requirement": "The provider MUST report a serious incident immediately after it has established a causal link between the AI system and the serious incident or the reasonable likelihood of such a link, and in any event not later than 15 days after the provider or, where applicable, the deployer becomes aware of the serious incident (Article 73(2)); immediately, and not later than two days after awareness, in the event of a widespread infringement or a serious incident as defined in Article 3, point (49)(b) (Article 73(3)); and, in the event of the death of a person, immediately after the provider or the deployer has established, or as soon as it suspects, a causal relationship between the high-risk AI system and the serious incident, but not later than 10 days after awareness (Article 73(4)). Where necessary to ensure timely reporting, the provider MAY submit an initial report that is incomplete, followed by a complete report (Article 73(5)).",
+      "rationale": "Art. 73(2) to (4) set differentiated deadlines; under Art. 73(2), second subparagraph, the reporting period 'shall take account of the severity of the serious incident'. Art. 73(5) permits an initial incomplete report followed by a complete report.",
       "acceptable_implementations": [
         "Incident response runbook with timeline-based escalation tiers",
         "Automated alerting system with deadline tracking",
@@ -48,8 +48,8 @@
       "id": "IS-ART73-R03",
       "obligation_ref": "ART73-OBL-5",
       "title": "Incident Investigation and Corrective Action",
-      "requirement": "The provider MUST perform necessary investigations without delay after a serious incident, including risk assessment and corrective action.",
-      "rationale": "Art. 73(6) requires immediate investigation with risk assessment and corrective measures.",
+      "requirement": "Following the reporting of a serious incident, the provider MUST, without delay, perform the necessary investigations in relation to the serious incident and the AI system concerned, including a risk assessment of the incident and corrective action. The provider MUST cooperate with the competent authorities and, where relevant, with the notified body concerned during the investigations, and MUST NOT perform any investigation which involves altering the AI system concerned in a way which may affect any subsequent evaluation of the causes of the incident, prior to informing the competent authorities of such action (Article 73(6)).",
+      "rationale": "Art. 73(6) requires the provider, 'without delay', to perform the necessary investigations, including 'a risk assessment of the incident, and corrective action', and restricts investigations that alter the AI system before the competent authorities are informed.",
       "required_content": [
         "Investigation methodology and root cause analysis",
         "Risk assessment of the incident and its potential recurrence",

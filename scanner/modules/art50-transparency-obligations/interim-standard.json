@@ -9,7 +9,7 @@
     "basis": [
       "EU AI Act Article 50 (official text)",
       "EU AI Act Recitals 132-134 (legislative intent for transparency)",
-      "European Commission Guidelines C(2026) 5054 final on the application of Article 50 transparency obligations (published 2026-07-20; SHA256 30861fc5de31205846f023068069c92fabc7271ebeac6af7bef68b97f0a33f66) — 304 verbatim atoms surfaced via cl_explain(obligation_id=..., limit=..., offset=...)",
+      "European Commission Guidelines C(2026) 5054 final on the implementation of the transparency obligations for certain AI systems under Article 50 (published 2026-07-20; SHA256 30861fc5de31205846f023068069c92fabc7271ebeac6af7bef68b97f0a33f66) — 304 verbatim atoms surfaced via cl_explain(obligation_id=..., limit=..., offset=...)",
       "C2PA (Coalition for Content Provenance and Authenticity) v2.1",
       "IPTC Photo Metadata Standard 2024.1",
       "ISO/IEC 12792:2024 — Transparency taxonomy of AI systems",
@@ -22,38 +22,38 @@
     ]
   },
 
-  "scope_note": "Art. 50 applies to ALMOST ALL AI systems, not just high-risk. This is the broadest transparency obligation in the EU AI Act. Any AI system that interacts with persons, generates synthetic content, or performs emotion recognition/biometric categorization falls under Art. 50.",
+  "scope_note": "Art. 50 applies to certain AI systems, whether or not they are high-risk: providers of AI systems intended to interact directly with natural persons (paragraph 1) and of AI systems, including general-purpose AI systems, generating synthetic audio, image, video or text content (paragraph 2); deployers of emotion recognition or biometric categorisation systems (paragraph 3) and of AI systems that generate or manipulate deep fakes or text published with the purpose of informing the public on matters of public interest (paragraph 4). Each paragraph has its own exceptions. Article 50 applies from 2 August 2026 (Art. 113); providers of AI systems generating synthetic content that were placed on the market before 2 August 2026 must comply with Art. 50(2) by 2 December 2026 (Art. 111(4)).",
 
   "requirements": [
     {
       "id": "IS-ART50-R01",
-      "obligation_ref": "ART50-OBL-1",
+      "obligation_ref": ["ART50-OBL-1", "ART50-OBL-5"],
       "title": "Human Interaction Disclosure",
       "paragraph": "Art. 50(1)",
-      "requirement": "AI systems designed to interact directly with natural persons MUST inform those persons that they are interacting with an AI system, unless this is obvious from the circumstances and context of use.",
-      "rationale": "Art. 50(1) requires that natural persons are informed they are interacting with an AI. This applies to chatbots, virtual assistants, AI customer service, AI-powered phone systems, and any conversational AI.",
+      "requirement": "The provider MUST ensure that AI systems intended to interact directly with natural persons are designed and developed in such a way that the natural persons concerned are informed that they are interacting with an AI system, unless this is obvious from the point of view of a natural person who is reasonably well-informed, observant and circumspect, taking into account the circumstances and the context of use. This does not apply to AI systems authorised by law to detect, prevent, investigate or prosecute criminal offences, subject to appropriate safeguards for the rights and freedoms of third parties, unless those systems are available for the public to report a criminal offence (Article 50(1)). The information MUST be provided in a clear and distinguishable manner at the latest at the time of the first interaction and MUST conform to the applicable accessibility requirements (Article 50(5)).",
+      "rationale": "Art. 50(1) is a provider obligation: the system must be designed and developed so that natural persons are informed that they are interacting with an AI system; Art. 50(5) requires the information 'in a clear and distinguishable manner at the latest at the time of the first interaction or exposure'. This applies to chatbots, virtual assistants, AI customer service, AI-powered phone systems, and any conversational AI.",
       "scope": ["chatbots", "virtual assistants", "AI customer service", "conversational AI", "AI-powered phone/voice systems"],
       "acceptable_implementations": [
         "Persistent banner or label: 'You are interacting with an AI system'",
         "Initial disclosure message at conversation start",
         "Visual indicator (icon, badge) consistently displayed",
         "Audio disclosure for voice-based systems",
-        "API response header: X-AI-Generated: true"
+        "API response header (e.g. X-AI-Generated: true) that enables downstream applications to show the disclosure; on its own it does not inform the natural person"
       ],
       "not_acceptable": [
         "Disclosure buried in terms of service only",
-        "One-time disclosure that disappears",
-        "No disclosure because system 'seems obvious'",
+        "Disclosure given only after the first interaction (Art. 50(5)); a one-time disclosure that disappears may also fall short where the context calls for ongoing awareness (Commission Guidelines C(2026) 5054, paragraphs 37 and 40)",
+        "No disclosure on the assumption that the AI nature is obvious, without assessing it from the point of view of a reasonably well-informed, observant and circumspect natural person",
         "Disclosure only available on request"
       ],
-      "exception": "Disclosure is not required when it is 'obvious from the circumstances and context of use' that the person is interacting with AI (e.g., a clearly labeled AI game character). The burden of proving 'obviousness' rests on the deployer."
+      "exception": "Disclosure is not required where it is obvious 'from the point of view of a natural person who is reasonably well-informed, observant and circumspect, taking into account the circumstances and the context of use' that the person is interacting with an AI system (e.g., a clearly labelled AI game character). The obligation also does not apply to AI systems authorised by law to detect, prevent, investigate or prosecute criminal offences, subject to appropriate safeguards for the rights and freedoms of third parties, unless those systems are available for the public to report a criminal offence (Art. 50(1)). The obligation, and with it the reliance on the exception, lies with the provider; the Commission Guidelines C(2026) 5054 (paragraphs 42 and 45) state that providers 'will need to assess and demonstrate' obviousness and that the exception should be interpreted restrictively."
     },
     {
       "id": "IS-ART50-R02",
       "obligation_ref": "ART50-OBL-2",
       "title": "Synthetic Content Marking",
       "paragraph": "Art. 50(2)",
-      "requirement": "AI systems that generate synthetic audio, image, video, or text content MUST mark output as artificially generated or manipulated, in a machine-readable format. The marking MUST be interoperable, robust, and reliable.",
+      "requirement": "Providers of AI systems, including general-purpose AI systems, generating synthetic audio, image, video or text content MUST ensure that the outputs of the AI system are marked in a machine-readable format and detectable as artificially generated or manipulated. Providers MUST ensure their technical solutions are effective, interoperable, robust and reliable as far as this is technically feasible, taking into account the specificities and limitations of various types of content, the costs of implementation and the generally acknowledged state of the art. The obligation does not apply to the extent the AI systems perform an assistive function for standard editing or do not substantially alter the input data provided by the deployer or the semantics thereof, or where authorised by law to detect, prevent, investigate or prosecute criminal offences (Article 50(2)). Providers of such AI systems placed on the market before 2 August 2026 MUST comply with Article 50(2) by 2 December 2026 (Article 111(4)).",
       "rationale": "Art. 50(2) requires that AI-generated content is marked in a way that can be detected by other systems. This enables downstream verification and prevents deceptive use of AI-generated content.",
       "scope": ["image generation", "video generation", "audio generation/TTS", "text generation", "deepfake creation", "content manipulation"],
       "recommended_standard": "C2PA (Coalition for Content Provenance and Authenticity)",
@@ -68,7 +68,7 @@
           "Hardware-binding capability (aligns with ComplianceLint hardware verification approach)",
           "Open standard with broad industry adoption"
         ],
-        "eu_alignment": "The European Commission has referenced C2PA as a suitable technical standard for Art. 50(2) compliance in its AI Office guidance documents."
+        "eu_alignment": "C2PA is not named in the Regulation or in the Commission Guidelines C(2026) 5054 on Article 50. The Guidelines (paragraph 73) mention cryptographic methods for proving provenance and authenticity among possible techniques and state that providers are not required to record or keep a full provenance chain; C2PA is one possible implementation."
       },
       "acceptable_implementations": [
         "C2PA manifest embedding in generated media files",
@@ -87,11 +87,11 @@
     },
     {
       "id": "IS-ART50-R03",
-      "obligation_ref": "ART50-OBL-3",
+      "obligation_ref": ["ART50-OBL-3", "ART50-OBL-5"],
       "title": "Emotion Recognition / Biometric Categorization Disclosure",
       "paragraph": "Art. 50(3)",
-      "requirement": "Deployers of emotion recognition systems or biometric categorization systems MUST inform natural persons exposed to such systems. The information MUST include: the operation of the system and the processing of personal data in accordance with GDPR/LED.",
-      "rationale": "Art. 50(3) requires disclosure when AI is used for emotion detection or biometric categorization. This is a deployer obligation (not provider), reflecting the sensitivity of these applications.",
+      "requirement": "Deployers of an emotion recognition system or a biometric categorisation system MUST inform the natural persons exposed thereto of the operation of the system, and MUST process the personal data in accordance with Regulations (EU) 2016/679 and (EU) 2018/1725 and Directive (EU) 2016/680, as applicable. The obligation does not apply to AI systems used for biometric categorisation and emotion recognition which are permitted by law to detect, prevent or investigate criminal offences, subject to appropriate safeguards for the rights and freedoms of third parties, and in accordance with Union law (Article 50(3)). The information MUST be provided in a clear and distinguishable manner at the latest at the time of the first exposure and MUST conform to the applicable accessibility requirements (Article 50(5)).",
+      "rationale": "Art. 50(3) requires disclosure when AI is used for emotion detection or biometric categorization. This is a deployer obligation (not provider), reflecting the sensitivity of these applications. Emotion recognition in the areas of workplace and education institutions is prohibited under Art. 5(1)(f), except where the AI system is intended for medical or safety reasons.",
       "scope": ["emotion recognition", "sentiment analysis from biometrics", "facial expression analysis", "voice emotion detection", "biometric categorization", "age estimation", "gender classification"],
       "acceptable_implementations": [
         "Clear signage in physical spaces where system operates",
@@ -99,26 +99,26 @@
         "Consent flow that explains what biometric data is processed",
         "Privacy notice specifically mentioning emotion recognition"
       ],
-      "gdpr_intersection": "Art. 50(3) explicitly requires compliance with Regulation (EU) 2016/679 (GDPR) Art. 13 and Art. 14, and Directive (EU) 2016/680 (LED) Art. 13."
+      "gdpr_intersection": "Art. 50(3) requires deployers to process the personal data in accordance with Regulations (EU) 2016/679 and (EU) 2018/1725 and Directive (EU) 2016/680, as applicable. It names no particular article of those acts; the information duties of Articles 13 and 14 of Regulation (EU) 2016/679 and Article 13 of Directive (EU) 2016/680 apply under those acts themselves."
     },
     {
       "id": "IS-ART50-R04",
-      "obligation_ref": "ART50-OBL-4",
-      "title": "Deep Fake Disclosure",
+      "obligation_ref": ["ART50-OBL-4", "ART50-OBL-4b", "ART50-OBL-5"],
+      "title": "Deep Fake and Public-Interest Text Disclosure",
       "paragraph": "Art. 50(4)",
-      "requirement": "Deployers of AI systems that generate or manipulate image, audio, or video content constituting a deep fake MUST disclose that the content has been artificially generated or manipulated.",
-      "rationale": "Art. 50(4) specifically targets deep fakes — content depicting real persons or events in a misleading way. This is a deployer-level obligation with exceptions for legitimate uses.",
+      "requirement": "Deployers of an AI system that generates or manipulates image, audio or video content constituting a deep fake MUST disclose that the content has been artificially generated or manipulated. Deployers of an AI system that generates or manipulates text which is published with the purpose of informing the public on matters of public interest MUST disclose that the text has been artificially generated or manipulated (Article 50(4)). The information MUST be provided in a clear and distinguishable manner at the latest at the time of the first exposure and MUST conform to the applicable accessibility requirements (Article 50(5)). The exceptions and the limitation for artistic, creative, satirical or fictional works are listed below.",
+      "rationale": "Art. 50(4) targets deep fakes, defined in Art. 3(60) as 'AI-generated or manipulated image, audio or video content that resembles existing persons, objects, places, entities or events and would falsely appear to a person to be authentic or truthful', and AI-generated or manipulated text published with the purpose of informing the public on matters of public interest. Both are deployer obligations.",
       "scope": ["face swapping", "voice cloning", "lip syncing", "body puppeteering", "AI-generated video of real persons", "AI-manipulated news/event footage"],
       "acceptable_implementations": [
         "Clear label on content: 'This content was generated/manipulated by AI'",
-        "C2PA manifest indicating manipulation",
+        "C2PA manifest indicating manipulation, together with a disclosure the viewer can perceive (a machine-readable manifest alone is not a clear and distinguishable disclosure to natural persons)",
         "Watermark visible to viewers",
-        "Metadata disclosure in content distribution"
+        "Metadata disclosure in content distribution, together with a disclosure the viewer can perceive"
       ],
       "exceptions": [
-        "Content used for manifestly artistic, creative, satirical, or fictional purposes (analogous to existing exceptions for parody/satire)",
-        "Content where disclosure would undermine the exercise of a fundamental right (e.g., freedom of expression)",
-        "However: even excepted content should indicate AI generation 'in an appropriate manner that does not hamper the display or enjoyment of the work'"
+        "Where the content forms part of an evidently artistic, creative, satirical, fictional or analogous work or programme, the obligation is not lifted but limited to 'disclosure of the existence of such generated or manipulated content in an appropriate manner that does not hamper the display or enjoyment of the work' (Art. 50(4), first subparagraph)",
+        "The deep-fake obligation does not apply where the use is authorised by law to detect, prevent, investigate or prosecute criminal offence (Art. 50(4), first subparagraph). The Regulation contains no exception for cases where disclosure would affect the exercise of a fundamental right. The deployer obligations of Art. 50(4) do not apply to deployers who are natural persons using AI systems in the course of a purely personal non-professional activity (Art. 2(10)).",
+        "The text obligation does not apply where the use is authorised by law to detect, prevent, investigate or prosecute criminal offences or where the AI-generated content has undergone a process of human review or editorial control and where a natural or legal person holds editorial responsibility for the publication of the content (Art. 50(4), second subparagraph)"
       ]
     }
   ],
@@ -157,6 +157,6 @@
     "compliant": "All applicable R01-R04 requirements met for the system's scope",
     "partial": "Some transparency measures in place but incomplete (e.g., disclosure exists but no machine-readable marking)",
     "non_compliant": "No transparency measures detected for an AI system that clearly falls under Art. 50",
-    "not_applicable": "System does not interact with persons, generate content, or process biometrics"
+    "not_applicable": "System is not intended to interact directly with natural persons, does not generate synthetic audio, image, video or text content, is not an emotion recognition or biometric categorisation system, and is not used to generate or manipulate deep fakes or text published to inform the public on matters of public interest"
   }
 }

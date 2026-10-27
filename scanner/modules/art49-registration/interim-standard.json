@@ -5,34 +5,54 @@
     "version": "0.1.0",
     "date": "2026-04-03",
     "status": "draft",
-    "disclaimer": "This is an interim standard developed by ComplianceLint. It will be superseded by the CEN-CENELEC harmonized standard.",
+    "disclaimer": "This is an interim checklist developed by ComplianceLint. It is not a harmonised standard and does not itself give a presumption of conformity. Article 40(2) provides for standardisation requests covering the requirements of Chapter III, Section 2, and, as applicable, the obligations of Chapter V, Sections 2 and 3; registration under Article 49 is not among them. Registration is made in the EU database set up and maintained by the Commission under Article 71.",
     "basis": [
       "EU AI Act Article 49 (official text)",
       "EU AI Act Annex VIII -- Information to be submitted upon registration",
       "EU AI Act Article 71 -- EU database for high-risk AI systems"
     ],
-    "awaiting_standard": "EU AI database (Art. 71) operational guidelines"
+    "awaiting_standard": "No harmonised standard is foreseen for Article 49 under Article 40(2). Registration is made in the EU database set up and maintained by the Commission under Article 71."
   },
   "requirements": [
     {
       "id": "IS-ART49-R01",
       "obligation_ref": "ART49-OBL-1",
       "title": "EU Database Registration",
-      "requirement": "The provider MUST register themselves and their high-risk AI system in the EU database before market placement.",
-      "rationale": "Art. 49(1) requires pre-market registration for Annex III systems.",
+      "requirement": "Before placing on the market or putting into service a high-risk AI system listed in Annex III, with the exception of high-risk AI systems referred to in point 2 of Annex III, the provider or, where applicable, the authorised representative MUST register themselves and their system in the EU database referred to in Article 71 (Article 49(1)), with the information set out in Annex VIII, Section A, kept up to date. High-risk AI systems referred to in point 2 of Annex III are registered at national level (Article 49(5)); for high-risk AI systems referred to in points 1, 6 and 7 of Annex III in the areas of law enforcement, migration, asylum and border control management, registration is in a secure non-public section of the EU database with the reduced information listed in Article 49(4).",
+      "rationale": "Art. 49(1) requires registration before placing on the market or putting into service for high-risk AI systems listed in Annex III, except those referred to in point 2 of Annex III. Art. 49(2) (systems the provider has concluded are not high-risk under Art. 6(3)) and Art. 49(3) (deployers that are public authorities, Union institutions, bodies, offices or agencies or persons acting on their behalf) set further registration duties that this requirement does not cover.",
       "required_information": [
-        "Provider identity and contact details",
-        "System name and description",
-        "Intended purpose",
-        "Status of the system (on market, withdrawn, recalled)",
-        "Conformity assessment procedure used",
-        "Member States where placed on market",
-        "URL to instructions for use"
+        "Name, address and contact details of the provider, of any person submitting the information on its behalf, and of the authorised representative, where applicable (points 1 to 3)",
+        "AI system trade name and any additional unambiguous reference allowing the identification and traceability of the AI system (point 4); a basic and concise description of the information used by the system (data, inputs) and its operating logic (point 6)",
+        "Description of the intended purpose of the AI system and of the components and functions supported through this AI system (point 5)",
+        "Status of the AI system (on the market, or in service; no longer placed on the market/in service, recalled) (point 7)",
+        "Type, number and expiry date of the certificate issued by the notified body and the name or identification number of that notified body, with a scanned copy of the certificate, where applicable (points 8 and 9); a copy of the EU declaration of conformity referred to in Article 47 (point 11)",
+        "Any Member States in which the AI system has been placed on the market, put into service or made available in the Union (point 10)",
+        "Electronic instructions for use (point 12; not provided for high-risk AI systems in the areas of law enforcement or migration, asylum and border control management referred to in Annex III, points 1, 6 and 7); a URL for additional information is optional (point 13)"
+      ]
+    },
+    {
+      "id": "IS-ART49-R02",
+      "obligation_ref": "ART49-OBL-2",
+      "title": "Registration of Annex III Systems Assessed as Not High-Risk",
+      "requirement": "Before placing on the market or putting into service an AI system for which the provider has concluded that it is not high-risk according to Article 6(3), that provider or, where applicable, the authorised representative MUST register themselves and that system in the EU database referred to in Article 71 (Article 49(2)), with the information set out in Annex VIII, Section B, kept up to date.",
+      "rationale": "Art. 49(2) requires the registration where the provider has concluded under Art. 6(3) that a system referred to in Annex III is not high-risk; under Art. 6(4) the provider also documents that assessment.",
+      "acceptable_implementations": [
+        "Record of the EU database registration with the information of Annex VIII, Section B, and the documented Article 6(3) assessment"
+      ]
+    },
+    {
+      "id": "IS-ART49-R03",
+      "obligation_ref": "ART49-OBL-3",
+      "title": "Registration of Use by Public-Sector Deployers",
+      "requirement": "Before putting into service or using a high-risk AI system listed in Annex III, with the exception of high-risk AI systems listed in point 2 of Annex III, deployers that are public authorities, Union institutions, bodies, offices or agencies or persons acting on their behalf MUST register themselves, select the system and register its use in the EU database referred to in Article 71 (Article 49(3)), with the information set out in Annex VIII, Section C, kept up to date.",
+      "rationale": "Art. 49(3) places this registration duty on deployers that are public authorities, Union institutions, bodies, offices or agencies, or persons acting on their behalf.",
+      "acceptable_implementations": [
+        "Record of the deployer's registration in the EU database with the information of Annex VIII, Section C"
       ]
     }
   ],
   "scoring": {
-    "compliant": "R01 met (registration completed with Annex VIII information)",
+    "compliant": "The registration that applies is completed with the Annex VIII information: R01 (provider of an Annex III high-risk AI system, Section A), R02 (provider that concluded under Article 6(3) that the system is not high-risk, Section B) or R03 (public-sector deployer, Section C)",
     "partial": "Registration initiated but incomplete",
     "non_compliant": "No registration"
   }

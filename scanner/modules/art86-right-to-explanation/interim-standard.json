@@ -8,7 +8,7 @@
     "disclaimer": "This is an interim checklist developed by ComplianceLint. It is not a harmonised standard and does not itself give a presumption of conformity. No harmonised standard is requested for Article 86. The right to obtain a clear and meaningful explanation in the circumstances defined by Article 86 applies directly; the Article does not provide for a standard, code, template or implementing act specific to Article 86.",
     "basis": [
       "EU AI Act Article 86 (official text)",
-      "EU AI Act Recitals 171-173 (legislative intent on right to explanation)",
+      "EU AI Act Recital 171 (legislative intent on right to explanation)",
       "ISO/IEC 42001:2023 -- AI management system",
       "ISO/IEC TR 24028:2020 -- AI trustworthiness (explainability)",
       "GDPR Article 22 -- Automated individual decision-making"
@@ -21,22 +21,22 @@
       "id": "IS-ART86-R01",
       "obligation_ref": "ART86-OBL-1",
       "title": "Explanation Capability",
-      "requirement": "The deployer MUST be able to provide clear and meaningful explanations of the role of the AI system in the decision-making procedure and the main elements of the decision taken, upon request by affected persons.",
-      "rationale": "Art. 86(1) grants affected persons the right to obtain explanations of AI-assisted decisions.",
+      "requirement": "Where a decision is taken by the deployer on the basis of the output from a high-risk AI system listed in Annex III, with the exception of systems listed under point 2 thereof, and the decision produces legal effects or similarly significantly affects a person in a way that they consider to have an adverse impact on their health, safety or fundamental rights, the deployer MUST be able to provide that affected person, on request, with clear and meaningful explanations of the role of the AI system in the decision-making procedure and the main elements of the decision taken (Article 86(1)).",
+      "rationale": "Art. 86(1) gives any affected person subject to such a decision 'the right to obtain from the deployer clear and meaningful explanations of the role of the AI system in the decision-making procedure and the main elements of the decision taken'.",
       "required_content": [
         "Explanation of what role the AI system played in the decision",
         "Main elements and factors that influenced the decision",
         "How the AI output was used by the deployer",
         "Whether and how human review was applied",
-        "How to contest or seek review of the decision"
+        "How to contest or seek review of the decision (recommended; Art. 86 does not require it, but Recital 171 states that the explanation 'should provide a basis on which the affected persons are able to exercise their rights')"
       ]
     },
     {
       "id": "IS-ART86-R02",
       "obligation_ref": "ART86-OBL-1",
       "title": "Explanation Delivery Mechanism",
-      "requirement": "The deployer MUST have a mechanism for affected persons to request and receive explanations in a clear and meaningful manner.",
-      "rationale": "Art. 86(1) requires explanations to be obtainable, implying a functional delivery mechanism.",
+      "requirement": "The deployer SHOULD have a mechanism for affected persons to request and receive explanations in a clear and meaningful manner. Article 86(1) gives affected persons a right to obtain explanations from the deployer but does not prescribe a mechanism.",
+      "rationale": "Art. 86(1) gives a right to obtain explanations from the deployer; a request and delivery mechanism is a practical way to honour it.",
       "acceptable_implementations": [
         "User-facing explainability interface or dashboard",
         "Request process with defined response timeline",
@@ -49,8 +49,8 @@
       "id": "IS-ART86-R03",
       "obligation_ref": ["ART86-EXC-1", "ART86-EXC-2"],
       "title": "Exception Analysis",
-      "requirement": "Where the deployer claims an exception under Art. 86(2) or (3), the deployer MUST document the legal basis for the exception.",
-      "rationale": "Art. 86(2)-(3) provide exceptions, but the deployer must justify their applicability.",
+      "requirement": "Where the deployer relies on Article 86(2) (exceptions from, or restrictions to, the obligation that follow from Union or national law in compliance with Union law) or Article 86(3) (the right is otherwise provided for under Union law), the deployer SHOULD document the provision of Union or national law concerned. The Regulation does not require this documentation.",
+      "rationale": "Under Art. 86(2), paragraph 1 does not apply to the use of AI systems for which exceptions from, or restrictions to, the obligation follow from Union or national law in compliance with Union law; under Art. 86(3), the Article applies 'only to the extent that the right referred to in paragraph 1 is not otherwise provided for under Union law'. Documenting the legal basis shows why Art. 86(1) does not apply.",
       "acceptable_implementations": [
         "Legal analysis documenting applicable Union or national law exceptions",
         "Written opinion from legal counsel on exception applicability",
@@ -60,8 +60,8 @@
   ],
 
   "scoring": {
-    "compliant": "R01 + R02 both met",
-    "partial": "At least R01 met",
+    "compliant": "R01 met (R02 and R03 are recommended, not required)",
+    "partial": "R01 partially met (explanations provided for some, but not all, decisions within Article 86(1))",
     "non_compliant": "R01 not met"
   }
 }

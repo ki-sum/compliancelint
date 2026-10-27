@@ -5,7 +5,7 @@
     "version": "0.1.0",
     "date": "2026-10-12",
     "status": "draft",
-    "disclaimer": "This is an interim standard developed by ComplianceLint. It is not an official EU, ISO or CEN-CENELEC standard.",
+    "disclaimer": "This is an interim checklist developed by ComplianceLint. It is not a harmonised standard and does not itself give a presumption of conformity.",
     "basis": [
       "EU AI Act Article 48 (official text)",
       "EU AI Act Article 16(h) -- provider obligation to affix the CE marking in accordance with Article 48",
@@ -18,7 +18,7 @@
       "id": "IS-ART48-R01",
       "obligation_ref": "ART48-OBL-3",
       "title": "CE Marking Affixed",
-      "requirement": "The CE marking MUST be affixed visibly, legibly and indelibly for the high-risk AI system or, where that is not possible or not warranted on account of the nature of the system, to the packaging or to the accompanying documentation.",
+      "requirement": "The CE marking MUST be affixed visibly, legibly and indelibly for the high-risk AI system or, where that is not possible or not warranted on account of the nature of the system, to the packaging or to the accompanying documentation, as appropriate.",
       "rationale": "Art. 48(3) sets how and where the CE marking is affixed.",
       "acceptable_locations": [
         "The high-risk AI system itself",
@@ -30,7 +30,7 @@
       "id": "IS-ART48-R02",
       "obligation_ref": "ART48-OBL-2",
       "title": "Digital CE Marking for Systems Provided Digitally",
-      "requirement": "For a high-risk AI system provided digitally, a digital CE marking MUST be used and MUST be easily accessible via the interface from which the system is accessed or via an easily accessible machine-readable code or other electronic means.",
+      "requirement": "For a high-risk AI system provided digitally, a digital CE marking MUST be used, only if it can easily be accessed via the interface from which the system is accessed or via an easily accessible machine-readable code or other electronic means (Article 48(2)). The digital CE marking is therefore to be made easily accessible by one of those means.",
       "rationale": "Art. 48(2) sets the form of the CE marking for systems provided digitally.",
       "applies_when": "The high-risk AI system is provided digitally."
     },

@@ -15,24 +15,24 @@
   "requirements": [
     {
       "id": "IS-ART54-R01",
-      "obligation_ref": "ART54-OBL-1",
+      "obligation_ref": ["ART54-OBL-1", "ART54-EXC-6"],
       "title": "Authorised Representative Appointment",
-      "requirement": "A provider of a GPAI model established in a third country MUST appoint an authorised representative established in the Union before making the model available on the Union market.",
-      "rationale": "Art. 54(1) mandates third-country providers appoint an EU-based authorised representative.",
+      "requirement": "Prior to placing a general-purpose AI model on the Union market, a provider established in a third country MUST, by written mandate, appoint an authorised representative which is established in the Union (Article 54(1)). This does not apply to providers of general-purpose AI models that are released under a free and open-source licence that allows for the access, usage, modification, and distribution of the model, and whose parameters, including the weights, the information on the model architecture, and the information on model usage, are made publicly available, unless the general-purpose AI models present systemic risks (Article 54(6)).",
+      "rationale": "Art. 54(1) requires third-country providers to appoint, by written mandate, an authorised representative established in the Union before placing the model on the Union market; Art. 54(6) exempts qualifying free and open-source models unless they present systemic risks.",
       "acceptable_implementations": [
         "Written mandate agreement with EU-established legal entity",
         "Authorised representative contract specifying scope and duration",
-        "Formal appointment letter filed with relevant EU authorities"
+        "Formal appointment letter; the Regulation requires no filing with an authority, but the authorised representative must provide a copy of the mandate to the AI Office upon request, in one of the official languages of the institutions of the Union (Art. 54(3))"
       ]
     },
     {
       "id": "IS-ART54-R02",
-      "obligation_ref": "ART54-OBL-2",
+      "obligation_ref": ["ART54-OBL-2", "ART54-OBL-3", "ART54-OBL-4"],
       "title": "Written Mandate Scope",
-      "requirement": "The authorised representative MUST have a written mandate specifying the tasks to be performed, including maintaining technical documentation and cooperating with competent authorities.",
-      "rationale": "Art. 54(2) requires a written mandate defining the representative's responsibilities.",
+      "requirement": "The provider MUST give the authorised representative a mandate that empowers it to carry out the tasks in Article 54(3), points (a) to (d): verify that the technical documentation specified in Annex XI has been drawn up and all obligations referred to in Article 53 and, where applicable, Article 55 have been fulfilled by the provider; keep a copy of that documentation and the contact details of the provider at the disposal of the AI Office and national competent authorities for 10 years after the model has been placed on the market; provide the AI Office, upon a reasoned request, with all the information and documentation necessary to demonstrate compliance with the obligations in Chapter V; and cooperate with the AI Office and competent authorities, upon a reasoned request, in any action they take in relation to the model. The mandate MUST also empower the authorised representative to be addressed, in addition to or instead of the provider, by the AI Office or the competent authorities on all issues related to ensuring compliance with the Regulation (Article 54(4)). The provider MUST enable the authorised representative to perform the tasks specified in the mandate (Article 54(2)).",
+      "rationale": "Art. 54(3) lists the tasks the mandate must empower the authorised representative to carry out and Art. 54(4) the power to be addressed by the AI Office or the competent authorities; Art. 54(2) requires the provider to enable the authorised representative to perform them. Drawing up and keeping the technical documentation up to date remains the provider's obligation under Art. 53(1)(a).",
       "acceptable_implementations": [
-        "Written mandate covering documentation maintenance and authority cooperation",
+        "Written mandate covering the tasks of Art. 54(3), points (a) to (d), and the power to be addressed under Art. 54(4)",
         "Detailed mandate agreement with enumerated regulatory tasks",
         "Legal instrument specifying representative powers aligned with Art. 54(2)"
       ]
@@ -40,19 +40,29 @@
     {
       "id": "IS-ART54-R03",
       "obligation_ref": "ART54-OBL-3",
-      "title": "Documentation Retention",
-      "requirement": "The provider MUST ensure that technical documentation is kept available for at least 10 years after the GPAI model has been placed on the market.",
-      "rationale": "Art. 54 requires long-term documentation retention to enable regulatory oversight.",
+      "title": "Copy of the Technical Documentation Kept for 10 Years",
+      "requirement": "The mandate MUST empower the authorised representative to keep a copy of the technical documentation specified in Annex XI at the disposal of the AI Office and national competent authorities, for a period of 10 years after the general-purpose AI model has been placed on the market, together with the contact details of the provider that appointed it (Article 54(3), point (b)); the authorised representative MUST perform that task (Article 54(3), first sentence).",
+      "rationale": "Art. 54(3)(b) places the 10-year retention of a copy of the Annex XI documentation, and of the provider's contact details, on the authorised representative, under the mandate given by the provider.",
       "acceptable_implementations": [
         "10-year document retention policy with secure archival storage",
         "Version-controlled documentation repository with retention schedule",
         "Third-party document management service with guaranteed retention period"
       ]
+    },
+    {
+      "id": "IS-ART54-R04",
+      "obligation_ref": "ART54-OBL-5",
+      "title": "Termination of the Mandate",
+      "requirement": "The authorised representative MUST terminate the mandate if it considers or has reason to consider the provider to be acting contrary to its obligations pursuant to the Regulation, and MUST then immediately inform the AI Office about the termination of the mandate and the reasons therefor (Article 54(5)).",
+      "rationale": "Art. 54(5) places this duty on the authorised representative, not on the provider.",
+      "acceptable_implementations": [
+        "Written procedure of the authorised representative for terminating the mandate and informing the AI Office"
+      ]
     }
   ],
   "scoring": {
-    "compliant": "R01 + R02 + R03 met",
-    "partial": "R01 met, R02 or R03 incomplete",
+    "compliant": "R01 + R02 + R03 met, and R04 met where it applies (when the authorised representative considers or has reason to consider that the provider acts contrary to its obligations)",
+    "partial": "R01 met, but R02 or R03 incomplete, or R04 not met where it applies",
     "non_compliant": "R01 not met"
   }
 }

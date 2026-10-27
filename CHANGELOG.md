@@ -6,6 +6,24 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+- `cl_interim_standard` wording for Articles 4, 5, 6, 9, 12, 17, 26, 27, 43, 47, 48, 49, 50, 54, 72, 73 and 86, after
+  an independent legal review of every string against the consolidated text: duties are stated for the right addressee
+  (for example AI literacy for providers and deployers, the two-person and monitoring duties as the Regulation frames
+  them); dropped conditions and exceptions are back (among others Article 5(3), the point (d) and (f) exceptions of
+  Article 5(1), the profiling rule of Article 6(3), the Annex III point 2 exclusions of Articles 27, 49 and 86, the
+  open-source exception of Article 54(6), the financial-institution rule of Article 26(5), Articles 43(4), 47(2) to
+  (4), 72(4) and 73(5) to (10)); Article 6(4) requires documentation and registration, not a notification; Article 12
+  has no paragraph 4 and does not require tamper protection; methods the Regulation does not prescribe (logging
+  frameworks, coverage thresholds, log fields, explanation mechanisms) are SHOULD; items that are not in the adopted
+  Annex III are named as such; obligation references point to the paragraphs the requirements implement; recital
+  ranges and the Commission guidelines (C(2025) 5052 final of 29 July 2025) are cited correctly.
+- New requirements for Article 49(2) (registration of Annex III systems assessed as not high-risk), Article 49(3)
+  (registration by public-sector deployers) and Article 54(5) (termination of the authorised representative's
+  mandate); the scoring of Articles 12, 26, 49, 54 and 86 follows the modality of the requirements.
+- The obligation ART50-OBL-5 quotes both sentences of Article 50(5), including "The information shall conform to the
+  applicable accessibility requirements."
+
 ## [1.3.9] — 2026-10-27
 
 ### Fixed

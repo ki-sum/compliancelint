@@ -17,22 +17,22 @@
   "requirements": [
     {
       "id": "IS-ART43-R01",
-      "obligation_ref": "ART43-OBL-2",
+      "obligation_ref": ["ART43-OBL-1", "ART43-OBL-2", "ART43-OBL-3"],
       "title": "Conformity Assessment Completion",
       "requirement": "The provider MUST complete the applicable conformity assessment procedure (Annex VI, Annex VII, or the procedure required by the Union harmonisation legislation listed in Section A of Annex I) before the high-risk AI system is placed on the market or put into service.",
       "rationale": "Art. 16(f), together with Art. 43(1)-(3), requires the relevant conformity assessment before placing the high-risk AI system on the market or putting it into service.",
       "acceptable_implementations": [
         "Annex VI internal control for Annex III points 2-8 systems that are not also covered by Union harmonisation legislation listed in Section A of Annex I, and for Annex III point 1 systems not so covered only where Art. 43(1) permits that option",
-        "Annex VII assessment with notified-body involvement for Annex III point 1 systems not also covered by Union harmonisation legislation listed in Section A of Annex I where chosen or required under Art. 43(1)",
-        "Conformity assessment under the Union harmonisation legislation listed in Section A of Annex I, including the Section 2 requirements, assessment of the Art. 17 quality management system and the Annex VII provisions listed in Art. 43(3)"
+        "Annex VII assessment with notified-body involvement for Annex III point 1 systems not also covered by Union harmonisation legislation listed in Section A of Annex I where chosen or required under Art. 43(1); where the system is intended to be put into service by law enforcement, immigration or asylum authorities or by Union institutions, bodies, offices or agencies, the market surveillance authority referred to in Art. 74(8) or (9) acts as the notified body",
+        "Conformity assessment under the Union harmonisation legislation listed in Section A of Annex I, including the Section 2 requirements, assessment of the Art. 17 quality management system and the Annex VII provisions listed in Art. 43(3); a manufacturer may use an option under that legislation to opt out of third-party conformity assessment only if it has also applied harmonised standards or, where applicable, common specifications covering all requirements set out in Section 2 (Art. 43(3), third subparagraph)"
       ]
     },
     {
       "id": "IS-ART43-R02",
       "obligation_ref": "ART43-OBL-4",
       "title": "Substantial Modification Tracking",
-      "requirement": "The provider MUST have a process to identify substantial modifications and trigger re-assessment.",
-      "rationale": "Art. 43(4) requires new assessment on substantial modification.",
+      "requirement": "A high-risk AI system that has already been subject to a conformity assessment procedure MUST undergo a new conformity assessment procedure in the event of a substantial modification, regardless of whether the modified system is intended to be further distributed or continues to be used by the current deployer (Article 43(4)). Changes pre-determined by the provider at the initial conformity assessment and described in the technical documentation (Annex IV, point 2(f)) are not a substantial modification for systems that continue to learn. The provider SHOULD have a process to identify substantial modifications and trigger re-assessment; any distributor, importer, deployer or other third-party that makes a substantial modification to a high-risk AI system that has already been placed on the market or has already been put into service, in such a way that it remains a high-risk AI system pursuant to Article 6, is considered to be a provider and is subject to the obligations of the provider under Article 16 (Article 25(1)(b)).",
+      "rationale": "Art. 43(4), first subparagraph, requires a new conformity assessment procedure in the event of a substantial modification; under the second subparagraph, changes to a system that continues to learn that 'have been pre-determined by the provider at the moment of the initial conformity assessment and are part of the information contained in the technical documentation referred to in point 2(f) of Annex IV, shall not constitute a substantial modification'.",
       "acceptable_implementations": [
         "Change management process with classification criteria",
         "Version control with modification impact assessment",

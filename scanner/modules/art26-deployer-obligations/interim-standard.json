@@ -21,8 +21,8 @@
       "id": "IS-ART26-R01",
       "obligation_ref": "ART26-OBL-1",
       "title": "Deployment Documentation",
-      "requirement": "The deployer MUST maintain documentation demonstrating that the high-risk AI system is used in accordance with the provider's instructions for use.",
-      "rationale": "Art. 26(1) requires use per instructions. Documentation provides evidence of compliance.",
+      "requirement": "The deployer MUST take appropriate technical and organisational measures to ensure that it uses the high-risk AI system in accordance with the instructions for use accompanying the system (Article 26(1)). The deployer SHOULD document those measures; Article 26(1) does not require such documentation.",
+      "rationale": "Art. 26(1) requires deployers to 'take appropriate technical and organisational measures to ensure they use such systems in accordance with the instructions for use accompanying the systems'. Documentation of those measures provides evidence of compliance.",
       "required_content": [
         "Reference to provider's instructions for use",
         "Deployment configuration and parameters",
@@ -35,8 +35,8 @@
       "id": "IS-ART26-R02",
       "obligation_ref": "ART26-OBL-2",
       "title": "Human Oversight Assignment",
-      "requirement": "The deployer MUST assign human oversight to identified natural persons with documented competence, training, authority, and support.",
-      "rationale": "Art. 26(2) requires oversight by competent persons. Assignment must be documented.",
+      "requirement": "The deployer MUST assign human oversight to natural persons who have the necessary competence, training and authority, as well as the necessary support (Article 26(2)). The deployer SHOULD document the assignment and the competence of the persons assigned. Article 26(3) preserves the deployer's freedom to organise its own resources and activities for the purpose of implementing the human oversight measures indicated by the provider.",
+      "rationale": "Art. 26(2) requires oversight by natural persons with 'the necessary competence, training and authority, as well as the necessary support'. Documenting the assignment is recommended practice; Art. 26(2) does not require it.",
       "required_content": [
         "Named oversight person(s) or role(s)",
         "Competency requirements and evidence of training",
@@ -49,8 +49,8 @@
       "id": "IS-ART26-R03",
       "obligation_ref": "ART26-OBL-5",
       "title": "Operational Monitoring",
-      "requirement": "The deployer MUST monitor the operation of the high-risk AI system and have procedures to inform the provider of identified risks.",
-      "rationale": "Art. 26(5) requires monitoring per instructions and risk communication to providers.",
+      "requirement": "The deployer MUST monitor the operation of the high-risk AI system on the basis of the instructions for use and, where relevant, inform providers in accordance with Article 72. Where the deployer has reason to consider that use in accordance with the instructions may result in the system presenting a risk within the meaning of Article 79(1), it MUST, without undue delay, inform the provider or distributor and the relevant market surveillance authority, and suspend the use of the system. Where the deployer has identified a serious incident, it MUST also immediately inform first the provider, and then the importer or distributor and the relevant market surveillance authorities; if it is not able to reach the provider, Article 73 applies mutatis mutandis (Article 26(5), first subparagraph). This obligation does not cover sensitive operational data of deployers of AI systems which are law enforcement authorities. For deployers that are financial institutions subject to requirements regarding their internal governance, arrangements or processes under Union financial services law, the monitoring obligation is deemed to be fulfilled by complying with the rules on internal governance arrangements, processes and mechanisms pursuant to the relevant financial service law (Article 26(5), second subparagraph).",
+      "rationale": "Art. 26(5) requires monitoring 'on the basis of the instructions for use' and sets duties to inform the provider, the importer or distributor and the market surveillance authorities, and to suspend use, in the cases it lists. The duty does not cover sensitive operational data of deployers of AI systems which are law enforcement authorities.",
       "acceptable_implementations": [
         "Monitoring dashboards with AI system health metrics",
         "Automated alerting for anomalous behavior",
@@ -63,8 +63,8 @@
       "id": "IS-ART26-R04",
       "obligation_ref": "ART26-OBL-6",
       "title": "Log Retention",
-      "requirement": "The deployer MUST retain automatically generated AI system logs for at least six months.",
-      "rationale": "Art. 26(6) mandates minimum 6-month log retention for deployers.",
+      "requirement": "The deployer MUST keep the logs automatically generated by the high-risk AI system, to the extent such logs are under its control, for a period appropriate to the intended purpose of the system, of at least six months, unless provided otherwise in applicable Union or national law, in particular in Union law on the protection of personal data (Article 26(6)). Deployers that are financial institutions subject to Union financial services law on internal governance maintain the logs as part of the documentation kept under that law.",
+      "rationale": "Art. 26(6) sets a retention period for deployers of 'at least six months', limited to logs under the deployer's control and subject to applicable Union or national law.",
       "acceptable_implementations": [
         "Log storage with a configured retention of 184 days (at least six months)",
         "Cloud logging service with retention policy",
@@ -76,7 +76,7 @@
       "id": "IS-ART26-R05",
       "obligation_ref": "ART26-OBL-11",
       "title": "Affected Person Notification",
-      "requirement": "The deployer MUST inform natural persons that they are subject to a high-risk AI system when it makes or assists in decisions about them.",
+      "requirement": "Deployers of high-risk AI systems referred to in Annex III that make decisions or assist in making decisions related to natural persons MUST inform those natural persons that they are subject to the use of the high-risk AI system, without prejudice to Article 50 (Article 26(11)). For high-risk AI systems used for law enforcement purposes, Article 13 of Directive (EU) 2016/680 applies.",
       "rationale": "Art. 26(11) requires transparency to affected persons.",
       "acceptable_implementations": [
         "Clear AI disclosure in user-facing interfaces",
@@ -89,7 +89,7 @@
 
   "scoring": {
     "compliant": "R01 + R02 + R03 + R04 + R05 all met",
-    "partial": "At least R01 + R02 met",
+    "partial": "R01 or R02 met, but not all of R01 to R05",
     "non_compliant": "Neither R01 nor R02 met"
   }
 }

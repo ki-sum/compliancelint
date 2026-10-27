@@ -8,7 +8,7 @@
     "disclaimer": "This is an interim checklist developed by ComplianceLint. It is not a harmonised standard and does not itself give a presumption of conformity. No harmonised standard is requested for Article 4. The Regulation instead requires the Commission to publish practical examples of how to comply on the single information platform (Article 4(2)) and the Board to adopt recommendations setting out common objectives (Article 4(3)). The Commission has published an AI-literacy Q&A and a living repository of AI-literacy practices.",
     "basis": [
       "EU AI Act Article 4 (official text)",
-      "EU AI Act Recital 91 (legislative intent on AI literacy)",
+      "EU AI Act Recital 20 (AI literacy) and Regulation (EU) 2026/1744, Recital 8 (amendment of Article 4)",
       "ISO/IEC 42001:2023 -- AI management system (Clause 7.2 Competence, 7.3 Awareness)",
       "ISO/IEC TR 24368:2022 -- Overview of ethical and societal concerns",
       "OECD AI Principles -- Human-centred values and fairness",
@@ -21,7 +21,7 @@
       "id": "IS-ART04-R01",
       "obligation_ref": "ART04-OBL-1",
       "title": "AI Literacy Measures",
-      "requirement": "The organization MUST take measures to support the development of AI literacy of all persons dealing with the operation and use of AI systems on its behalf; a structured AI literacy programme is the recommended way to do so.",
+      "requirement": "The provider or deployer of an AI system MUST take measures to support the development of AI literacy of its staff and other persons dealing with the operation and use of AI systems on its behalf (Article 4(1)); a structured AI literacy programme is the recommended way to do so. Article 4 prescribes no specific content or format; the content and formats listed below are recommended.",
       "rationale": "Art. 4(1), as amended by Regulation (EU) 2026/1744, requires providers and deployers to 'take measures to support the development of AI literacy' of their staff and other persons dealing with the operation and use of AI systems on their behalf; it does not require them to guarantee any specific level of AI literacy of any individual.",
       "required_content": [
         "Overview of AI capabilities and limitations relevant to the organization",
@@ -44,7 +44,7 @@
       "obligation_ref": "ART04-OBL-1",
       "title": "AI Usage Policy",
       "requirement": "The organization SHOULD maintain an AI usage policy documenting how AI systems are to be operated and used by staff.",
-      "rationale": "An AI usage policy demonstrates that the organization has considered the context of use and affected persons, as required by Art. 4.",
+      "rationale": "Art. 4(1) requires the AI literacy measures to take into account 'the context the AI systems are to be used in' and to consider 'the persons or groups of persons on whom the AI systems are to be used'. An AI usage policy is one way to document this; Art. 4 does not require a policy.",
       "required_content": [
         "List of AI systems in use and their intended purposes",
         "Approved use cases and explicitly prohibited uses",
@@ -58,7 +58,7 @@
       "id": "IS-ART04-R03",
       "obligation_ref": "ART04-OBL-1",
       "title": "Role-Specific Training Differentiation",
-      "requirement": "AI literacy training SHOULD be differentiated based on roles, taking into account technical knowledge, experience, and training of staff.",
+      "requirement": "The AI literacy measures MUST take into account the technical knowledge, experience, education and training of the persons concerned and the context the AI systems are to be used in, and consider the persons or groups of persons on whom the AI systems are to be used (Article 4(1)). Differentiating training by role SHOULD be used to achieve this.",
       "rationale": "Art. 4(1) requires the measures to take into account the technical knowledge, experience, education and training of the relevant persons. Any measures used must be designed so that those differences are taken into account.",
       "acceptable_implementations": [
         "Developer track: AI/ML fundamentals, bias detection, testing",
@@ -69,8 +69,8 @@
     }
   ],
   "scoring": {
-    "compliant": "R01 met + at least one of R02, R03 met",
-    "partial": "R01 partially met (some measures exist) or only R02 met",
-    "non_compliant": "No AI literacy measures and no AI usage policy"
+    "compliant": "R01 met, with the measures taking into account the factors listed in R03 (R02 is recommended, not required)",
+    "partial": "R01 partially met (some measures exist, but they do not take into account the factors listed in R03) or only R02 met",
+    "non_compliant": "No AI literacy measures"
   }
 }

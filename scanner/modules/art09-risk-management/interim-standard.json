@@ -25,7 +25,7 @@
       "obligation_ref": "ART09-OBL-1",
       "title": "Risk Management System Documentation",
       "requirement": "The provider MUST establish, implement, document, and maintain a risk management system throughout the entire lifecycle of the high-risk AI system.",
-      "rationale": "Art. 9(1) mandates a continuous, documented risk management process — not a one-time assessment. The system must be a living document updated throughout the AI lifecycle.",
+      "rationale": "Art. 9(1) requires a risk management system to be established, implemented, documented and maintained; Art. 9(2) describes it as 'a continuous iterative process planned and run throughout the entire lifecycle of a high-risk AI system, requiring regular systematic review and updating'. A one-time assessment does not meet this. Under Art. 9(10), providers subject to requirements regarding internal risk management processes under other relevant provisions of Union law may make these aspects part of, or combine them with, those procedures.",
       "acceptable_implementations": [
         "Dedicated risk_assessment.md or risk management plan document",
         "Risk register (spreadsheet, database, or structured file) with identified risks",
@@ -41,16 +41,16 @@
     },
     {
       "id": "IS-ART09-R02",
-      "obligation_ref": "ART09-OBL-2",
+      "obligation_ref": ["ART09-OBL-2a", "ART09-OBL-2b"],
       "title": "Risk Identification and Analysis",
-      "requirement": "The provider MUST identify and analyze known and reasonably foreseeable risks that the high-risk AI system can pose to health, safety, or fundamental rights.",
-      "rationale": "Art. 9(2)(a) requires systematic identification of risks from intended use AND reasonably foreseeable misuse. This must go beyond technical failures to include societal impacts.",
+      "requirement": "The provider MUST identify and analyse the known and the reasonably foreseeable risks that the high-risk AI system can pose to health, safety or fundamental rights when used in accordance with its intended purpose (Article 9(2)(a)), and MUST estimate and evaluate the risks that may emerge when it is used in accordance with its intended purpose and under conditions of reasonably foreseeable misuse (Article 9(2)(b)). The risks concerned are only those which may be reasonably mitigated or eliminated through the development or design of the system, or the provision of adequate technical information (Article 9(3)).",
+      "rationale": "Art. 9(2)(a) covers the identification and analysis of risks when the system is used in accordance with its intended purpose; Art. 9(2)(b) adds the estimation and evaluation of risks under the intended purpose and under conditions of reasonably foreseeable misuse. The risks concern health, safety and fundamental rights, not only technical failures.",
       "required_content": [
-        "List of identified risks with severity and likelihood ratings",
+        "List of identified risks (severity and likelihood ratings are a common method; the Regulation prescribes no rating scheme)",
         "Analysis of risks from intended use scenarios",
         "Analysis of risks from reasonably foreseeable misuse",
         "Consideration of risks to health, safety, and fundamental rights",
-        "Risk categorization (technical, ethical, societal, legal)"
+        "Optional: risk categorisation (e.g. technical, ethical, societal, legal); the Regulation does not require one"
       ],
       "acceptable_implementations": [
         "Risk register with risk ID, description, category, likelihood, severity, and risk score",
@@ -61,9 +61,9 @@
     },
     {
       "id": "IS-ART09-R03",
-      "obligation_ref": "ART09-OBL-2b",
+      "obligation_ref": "ART09-OBL-2c",
       "title": "Post-Market Risk Evaluation",
-      "requirement": "The provider MUST evaluate risks using data gathered from post-market monitoring systems (Art. 72).",
+      "requirement": "The provider MUST evaluate other risks possibly arising, based on the analysis of data gathered from the post-market monitoring system referred to in Article 72 (Article 9(2)(c)).",
       "rationale": "Art. 9(2)(c) requires ongoing risk evaluation based on real-world usage data. Pre-deployment risk assessment alone is insufficient.",
       "acceptable_implementations": [
         "Documented process for incorporating post-market monitoring findings into risk register",
@@ -74,15 +74,15 @@
     },
     {
       "id": "IS-ART09-R04",
-      "obligation_ref": "ART09-OBL-3",
+      "obligation_ref": ["ART09-OBL-2d", "ART09-OBL-4", "ART09-OBL-5", "ART09-OBL-5a", "ART09-OBL-5b", "ART09-OBL-5d"],
       "title": "Risk Management Measures",
-      "requirement": "Risk management measures MUST eliminate or reduce risks as far as possible through adequate design and development. Remaining residual risks MUST be mitigated and controlled. Measures MUST consider cumulative effects and be proportionate.",
-      "rationale": "Art. 9(3) establishes a hierarchy: eliminate > reduce > mitigate > communicate. Measures must be proportionate to the level of risk and consider effects in combination, not in isolation.",
+      "requirement": "The provider MUST adopt appropriate and targeted risk management measures designed to address the identified risks (Article 9(2)(d)). The measures MUST be such that the relevant residual risk associated with each hazard, as well as the overall residual risk, is judged to be acceptable (Article 9(5), first subparagraph). In identifying them, the provider MUST ensure elimination or reduction of risks in as far as technically feasible through adequate design and development and, where appropriate, adequate mitigation and control measures for risks that cannot be eliminated (Article 9(5), second subparagraph, points (a) and (b)), giving due consideration to the technical knowledge, experience, education and training to be expected by the deployer and the presumable context of use (Article 9(5), third subparagraph). The measures MUST give due consideration to the effects and possible interaction resulting from the combined application of the requirements of Articles 8 to 15, with a view to minimising risks more effectively while achieving an appropriate balance in implementing the measures (Article 9(4)).",
+      "rationale": "Art. 9(5), second subparagraph, lists what shall be ensured in identifying the most appropriate risk management measures: elimination or reduction through adequate design and development in as far as technically feasible; where appropriate, mitigation and control measures for risks that cannot be eliminated; and the provision of information under Art. 13 and, where appropriate, training to deployers. Art. 9(4) concerns the combined application of the requirements of Articles 8 to 15, not the combination of individual risks.",
       "required_content": [
-        "For each identified risk: mitigation strategy with rationale",
+        "For each identified risk: the measure adopted with its rationale, and the judgement that the residual risk associated with each hazard and the overall residual risk are acceptable (Art. 9(5))",
         "Evidence that elimination was considered before mitigation",
-        "Assessment of cumulative/combined effects of multiple risks",
-        "Proportionality justification for chosen measures"
+        "Assessment of the effects and possible interaction resulting from the combined application of the requirements of Articles 8 to 15 (Art. 9(4))",
+        "Justification of the balance struck in implementing the measures (Art. 9(4))"
       ],
       "acceptable_implementations": [
         "Risk treatment plan with risk ID linked to specific mitigations",
@@ -93,14 +93,14 @@
     },
     {
       "id": "IS-ART09-R05",
-      "obligation_ref": "ART09-OBL-4",
+      "obligation_ref": ["ART09-OBL-6", "ART09-OBL-8a", "ART09-OBL-8b"],
       "title": "Testing with Appropriate Metrics and Thresholds",
-      "requirement": "The high-risk AI system MUST be tested to identify the most appropriate and targeted risk management measures. Testing MUST use appropriate metrics and probabilistic thresholds.",
-      "rationale": "Art. 9(4) requires that risk management is validated through testing — not just documented. Tests must use quantitative metrics, not just qualitative assessments.",
+      "requirement": "The high-risk AI system MUST be tested for the purpose of identifying the most appropriate and targeted risk management measures; testing MUST ensure that the system performs consistently for its intended purpose and complies with the requirements of Articles 8 to 15 (Article 9(6)). Testing MUST be performed, as appropriate, at any time throughout the development process and, in any event, prior to placing on the market or putting into service, against prior defined metrics and probabilistic thresholds that are appropriate to the intended purpose (Article 9(8)). Testing procedures MAY include testing in real-world conditions in accordance with Article 60 (Article 9(7)).",
+      "rationale": "Art. 9(6) and 9(8) require that risk management is validated through testing, not only documented. Art. 9(8) requires testing 'against prior defined metrics and probabilistic thresholds that are appropriate to the intended purpose of the high-risk AI system'; the Regulation names no specific metrics.",
       "required_content": [
         "Test plans linked to identified risks",
-        "Quantitative metrics (accuracy, precision, recall, F1, AUC, etc.)",
-        "Defined probabilistic thresholds for acceptable performance",
+        "Metrics defined before testing (e.g. accuracy, precision, recall, F1, AUC; the Regulation names none)",
+        "Probabilistic thresholds defined before testing and appropriate to the intended purpose",
         "Test results documenting whether thresholds were met",
         "Evaluation against intended purpose and foreseeable conditions"
       ],
@@ -113,30 +113,30 @@
       ],
       "not_acceptable": [
         "No testing infrastructure at all",
-        "Tests without quantitative metrics or thresholds",
-        "Manual-only testing with no reproducible results"
+        "Tests without prior defined metrics and probabilistic thresholds",
+        "Testing whose results are not recorded against the prior defined metrics and thresholds"
       ]
     },
     {
       "id": "IS-ART09-R06",
-      "obligation_ref": "ART09-OBL-5",
-      "title": "Child-Specific Risk Assessment",
-      "requirement": "If the high-risk AI system is intended to be used by or affect children, the risk management system MUST specifically assess child-specific risks.",
-      "rationale": "Art. 9(5) explicitly requires that systems intended for children account for their specific vulnerabilities. This is a distinct obligation beyond general risk assessment.",
+      "obligation_ref": "ART09-OBL-9",
+      "title": "Consideration of Persons under 18 and Other Vulnerable Groups",
+      "requirement": "When implementing the risk management system, the provider MUST give consideration to whether, in view of its intended purpose, the high-risk AI system is likely to have an adverse impact on persons under the age of 18 and, as appropriate, other vulnerable groups (Article 9(9)).",
+      "rationale": "Art. 9(9) requires providers to 'give consideration to whether in view of its intended purpose the high-risk AI system is likely to have an adverse impact on persons under the age of 18 and, as appropriate, other vulnerable groups'. The consideration is required for every high-risk AI system, not only for systems intended for children.",
       "acceptable_implementations": [
         "Dedicated section in risk assessment for child-specific risks",
         "Age-appropriate design assessment",
         "Child safety impact analysis",
         "Consultation with child development or protection experts"
       ],
-      "note": "This requirement only applies when the system is intended to interact with or be used by children. If not applicable, document the non-applicability."
+      "note": "The consideration applies to every high-risk AI system. Where the provider concludes that no adverse impact on persons under 18 or other vulnerable groups is likely, it should document that conclusion and its reasons."
     },
     {
       "id": "IS-ART09-R07",
-      "obligation_ref": "ART09-OBL-6",
-      "title": "Residual Risk Communication",
-      "requirement": "The provider MUST communicate residual risks to deployers via instructions for use (Art. 13) and, where appropriate, to affected persons.",
-      "rationale": "Art. 9(6-8) requires that risks which cannot be eliminated or sufficiently mitigated are transparently communicated to downstream users and affected persons.",
+      "obligation_ref": "ART09-OBL-5c",
+      "title": "Information and Training for Deployers",
+      "requirement": "In identifying the risk management measures, the provider MUST ensure the provision of the information required pursuant to Article 13 and, where appropriate, training to deployers (Article 9(5), second subparagraph, point (c)). This includes, in the instructions for use, any known or foreseeable circumstance which may lead to risks to health and safety or fundamental rights (Article 13(3)(b)(iii)).",
+      "rationale": "Art. 9(5), second subparagraph, point (c), makes the information required under Art. 13 and, where appropriate, training to deployers part of the risk management measures, so that risks which cannot be eliminated are known to those who use the system.",
       "acceptable_implementations": [
         "Residual risk section in user documentation or instructions for use",
         "Known limitations document listing unmitigated risks",
