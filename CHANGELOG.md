@@ -6,6 +6,8 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.3.10] — 2026-10-28
+
 ### Fixed
 - `cl_interim_standard` wording for Articles 4, 5, 6, 9, 12, 17, 26, 27, 43, 47, 48, 49, 50, 54, 72, 73 and 86, after
   an independent legal review of every string against the consolidated text: duties are stated for the right addressee
