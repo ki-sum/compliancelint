@@ -6,6 +6,23 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.3.8] — 2026-10-27
+
+### Fixed
+- Log retention of "at least six months" (Article 19(1) for providers, Article 26(6) for deployers) was taken as
+  180 days. Six calendar months span 181 to 184 days, so a retention of 180 days always falls short, yet it was
+  reported as meeting the minimum, and the guidance told users to keep logs for 180 days. A retention counted in days
+  now meets the minimum from 184 days, which covers any six calendar months; 180 to 183 days is non-compliant, and
+  the finding says why. The texts give the law's wording (logs under the provider's or deployer's control, a period
+  appropriate to the intended purpose, of at least six months, unless applicable Union or national law, in particular
+  on the protection of personal data, provides otherwise); where a number of days is shown, it reads "184 days (at
+  least six months)". Applies to the Article 12, 19 and 26 modules, the Article 16 action and the interim standards
+  for Articles 12 and 26.
+- The retention examples in `cl_action_plan`: logrotate keeps 184 daily files; AWS CloudWatch Logs is set to 365
+  days (`aws logs put-retention-policy ... --retention-in-days 365`), because it offers no value between 180 and 365;
+  the Docker `max-file` example is gone, because the json-file driver rotates by size, not by date, so a number of
+  files sets no retention period.
+
 ## [1.3.7] — 2026-10-27
 
 ### Fixed
