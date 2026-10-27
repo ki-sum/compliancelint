@@ -6,6 +6,20 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.3.7] — 2026-10-27
+
+### Fixed
+- Article 10(2)(f) (examination of possible biases) and Article 10(2)(g) (measures to detect, prevent and mitigate
+  them) read the same answer, `has_bias_mitigation`, which had no description. A system with safeguards but no
+  examination was reported as "bias examination: partial". The examination now has its own answer,
+  `has_bias_examination` with `bias_examination_evidence`; `has_bias_mitigation` and `bias_evidence` cover the
+  measures. All four fields are described: measures on their own, or a test that has not been carried out, are not an
+  examination; the testing-data-only case of Article 10(6) is named; the measures answer records that measures exist,
+  not that they are appropriate. `cl_action_plan` has one action per duty, and the finding texts follow the wording of
+  Article 10(2)(f) and (g).
+- The Article 10 explanation retyped Recital 67 ("bias-free"). It now names the recital and points to the official
+  text.
+
 ## [1.3.6] — 2026-10-26
 
 ### Fixed
