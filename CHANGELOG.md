@@ -6,6 +6,28 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.3.9] — 2026-10-27
+
+### Fixed
+- `cl_interim_standard`: 27 of 106 requirements referred to obligation ids that do not exist (one of them to Article
+  10(5), deleted by Regulation (EU) 2026/1744), one used a comma-separated string, and 13 referred to an unrelated
+  obligation of the same article. Every reference now names an existing obligation that the requirement implements.
+- `cl_interim_standard` wording for Articles 10, 11, 13, 14, 15, 51, 52, 53 and 55: what the Regulation makes optional
+  is no longer a MUST (technical redundancy, rebuttal arguments under Article 52(2), confidence-based escalation, input
+  validation, authentication, dependency scanning, the high-impact evaluation and the classification record); a model
+  card, change log, API specification or split ratio is named as a possible format, not a duty; conditions and
+  exceptions are kept ("when appropriate" in Article 13(3)(b)(vi), "as appropriate" in Article 55(1)(c), the
+  open-source exception of Article 53(2), the second subparagraph of Article 14(5)); Article 15 and Annex IV are cited
+  with their adopted paragraphs and points; Article 10(1) quality criteria include Article 4a(1).
+- The obligation ART52-OBL-1 quotes both sentences of Article 52(1), including "That notification shall include the
+  information necessary to demonstrate that the relevant requirement has been met."
+
+### Changed
+- `cl_sync` returns the dashboard's numbers after its upload (`findings_on_dashboard_now`, `dashboard_overall`, with
+  the Human Gates answers and evidence applied) and names articles whose results come from an earlier scan
+  (`articles_from_earlier_scans`). Before, after a rescan of some articles the assistant could only quote the numbers
+  from before the upload.
+
 ## [1.3.8] — 2026-10-27
 
 ### Fixed
