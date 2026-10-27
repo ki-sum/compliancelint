@@ -317,3 +317,98 @@ def test_sync_does_not_upload_findings_the_last_scan_no_longer_reports(tmp_path,
     parsed = json.loads(server.cl_sync(str(tmp_path), regulation=""))
     assert parsed.get("status") == "synced", parsed
     assert list(captured["last_payload"]["articles"]["art26"]["findings"]) == ["ART26-NOT-APPLICABLE"]
+
+
+# Series-3 recording (2026-10-27): after a rescan of some articles and cl_sync, the assistant had no way to get the
+# dashboard's numbers after the upload — cl_scan's findings_on_dashboard_now is read before the sync — and said it had
+# "figures from before the upload, check the link". cl_sync reads the dashboard's effective statuses after the upload
+# and reports them, and names the articles whose results come from an earlier scan.
+
+def _seed_scanned_article(project_path, article_num, scan_date, obligation_id):
+    art_dir = os.path.join(project_path, ".compliancelint", "local", "articles")
+    os.makedirs(art_dir, exist_ok=True)
+    with open(os.path.join(art_dir, f"art{article_num}.json"), "w", encoding="utf-8") as f:
+        json.dump({
+            "article": article_num,
+            "scan_date": scan_date,
+            "overall_level": "non_compliant",
+            "findings": {obligation_id: {"obligation_id": obligation_id, "level": "non_compliant", "status": "open",
+                                         "description": "seeded", "history": [], "evidence": []}},
+        }, f)
+
+
+def _fake_run_with_dashboard_status(captured, before, after, status_code=200):
+    """The effective-status endpoint answers `before` until the scan is posted, `after` once it is."""
+    scans = {"status": 201, "body": json.dumps({"scan_id": "s", "dashboard_url": "https://dash.test.local/x"})}
+    inner = _make_fake_run(scans, captured)
+
+    def fake_run(cmd, *args, **kwargs):
+        if isinstance(cmd, (list, tuple)) and cmd and cmd[0] == "curl":
+            url = next((c for c in cmd if isinstance(c, str) and c.startswith("http")), "")
+            if "effective-status" in url:
+                obligations = after if "last_payload" in captured else before
+                return subprocess.CompletedProcess(
+                    cmd, 0, stdout=f"{json.dumps({'obligations': obligations})}\n{status_code}", stderr="")
+        return inner(cmd, *args, **kwargs)
+    return fake_run
+
+
+def test_sync_reports_the_dashboard_counts_after_the_upload(tmp_path, monkeypatch):
+    _seed_rc_with_saas(str(tmp_path))
+    _seed_scanned_article(str(tmp_path), 12, "2026-10-27T10:00:00+00:00", "ART12-OBL-1")
+    captured: dict = {}
+    before = {"ART12-OBL-1": "NON_COMPLIANT", "ART14-OBL-1": "NON_COMPLIANT"}
+    after = {"ART12-OBL-1": "COMPLIANT", "ART14-OBL-1": "NON_COMPLIANT", "ART06-CLS-2": "UNABLE_TO_DETERMINE"}
+    monkeypatch.setattr(subprocess, "run", _fake_run_with_dashboard_status(captured, before, after))
+
+    parsed = json.loads(server.cl_sync(str(tmp_path), regulation=""))
+
+    assert parsed["status"] == "synced", parsed
+    assert parsed["findings_on_dashboard_now"] == {
+        "unit": "findings (one per obligation, not-applicable ones not listed)",
+        "compliant": 1, "non_compliant": 1, "needs_review": 1,
+    }
+    assert parsed["dashboard_overall"] == "non_compliant"
+    assert "after this upload" in parsed["message"]
+    assert "1 compliant, 1 non-compliant, 1 to review" in parsed["message"]
+
+
+def test_sync_without_dashboard_status_still_syncs_and_reports_no_counts(tmp_path, monkeypatch):
+    _seed_rc_with_saas(str(tmp_path))
+    _seed_scanned_article(str(tmp_path), 12, "2026-10-27T10:00:00+00:00", "ART12-OBL-1")
+    captured: dict = {}
+    monkeypatch.setattr(subprocess, "run", _fake_run_with_dashboard_status(
+        captured, {}, {"ART12-OBL-1": "COMPLIANT"}, status_code=500))
+
+    parsed = json.loads(server.cl_sync(str(tmp_path), regulation=""))
+
+    assert parsed["status"] == "synced", parsed
+    assert "findings_on_dashboard_now" not in parsed and "dashboard_overall" not in parsed
+
+
+def test_sync_names_the_articles_whose_results_come_from_an_earlier_scan(tmp_path, monkeypatch):
+    _seed_rc_with_saas(str(tmp_path))
+    _seed_scanned_article(str(tmp_path), 9, "2026-10-20T08:00:00+00:00", "ART09-OBL-1")
+    _seed_scanned_article(str(tmp_path), 12, "2026-10-27T10:00:00+00:00", "ART12-OBL-1")
+    _seed_scanned_article(str(tmp_path), 14, "2026-10-27T10:00:05+00:00", "ART14-OBL-1")
+    captured: dict = {}
+    monkeypatch.setattr(subprocess, "run", _fake_run_with_dashboard_status(captured, {}, {}))
+
+    parsed = json.loads(server.cl_sync(str(tmp_path), regulation=""))
+
+    assert parsed["articles_from_earlier_scans"] == {"art9": "2026-10-20T08:00:00+00:00"}
+    assert "art9 was not rescanned" in parsed["message"]
+    assert "2026-10-20" in parsed["message"]
+
+
+def test_sync_after_a_full_scan_lists_no_earlier_articles(tmp_path, monkeypatch):
+    _seed_rc_with_saas(str(tmp_path))
+    _seed_scanned_article(str(tmp_path), 9, "2026-10-27T10:00:00+00:00", "ART09-OBL-1")
+    _seed_scanned_article(str(tmp_path), 12, "2026-10-27T10:00:07+00:00", "ART12-OBL-1")
+    captured: dict = {}
+    monkeypatch.setattr(subprocess, "run", _fake_run_with_dashboard_status(captured, {}, {}))
+
+    parsed = json.loads(server.cl_sync(str(tmp_path), regulation=""))
+
+    assert parsed["status"] == "synced", parsed
+    assert "articles_from_earlier_scans" not in parsed

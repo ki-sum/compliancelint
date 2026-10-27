@@ -2743,6 +2743,20 @@ def _apply_dashboard_overlay(report: dict, status_map: dict[str, str]) -> None:
             pending["count"] = len(rows)
         else:
             report.pop("pending_evidence", None)
+    now, overall = _dashboard_counts(status_map)
+    totals = report.setdefault("totals", {})
+    totals["findings_on_dashboard_now"] = now
+    if isinstance(totals.get("explanation"), str):
+        totals["explanation"] += (
+            " findings_on_dashboard_now is what the dashboard shows as of the last cl_sync — with the Human Gates answers"
+            " and the evidence applied; cl_sync reports the numbers after its upload, quote those when the user asks"
+            " where the project stands."
+        )
+    report["dashboard_overall"] = overall
+
+
+def _dashboard_counts(status_map: dict[str, str]) -> tuple[dict, str]:
+    """The dashboard's effective statuses as counts (`findings_on_dashboard_now`) and its overall level."""
     counts = {"compliant": 0, "non_compliant": 0, "needs_review": 0}
     for status in status_map.values():
         if status == "COMPLIANT":
@@ -2751,18 +2765,28 @@ def _apply_dashboard_overlay(report: dict, status_map: dict[str, str]) -> None:
             counts["non_compliant"] += 1
         else:
             counts["needs_review"] += 1
-    totals = report.setdefault("totals", {})
-    totals["findings_on_dashboard_now"] = {
-        "unit": "findings (one per obligation, not-applicable ones not listed)", **counts,
-    }
-    if isinstance(totals.get("explanation"), str):
-        totals["explanation"] += (
-            " findings_on_dashboard_now is what the dashboard shows as of the last cl_sync — with the Human Gates answers"
-            " and the evidence applied; quote it (after syncing this scan) when the user asks where the project stands."
-        )
-    report["dashboard_overall"] = (
-        "non_compliant" if counts["non_compliant"] else "needs_review" if counts["needs_review"] else "compliant"
-    )
+    overall = "non_compliant" if counts["non_compliant"] else "needs_review" if counts["needs_review"] else "compliant"
+    return {"unit": "findings (one per obligation, not-applicable ones not listed)", **counts}, overall
+
+
+def _articles_from_earlier_scans(articles: dict, window_seconds: int = 600) -> dict[str, str]:
+    """Articles whose saved scan is older than the newest one by more than `window_seconds` (a scan of all articles
+    saves them within seconds): after a rescan of some articles, these were not rescanned and the upload carries their
+    earlier results. {article key: scan_date}."""
+    dates = {}
+    for key, art in articles.items():
+        raw = art.get("scan_date") if isinstance(art, dict) else None
+        if not isinstance(raw, str):
+            continue
+        try:
+            parsed = datetime.fromisoformat(raw.replace("Z", "+00:00"))
+        except ValueError:
+            continue
+        dates[key] = (parsed if parsed.tzinfo else parsed.replace(tzinfo=timezone.utc), raw)
+    if not dates:
+        return {}
+    newest = max(d for d, _ in dates.values())
+    return {k: raw for k, (d, raw) in dates.items() if (newest - d).total_seconds() > window_seconds}
 
 
 def _fetch_effective_status_from_saas(project_path: str) -> dict[str, str]:
@@ -4721,7 +4745,9 @@ def cl_sync(project_path: str, regulation: str = "") -> str:
         project_path: Absolute path to the project directory.
         regulation: Filter by regulation (empty = sync all).
 
-    Returns: JSON with sync status and dashboard URL.
+    Returns: JSON with sync status and dashboard URL; when the dashboard answers, `findings_on_dashboard_now` and
+    `dashboard_overall` as the dashboard shows them after this upload (quote these, not a scan's earlier numbers), and
+    `articles_from_earlier_scans` for articles that were not rescanned since an earlier scan.
     """
     if not os.path.isdir(project_path):
         return dump_error(f"Directory not found: {project_path}")
@@ -5197,6 +5223,24 @@ def cl_sync(project_path: str, regulation: str = "") -> str:
         result_payload["message"] = (
             f"{result_payload['message']}\n\nEvidence not saved — your plan does not include it:\n"
             + "\n".join(lines)
+        )
+    # Series-3 recording (2026-10-27): the dashboard's numbers after this upload (cl_scan's findings_on_dashboard_now
+    # is read before the sync), and the articles this upload carries from an earlier scan.
+    status_after = _fetch_effective_status_from_saas(project_path)
+    if status_after:
+        now, overall = _dashboard_counts(status_after)
+        result_payload["findings_on_dashboard_now"] = now
+        result_payload["dashboard_overall"] = overall
+        result_payload["message"] += (
+            f"\n\nDashboard after this upload: {now['compliant']} compliant, {now['non_compliant']} non-compliant,"
+            f" {now['needs_review']} to review ({now['unit']}; Human Gates answers and evidence applied)."
+        )
+    earlier = _articles_from_earlier_scans(state.get("articles", {}))
+    if earlier:
+        result_payload["articles_from_earlier_scans"] = earlier
+        result_payload["message"] += "\n\n" + "\n".join(
+            f"{key} was not rescanned this time; its results are from the scan of {date[:10]}."
+            for key, date in sorted(earlier.items(), key=lambda kv: kv[1])
         )
     if human_prompt:
         # Surface the prompt at top-level so MCP clients (Claude Code,
