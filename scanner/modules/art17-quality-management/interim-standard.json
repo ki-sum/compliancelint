@@ -33,7 +33,7 @@
     },
     {
       "id": "IS-ART17-R02",
-      "obligation_ref": "ART17-OBL-1c,ART17-OBL-1d",
+      "obligation_ref": ["ART17-OBL-1c", "ART17-OBL-1d"],
       "title": "Development QA and Testing",
       "requirement": "The QMS MUST include development quality assurance and testing procedures.",
       "rationale": "Art. 17(1)(c)(d) requires QC/QA and testing procedures.",

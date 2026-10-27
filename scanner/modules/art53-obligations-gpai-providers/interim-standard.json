@@ -17,10 +17,10 @@
   "requirements": [
     {
       "id": "IS-ART53-R01",
-      "obligation_ref": "ART53-OBL-1",
+      "obligation_ref": "ART53-OBL-1a",
       "title": "Technical Documentation (Annex XI)",
-      "requirement": "The provider MUST draw up and keep up-to-date technical documentation of the GPAI model in accordance with Annex XI.",
-      "rationale": "Art. 53(1)(a) mandates Annex XI technical documentation for all GPAI providers.",
+      "requirement": "Except where Article 53(2) applies, a GPAI-model provider MUST draw up and keep current technical documentation of its model, including at least the applicable Annex XI information (Article 53(1)(a)).",
+      "rationale": "Art. 53(1)(a) requires technical documentation of the model containing, at a minimum, the information set out in Annex XI. Under Art. 53(2) this does not apply to providers of models released under a free and open-source licence that allows for the access, usage, modification, and distribution of the model, and whose parameters, including the weights, the information on the model architecture, and the information on model usage, are made publicly available, unless the model is a general-purpose AI model with systemic risk.",
       "acceptable_implementations": [
         "Comprehensive model card covering all Annex XI elements",
         "Technical documentation repository with version control",
@@ -29,10 +29,10 @@
     },
     {
       "id": "IS-ART53-R02",
-      "obligation_ref": "ART53-OBL-2",
+      "obligation_ref": "ART53-OBL-1b",
       "title": "Downstream Provider Documentation (Annex XII)",
-      "requirement": "The provider MUST draw up and keep up-to-date information and documentation for downstream providers integrating the GPAI model, in accordance with Annex XII.",
-      "rationale": "Art. 53(1)(b) requires sufficient documentation for downstream providers to comply with their own obligations.",
+      "requirement": "Except where Article 53(2) applies, a GPAI-model provider MUST draw up, keep current and make available to downstream AI-system providers the integration information and documentation required by Article 53(1)(b) and Annex XII.",
+      "rationale": "Art. 53(1)(b) requires information and documentation that enable providers of AI systems who intend to integrate the model to have a good understanding of its capabilities and limitations and to comply with their own obligations under the Regulation, containing at a minimum the elements set out in Annex XII. The free and open-source exception of Art. 53(2) applies here too, except for general-purpose AI models with systemic risk.",
       "acceptable_implementations": [
         "Downstream integration guide covering all Annex XII elements",
         "API documentation with capability descriptions and limitations",
@@ -41,7 +41,7 @@
     },
     {
       "id": "IS-ART53-R03",
-      "obligation_ref": "ART53-OBL-3",
+      "obligation_ref": "ART53-OBL-1c",
       "title": "Copyright Policy and Compliance",
       "requirement": "The provider MUST put in place a policy to comply with Union copyright law, including identification and compliance with text and data mining opt-out reservations.",
       "rationale": "Art. 53(1)(c) mandates a copyright compliance policy, particularly regarding TDM opt-outs under the DSM Directive.",
@@ -53,7 +53,7 @@
     },
     {
       "id": "IS-ART53-R04",
-      "obligation_ref": "ART53-OBL-4",
+      "obligation_ref": "ART53-OBL-1d",
       "title": "Training Data Summary",
       "requirement": "The provider MUST draw up and make publicly available a sufficiently detailed summary of the content used for training the GPAI model.",
       "rationale": "Art. 53(1)(d) requires a public training data summary to enable copyright holders to exercise their rights.",

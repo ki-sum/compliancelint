@@ -27,10 +27,10 @@
     },
     {
       "id": "IS-ART52-R02",
-      "obligation_ref": "ART52-OBL-2",
+      "obligation_ref": "ART52-OBL-1",
       "title": "Notification Content Completeness",
-      "requirement": "The notification MUST include sufficient information to demonstrate that the GPAI model meets the systemic risk criteria.",
-      "rationale": "Art. 52 requires the notification to contain evidence supporting the classification determination.",
+      "requirement": "The notification under Article 52(1) MUST include the information necessary to demonstrate that the condition of Article 51(1), point (a), has been met.",
+      "rationale": "Art. 52(1), second sentence: 'That notification shall include the information necessary to demonstrate that the relevant requirement has been met.'",
       "acceptable_implementations": [
         "Notification package with FLOPs calculation and training documentation",
         "Structured notification form with capability assessment results",
@@ -39,10 +39,10 @@
     },
     {
       "id": "IS-ART52-R03",
-      "obligation_ref": "ART52-OBL-3",
-      "title": "Rebuttal Process Readiness",
-      "requirement": "The provider MUST be prepared to present sufficiently substantiated arguments for rebuttal if the provider considers the model does not meet systemic risk criteria despite exceeding the FLOPs threshold.",
-      "rationale": "Art. 52(2) grants providers the right to present arguments that their model should not be classified as systemic risk.",
+      "obligation_ref": "ART52-PERM-2",
+      "title": "Arguments Against Classification (Optional)",
+      "requirement": "A provider that considers its model does not present systemic risks despite meeting Article 51(1)(a) MAY submit sufficiently substantiated arguments with the notification under Article 52(1), relying on the model's specific characteristics (Article 52(2)).",
+      "rationale": "Art. 52(2) lets the provider 'present, with its notification, sufficiently substantiated arguments to demonstrate that, exceptionally, although it meets that requirement, the general-purpose AI model does not present, due to its specific characteristics, systemic risks'. It does not require the provider to prepare such arguments.",
       "acceptable_implementations": [
         "Documented rebuttal case with technical evidence of limited capability scope",
         "Independent assessment report supporting non-systemic-risk classification",

@@ -16,7 +16,7 @@
   "requirements": [
     {
       "id": "IS-ART55-R01",
-      "obligation_ref": "ART55-OBL-1",
+      "obligation_ref": "ART55-OBL-1a",
       "title": "Model Evaluation and Adversarial Testing",
       "requirement": "The provider MUST perform model evaluation including adversarial testing to identify and mitigate systemic risks.",
       "rationale": "Art. 55(1)(a) mandates state-of-the-art evaluations and adversarial testing for systemic risk models.",
@@ -28,7 +28,7 @@
     },
     {
       "id": "IS-ART55-R02",
-      "obligation_ref": "ART55-OBL-2",
+      "obligation_ref": "ART55-OBL-1b",
       "title": "Systemic Risk Assessment and Mitigation",
       "requirement": "The provider MUST assess and mitigate possible systemic risks at Union level, including their sources.",
       "rationale": "Art. 55(1)(b) requires identification and mitigation of systemic risks that may arise at Union level.",
@@ -40,9 +40,9 @@
     },
     {
       "id": "IS-ART55-R03",
-      "obligation_ref": "ART55-OBL-3",
+      "obligation_ref": "ART55-OBL-1c",
       "title": "Serious Incident Reporting",
-      "requirement": "The provider MUST track, document, and report serious incidents and possible corrective measures to the AI Office and national competent authorities without undue delay.",
+      "requirement": "The provider MUST keep track of, document and report without undue delay relevant information on serious incidents and possible corrective measures to the AI Office and, as appropriate, to national competent authorities (Article 55(1)(c)).",
       "rationale": "Art. 55(1)(c) mandates incident tracking and reporting for systemic risk models.",
       "acceptable_implementations": [
         "Incident response plan with reporting workflow to AI Office",
@@ -52,7 +52,7 @@
     },
     {
       "id": "IS-ART55-R04",
-      "obligation_ref": "ART55-OBL-4",
+      "obligation_ref": "ART55-OBL-1d",
       "title": "Cybersecurity Protections",
       "requirement": "The provider MUST ensure an adequate level of cybersecurity protection for the GPAI model with systemic risk and the physical infrastructure of the model.",
       "rationale": "Art. 55(1)(d) requires cybersecurity measures for both the model and its infrastructure.",

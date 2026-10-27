@@ -27,7 +27,7 @@
       "obligation_ref": "ART11-OBL-1",
       "title": "System Description (Annex IV, Section 1)",
       "requirement": "The provider MUST maintain a README or equivalent document providing a general description of the AI system.",
-      "rationale": "Annex IV(1)(a) requires a 'general description of the AI system' including intended purpose, provider identity, version, and how it interacts with hardware and software.",
+      "rationale": "Annex IV(1) requires 'a general description of the AI system', including its intended purpose, the name of the provider and the version of the system (point (a)) and, where applicable, how it interacts with, or can be used to interact with, hardware or software that is not part of the AI system itself (point (b)).",
       "required_content": [
         "System name and version",
         "Provider identity and contact information",
@@ -41,10 +41,10 @@
     },
     {
       "id": "IS-ART11-R02",
-      "obligation_ref": "ART11-OBL-2",
+      "obligation_ref": "ART11-OBL-1c",
       "title": "Architecture Documentation (Annex IV, Section 2)",
       "requirement": "The provider MUST maintain architecture documentation describing system elements and the development process.",
-      "rationale": "Annex IV(2)(a) requires 'a description of the elements of the AI system and of the process for its development, including design specifications.'",
+      "rationale": "Annex IV(2) requires 'a detailed description of the elements of the AI system and of the process for its development', including the design specifications (point (b)) and the system architecture (point (c)).",
       "required_content": [
         "System architecture diagram or description",
         "Component descriptions and interactions",
@@ -56,10 +56,10 @@
     },
     {
       "id": "IS-ART11-R03",
-      "obligation_ref": "ART11-OBL-3",
-      "title": "API / Interface Documentation (Annex IV, Section 2(e))",
-      "requirement": "The provider SHOULD maintain an API specification (e.g., OpenAPI/Swagger) describing input data, output data, and their specifications.",
-      "rationale": "Annex IV(2)(e) requires a description of 'input data' and 'a description of the output of the system.' An API specification is the industry standard way to document this.",
+      "obligation_ref": "ART11-OBL-1c",
+      "title": "API / Interface Documentation (Annex IV, points 1(d), 2(b) and 3)",
+      "requirement": "The provider SHOULD document relevant input requirements, expected outputs and interface/API arrangements, where applicable, within the Annex IV technical documentation; OpenAPI/Swagger is an optional format (Annex IV(2)(b), (3), (1)(d)).",
+      "rationale": "Annex IV(2)(b) requires 'the description of the expected output and output quality of the system', Annex IV(3) requires 'specifications on input data, as appropriate', and Annex IV(1)(d) names APIs among the forms in which the AI system is placed on the market or put into service. An API specification is one practical way to document these points; the Regulation does not prescribe a format.",
       "acceptable_formats": [
         "OpenAPI 3.x specification (YAML or JSON)",
         "Swagger 2.0 specification",
@@ -70,10 +70,10 @@
     },
     {
       "id": "IS-ART11-R04",
-      "obligation_ref": "ART11-OBL-4",
-      "title": "Model Card (Annex IV, Section 2(b-d))",
-      "requirement": "The provider MUST maintain a model card documenting design specifications, model architecture, training methodologies, and key design choices.",
-      "rationale": "Annex IV(2)(b-d) requires documentation of design specifications, computational resources, training methodologies, training data information, and key design choices.",
+      "obligation_ref": "ART11-OBL-1c",
+      "title": "Design and Development Documentation (Annex IV, points 2(b) to 2(d))",
+      "requirement": "The technical documentation MUST describe, as applicable, the design specifications and key design choices, the system architecture and computational resources, and the data requirements and training methodologies (Annex IV(2)(b)–(d)); a model card is one possible format.",
+      "rationale": "Annex IV(2)(b)-(d) requires documentation of design specifications, computational resources, training methodologies, training data information, and key design choices. The Regulation does not require a separate document called a model card.",
       "required_content": [
         "Model architecture type and description",
         "Training procedure (algorithm, hyperparameters, training duration)",
@@ -92,10 +92,10 @@
     },
     {
       "id": "IS-ART11-R05",
-      "obligation_ref": "ART11-OBL-5",
-      "title": "Testing Documentation (Annex IV, Section 4)",
-      "requirement": "The provider MUST maintain testing documentation describing validation and testing procedures and their outcomes.",
-      "rationale": "Annex IV(4) requires documentation of 'validation and testing procedures used, including information about the validation and testing data used and their main characteristics, metrics used to measure accuracy, robustness and compliance with other relevant requirements, test logs, and all test reports.'",
+      "obligation_ref": "ART11-OBL-1c",
+      "title": "Testing Documentation (Annex IV, point 2(g))",
+      "requirement": "The technical documentation MUST include, as applicable, the validation and testing procedures, datasets and characteristics, relevant metrics, and dated and signed test logs and reports (Annex IV(2)(g)).",
+      "rationale": "Annex IV(2)(g) requires 'the validation and testing procedures used, including information about the validation and testing data used and their main characteristics; metrics used to measure accuracy, robustness and compliance with other relevant requirements set out in Chapter III, Section 2, as well as potentially discriminatory impacts; test logs and all test reports dated and signed by the responsible persons'.",
       "required_content": [
         "Testing strategy and methodology",
         "Test datasets description",
@@ -107,10 +107,10 @@
     },
     {
       "id": "IS-ART11-R06",
-      "obligation_ref": "ART11-OBL-6",
-      "title": "Change Log / Version History",
-      "requirement": "The provider MUST maintain a change log documenting all significant modifications to the system.",
-      "rationale": "Art. 11(1) requires documentation to be 'kept up to date.' A change log is the standard mechanism for tracking documentation currency.",
+      "obligation_ref": ["ART11-OBL-1c", "ART11-OBL-1"],
+      "title": "Changes Through the Lifecycle",
+      "requirement": "The technical documentation MUST describe relevant changes made by the provider to the system through its lifecycle and MUST be kept up to date (Annex IV(6), Article 11(1)); a change log is one possible format.",
+      "rationale": "Annex IV(6) requires 'a description of relevant changes made by the provider to the system through its lifecycle', and Art. 11(1) requires the technical documentation to be 'kept up-to date'. A change log is a common way to track this; the Regulation does not prescribe its format.",
       "acceptable_formats": [
         "CHANGELOG.md (Keep a Changelog format)",
         "CHANGES.md or HISTORY.md",
@@ -120,10 +120,10 @@
     },
     {
       "id": "IS-ART11-R07",
-      "obligation_ref": "ART11-OBL-7",
-      "title": "Deployment Documentation",
-      "requirement": "The provider SHOULD maintain deployment documentation describing how the system is deployed and operated.",
-      "rationale": "Annex IV(1)(a) requires description of 'forms in which the AI system is placed on the market or put into service.' Deployment documentation ensures this information is available.",
+      "obligation_ref": "ART11-OBL-1c",
+      "title": "Forms of Placing on the Market or Putting into Service (Annex IV, point 1(d))",
+      "requirement": "The technical documentation MUST describe all the forms in which the AI system is placed on the market or put into service, including APIs where relevant (Annex IV(1)(d)); a separate deployment guide is optional.",
+      "rationale": "Annex IV(1)(d) requires 'the description of all the forms in which the AI system is placed on the market or put into service, such as software packages embedded into hardware, downloads, or APIs'. Deployment documentation is one way to provide this information.",
       "acceptable_implementations": [
         "Deployment guide (deployment.md or equivalent)",
         "Dockerfile / docker-compose.yml with documentation",

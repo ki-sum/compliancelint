@@ -16,7 +16,7 @@
   "requirements": [
     {
       "id": "IS-ART51-R01",
-      "obligation_ref": "ART51-OBL-1",
+      "obligation_ref": "ART51-CLS-2",
       "title": "Cumulative FLOPs Threshold Assessment",
       "requirement": "The provider MUST assess whether the cumulative amount of computation used for training the GPAI model exceeds 10^25 FLOPs.",
       "rationale": "Art. 51(2) sets 10^25 FLOPs as the presumptive threshold for systemic risk classification.",
@@ -28,10 +28,10 @@
     },
     {
       "id": "IS-ART51-R02",
-      "obligation_ref": "ART51-OBL-2",
+      "obligation_ref": "ART51-CLS-1",
       "title": "High-Impact Capabilities Evaluation",
-      "requirement": "The provider MUST evaluate whether the GPAI model has high-impact capabilities based on Annex XIII criteria, independent of the FLOPs threshold.",
-      "rationale": "Art. 51(1)(b) allows Commission designation based on high-impact capabilities per Annex XIII criteria.",
+      "requirement": "The provider SHOULD assess whether its GPAI model has high-impact capabilities under Article 51(1)(a), using appropriate technical tools, methodologies, indicators and benchmarks; the Annex XIII criteria instead inform a Commission designation under Article 51(1)(b).",
+      "rationale": "Art. 51(1)(a) classifies a model that 'has high impact capabilities evaluated on the basis of appropriate technical tools and methodologies, including indicators and benchmarks'; under Art. 51(1)(b) the Commission may designate a model having regard to the criteria set out in Annex XIII. This is a recommended internal classification practice, not an express provider duty under Article 51.",
       "acceptable_implementations": [
         "Structured capability evaluation against Annex XIII criteria",
         "Benchmark suite covering high-impact capability domains",
@@ -40,10 +40,10 @@
     },
     {
       "id": "IS-ART51-R03",
-      "obligation_ref": "ART51-OBL-3",
+      "obligation_ref": "ART51-CLS-1",
       "title": "Classification Record Maintenance",
-      "requirement": "The provider MUST maintain records documenting the classification outcome and supporting evidence.",
-      "rationale": "Art. 51 requires providers to know and document their classification status for regulatory compliance.",
+      "requirement": "The provider SHOULD maintain an internal record of its assessment of whether its GPAI model meets the systemic-risk classification conditions and the supporting evidence.",
+      "rationale": "Art. 51 sets the classification conditions; it does not itself require a record. A record of the assessment supports the notification under Art. 52(1), which must include the information necessary to demonstrate that the condition has been met.",
       "acceptable_implementations": [
         "Classification decision document with FLOPs calculation and capability assessment",
         "Internal classification register with periodic review schedule",

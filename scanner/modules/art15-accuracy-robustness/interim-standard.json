@@ -28,7 +28,7 @@
       "obligation_ref": "ART15-OBL-1",
       "title": "Accuracy Metrics Definition and Tracking",
       "requirement": "The provider MUST define, track, and declare accuracy metrics appropriate for the system's intended purpose.",
-      "rationale": "Art. 15(1) requires 'an appropriate level of accuracy' and Art. 15(2) requires 'accuracy metrics shall be declared in the accompanying instructions of use.' Without defined metrics, compliance cannot be assessed.",
+      "rationale": "Art. 15(1) requires 'an appropriate level of accuracy' and Art. 15(3) requires that 'the levels of accuracy and the relevant accuracy metrics of high-risk AI systems shall be declared in the accompanying instructions of use.' Without defined metrics, compliance cannot be assessed.",
       "recommended_metrics": {
         "classification": ["accuracy", "precision", "recall", "F1-score", "AUC-ROC", "confusion matrix"],
         "regression": ["MSE", "RMSE", "MAE", "R-squared", "MAPE"],
@@ -45,10 +45,10 @@
     },
     {
       "id": "IS-ART15-R02",
-      "obligation_ref": "ART15-OBL-2",
+      "obligation_ref": ["ART15-OBL-1", "ART15-OBL-4"],
       "title": "Testing Infrastructure",
-      "requirement": "The provider MUST implement comprehensive testing including unit tests, integration tests, and model evaluation tests.",
-      "rationale": "Art. 15(3) requires resilience to 'errors, faults or inconsistencies.' Testing is the primary mechanism for demonstrating and maintaining robustness.",
+      "requirement": "The provider MUST design and develop the high-risk AI system to achieve appropriate accuracy, robustness and cybersecurity, and take technical and organisational measures for resilience against errors, faults and inconsistencies; unit, integration and model-evaluation tests are possible methods, not individually mandated categories (Article 15(1), (4)).",
+      "rationale": "Art. 15(1) requires an appropriate level of accuracy, robustness and cybersecurity throughout the lifecycle, and Art. 15(4) requires high-risk AI systems to be 'as resilient as possible regarding errors, faults or inconsistencies', with technical and organisational measures taken in this regard. Testing is a primary way to demonstrate and maintain this.",
       "acceptable_implementations": [
         "Unit tests for individual components (pytest, jest, JUnit)",
         "Integration tests for system interactions",
@@ -61,10 +61,10 @@
     },
     {
       "id": "IS-ART15-R03",
-      "obligation_ref": "ART15-OBL-3",
+      "obligation_ref": "ART15-OBL-4",
       "title": "Input Validation and Sanitization",
-      "requirement": "The provider MUST implement input validation and sanitization on all system entry points.",
-      "rationale": "Art. 15(3) requires resilience to 'errors, faults or inconsistencies that may occur within the system or the environment in which the system operates.' Input validation is the first line of defense.",
+      "requirement": "The provider SHOULD validate inputs at the system's entry points as one of the technical measures for resilience against errors, faults or inconsistencies (Article 15(4)); the Regulation does not prescribe input validation by name.",
+      "rationale": "Art. 15(4) requires high-risk AI systems to be 'as resilient as possible regarding errors, faults or inconsistencies that may occur within the system or the environment in which the system operates'. Input validation is a common first line of defence.",
       "acceptable_implementations": [
         "Schema validation (pydantic, zod, JSON Schema, Protocol Buffers)",
         "Type checking and range validation",
@@ -77,8 +77,8 @@
       "id": "IS-ART15-R04",
       "obligation_ref": "ART15-OBL-4",
       "title": "Error Handling and Graceful Degradation",
-      "requirement": "The provider MUST implement error handling with graceful degradation, including technically redundant solutions (back-up plans, fail-safe plans).",
-      "rationale": "Art. 15(3) explicitly requires 'technically redundant solutions which may include back-up plans and fail-safe plans.'",
+      "requirement": "The provider MUST take technical and organisational measures so that the high-risk AI system is as resilient as possible regarding errors, faults or inconsistencies; error handling with graceful degradation is one such measure. Technical redundancy solutions, including backup or fail-safe plans, MAY be used (Article 15(4)).",
+      "rationale": "Art. 15(4): 'High-risk AI systems shall be as resilient as possible regarding errors, faults or inconsistencies that may occur within the system or the environment in which the system operates [...]. Technical and organisational measures shall be taken in this regard. The robustness of high-risk AI systems may be achieved through technical redundancy solutions, which may include backup or fail-safe plans.'",
       "acceptable_implementations": [
         "Structured exception handling (try/except, try/catch)",
         "Error boundaries in UI components",
@@ -93,7 +93,7 @@
       "obligation_ref": "ART15-OBL-5",
       "title": "Rate Limiting and Abuse Prevention",
       "requirement": "The provider SHOULD implement rate limiting on all public-facing endpoints to prevent abuse and denial-of-service attacks.",
-      "rationale": "Art. 15(5) requires 'cybersecurity measures appropriate to the circumstances and the risks.' Rate limiting is a standard defense against service abuse.",
+      "rationale": "Art. 15(5) requires the technical solutions aiming to ensure the cybersecurity of high-risk AI systems to be 'appropriate to the relevant circumstances and the risks'. Rate limiting is a standard defense against service abuse.",
       "acceptable_implementations": [
         "Per-client rate limiting (by IP, API key, or user ID)",
         "Global rate limiting for system protection",
@@ -103,10 +103,10 @@
     },
     {
       "id": "IS-ART15-R06",
-      "obligation_ref": "ART15-OBL-6",
+      "obligation_ref": "ART15-OBL-5",
       "title": "Authentication and Authorization",
-      "requirement": "The provider MUST implement authentication and authorization controls on all system endpoints and administrative functions.",
-      "rationale": "Art. 15(5) requires protection against 'attempts by unauthorised third parties.' Authentication verifies identity; authorization enforces access control.",
+      "requirement": "The provider SHOULD apply authentication and authorisation controls to system endpoints and administrative functions, as appropriate to the relevant circumstances and the risks, as part of the resilience against unauthorised third parties required by Article 15(5).",
+      "rationale": "Art. 15(5) requires resilience against 'attempts by unauthorised third parties to alter their use, outputs or performance by exploiting system vulnerabilities'. Authentication verifies identity; authorisation enforces access control.",
       "acceptable_implementations": [
         "JWT (JSON Web Tokens) with proper validation",
         "OAuth 2.0 / OpenID Connect",
@@ -118,9 +118,9 @@
     },
     {
       "id": "IS-ART15-R07",
-      "obligation_ref": "ART15-OBL-7",
+      "obligation_ref": "ART15-OBL-5",
       "title": "Dependency Vulnerability Scanning",
-      "requirement": "The provider MUST integrate automated dependency vulnerability scanning into the development pipeline.",
+      "requirement": "The provider SHOULD scan third-party dependencies for known vulnerabilities, for example automatically in the development pipeline, as part of the resilience against the exploitation of system vulnerabilities required by Article 15(5).",
       "rationale": "Art. 15(5) requires protection against exploitation of 'system vulnerabilities.' Third-party dependencies are a common attack vector.",
       "acceptable_implementations": [
         "pip-audit or safety (Python)",
@@ -134,10 +134,10 @@
     },
     {
       "id": "IS-ART15-R08",
-      "obligation_ref": "ART15-OBL-8",
+      "obligation_ref": "ART15-OBL-5b",
       "title": "Adversarial Testing",
-      "requirement": "The provider SHOULD conduct adversarial testing appropriate to the system's risk profile and attack surface.",
-      "rationale": "Art. 15(4) explicitly names adversarial ML attacks: 'data poisoning, model evasion, model inversion, and model inference.' Testing resilience against these is necessary.",
+      "requirement": "The provider SHOULD perform adversarial testing proportionate to relevant AI-specific vulnerabilities, potentially including data poisoning, model poisoning, adversarial examples/model evasion and confidentiality attacks; Article 15(5) requires appropriate cybersecurity solutions, not a specifically named testing regimen.",
+      "rationale": "Art. 15(5) requires the technical solutions to address AI specific vulnerabilities to include, where appropriate, measures against attacks trying to manipulate the training data set (data poisoning) or pre-trained components used in training (model poisoning), inputs designed to cause the AI model to make a mistake (adversarial examples or model evasion), confidentiality attacks or model flaws. Model inversion and membership inference are not named in the Regulation; they are common examples of confidentiality attacks.",
       "acceptable_implementations": [
         "Adversarial Robustness Toolbox (ART) — IBM",
         "CleverHans — adversarial example generation",
@@ -149,18 +149,19 @@
       ],
       "attack_types_to_test": [
         "Data poisoning: Can training data be manipulated?",
-        "Model evasion: Can adversarial inputs cause misclassification?",
-        "Model inversion: Can model outputs reveal training data?",
-        "Model inference: Can membership in training set be detected?",
+        "Model poisoning: Can pre-trained components used in training be manipulated?",
+        "Adversarial examples or model evasion: Can adversarial inputs cause misclassification?",
+        "Confidentiality attacks, e.g. model inversion: Can model outputs reveal training data?",
+        "Confidentiality attacks, e.g. membership inference: Can membership in the training set be detected?",
         "Prompt injection (for LLM-based systems)"
       ]
     },
     {
       "id": "IS-ART15-R09",
-      "obligation_ref": "ART15-OBL-9",
+      "obligation_ref": "ART15-PERM-4c",
       "title": "Redundancy and Failover",
-      "requirement": "The provider SHOULD implement redundancy and failover mechanisms appropriate to the system's criticality.",
-      "rationale": "Art. 15(3) requires 'technically redundant solutions which may include back-up plans and fail-safe plans.' For production systems, this translates to infrastructure redundancy.",
+      "requirement": "The provider MAY employ technical redundancy, including backup or fail-safe plans, as an approach to robustness appropriate to the system's risks; Article 15(4) does not require redundancy.",
+      "rationale": "Art. 15(4): 'The robustness of high-risk AI systems may be achieved through technical redundancy solutions, which may include backup or fail-safe plans.' For production systems, this often means infrastructure redundancy.",
       "acceptable_implementations": [
         "Health checks and liveness/readiness probes",
         "Replica sets with automatic failover",

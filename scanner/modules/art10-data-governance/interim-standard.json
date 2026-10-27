@@ -69,7 +69,7 @@
     },
     {
       "id": "IS-ART10-R03",
-      "obligation_ref": "ART10-OBL-3",
+      "obligation_ref": ["ART10-OBL-2f", "ART10-OBL-2g"],
       "title": "Bias Detection and Mitigation",
       "requirement": "The provider MUST conduct and document bias examination of training data, using appropriate statistical methods or fairness toolkits.",
       "rationale": "Art. 10(2)(f) requires 'examination in view of possible biases that are likely to affect the health and safety of persons, have a negative impact on fundamental rights, or lead to discrimination.' This cannot be satisfied without systematic bias analysis.",
@@ -89,7 +89,7 @@
     },
     {
       "id": "IS-ART10-R04",
-      "obligation_ref": "ART10-OBL-4",
+      "obligation_ref": "ART10-OBL-2",
       "title": "Data Versioning and Traceability",
       "requirement": "Datasets SHOULD be versioned alongside code to ensure traceability of data origin and reproducibility of model training.",
       "rationale": "Art. 10(2)(a) requires documented 'design choices' and 'data collection processes' including 'the origin of data.' Without data versioning, it is difficult to trace which data was used for which model version.",
@@ -103,10 +103,10 @@
     },
     {
       "id": "IS-ART10-R05",
-      "obligation_ref": "ART10-OBL-5",
-      "title": "Training/Validation/Testing Dataset Separation",
-      "requirement": "The provider MUST implement and document separate training, validation, and testing datasets with explicit split ratios.",
-      "rationale": "Art. 10(3) requires 'relevant, sufficiently representative, and to the best extent possible, free of errors and complete' datasets for training, validation, and testing. Proper separation is fundamental to meaningful evaluation.",
+      "obligation_ref": ["ART10-OBL-1", "ART10-OBL-3"],
+      "title": "Training, Validation and Testing Data Set Quality",
+      "requirement": "Where training, validation and testing datasets are used in developing a high-risk AI system, the provider MUST ensure that they meet the applicable quality criteria of Article 10(2) to (4) and Article 4a(1) (Article 10(1)). Validation data may be a separate dataset or part of the training dataset (fixed or variable split); no specific split ratios are mandated.",
+      "rationale": "Art. 10(3) requires that 'training, validation and testing data sets shall be relevant, sufficiently representative, and to the best extent possible, free of errors and complete in view of the intended purpose.' Art. 3(31) defines the validation data set as 'a separate data set or part of the training data set, either as a fixed or variable split'. Keeping the testing data out of model selection is good practice for a meaningful evaluation; the Regulation does not prescribe split ratios.",
       "acceptable_implementations": [
         "Explicit train/validation/test split with documented ratios",
         "Stratified splitting by target variable and key features",
@@ -114,7 +114,7 @@
         "Separate data collection for test set (gold standard)"
       ],
       "minimum_requirements": [
-        "Documented split ratios (e.g., 70/15/15 or 80/10/10)",
+        "Documented split method and the ratios the provider chose (the Regulation prescribes none)",
         "Stratification strategy documented",
         "No data leakage between splits",
         "Test set held out from any model selection process"
@@ -122,10 +122,10 @@
     },
     {
       "id": "IS-ART10-R06",
-      "obligation_ref": "ART10-OBL-6",
+      "obligation_ref": "ART15-OBL-4b",
       "title": "Continuous Learning Safeguards",
-      "requirement": "For AI systems that continue to learn after deployment, the provider MUST implement safeguards against biased outputs used as input for future operations (feedback loops).",
-      "rationale": "Art. 10(6) explicitly requires 'appropriate measures' to prevent feedback loop biases in systems that continue learning after deployment.",
+      "requirement": "A provider of a high-risk AI system that continues to learn after placing on the market or putting into service MUST design it to eliminate or reduce as far as possible the risk of biased outputs feeding future inputs, and ensure that such feedback loops are addressed with appropriate mitigation measures (Article 15(4), third subparagraph).",
+      "rationale": "Art. 15(4), third subparagraph: 'High-risk AI systems that continue to learn after being placed on the market or put into service shall be developed in such a way as to eliminate or reduce as far as possible the risk of possibly biased outputs influencing input for future operations (feedback loops), and as to ensure that any such feedback loops are duly addressed with appropriate mitigation measures.' Art. 10(6) is a different rule: for systems not developed with techniques involving the training of AI models, it applies the data-governance rules only to the testing data sets.",
       "acceptable_implementations": [
         "Drift detection monitoring (data drift, concept drift, prediction drift)",
         "Periodic revalidation against held-out test sets",
