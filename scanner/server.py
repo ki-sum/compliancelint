@@ -3418,7 +3418,7 @@ def cl_update_finding(
 
     ACCEPT specific evidence like:
     - "docs/risk-management.md Section 2 lists 7 identified risks with mitigations"
-    - "src/logging.py implements structlog with JSON output, retention 180 days"
+    - "src/logging.py implements structlog with JSON output, retention 365 days"
     - "Confirmed: system is high-risk under Annex III 5(b), classification accepted"
 
     This is critical: evidence_provided findings are upgraded to COMPLIANT on next scan.

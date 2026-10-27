@@ -495,7 +495,7 @@ class ProjectContext:
         "logging_description": "e.g. uses structlog with JSON output",
         "logging_evidence": ["src/logging_config.py:5", ...],
         "has_retention_config": true | false | null,
-        "retention_days": null | 180 | 365,
+        "retention_days": null | 184 | 365,
         "retention_evidence": "description of where retention is configured"
       },
       "art13": {

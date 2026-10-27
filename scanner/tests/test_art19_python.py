@@ -18,7 +18,7 @@ def art19_module():
     return _load_module("art19-automatically-generated-logs")
 
 
-RETENTION_MINIMUM_DAYS = 180
+RETENTION_MINIMUM_DAYS = 184  # six months counted in days (core/retention.py)
 
 
 def _full_true_ctx():
@@ -168,24 +168,24 @@ class TestArt19Obl1b:
         assert len(obl) > 0
         assert obl[0].level == ComplianceLevel.UNABLE_TO_DETERMINE
 
-    def test_retention_boundary_180_gives_partial(self, art19_module, tmp_path):
-        """retention_days == 180 (boundary) → ART19-OBL-1b PARTIAL."""
+    def test_retention_boundary_184_gives_partial(self, art19_module, tmp_path):
+        """retention_days == 184 (boundary: six months in days) → ART19-OBL-1b PARTIAL."""
         BaseArticleModule.set_context(_ctx_with("art19", {
             "has_log_retention": True,
             "has_retention_config": True,
-            "retention_days": 180,
+            "retention_days": 184,
         }))
         result = art19_module.scan(str(tmp_path))
         obl = _find(result, "ART19-OBL-1b")
         assert len(obl) > 0
         assert obl[0].level == ComplianceLevel.PARTIAL
 
-    def test_retention_boundary_179_gives_non_compliant(self, art19_module, tmp_path):
-        """retention_days == 179 (just below threshold) → ART19-OBL-1b NON_COMPLIANT."""
+    def test_retention_boundary_183_gives_non_compliant(self, art19_module, tmp_path):
+        """retention_days == 183 (just below six months for some logs) → ART19-OBL-1b NON_COMPLIANT."""
         BaseArticleModule.set_context(_ctx_with("art19", {
             "has_log_retention": True,
             "has_retention_config": True,
-            "retention_days": 179,
+            "retention_days": 183,
         }))
         result = art19_module.scan(str(tmp_path))
         obl = _find(result, "ART19-OBL-1b")

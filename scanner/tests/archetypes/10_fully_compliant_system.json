@@ -471,7 +471,7 @@
     },
     "art19": {
       "overall": "partial",
-      "legal_basis": "Art. 19(1): high-risk AI system has log retention with 730-day retention period (exceeds 180-day minimum)"
+      "legal_basis": "Art. 19(1): high-risk AI system has log retention with 730-day retention period (exceeds the six-month minimum, 184 days)"
     },
     "art20": {
       "overall": "partial",

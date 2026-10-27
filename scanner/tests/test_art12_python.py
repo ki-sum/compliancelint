@@ -13,7 +13,7 @@ Obligation mapping:
 from core.protocol import ComplianceLevel, BaseArticleModule
 from conftest import _ctx_with
 
-RETENTION_MINIMUM_DAYS = 180
+RETENTION_MINIMUM_DAYS = 184  # six months counted in days (core/retention.py)
 
 
 def _full_true_ctx():
@@ -213,15 +213,15 @@ class TestArt19Obl1Retention:
         assert len(obl) > 0
         assert obl[0].level == ComplianceLevel.UNABLE_TO_DETERMINE
 
-    def test_retention_exactly_180_gives_partial(self, art12_module, tmp_path):
-        """retention_days == 180 (boundary) → ART19-OBL-1b PARTIAL."""
+    def test_retention_exactly_184_gives_partial(self, art12_module, tmp_path):
+        """retention_days == 184 (boundary: six months in days) → ART19-OBL-1b PARTIAL."""
         ctx = _ctx_with("art12", {
             "has_logging": True,
             "logging_description": "test",
             "logging_evidence": [],
             "has_retention_config": True,
-            "retention_days": 180,
-            "retention_evidence": "180 days configured",
+            "retention_days": 184,
+            "retention_evidence": "184 days configured",
         })
         BaseArticleModule.set_context(ctx)
         result = art12_module.scan(str(tmp_path))
@@ -229,15 +229,15 @@ class TestArt19Obl1Retention:
         assert len(obl) > 0
         assert obl[0].level == ComplianceLevel.PARTIAL
 
-    def test_retention_179_gives_non_compliant(self, art12_module, tmp_path):
-        """retention_days == 179 (just below threshold) → ART19-OBL-1b NON_COMPLIANT."""
+    def test_retention_183_gives_non_compliant(self, art12_module, tmp_path):
+        """retention_days == 183 (just below six months for some logs) → ART19-OBL-1b NON_COMPLIANT."""
         ctx = _ctx_with("art12", {
             "has_logging": True,
             "logging_description": "test",
             "logging_evidence": [],
             "has_retention_config": True,
-            "retention_days": 179,
-            "retention_evidence": "179 days",
+            "retention_days": 183,
+            "retention_evidence": "183 days",
         })
         BaseArticleModule.set_context(ctx)
         result = art12_module.scan(str(tmp_path))

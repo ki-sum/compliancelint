@@ -73,7 +73,7 @@
       "requirement": "Logs MUST be retained for a minimum of 6 months. Systems in healthcare, law enforcement, or critical infrastructure SHOULD retain for 12+ months.",
       "rationale": "Art. 19(1) explicitly states 'at least six months.' Longer retention for high-impact domains is industry best practice.",
       "implementation_guidance": [
-        "Configure log rotation with minimum 180-day retention",
+        "Configure log rotation that keeps every log for at least six months: counted in days, at least 184 days",
         "Use append-only log storage (S3 with object lock, WORM storage)",
         "Ensure retention policy is documented and auditable",
         "Consider GDPR data minimization: anonymize personal data in logs after active use period"

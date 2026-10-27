@@ -498,7 +498,7 @@ class Art16Module(BaseArticleModule):
                 action="Configure log retention per Art. 19",
                 details=(
                     "Art. 16(e) requires keeping automatically generated logs when under "
-                    "provider control. Configure log retention for at least 6 months (180 days) "
+                    "provider control. Configure log retention for at least six months (counted in days, at least 184 days) "
                     "per Art. 19(1)."
                 ),
                 effort="2-4 hours",

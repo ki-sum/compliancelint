@@ -14,7 +14,7 @@ Obligation mapping:
   ART26-OBL-2   → has_human_oversight_assignment (oversight assigned)
   ART26-OBL-4   → handled by gap_findings (conditional: deployer_controls_input_data)
   ART26-OBL-5   → has_operational_monitoring (monitoring)
-  ART26-OBL-6   → has_log_retention + retention_days (>= 180 day minimum)
+  ART26-OBL-6   → has_log_retention + retention_days (>= 184 days: six months)
   ART26-OBL-7   → handled by gap_findings (conditional: is_workplace_deployment, manual)
   ART26-OBL-8   → handled by gap_findings (conditional: is_public_authority, manual)
   ART26-OBL-9   → handled by gap_findings (conditional: requires_dpia, manual)
@@ -50,7 +50,7 @@ from core.protocol import (
 )
 from core.obligation_engine import ObligationEngine
 
-RETENTION_MINIMUM_DAYS = 180
+from core.retention import RETENTION_MINIMUM_DAYS, six_months, short_of_six_months
 
 
 class Art26Module(BaseArticleModule):
@@ -148,7 +148,7 @@ class Art26Module(BaseArticleModule):
             gap_type=GapType.CODE,
         ))
 
-        # ── ART26-OBL-6: Log retention (>= 6 months / 180 days) ──
+        # ── ART26-OBL-6: Log retention (at least six months: 184 days, see core.retention) ──
         # Multi-value comparison: needs custom logic (boundary case #5)
         findings.append(self._make_retention_finding(
             has_log_retention=has_log_retention,
@@ -226,9 +226,9 @@ class Art26Module(BaseArticleModule):
     ) -> Finding:
         """Build the ART26-OBL-6 retention finding from AI answers.
 
-        Rules (same threshold as Art. 19(1) — 6 months / 180 days):
-          - has_log_retention=True, retention_days >= 180  → PARTIAL
-          - has_log_retention=True, retention_days < 180   → NON_COMPLIANT
+        Rules (same threshold as Art. 19(1) — six months / 184 days):
+          - has_log_retention=True, retention_days >= 184  → PARTIAL
+          - has_log_retention=True, retention_days < 184   → NON_COMPLIANT
           - has_log_retention=True, retention_days=None    → PARTIAL (period unknown)
           - has_log_retention=False                        → NON_COMPLIANT
           - has_log_retention=None                         → UNABLE_TO_DETERMINE
@@ -242,7 +242,7 @@ class Art26Module(BaseArticleModule):
                 confidence=Confidence.LOW,
                 description=(
                     "AI could not determine whether log retention is configured. "
-                    f"Art. 26(6) requires a minimum of {RETENTION_MINIMUM_DAYS} days (6 months). "
+                    f"{six_months('Art. 26(6)')} "
                     f"{('Evidence: ' + retention_evidence) if retention_evidence else ''}"
                 ),
                 gap_type=GapType.CODE,
@@ -257,7 +257,7 @@ class Art26Module(BaseArticleModule):
                 confidence=Confidence.MEDIUM,
                 description=(
                     "No log retention policy configured. "
-                    f"Art. 26(6) requires keeping logs for at least {RETENTION_MINIMUM_DAYS} days (6 months)."
+                    f"{six_months('Art. 26(6)')}"
                 ),
                 remediation=(
                     f"Configure log retention for at least {RETENTION_MINIMUM_DAYS} days. "
@@ -276,11 +276,12 @@ class Art26Module(BaseArticleModule):
                 confidence=Confidence.LOW,
                 description=(
                     "Log retention configuration found but period could not be determined. "
-                    f"Art. 26(6) requires a minimum of {RETENTION_MINIMUM_DAYS} days (6 months). "
+                    f"{six_months('Art. 26(6)')} "
                     f"{('Evidence: ' + retention_evidence) if retention_evidence else ''}"
                 ),
                 remediation=(
-                    f"Verify the configured retention period meets the {RETENTION_MINIMUM_DAYS}-day minimum."
+                    f"Verify that the configured period keeps every log for at least six months "
+                    f"({RETENTION_MINIMUM_DAYS} days)."
                 ),
                 gap_type=GapType.CODE,
             )
@@ -294,7 +295,10 @@ class Art26Module(BaseArticleModule):
                 confidence=Confidence.MEDIUM,
                 description=(
                     f"Log retention configured: {retention_days} days "
-                    f"(>= {RETENTION_MINIMUM_DAYS}-day minimum per Art. 26(6)). "
+                    f"(at least six months, as Art. 26(6) requires; a person still needs to confirm that the "
+                    f"period is appropriate to the intended purpose of the high-risk AI system and that no "
+                    f"applicable Union or national law, in particular on the protection of personal data, "
+                    f"provides otherwise). "
                     f"{('Evidence: ' + retention_evidence) if retention_evidence else ''}"
                 ),
                 gap_type=GapType.CODE,
@@ -307,8 +311,8 @@ class Art26Module(BaseArticleModule):
                 level=ComplianceLevel.NON_COMPLIANT,
                 confidence=Confidence.MEDIUM,
                 description=(
-                    f"Log retention of {retention_days} days is below the "
-                    f"{RETENTION_MINIMUM_DAYS}-day minimum required by Art. 26(6). "
+                    f"{short_of_six_months('Log retention', retention_days)} "
+                    f"{six_months('Art. 26(6)')} "
                     f"{('Evidence: ' + retention_evidence) if retention_evidence else ''}"
                 ),
                 remediation=(
@@ -372,7 +376,7 @@ class Art26Module(BaseArticleModule):
                 "ComplianceLint Compliance Checklist v0.1 requires: (1) deployment documentation "
                 "referencing provider instructions, (2) documented human oversight assignment with "
                 "competency records, (3) operational monitoring infrastructure, (4) log retention "
-                ">= 180 days, (5) notification mechanism for affected persons. "
+                "of at least six months (184 days), (5) notification mechanism for affected persons. "
                 "Based on: ISO/IEC 42001:2023, ISO/IEC 23894:2023."
             ),
             enforcement_date=applicable_from(26),
@@ -427,10 +431,9 @@ class Art26Module(BaseArticleModule):
             actions.append(ActionItem(
                 priority="HIGH",
                 article="Art. 26(6)",
-                action=f"Configure log retention (>= {RETENTION_MINIMUM_DAYS} days / 6 months)",
+                action=f"Configure log retention of at least six months ({RETENTION_MINIMUM_DAYS} days)",
                 details=(
-                    f"Art. 26(6) requires keeping auto-generated logs for at least "
-                    f"{RETENTION_MINIMUM_DAYS} days. Configure retention via logrotate, "
+                    f"{six_months('Art. 26(6)')} Configure retention via logrotate, "
                     f"cloud log settings, or database archival."
                 ),
                 effort="1-2 hours",
@@ -444,10 +447,11 @@ class Art26Module(BaseArticleModule):
             actions.append(ActionItem(
                 priority="HIGH",
                 article="Art. 26(6)",
-                action=f"Increase log retention from {current_days} to >= {RETENTION_MINIMUM_DAYS} days",
+                action=f"Increase log retention from {current_days} days to at least six months "
+                       f"({RETENTION_MINIMUM_DAYS} days)",
                 details=(
-                    f"Current retention of {current_days} days is below the "
-                    f"{RETENTION_MINIMUM_DAYS}-day minimum required by Art. 26(6)."
+                    f"{short_of_six_months('Current retention', current_days)} "
+                    f"{six_months('Art. 26(6)')}"
                 ),
                 effort="30 minutes",
             ))

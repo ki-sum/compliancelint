@@ -7,7 +7,7 @@ detection is entirely the AI's responsibility.
 
 Obligation mapping:
   ART12-OBL-1   → has_logging
-  ART12-OBL-2a  → has_retention_config + retention_days (>= 180 day minimum)
+  ART12-OBL-2a  → has_retention_config + retention_days (>= 184 days: six months)
   ART12-OBL-2b  → has_logging (post-market monitoring aspect)
   ART12-OBL-2c  → UNABLE_TO_DETERMINE always (deployer monitoring requires human review)
 """
@@ -27,7 +27,7 @@ from core.protocol import (
 )
 from core.obligation_engine import ObligationEngine
 
-RETENTION_MINIMUM_DAYS = 180
+from core.retention import RETENTION_MINIMUM_DAYS, six_months, short_of_six_months
 
 
 class Art12Module(BaseArticleModule):
@@ -217,8 +217,8 @@ class Art12Module(BaseArticleModule):
         """Build the ART19-OBL-1b retention finding from AI answers.
 
         Rules:
-          - has_retention_config=True, retention_days >= 180  → PARTIAL (compliant threshold)
-          - has_retention_config=True, retention_days < 180   → NON_COMPLIANT
+          - has_retention_config=True, retention_days >= 184  → PARTIAL (compliant threshold)
+          - has_retention_config=True, retention_days < 184   → NON_COMPLIANT
           - has_retention_config=True, retention_days=None    → PARTIAL (period unknown)
           - has_retention_config=False                        → NON_COMPLIANT
           - has_retention_config=None                         → UNABLE_TO_DETERMINE
@@ -232,7 +232,7 @@ class Art12Module(BaseArticleModule):
                 confidence=Confidence.LOW,
                 description=(
                     "AI could not determine whether a log retention policy is configured. "
-                    f"Art. 19(1) requires a minimum of {RETENTION_MINIMUM_DAYS} days (6 months). "
+                    f"{six_months('Art. 19(1)')} "
                     f"{('Evidence: ' + retention_evidence) if retention_evidence else ''}"
                 ),
                 gap_type=GapType.CODE,
@@ -247,12 +247,12 @@ class Art12Module(BaseArticleModule):
                 confidence=Confidence.MEDIUM,
                 description=(
                     f"No retention policy configured. "
-                    f"Art. 19(1) requires a minimum of {RETENTION_MINIMUM_DAYS} days (6 months)."
+                    f"{six_months('Art. 19(1)')}"
                 ),
                 remediation=(
                     f"Configure log retention for at least {RETENTION_MINIMUM_DAYS} days. "
-                    "Options: logrotate (rotate 180), Docker json-file max-file:180, "
-                    "AWS CloudWatch retention_in_days:180, or equivalent."
+                    "Options: logrotate (daily, rotate 184), an AWS CloudWatch Logs retention of 365 days (it offers "
+                    "no value between 180 and 365 days), or an equivalent time-based retention."
                 ),
                 gap_type=GapType.CODE,
             )
@@ -267,11 +267,12 @@ class Art12Module(BaseArticleModule):
                 confidence=Confidence.LOW,
                 description=(
                     "Retention configuration found but period could not be determined. "
-                    f"Art. 19(1) requires a minimum of {RETENTION_MINIMUM_DAYS} days (6 months). "
+                    f"{six_months('Art. 19(1)')} "
                     f"{('Evidence: ' + retention_evidence) if retention_evidence else ''}"
                 ),
                 remediation=(
-                    f"Verify the configured retention period meets the {RETENTION_MINIMUM_DAYS}-day minimum."
+                    f"Verify that the configured period keeps every log for at least six months "
+                    f"({RETENTION_MINIMUM_DAYS} days)."
                 ),
                 gap_type=GapType.CODE,
             )
@@ -285,7 +286,10 @@ class Art12Module(BaseArticleModule):
                 confidence=Confidence.MEDIUM,
                 description=(
                     f"Retention configured: {retention_days} days "
-                    f"(>= {RETENTION_MINIMUM_DAYS}-day minimum per Art. 19(1)). "
+                    f"(at least six months, as Art. 19(1) requires; a person still needs to confirm that the "
+                    f"period is appropriate to the intended purpose of the high-risk AI system and that no "
+                    f"applicable Union or national law, in particular on the protection of personal data, "
+                    f"provides otherwise). "
                     f"{('Evidence: ' + retention_evidence) if retention_evidence else ''}"
                 ),
                 gap_type=GapType.CODE,
@@ -298,8 +302,8 @@ class Art12Module(BaseArticleModule):
                 level=ComplianceLevel.NON_COMPLIANT,
                 confidence=Confidence.MEDIUM,
                 description=(
-                    f"Retention of {retention_days} days is below the "
-                    f"{RETENTION_MINIMUM_DAYS}-day minimum required by Art. 19(1). "
+                    f"{short_of_six_months('Retention', retention_days)} "
+                    f"{six_months('Art. 19(1)')} "
                     f"{('Evidence: ' + retention_evidence) if retention_evidence else ''}"
                 ),
                 remediation=(
@@ -396,31 +400,27 @@ class Art12Module(BaseArticleModule):
             actions.append(ActionItem(
                 priority="HIGH",
                 article="Art. 19(1)",
-                action=f"Configure log retention policy (>= {RETENTION_MINIMUM_DAYS} days / 6 months)",
+                action=f"Configure log retention of at least six months ({RETENTION_MINIMUM_DAYS} days)",
                 details=(
-                    f"Art. 19(1) explicitly requires minimum {RETENTION_MINIMUM_DAYS}-day log retention.\n"
+                    f"{six_months('Art. 19(1)')}\n"
                     "\n"
                     "  Option A: logrotate (Linux)\n"
                     "\n"
                     "    # /etc/logrotate.d/ai-system\n"
                     "    /var/log/ai-system/*.log {\n"
                     "        daily\n"
-                    f"        rotate {RETENTION_MINIMUM_DAYS}       # 6 months minimum (Art. 19)\n"
+                    f"        rotate {RETENTION_MINIMUM_DAYS}       # {RETENTION_MINIMUM_DAYS} daily files: six months (Art. 19)\n"
                     "        compress\n"
                     "        notifempty\n"
                     "    }\n"
                     "\n"
-                    "  Option B: Docker Compose\n"
+                    "  Option B: Cloud (AWS CloudWatch)\n"
                     "\n"
-                    "    logging:\n"
-                    "      driver: \"json-file\"\n"
-                    "      options:\n"
-                    "        max-size: \"100m\"\n"
-                    f"        max-file: \"{RETENTION_MINIMUM_DAYS}\"   # ~6 months of daily logs\n"
+                    "    aws logs put-retention-policy --log-group-name <log-group> --retention-in-days 365\n"
+                    "    # CloudWatch Logs offers no retention value between 180 and 365 days\n"
                     "\n"
-                    "  Option C: Cloud (AWS CloudWatch)\n"
-                    "\n"
-                    f"    retention_in_days: {RETENTION_MINIMUM_DAYS}  # 6 months minimum"
+                    "  Docker's json-file driver rotates by size, not by date, so a number of files does "
+                    "not set a retention period: send container logs to a store with time-based retention."
                 ),
                 effort="1 hour",
             ))
@@ -433,10 +433,11 @@ class Art12Module(BaseArticleModule):
             actions.append(ActionItem(
                 priority="HIGH",
                 article="Art. 19(1)",
-                action=f"Increase log retention from {current_days} to >= {RETENTION_MINIMUM_DAYS} days",
+                action=f"Increase log retention from {current_days} days to at least six months "
+                       f"({RETENTION_MINIMUM_DAYS} days)",
                 details=(
-                    f"Current retention of {current_days} days is below the "
-                    f"{RETENTION_MINIMUM_DAYS}-day minimum required by Art. 19(1). "
+                    f"{short_of_six_months('Current retention', current_days)} "
+                    f"{six_months('Art. 19(1)')} "
                     f"Update your retention configuration to at least {RETENTION_MINIMUM_DAYS} days."
                 ),
                 effort="30 minutes",

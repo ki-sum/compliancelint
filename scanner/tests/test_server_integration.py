@@ -291,7 +291,7 @@ class TestClScanArticle12:
             assert findings[0]["level"] == "unable_to_determine"
 
     def test_retention_insufficient_non_compliant(self, project_dir):
-        """Retention < 180 days → ART19-OBL-1b NON_COMPLIANT."""
+        """Retention < 184 days (six months) → ART19-OBL-1b NON_COMPLIANT."""
         ctx = ProjectContext.from_json(json.dumps({
             "art12": {
                 "has_logging": True,
@@ -3688,7 +3688,7 @@ class TestClScanArticle19:
             assert obl_id in finding_ids, f"{obl_id} not in findings. Found: {sorted(finding_ids)}"
 
     def test_retention_threshold(self, project_dir):
-        """retention_days < 180 -> ART19-OBL-1b NON_COMPLIANT."""
+        """retention_days < 184 (six months) -> ART19-OBL-1b NON_COMPLIANT."""
         ctx = ProjectContext.from_json(json.dumps({
             "art19": {
                 "has_log_retention": True,

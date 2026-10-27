@@ -177,14 +177,14 @@ class TestArt26Obl6:
         assert len(obl) > 0
         assert obl[0].level == ComplianceLevel.NON_COMPLIANT
 
-    def test_retention_true_exactly_180_gives_partial(self, art26_module, tmp_path):
-        """has_log_retention=True, retention_days=180 → PARTIAL."""
+    def test_retention_true_exactly_184_gives_partial(self, art26_module, tmp_path):
+        """has_log_retention=True, retention_days=184 (six months in days) → PARTIAL."""
         ctx = _ctx_with("art26", {
             "has_deployment_documentation": True,
             "has_human_oversight_assignment": True,
             "has_operational_monitoring": True,
             "has_log_retention": True,
-            "retention_days": 180,
+            "retention_days": 184,
             "has_affected_persons_notification": True,
         })
         BaseArticleModule.set_context(ctx)
@@ -209,14 +209,14 @@ class TestArt26Obl6:
         assert len(obl) > 0
         assert obl[0].level == ComplianceLevel.PARTIAL
 
-    def test_retention_true_179_gives_non_compliant(self, art26_module, tmp_path):
-        """has_log_retention=True, retention_days=179 (just below threshold) → NON_COMPLIANT."""
+    def test_retention_true_183_gives_non_compliant(self, art26_module, tmp_path):
+        """has_log_retention=True, retention_days=183 (just below six months for some logs) → NON_COMPLIANT."""
         ctx = _ctx_with("art26", {
             "has_deployment_documentation": True,
             "has_human_oversight_assignment": True,
             "has_operational_monitoring": True,
             "has_log_retention": True,
-            "retention_days": 179,
+            "retention_days": 183,
             "has_affected_persons_notification": True,
         })
         BaseArticleModule.set_context(ctx)
