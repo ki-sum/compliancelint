@@ -6,6 +6,15 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+- A scan of some articles (`cl_scan` with `articles="9,13"`, or one article) no longer replaces the saved answers of
+  the other articles in `.compliancelint/local/last_context.json`. `cl_action_plan` rescans each article with that
+  saved context, so after a partial scan its plan for the articles not rescanned was built from missing answers (on a
+  real project: 85 actions fell to 44, and Article 5 practices answered "no" came back as "could not determine"). An
+  article scanned in the call takes the new answers; the others keep their saved answers, consistent with their
+  results in `.compliancelint/local/articles/`. A scan of all articles (`cl_scan_all`) still saves its context as
+  given.
+
 ## [1.3.10] — 2026-10-28
 
 ### Fixed

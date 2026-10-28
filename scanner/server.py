@@ -11,6 +11,7 @@ Architecture:
 """
 
 import asyncio
+import dataclasses
 import importlib.util
 import json
 import logging
@@ -4095,14 +4096,32 @@ def cl_verify_evidence(project_path: str) -> str:
 
 # ── Internal helpers ──
 
-def _save_last_context(project_path: str, ctx) -> None:
-    """Keep the scan's project context on disk for cl_action_plan (best effort — never fails a scan)."""
+def _save_last_context(project_path: str, ctx, scanned_article: int | None = None) -> None:
+    """Keep the scan's project context on disk for cl_action_plan (best effort — never fails a scan).
+
+    scanned_article: the one article this call scanned, or None for a scan of all articles. A scan of one article
+    keeps the saved answers of the other articles: their results in local/articles/ were not rescanned, and
+    cl_action_plan rescans each article with this context. Series-3 recording (2026-10-28): a rescan of Art. 9 and
+    13 with only their answers replaced the saved answers of 43 articles, and the plan fell from 85 to 44 actions.
+    """
     try:
         if not isinstance(ctx, ProjectContext):
             return
         from core import paths as cl_paths
+        to_save = ctx
+        if scanned_article is not None and isinstance(ctx.compliance_answers, dict):
+            saved = _load_last_context(project_path)
+            if saved is not None and isinstance(saved.compliance_answers, dict):
+                own_key = f"art{scanned_article}"
+                answers = dict(saved.compliance_answers)
+                for key, value in ctx.compliance_answers.items():
+                    # This article's answers and the scope come from this scan; another article's answers only
+                    # when nothing was saved for it.
+                    if key in (own_key, "_scope") or key not in answers:
+                        answers[key] = value
+                to_save = dataclasses.replace(ctx, compliance_answers=answers)
         cl_paths.ensure_local_dir(project_path)
-        cl_paths.last_context_file(project_path).write_text(ctx.to_json(), encoding="utf-8")
+        cl_paths.last_context_file(project_path).write_text(to_save.to_json(), encoding="utf-8")
     except Exception as e:  # disk full / permissions — the scan result matters more
         logger.warning("could not save last_context.json: %s", e)
 
@@ -4164,7 +4183,7 @@ def _scan_single_article(article_number: int, project_path: str, context=None, r
         })
 
     BaseArticleModule.set_context(context)
-    _save_last_context(project_path, context)
+    _save_last_context(project_path, context, scanned_article=article_number)
 
     try:
         result = mod.scan(project_path)
