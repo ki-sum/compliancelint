@@ -4,8 +4,9 @@ The assistant rescanned Articles 9 and 13 with a project context that held only 
 _scope). _save_last_context wrote that context over .compliancelint/local/last_context.json, so the saved answers of
 the 43 other articles were gone although their results in .compliancelint/local/articles/ were unchanged.
 cl_action_plan reads the saved context: on the same project its plan fell from 85 to 44 actions. The saved context
-now stays consistent with the per-article results on disk: an article scanned in this call takes the new answers,
-an article not scanned keeps its saved answers.
+now keeps the saved answers of an article the call gives no answers for (absent, or the empty template); the
+scanned article, and any article the call does give answers for, take the new answers (the Art. 19 module reads the
+Art. 12 answers, the Art. 43 module the Art. 6 answers).
 """
 import json
 import os
@@ -80,6 +81,31 @@ def test_several_articles_in_one_call_take_their_new_answers(tmp_path):
     assert saved["art12"]["has_logging"] is True
     assert saved["art9"] == second["art9"]
     assert saved["art13"] == second["art13"]
+
+
+def test_answers_given_for_another_article_are_saved(tmp_path):
+    """The Art. 19 module reads the Art. 12 answers: a scan of Art. 19 alone that brings new Art. 12 answers saves
+    them, so the saved context matches the Art. 19 result."""
+    first = _answers()
+    first["art12"]["has_logging"] = False
+    _scan(tmp_path, first, "12")
+
+    second = _only(_answers(), "art12", "art19")
+    second["art12"]["has_logging"] = True
+    _scan(tmp_path, second, "19")
+
+    assert _saved(tmp_path)["compliance_answers"]["art12"]["has_logging"] is True
+
+
+def test_empty_answers_of_an_unscanned_article_do_not_replace_saved_ones(tmp_path):
+    """The full answers template with nothing filled in for Art. 12 is not an answer for Art. 12."""
+    first = _answers()
+    first["art12"]["has_logging"] = True
+    _scan(tmp_path, first, "12")
+
+    _scan(tmp_path, _answers(), "9")  # every article in the template, none answered
+
+    assert _saved(tmp_path)["compliance_answers"]["art12"]["has_logging"] is True
 
 
 def _art5_answered() -> dict:
