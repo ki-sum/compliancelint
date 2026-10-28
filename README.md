@@ -27,7 +27,7 @@ Scan, attest, and document EU AI Act compliance without leaving your IDE. The sc
 
 [![ComplianceLint overview video (1:37)](https://compliancelint.dev/videos/0-overview.jpg)](https://compliancelint.dev/videos/0-overview.mp4)
 
-**[Watch the overview (1:37)](https://compliancelint.dev/videos/0-overview.mp4)**: one demo project, a credit-scoring API, from setup to the export pack. Each step in its own short video:
+**[Watch the overview (1:12)](https://compliancelint.dev/videos/0-overview.mp4)**: one demo project, a credit-scoring API, from setup to the export pack. Each step in its own short video:
 
 | Step | Video |
 |------|-------|
@@ -44,7 +44,7 @@ All videos, with their transcripts, on one page: [compliancelint.dev/videos](htt
 
 #### Walkthrough: fixing an AI chatbot, from findings to evidence
 
-[![Walkthrough overview video (1:29)](https://compliancelint.dev/videos/fixing-a-chatbot/e0-overview.jpg)](https://compliancelint.dev/videos/fixing-a-chatbot/e0-overview.mp4)
+[![Walkthrough overview video (1:12)](https://compliancelint.dev/videos/fixing-a-chatbot/e0-overview.jpg)](https://compliancelint.dev/videos/fixing-a-chatbot/e0-overview.mp4)
 
 **[Watch the overview (1:29)](https://compliancelint.dev/videos/fixing-a-chatbot/e0-overview.mp4)**: a fictional customer-support chatbot that is not high-risk, taken from its first scan to the Compliance Pack under Article 50 (transparency), Article 4 (AI literacy) and Article 5. One point stays open for review, with its reason and a review date.
 
@@ -68,13 +68,13 @@ Also as a [YouTube playlist](https://www.youtube.com/playlist?list=PLAF1jMZOUYEA
 
 | Episode | Video |
 |------|-------|
-| 1. The first scan: high-risk under Annex III, and no Article 6(3) exemption | [1:16](https://compliancelint.dev/videos/high-risk-recruiting-ai/e1-first-scan.mp4) |
-| 2. Article 5(1)(f): removing emotion recognition from a recruiting AI | [1:41](https://compliancelint.dev/videos/high-risk-recruiting-ai/e2-emotion.mp4) |
-| 3. High-risk classification: the Profiling Wizard and the readiness view | [1:44](https://compliancelint.dev/videos/high-risk-recruiting-ai/e3-wizard.mp4) |
-| 4. Articles 12 and 14: event logs and human oversight | [2:17](https://compliancelint.dev/videos/high-risk-recruiting-ai/e4-oversight-logs.mp4) |
-| 5. Log retention and Article 10 bias safeguards | [3:02](https://compliancelint.dev/videos/high-risk-recruiting-ai/e5-bias.mp4) |
-| 6. Articles 9 and 13: risk management, instructions for use, Human Gates | [2:04](https://compliancelint.dev/videos/high-risk-recruiting-ai/e6-documents.mp4) |
-| 7. The record: what is still open before launch | [1:49](https://compliancelint.dev/videos/high-risk-recruiting-ai/e7-record.mp4) |
+| 1. The first scan: high-risk under Annex III, and no Article 6(3) exemption | [1:15](https://compliancelint.dev/videos/high-risk-recruiting-ai/e1-first-scan.mp4) |
+| 2. Article 5(1)(f): removing emotion recognition from a recruiting AI | [1:40](https://compliancelint.dev/videos/high-risk-recruiting-ai/e2-emotion.mp4) |
+| 3. High-risk classification: the Profiling Wizard and the readiness view | [1:49](https://compliancelint.dev/videos/high-risk-recruiting-ai/e3-wizard.mp4) |
+| 4. Articles 12 and 14: event logs and human oversight | [2:24](https://compliancelint.dev/videos/high-risk-recruiting-ai/e4-oversight-logs.mp4) |
+| 5. Log retention and Article 10 bias safeguards | [3:22](https://compliancelint.dev/videos/high-risk-recruiting-ai/e5-bias.mp4) |
+| 6. Articles 9 and 13: risk management, instructions for use, Human Gates | [1:55](https://compliancelint.dev/videos/high-risk-recruiting-ai/e6-documents.mp4) |
+| 7. The record: what is still open before launch | [2:05](https://compliancelint.dev/videos/high-risk-recruiting-ai/e7-record.mp4) |
 
 Also as a [YouTube playlist](https://www.youtube.com/playlist?list=PLOZMylyRTuMA).
 
