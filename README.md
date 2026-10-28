@@ -27,7 +27,7 @@ Scan, attest, and document EU AI Act compliance without leaving your IDE. The sc
 
 [![ComplianceLint overview video (1:37)](https://compliancelint.dev/videos/0-overview.jpg)](https://compliancelint.dev/videos/0-overview.mp4)
 
-**[Watch the overview (1:12)](https://compliancelint.dev/videos/0-overview.mp4)**: one demo project, a credit-scoring API, from setup to the export pack. Each step in its own short video:
+**[Watch the overview (1:37)](https://compliancelint.dev/videos/0-overview.mp4)**: one demo project, a credit-scoring API, from setup to the export pack. Each step in its own short video:
 
 | Step | Video |
 |------|-------|
@@ -44,7 +44,7 @@ All videos, with their transcripts, on one page: [compliancelint.dev/videos](htt
 
 #### Walkthrough: fixing an AI chatbot, from findings to evidence
 
-[![Walkthrough overview video (1:12)](https://compliancelint.dev/videos/fixing-a-chatbot/e0-overview.jpg)](https://compliancelint.dev/videos/fixing-a-chatbot/e0-overview.mp4)
+[![Walkthrough overview video (1:29)](https://compliancelint.dev/videos/fixing-a-chatbot/e0-overview.jpg)](https://compliancelint.dev/videos/fixing-a-chatbot/e0-overview.mp4)
 
 **[Watch the overview (1:29)](https://compliancelint.dev/videos/fixing-a-chatbot/e0-overview.mp4)**: a fictional customer-support chatbot that is not high-risk, taken from its first scan to the Compliance Pack under Article 50 (transparency), Article 4 (AI literacy) and Article 5. One point stays open for review, with its reason and a review date.
 
