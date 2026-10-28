@@ -2282,15 +2282,6 @@ def cl_scan_all(project_path: str, project_context: str = "", ai_provider: str =
             "4. REPEAT until all findings are COMPLIANT or the user decides to stop.\n\n"
             "5. For findings that require human judgment (NEEDS_REVIEW with no code fix), "
             "ask the user to confirm with cl_update_finding.\n\n"
-            "6. CHANGES TRACKING (do this after every scan):\n"
-            "   Identify the project's version control or change tracking system "
-            "(e.g., git, SVN, Mercurial, Perforce, or any other mechanism). "
-            "Retrieve the history of changes since the last compliance scan. "
-            "Summarize what was modified and why, focusing on changes relevant to "
-            "compliance findings. Save the summary to .compliancelint/local/changes_summary.txt "
-            "so that cl_sync can include it in the dashboard upload.\n"
-            "   Example: 'Added structured logging (src/logger.py), created risk management "
-            "docs (docs/risk-management.md), implemented bias examination (src/fairness.py)'\n\n"
             "Do NOT just display this report and wait. Proactively help the user fix issues."
         ),
         "disclaimer": (
