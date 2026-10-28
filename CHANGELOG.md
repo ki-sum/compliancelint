@@ -6,6 +6,8 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.3.11] — 2026-10-28
+
 ### Fixed
 - A scan of some articles (`cl_scan` with `articles="9,13"`, or one article) no longer replaces the saved answers of
   the other articles in `.compliancelint/local/last_context.json`. `cl_action_plan` rescans each article with that
