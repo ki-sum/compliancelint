@@ -93,6 +93,7 @@ Also as a [YouTube playlist](https://www.youtube.com/playlist?list=PLOZMylyRTuMA
 | 5. Article 26: input data, logs and monitoring | [2:01](https://compliancelint.dev/videos/employer-recruiting-ai/e5-data-logs.mp4) |
 | 6. Telling people: candidates, the works council, explanations | [1:58](https://compliancelint.dev/videos/employer-recruiting-ai/e6-telling-people.mp4) |
 | 7. The record: a documented plan before first use | [2:02](https://compliancelint.dev/videos/employer-recruiting-ai/e7-record.mp4) |
+| Extra: the record on the dashboard (Human Gates, Compliance All-in-One Pack) | [1:26](https://compliancelint.dev/videos/employer-recruiting-ai/e8-dashboard.mp4) |
 
 Also as a [YouTube playlist](https://www.youtube.com/playlist?list=PLUHTOU0MOnEE).
 
