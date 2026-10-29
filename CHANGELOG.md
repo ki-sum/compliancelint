@@ -10,6 +10,11 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 - `cl_scan_all` no longer tells the assistant to write `.compliancelint/local/changes_summary.txt` "so that cl_sync
   can include it in the dashboard upload". That upload was removed on 2026-04-16 (cl_sync always sends no summary), so
   the instruction made the assistant create a file nothing reads and tell the user it had been uploaded.
+- The Art. 6 action plan follows the role. When the role is confirmed and does not include the provider (for
+  example a deployer set in the Profiling Wizard), the plan no longer lists the provider's items: the Art. 6(3)
+  derogation with its Art. 6(4) documentation and registration, the Chapter III, Section 2 requirements (Arts. 8-15)
+  and the Art. 43 conformity assessment. A provider, a product manufacturer under Art. 25(3), or a role nobody has
+  confirmed keeps every action.
 
 ## [1.3.11] — 2026-10-28
 

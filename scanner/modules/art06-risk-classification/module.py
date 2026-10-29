@@ -206,7 +206,12 @@ class Art06Module(BaseArticleModule):
         else:
             classification_result = "NO_INDICATORS_FOUND (likely not high-risk, but manual review recommended)"
 
+        # The role, for the action plan: the Art. 6(3)/(4) and Chapter III, Section 2 actions are a provider's
+        # (series-4 recording, 2026-10-29). None = not confirmed.
+        scope = ctx.get_article_answers("_scope") if ctx.compliance_answers else {}
         details = {
+            "is_provider": scope.get("is_provider") if isinstance(scope, dict) else None,
+            "is_product_manufacturer": scope.get("is_product_manufacturer") if isinstance(scope, dict) else None,
             "annex_iii_categories": annex_iii_categories,
             "annex_i_product_type": annex_i_product_type,
             "is_high_risk": is_high_risk,
@@ -338,6 +343,10 @@ class Art06Module(BaseArticleModule):
 
         annex_iii_categories = details.get("annex_iii_categories", [])
         no_indicator = not annex_iii_categories and not details.get("annex_i_product_type")
+        # Not a provider (a confirmed role without the provider, and no Art. 25(3) product manufacturer): the Art. 6(3)
+        # derogation with its Art. 6(4) duties, Arts. 8-15 and the Art. 43 procedure are the provider's. An unconfirmed
+        # role keeps every action.
+        not_provider = details.get("is_provider") is False and details.get("is_product_manufacturer") is not True
 
         # Always: the classification, with its record (one action; no separate documentation item)
         actions.append(ActionItem(
@@ -354,11 +363,13 @@ class Art06Module(BaseArticleModule):
                 + ("No high-risk indicators were detected by AI analysis; this does not establish that "
                    "the system is not high-risk. Check the system's intended purpose against each area "
                    "and use case listed in Annex III. " if no_indicator else "")
-                + "Record the reasoning and conclusion. If the system is referred to in Annex III and "
-                "you consider it not high-risk under Art. 6(3), Art. 6(4) requires you to document that "
-                "assessment before the system is placed on the market or put into service, to register "
-                "under Art. 49(2), and to provide the documentation on request of national competent "
-                "authorities."
+                + "Record the reasoning and conclusion."
+                + ("" if not_provider else
+                   " If the system is referred to in Annex III and "
+                   "you consider it not high-risk under Art. 6(3), Art. 6(4) requires you to document that "
+                   "assessment before the system is placed on the market or put into service, to register "
+                   "under Art. 49(2), and to provide the documentation on request of national competent "
+                   "authorities.")
             ),
             effort="2-4 hours",
             action_type="human_judgment_required",
@@ -401,7 +412,8 @@ class Art06Module(BaseArticleModule):
                 action_type="human_judgment_required",
             ))
 
-            # Art. 6(3) exception evaluation, with the Art. 6(4) duties of a provider who relies on it
+        # Art. 6(3) exception evaluation, with the Art. 6(4) duties of a provider who relies on it
+        if annex_iii_categories and not not_provider:
             actions.append(ActionItem(
                 priority="HIGH",
                 article="Art. 6(3)-(4)",
@@ -431,7 +443,7 @@ class Art06Module(BaseArticleModule):
             ))
 
         # If classified as potentially high-risk
-        if "HIGH_RISK" in classification:
+        if "HIGH_RISK" in classification and not not_provider:
             actions.append(ActionItem(
                 priority="HIGH",
                 article="Arts. 8-15",
