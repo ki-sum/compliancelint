@@ -78,6 +78,24 @@ Also as a [YouTube playlist](https://www.youtube.com/playlist?list=PLAF1jMZOUYEA
 
 Also as a [YouTube playlist](https://www.youtube.com/playlist?list=PLOZMylyRTuMA).
 
+#### Walkthrough: using a high-risk recruiting AI as an employer
+
+[![Walkthrough overview video (1:11)](https://compliancelint.dev/videos/employer-recruiting-ai/e0-overview.jpg)](https://compliancelint.dev/videos/employer-recruiting-ai/e0-overview.mp4)
+
+**[Watch the overview (1:11)](https://compliancelint.dev/videos/employer-recruiting-ai/e0-overview.mp4)**: a fictional employer prepares to use the recruiting AI of the previous series, before first use. A scan of its own integration code finds problems that are the employer's to fix; the Profiling Wizard sets the role: a deployer of a high-risk system and, as a private employer that does not provide public services, outside the fundamental rights impact assessment of Article 27. It ends with a documented plan, not a statement of compliance.
+
+| Episode | Video |
+|------|-------|
+| 1. The first scan as the employer | [2:31](https://compliancelint.dev/videos/employer-recruiting-ai/e1-first-scan.mp4) |
+| 2. Article 25: when a deployer can become the provider | [1:50](https://compliancelint.dev/videos/employer-recruiting-ai/e2-provider.mp4) |
+| 3. The role of a private employer: deployer, high-risk, no Article 27 FRIA | [2:33](https://compliancelint.dev/videos/employer-recruiting-ai/e3-role.mp4) |
+| 4. Article 26(2): a person decides, and is trained for it | [1:18](https://compliancelint.dev/videos/employer-recruiting-ai/e4-oversight.mp4) |
+| 5. Article 26: input data, logs and monitoring | [2:01](https://compliancelint.dev/videos/employer-recruiting-ai/e5-data-logs.mp4) |
+| 6. Telling people: candidates, the works council, explanations | [1:58](https://compliancelint.dev/videos/employer-recruiting-ai/e6-telling-people.mp4) |
+| 7. The record: a documented plan before first use | [2:02](https://compliancelint.dev/videos/employer-recruiting-ai/e7-record.mp4) |
+
+Also as a [YouTube playlist](https://www.youtube.com/playlist?list=PLUHTOU0MOnEE).
+
 Try the live demo at **[compliancelint.dev/demo](https://compliancelint.dev/demo)** — pre-loaded with three AI systems (a chatbot that is not high-risk but has an Article 50 transparency trigger, a high-risk finance system, a high-risk medical system) so you can browse a real scan, attestation flow, and Compliance Journey trend without setting up a project of your own.
 
 ### Dashboard
