@@ -6,6 +6,8 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.3.12] — 2026-10-29
+
 ### Fixed
 - `cl_scan_all` no longer tells the assistant to write `.compliancelint/local/changes_summary.txt` "so that cl_sync
   can include it in the dashboard upload". That upload was removed on 2026-04-16 (cl_sync always sends no summary), so
