@@ -80,7 +80,7 @@
       "deontic_type": "obligation",
       "modality": "shall",
       "addressee": "deployer",
-      "scope_limitation": "Only applies to public authority deployers",
+      "scope_limitation": "Only applies to deployers that are public authorities, Union institutions, bodies, offices or agencies, or persons acting on their behalf, and only for high-risk AI systems listed in Annex III, with the exception of those listed in point 2 of Annex III",
       "context_skip_field": "is_public_authority",
       "context_skip_value": false,
       "decomposed_atoms": [

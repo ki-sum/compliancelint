@@ -62,7 +62,7 @@
       "automation_assessment": {
         "level": "partial"
       },
-      "scope_limitation": "Only applies to deployers who are, or act on behalf of, public authorities",
+      "scope_limitation": "Only applies to the deployer who is, or who acts on behalf of, a public authority, agency or body, for high-risk AI systems to be registered in accordance with Article 49(3)",
       "context_skip_field": "is_public_authority_deployer",
       "cross_references": [
         "Annex VIII Section C",

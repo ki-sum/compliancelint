@@ -158,7 +158,7 @@
       "deontic_type": "obligation",
       "modality": "shall",
       "addressee": "deployer",
-      "scope_limitation": "Only applies to public authority deployers",
+      "scope_limitation": "Only applies to deployers that are public authorities, or Union institutions, bodies, offices or agencies",
       "context_skip_field": "is_public_authority",
       "context_skip_value": false,
       "decomposed_atoms": [
