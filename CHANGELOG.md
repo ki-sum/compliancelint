@@ -6,6 +6,16 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.3.13] — 2026-10-30
+
+### Fixed
+- The scope notes of three public-authority deployer obligations name every addressee the Article names. The note is
+  printed in the finding ("This obligation has a scope limitation: ..."). Art. 49(3) and Art. 26(8) read "Only applies
+  to public authority deployers", which left out Union institutions, bodies, offices or agencies and, for Art. 49(3),
+  persons acting on their behalf; the Art. 71(3) note left out agencies and bodies. The Art. 49(3) note now also says
+  that it concerns high-risk AI systems listed in Annex III, except those listed in point 2 of Annex III, and the
+  Art. 71(3) note that it concerns systems registered in accordance with Art. 49(3).
+
 ## [1.3.12] — 2026-10-29
 
 ### Fixed
